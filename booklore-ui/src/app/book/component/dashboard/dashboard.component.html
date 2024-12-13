@@ -12,7 +12,8 @@
   </div>
 
   <ng-template #dashboardScroller>
-    <app-dashboard-scroller></app-dashboard-scroller>
+    <app-dashboard-scroller [bookListType]="'lastRead'" title="Last Read Books"></app-dashboard-scroller>
+    <app-dashboard-scroller [bookListType]="'latestAdded'" title="Latest Added Books"></app-dashboard-scroller>
   </ng-template>
 
 </div>

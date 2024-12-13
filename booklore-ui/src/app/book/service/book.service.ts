@@ -30,6 +30,13 @@ export class BookService {
     );
   }
 
+  loadLatestAddedBooks(page: number): Observable<PaginatedBooksResponse> {
+    return this.http.get<PaginatedBooksResponse>(
+      `${this.bookUrl}?page=${page}&size=10&sortBy=addedOn&sortDir=desc`
+    );
+  }
+
+
   searchBooks(query: string): Observable<Book[]> {
     if (query.length < 2) {
       return new Observable<Book[]>();

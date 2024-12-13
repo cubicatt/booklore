@@ -21,5 +21,7 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     List<Book> findByTitleContainingIgnoreCase(String title);
 
     Page<Book> findByLastReadTimeIsNotNull(Pageable pageable);
+
+    Page<Book> findByAddedOnIsNotNull(Pageable pageable);
 }
 

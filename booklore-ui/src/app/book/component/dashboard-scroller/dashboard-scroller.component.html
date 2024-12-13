@@ -1,5 +1,5 @@
 <div class="book-list-container">
-  <h2 class="last-read-title">Last Read</h2>
+  <h2 class="last-read-title">{{ title }}</h2>
   <div class="book-list"
        infiniteScroll
        [infiniteScrollDistance]="2"
@@ -7,6 +7,7 @@
        (scrolled)="loadMore()"
        #scrollContainer
        (scroll)="onScroll($event)">
+
     <div class="book-item" *ngFor="let book of books">
       <img [src]="coverImageSrc(book.id)" class="book-cover" alt="Cover of {{ book.title }}" loading="lazy"/>
       <div class="book-info">
@@ -17,4 +18,3 @@
     </div>
   </div>
 </div>
-

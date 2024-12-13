@@ -15,5 +15,6 @@ public class BookDTO {
     private String fileName;
     private String title;
     private Instant lastReadTime;
+    private Instant addedOn;
     private List<AuthorDTO> authors = new ArrayList<>();
 }

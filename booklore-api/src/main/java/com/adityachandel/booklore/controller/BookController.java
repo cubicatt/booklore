@@ -37,9 +37,13 @@ public class BookController {
             @RequestParam(defaultValue = "25") @Min(1) @Max(100) int size,
             @RequestParam(defaultValue = "lastReadTime") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir) {
+        if (!sortBy.equals("lastReadTime") && !sortBy.equals("addedOn")) {
+            return ResponseEntity.badRequest().body(null);
+        }
         Page<BookDTO> books = booksService.getBooks(page, size, sortBy, sortDir);
         return ResponseEntity.ok(books);
     }
+
 
     @GetMapping("/search")
     public ResponseEntity<List<BookDTO>> searchBooks(@RequestParam String title) {

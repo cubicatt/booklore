@@ -55,7 +55,12 @@ public class BooksService {
     public Page<BookDTO> getBooks(int page, int size, String sortBy, String sortDir) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         PageRequest pageRequest = PageRequest.of(page, size, sort);
-        Page<Book> bookPage = bookRepository.findByLastReadTimeIsNotNull(pageRequest);
+        Page<Book> bookPage = Page.empty();
+        if (sortBy.equals("addedOn")) {
+            bookPage = bookRepository.findByAddedOnIsNotNull(pageRequest);
+        } else if (sortBy.equals("lastReadTime")) {
+            bookPage = bookRepository.findByLastReadTimeIsNotNull(pageRequest);
+        }
         List<BookDTO> bookDTOs = bookPage.getContent().stream()
                 .map(BookTransformer::convertToBookDTO)
                 .collect(Collectors.toList());

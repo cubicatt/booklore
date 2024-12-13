@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Book } from '../../model/book.model';
-import { BookService } from '../../service/book.service';
-import { Button } from 'primeng/button';
-import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
-import { NgForOf } from '@angular/common';
+import {Component, OnInit, ViewChild, ElementRef, Input} from '@angular/core';
+import {Book} from '../../model/book.model';
+import {BookService} from '../../service/book.service';
+import {Button} from 'primeng/button';
+import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
+import {NgForOf} from '@angular/common';
 
 @Component({
   selector: 'app-dashboard-scroller',
@@ -16,27 +16,45 @@ import { NgForOf } from '@angular/common';
   styleUrls: ['./dashboard-scroller.component.scss']
 })
 export class DashboardScrollerComponent implements OnInit {
+
+  @Input() bookListType: 'lastRead' | 'latestAdded' = 'lastRead';
+  @Input() title: string = 'Last Read Books';
+
+
   books: Book[] = [];
   private currentPage: number = 0;
 
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
-  constructor(private bookService: BookService) {}
+  constructor(private bookService: BookService) {
+  }
 
   ngOnInit(): void {
     this.loadBooks();
   }
 
   loadBooks(): void {
-    this.bookService.loadLatestBooks(this.currentPage).subscribe({
-      next: (response) => {
-        this.books = [...this.books, ...response.content];
-        this.currentPage++;
-      },
-      error: (err) => {
-        console.error('Error loading books:', err);
-      },
-    });
+    if (this.bookListType === 'lastRead') {
+      this.bookService.loadLatestBooks(this.currentPage).subscribe({
+        next: (response) => {
+          this.books = [...this.books, ...response.content];
+          this.currentPage++;
+        },
+        error: (err) => {
+          console.error('Error loading books:', err);
+        },
+      });
+    } else {
+      this.bookService.loadLatestAddedBooks(this.currentPage).subscribe({
+        next: (response) => {
+          this.books = [...this.books, ...response.content];
+          this.currentPage++;
+        },
+        error: (err) => {
+          console.error('Error loading books:', err);
+        },
+      });
+    }
   }
 
   coverImageSrc(bookId: number): string {

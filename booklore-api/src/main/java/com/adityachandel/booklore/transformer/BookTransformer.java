@@ -14,6 +14,7 @@ public class BookTransformer {
         bookDTO.setFileName(book.getFileName());
         bookDTO.setTitle(book.getTitle());
         bookDTO.setLastReadTime(book.getLastReadTime());
+        bookDTO.setAddedOn(book.getAddedOn());
         bookDTO.setAuthors(book.getAuthors().stream().map(AuthorTransformer::toAuthorDTO).collect(Collectors.toList()));
         return bookDTO;
     }

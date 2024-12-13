@@ -1,0 +1,83 @@
+.book-list-container {
+  margin-bottom: 20px;
+}
+
+.last-read-title {
+  font-size: 1.5rem;
+  color: var(--text-color);
+  margin-bottom: 10px;
+  padding: 5px;
+  text-align: left;
+}
+
+.book-list {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  padding: 10px;
+  gap: 20px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.book-item {
+  overflow: hidden;
+  background-color: var(--surface-card);
+  border-radius: 8px;
+  flex: 0 0 12%;
+  scroll-snap-align: start;
+  position: relative;
+}
+
+.book-cover {
+  height: 225px;
+  object-fit: cover;
+  background-color: #444;
+  transition: background-color 0.3s ease, filter 0.3s ease;
+  position: relative;
+  border: none;
+}
+
+.book-item:hover .book-cover {
+  filter: blur(2px);
+}
+
+.book-info {
+  padding: 5px;
+  text-align: center;
+}
+
+h4 {
+  font-size: 0.9rem;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  margin-bottom: 3px;
+}
+
+p {
+  color: var(--text-color-secondary);
+  font-size: 0.7rem;
+  line-height: 1.2;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.view-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  z-index: 1;
+}
+
+.book-item:hover .view-btn {
+  display: block;
+}

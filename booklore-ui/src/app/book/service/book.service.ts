@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import { Book, PaginatedBooksResponse } from '../model/book.model';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import {BookSetting} from '../model/book-settings.model';
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +24,12 @@ export class BookService {
     );
   }
 
+  loadLatestBooks(page: number): Observable<PaginatedBooksResponse> {
+    return this.http.get<PaginatedBooksResponse>(
+      `${this.bookUrl}?page=${page}&size=10&sortBy=lastReadTime&sortDir=desc`
+    );
+  }
+
   searchBooks(query: string): Observable<Book[]> {
     if (query.length < 3) {
       return new Observable<Book[]>();
@@ -35,11 +42,19 @@ export class BookService {
     return this.http.put<void>(url, viewerSetting);
   }
 
+  getBookSetting(bookId: number): Observable<BookSetting> {
+    return this.http.get<BookSetting>(`${this.bookUrl}/${bookId}/viewer-setting`);
+  }
+
   getBookDataUrl(bookId: number): string {
     return `${this.bookUrl}/${bookId}/data`;
   }
 
   getBookCoverUrl(bookId: number): string {
     return `${this.bookUrl}/${bookId}/cover`;
+  }
+
+  updateLastReadTime(bookId: number): Observable<void> {
+    return this.http.put<void>(`${this.bookUrl}/${bookId}/update-last-read`, {});
   }
 }

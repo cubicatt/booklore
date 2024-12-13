@@ -10,6 +10,7 @@ import com.adityachandel.booklore.exception.ErrorCode;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.BookViewerSettingRepository;
 import com.adityachandel.booklore.service.parser.PdfParser;
+import com.adityachandel.booklore.transformer.BookSettingTransformer;
 import com.adityachandel.booklore.transformer.BookTransformer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,10 +52,13 @@ public class BooksService {
         return BookTransformer.convertToBookDTO(book);
     }
 
-    public Page<BookDTO> getBooks(int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Book> bookPage = bookRepository.findAll(PageRequest.of(page, size));
-        List<BookDTO> bookDTOs = bookPage.getContent().stream().map(BookTransformer::convertToBookDTO).collect(Collectors.toList());
+    public Page<BookDTO> getBooks(int page, int size, String sortBy, String sortDir) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        Page<Book> bookPage = bookRepository.findByLastReadTimeIsNotNull(pageRequest);
+        List<BookDTO> bookDTOs = bookPage.getContent().stream()
+                .map(BookTransformer::convertToBookDTO)
+                .collect(Collectors.toList());
         return new PageImpl<>(bookDTOs, pageRequest, bookPage.getTotalElements());
     }
 
@@ -102,10 +108,6 @@ public class BooksService {
         Book book = pdfParser.parseBook(filePath.toAbsolutePath().toString(), appProperties.getPathConfig());
         book.setViewerSetting(BookViewerSetting.builder()
                 .bookId(book.getId())
-                .pageNumber(0)
-                .zoom("page-fit")
-                .spread("off")
-                .sidebar_visible(false)
                 .build());
         return book;
     }
@@ -146,5 +148,16 @@ public class BooksService {
     public List<BookDTO> search(String title) {
         List<Book> books = bookRepository.findByTitleContainingIgnoreCase(title);
         return books.stream().map(BookTransformer::convertToBookDTO).toList();
+    }
+
+    public BookViewerSettingDTO getBookViewerSetting(long bookId) {
+        BookViewerSetting bookViewerSetting = bookViewerSettingRepository.findById(bookId).orElseThrow(() -> ErrorCode.BOOK_NOT_FOUND.createException(bookId));
+        return BookSettingTransformer.convertToDTO(bookViewerSetting);
+    }
+
+    public void updateLastReadTime(long bookId) {
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> ErrorCode.BOOK_NOT_FOUND.createException(bookId));
+        book.setLastReadTime(Instant.now());
+        bookRepository.save(book);
     }
 }

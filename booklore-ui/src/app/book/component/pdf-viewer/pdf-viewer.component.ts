@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgxExtendedPdfViewerModule, ScrollModeType } from 'ngx-extended-pdf-viewer';
 import { BookService } from '../../service/book.service';
@@ -9,7 +9,7 @@ import { BookService } from '../../service/book.service';
   imports: [NgxExtendedPdfViewerModule],
   templateUrl: './pdf-viewer.component.html',
 })
-export class PdfViewerComponent implements OnInit {
+export class PdfViewerComponent implements OnInit, OnDestroy {
   bookId!: number;
   handTool = true;
   page = 1;
@@ -31,18 +31,25 @@ export class PdfViewerComponent implements OnInit {
     this.route.paramMap.subscribe((params) => {
       this.bookId = +params.get('bookId')!;
       this.loadBook(this.bookId);
+      this.updateLastReadTime();
     });
+  }
+
+  ngOnDestroy(): void {
+    this.updateLastReadTime();
   }
 
   private loadBook(bookId: number): void {
     this.bookService.getBook(bookId).subscribe((book) => {
       this.zone.run(() => {
-        const { pageNumber, zoom, sidebar_visible, spread } = book.viewerSetting;
-        this.page = pageNumber || 1;
-        this.zoom = zoom || 'page-fit';
-        this.sidebarVisible = sidebar_visible || false;
-        this.spread = spread || 'odd';
-        this.isInitialLoad = false;
+        this.bookService.getBookSetting(bookId).subscribe((bookSetting) => {
+          const { pageNumber, zoom, sidebar_visible, spread } = bookSetting;
+          this.page = pageNumber || 1;
+          this.zoom = zoom || 'page-fit';
+          this.sidebarVisible = sidebar_visible || false;
+          this.spread = spread || 'odd';
+          this.isInitialLoad = false;
+        });
       });
     });
   }
@@ -58,7 +65,12 @@ export class PdfViewerComponent implements OnInit {
     this.bookService.updateViewerSetting(updatedViewerSetting, this.bookId).subscribe();
   }
 
+  private updateLastReadTime(): void {
+    this.bookService.updateLastReadTime(this.bookId).subscribe();
+  }
+
   onPageChange(page: number): void {
+    console.log('page', page);
     if (page !== this.page) {
       this.page = page;
       this.updateViewerSetting();
@@ -66,6 +78,7 @@ export class PdfViewerComponent implements OnInit {
   }
 
   onZoomChange(zoom: string | number): void {
+    console.log('zoom', zoom);
     if (zoom !== this.zoom) {
       this.zoom = zoom;
       this.updateViewerSetting();
@@ -73,6 +86,7 @@ export class PdfViewerComponent implements OnInit {
   }
 
   onSidebarVisibleChange(visible: boolean): void {
+    console.log('sidebarVisible', visible);
     if (visible !== this.sidebarVisible) {
       this.sidebarVisible = visible;
       this.updateViewerSetting();

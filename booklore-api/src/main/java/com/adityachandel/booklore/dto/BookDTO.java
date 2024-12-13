@@ -3,6 +3,7 @@ package com.adityachandel.booklore.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,5 +14,6 @@ public class BookDTO {
     private Long libraryId;
     private String fileName;
     private String title;
+    private Instant lastReadTime;
     private List<AuthorDTO> authors = new ArrayList<>();
 }

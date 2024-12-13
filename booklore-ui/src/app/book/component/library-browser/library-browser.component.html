@@ -1,4 +1,9 @@
-<div class="book-list" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50" (scrolled)="loadMore()">
+<div class="book-list"
+     infiniteScroll
+     [infiniteScrollDistance]="2"
+     [infiniteScrollThrottle]="50"
+     [horizontal]=true
+     (scrolled)="loadMore()">
   <div class="book-item" *ngFor="let book of books">
     <img [src]="coverImageSrc(book.id)" class="book-cover placeholder" alt="Cover of {{ book.title }}" loading="lazy"/>
     <div class="book-info">

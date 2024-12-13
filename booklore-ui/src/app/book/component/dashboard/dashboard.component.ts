@@ -5,16 +5,18 @@ import { Button } from 'primeng/button';
 import { NgIf } from '@angular/common';
 import { LibraryCreatorComponent } from '../library-creator/library-creator.component';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import {DashboardScrollerComponent} from '../dashboard-scroller/dashboard-scroller.component';
 
 @Component({
   selector: 'app-home-page',
   templateUrl: './dashboard.component.html',
   imports: [
     Button,
-    NgIf
+    NgIf,
+    DashboardScrollerComponent
   ],
   styleUrls: ['./dashboard.component.scss'],
-  providers: [DialogService], // Ensure the DialogService is available
+  providers: [DialogService],
 })
 export class DashboardComponent {
   private libraries: WritableSignal<Library[]>;
@@ -25,7 +27,7 @@ export class DashboardComponent {
   }
 
   get isLibrariesEmpty(): boolean {
-    return this.libraries()?.length === 1;
+    return this.libraries()?.length === 0;
   }
 
   createNewLibrary(event: MouseEvent) {
@@ -39,12 +41,12 @@ export class DashboardComponent {
 
     this.ref = this.dialogService.open(LibraryCreatorComponent, {
       modal: true,
-      width: `${dialogWidthPercentage}%`, // Dynamic width
-      height: 'auto', // Let height adapt to content
+      width: `${dialogWidthPercentage}%`,
+      height: 'auto',
       style: {
         position: 'absolute',
-        top: `${buttonRect.bottom + 10}px`, // Position below the button
-        left: `${Math.max(leftPosition, 0)}px`, // Ensure it stays within the viewport
+        top: `${buttonRect.bottom + 10}px`,
+        left: `${Math.max(leftPosition, 0)}px`
       },
     });
   }

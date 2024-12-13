@@ -5,14 +5,6 @@ export interface Book {
   libraryId: number;
   title: string;
   authors: Author[];
-  viewerSetting: BookViewerSetting;
-}
-
-export interface BookViewerSetting {
-  pageNumber: number;
-  zoom: number | string;
-  sidebar_visible: boolean;
-  spread: 'off' | 'even' | 'odd';
 }
 
 export interface PaginatedBooksResponse {

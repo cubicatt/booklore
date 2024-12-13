@@ -3,6 +3,7 @@ package com.adityachandel.booklore.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.util.List;
 
 @Entity
@@ -40,4 +41,7 @@ public class Book {
 
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private BookViewerSetting viewerSetting;
+
+    @Column(name = "last_read_time")
+    private Instant lastReadTime;
 }

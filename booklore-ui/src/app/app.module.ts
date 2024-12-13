@@ -17,9 +17,9 @@ import {InputIconModule} from 'primeng/inputicon';
 import {ToggleButtonModule} from 'primeng/togglebutton';
 import {PasswordModule} from 'primeng/password';
 import {ToastModule} from 'primeng/toast';
-import { LibraryBrowserComponent } from './book/component/library-browser/library-browser.component';
+import {LibraryBrowserComponent} from './book/component/library-browser/library-browser.component';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
-import { SearchComponent } from './book/component/search/search.component';
+import {SearchComponent} from './book/component/search/search.component';
 
 @NgModule({
   declarations: [

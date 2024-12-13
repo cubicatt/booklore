@@ -1,0 +1,32 @@
+app:
+  path-book: '/Users/aditya.chandel/my-library-temp/books'
+  path-config: '/Users/aditya.chandel/my-library-temp/config'
+
+spring:
+  application:
+    name: booklore-api
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: ${SOLITUDE_API_MARIADB_URL:jdbc:mariadb://localhost:3306/booklore}
+    username: ${SOLITUDE_API_MARIADB_USERNAME:root}
+    password: ${SOLITUDE_API_MARIADB_PASSWORD:cfcNEBdUm6QerR6oo2UM}
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 500
+          order_inserts: true
+          order_updates: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+logging:
+  level:
+    root: INFO
+    org.apache.fontbox: ERROR
+    org.apache.pdfbox: ERROR

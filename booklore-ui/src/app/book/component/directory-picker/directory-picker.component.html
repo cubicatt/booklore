@@ -1,0 +1,33 @@
+<div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+  <input
+    id="disabled-input"
+    type="text"
+    pInputText
+    [value]="selectedProductName"
+    [disabled]="true"
+    [ngStyle]="{ 'width': '100%', 'padding': '0.5rem', 'font-size': '1rem' }"
+  />
+  <p-button label="Select" severity="success" [ngStyle]="{ 'width': '100px' }" (click)="onSelect()"/>
+</div>
+<ng-container>
+  <div style="overflow-x: auto;">
+    <p-table [value]="paths" [tableStyle]="{ 'min-width': '50rem' }" class="product-table">
+      <ng-template pTemplate="header">
+        <tr>
+          <th [style.width]="'10%'">Type</th>
+          <th [style.width]="'90%'">Name</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-product>
+        <tr (click)="onRowClick(product)">
+          <td>
+            <i *ngIf="product === '...'" class="pi pi-arrow-up"></i>
+            <i *ngIf="product !== '...'" class="pi pi-folder-open"></i>
+          </td>
+          <td>{{ product }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</ng-container>

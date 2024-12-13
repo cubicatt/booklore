@@ -1,0 +1,44 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 100%;  /* Fills the parent container */
+}
+
+.textbox {
+  padding: 10px;
+  margin-bottom: 20px;  /* Space between textbox and button */
+}
+
+.button {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
+.tr-custom {
+  padding: 0.25rem 0.5rem !important;
+  border: 0px !important;
+}
+
+.p-table-custom {
+  margin: 1.5rem !important;
+  min-width: 35rem !important;
+  max-height: 11.25rem !important;
+  overflow: scroll;
+}
+
+.td-x-custom {
+  text-align: right;
+}
+
+.mt-3 {
+  margin-top: 1rem; /* Adds spacing between the button and the table */
+}
+
+.w-100 {
+  width: 100%; /* Ensures full-width alignment for consistent layout */
+}
+

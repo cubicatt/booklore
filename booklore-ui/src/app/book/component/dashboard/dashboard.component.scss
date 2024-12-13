@@ -1,0 +1,27 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5rem;
+  text-align: center;
+
+  .no-library-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-color)
+  }
+  .p-dialog {
+    max-width: 90%; /* Ensure the dialog doesn't overflow the viewport */
+  }
+}
+
+::ng-deep .p-dialog-mask {
+  background-color: rgba(0, 0, 0, 0.5); /* Darken the background with 50% opacity */
+}
+
+/* You can also adjust the blur if you want */
+::ng-deep .p-dialog-mask {
+  backdrop-filter: blur(3px); /* Optional: Apply blur to the background */
+}

@@ -1,0 +1,21 @@
+<div class="search-container" #searchContainer>
+  <span class="p-input-icon-left">
+    <i class="pi pi-search"></i>
+    <input
+      type="text"
+      pInputText
+      [(ngModel)]="searchQuery"
+      (input)="onSearchInputChange()"
+      placeholder="Search books..."
+      class="search-input"
+      #searchInput/>
+    <button *ngIf="searchQuery" pButton icon="pi pi-times" (click)="clearSearch()" class="clear-btn" type="button" aria-label="Clear Search"></button>
+  </span>
+
+  <div class="search-dropdown layout-menu" [class.show]="books.length > 0">
+    <div class="search-dropdown-item" *ngFor="let book of books" (click)="onBookClick(book)">
+      <img [src]="getBookCoverUrl(book.id)" alt="Book Cover" class="search-book-cover" />
+      <span class="search-book-name">{{ book.title }}</span>
+    </div>
+  </div>
+</div>

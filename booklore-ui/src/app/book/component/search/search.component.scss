@@ -1,0 +1,77 @@
+.search-container {
+  margin-left: 20px;
+  position: relative; /* Ensure the dropdown is positioned relative to the container */
+}
+
+.search-dropdown {
+  position: absolute;
+  left: 0; /* Align the dropdown to the left of the container */
+  background-color: var(--surface-overlay); /* Use theme's background color */
+  border: 1px solid var(--surface-border);
+  border-radius: var(--border-radius);
+  z-index: 1000;
+  max-height: 300px; /* Limit the height of the dropdown */
+  overflow-y: auto; /* Scroll if the content exceeds max-height */
+  width: 600px; /* Ensures the dropdown has the same width as the search bar */
+  opacity: 0;
+  height: 0;
+  transition: opacity 0.3s ease, height 0.3s ease;
+}
+
+/* Show the dropdown */
+.search-dropdown.show {
+  opacity: 1;
+  height: auto;
+}
+
+/* Dropdown item styles */
+.search-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  /* Hover effect */
+  &:hover {
+    background-color: var(--surface-hover);
+  }
+}
+
+/* Book cover styling */
+.search-book-cover {
+  width: 25px; /* Set a fixed width */
+  height: 37px; /* Set a fixed height */
+  object-fit: cover; /* Ensure the image fits the area without distortion */
+  max-width: 100px; /* Max width to prevent images from becoming too big */
+  max-height: 150px; /* Max height to maintain consistency */
+  border-radius: 4px; /* Rounded corners */
+  margin-right: 10px; /* Space between the image and the title */
+}
+
+/* Book title styling */
+.search-book-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color);
+  flex-grow: 1; /* Allow the title to take up the remaining space */
+}
+
+/* Optionally customize the transition duration or timing */
+.search-dropdown.show {
+  opacity: 1;
+  height: auto;
+  transition: opacity 0.3s ease, height 0.4s ease-in-out;
+}
+
+.clear-btn {
+  color: var(--text-color-secondary);
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+}

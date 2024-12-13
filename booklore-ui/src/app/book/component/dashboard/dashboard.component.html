@@ -1,0 +1,11 @@
+<div class="dashboard">
+  <h1 *ngIf="isLibrariesEmpty" class="no-library-header">
+    Looks like you haven't added a library yet. Let's add one!
+  </h1>
+  <p-button *ngIf="isLibrariesEmpty"
+            label="Add a Library"
+            icon="pi pi-plus"
+            styleClass="p-button-rounded p-button-outlined"
+            (click)="createNewLibrary($event)">
+  </p-button>
+</div>

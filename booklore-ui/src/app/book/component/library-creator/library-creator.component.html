@@ -1,0 +1,60 @@
+<p-stepper>
+  <p-stepperPanel header="Library Name">
+    <ng-template pTemplate="content" let-nextCallback="nextCallback" let-index="index">
+      <div class="flex flex-column h-21rem">
+        <div
+          class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="value"
+            placeholder="Enter library name..."/>
+        </div>
+      </div>
+      <div class="flex pt-4 justify-content-end">
+        <p-button
+          label="Next"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          (onClick)="nextCallback.emit()"/>
+      </div>
+    </ng-template>
+  </p-stepperPanel>
+  <p-stepperPanel header="Media Location">
+    <ng-template pTemplate="content" let-prevCallback="prevCallback" let-index="index">
+      <div class="flex flex-column">
+        <div
+          class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex align-items-start"
+          style="padding-top: 2.5rem;">
+          <div class="flex flex-column justify-content-center align-items-center w-100">
+            <p-button
+              severity="secondary"
+              label="Browse for media folders"
+              (onClick)="show()">
+            </p-button>
+            <p-table [value]="folders" styleClass="p-datatable-striped" class="p-table-custom mt-3">
+              <ng-template pTemplate="body" let-folder let-i="rowIndex">
+                <tr>
+                  <td class="tr-custom">{{ folder }}</td>
+                  <td class="tr-custom td-x-custom">
+                    <p-button
+                      icon="pi pi-times"
+                      [rounded]="true"
+                      [text]="true"
+                      severity="danger"
+                      (onClick)="removeFolder(i)"
+                    />
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
+      </div>
+      <div class="flex pt-4 justify-content-between">
+        <p-button label="Back" icon="pi pi-arrow-left" (onClick)="prevCallback.emit()"/>
+        <p-button severity="success" label="Save" icon="pi pi-save" (onClick)="addLibrary()"></p-button>
+      </div>
+    </ng-template>
+  </p-stepperPanel>
+</p-stepper>

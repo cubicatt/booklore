@@ -75,3 +75,12 @@
   cursor: pointer;
   font-size: 12px;
 }
+
+.search-dropdown-item.no-results {
+  font-size: 14px;
+  color: var(--text-color-secondary);
+  padding: 10px;
+  text-align: center;
+  font-style: italic;
+}
+

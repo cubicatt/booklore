@@ -31,7 +31,7 @@ export class BookService {
   }
 
   searchBooks(query: string): Observable<Book[]> {
-    if (query.length < 3) {
+    if (query.length < 2) {
       return new Observable<Book[]>();
     }
     return this.http.get<Book[]>(`${this.bookUrl}/search?title=${encodeURIComponent(query)}`);

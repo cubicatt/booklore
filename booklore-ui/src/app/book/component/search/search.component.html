@@ -12,10 +12,19 @@
     <button *ngIf="searchQuery" pButton icon="pi pi-times" (click)="clearSearch()" class="clear-btn" type="button" aria-label="Clear Search"></button>
   </span>
 
-  <div class="search-dropdown layout-menu" [class.show]="books.length > 0">
-    <div class="search-dropdown-item" *ngFor="let book of books" (click)="onBookClick(book)">
-      <img [src]="getBookCoverUrl(book.id)" alt="Book Cover" class="search-book-cover" />
-      <span class="search-book-name">{{ book.title }}</span>
-    </div>
+  <div class="search-dropdown layout-menu" [class.show]="(books.length > 0 || (searchQuery?.length ?? 0) > 0)">
+    <ng-container *ngIf="books.length > 0; else noResults">
+      <div class="search-dropdown-item" *ngFor="let book of books" (click)="onBookClick(book)">
+        <img [src]="getBookCoverUrl(book.id)" alt="Book Cover" class="search-book-cover" />
+        <span class="search-book-name">{{ book.title }}</span>
+      </div>
+    </ng-container>
+
+    <!-- No results message -->
+    <ng-template #noResults>
+      <div class="search-dropdown-item">
+        <span>No results found</span>
+      </div>
+    </ng-template>
   </div>
 </div>

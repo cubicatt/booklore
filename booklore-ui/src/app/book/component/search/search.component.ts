@@ -34,7 +34,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   initializeSearch(): void {
     this.#subscription = this.#searchSubject.pipe(
-      debounceTime(500),
+      debounceTime(350),
       distinctUntilChanged(),
       switchMap((query) => this.bookService.searchBooks(query).pipe(
         catchError((error) => {

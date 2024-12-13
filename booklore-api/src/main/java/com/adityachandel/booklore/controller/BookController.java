@@ -50,7 +50,7 @@ public class BookController {
     @GetMapping("/{bookId}/cover")
     public ResponseEntity<Resource> getBookCover(@PathVariable long bookId) {
         Random random = new Random();
-        int delay = 250 + random.nextInt(750);
+        int delay = 50 + random.nextInt(250);
         try {
             Thread.sleep(delay);
         } catch (InterruptedException e) {

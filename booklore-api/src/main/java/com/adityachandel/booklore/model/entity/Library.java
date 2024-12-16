@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.entity;
+package com.adityachandel.booklore.model.entity;
 
 import com.adityachandel.booklore.convertor.PathsConverter;
 import jakarta.persistence.*;

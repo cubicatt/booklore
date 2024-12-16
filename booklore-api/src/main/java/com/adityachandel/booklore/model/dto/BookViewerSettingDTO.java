@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.dto;
+package com.adityachandel.booklore.model.dto;
 
 import lombok.Builder;
 import lombok.Data;

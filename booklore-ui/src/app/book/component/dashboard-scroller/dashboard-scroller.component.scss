@@ -61,7 +61,7 @@ h4 {
 
 p {
   color: var(--text-color-secondary);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   line-height: 1.2;
   margin: 0;
   white-space: nowrap;
@@ -69,15 +69,20 @@ p {
   text-overflow: ellipsis;
 }
 
-.view-btn {
+.view-btn, .read-btn {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -20%);
   display: none;
-  z-index: 1;
+  margin: -60px 0;
 }
 
 .book-item:hover .view-btn {
   display: block;
+}
+
+.book-item:hover .read-btn {
+  display: block;
+  top: 75%;
 }

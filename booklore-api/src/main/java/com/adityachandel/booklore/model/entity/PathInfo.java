@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.entity;
+package com.adityachandel.booklore.model.entity;
 
 public class PathInfo {
     private String name;

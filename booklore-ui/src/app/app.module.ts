@@ -20,13 +20,16 @@ import {ToastModule} from 'primeng/toast';
 import {LibraryBrowserComponent} from './book/component/library-browser/library-browser.component';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {SearchComponent} from './book/component/search/search.component';
+import { BookMetadataComponent } from './book-metadata/book-metadata.component';
+import { BooksMetadataDialogComponent } from './books-metadata-dialog/books-metadata-dialog.component';
+import {MessageService} from 'primeng/api';
+import { NotificationComponent } from './notification/notification.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DirectoryPickerComponent,
-    LibraryCreatorComponent,
-    LibraryBrowserComponent
+    LibraryCreatorComponent
   ],
   imports: [
     BrowserModule,
@@ -45,7 +48,7 @@ import {SearchComponent} from './book/component/search/search.component';
     InfiniteScrollDirective,
     SearchComponent,
   ],
-  providers: [DialogService],
+  providers: [DialogService, MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

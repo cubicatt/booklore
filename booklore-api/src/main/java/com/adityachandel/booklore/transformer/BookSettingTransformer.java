@@ -1,7 +1,7 @@
 package com.adityachandel.booklore.transformer;
 
-import com.adityachandel.booklore.dto.BookViewerSettingDTO;
-import com.adityachandel.booklore.entity.BookViewerSetting;
+import com.adityachandel.booklore.model.dto.BookViewerSettingDTO;
+import com.adityachandel.booklore.model.entity.BookViewerSetting;
 
 public class BookSettingTransformer {
 

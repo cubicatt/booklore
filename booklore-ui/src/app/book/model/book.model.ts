@@ -1,10 +1,7 @@
-import {Author} from './author.model';
-
 export interface Book {
   id: number;
   libraryId: number;
-  title: string;
-  authors: Author[];
+  metadata: BookMetadata
 }
 
 export interface PaginatedBooksResponse {
@@ -16,3 +13,29 @@ export interface PaginatedBooksResponse {
   first: boolean;
   last: boolean;
 }
+
+export interface BookMetadata {
+  thumbnail: string;
+  title: string;
+  authors: Author[];
+  categories: Category[];
+  publisher: string;
+  publishedDate: string;
+  isbn10: string;
+  description: string;
+  pageCount: number;
+  language: string;
+  googleBookId: string;
+}
+
+export interface Author {
+  id: number;
+  name: string;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+}
+
+

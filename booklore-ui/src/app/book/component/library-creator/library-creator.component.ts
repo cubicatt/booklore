@@ -3,6 +3,7 @@ import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {DirectoryPickerComponent} from '../directory-picker/directory-picker.component';
 import {MessageService} from 'primeng/api';
 import {LibraryService} from '../../service/library.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-library-creator',
@@ -20,8 +21,10 @@ export class LibraryCreatorComponent {
     public dialogService: DialogService,
     private dynamicDialogRef: DynamicDialogRef,
     private messageService: MessageService,
-    private libraryServiceV2: LibraryService
-  ) {}
+    private libraryServiceV2: LibraryService,
+    private router: Router,
+  ) {
+  }
 
   show() {
     this.ref = this.dialogService.open(DirectoryPickerComponent, {
@@ -29,7 +32,7 @@ export class LibraryCreatorComponent {
       modal: false,
       width: '50%',
       height: '75%',
-      contentStyle: { overflow: 'auto' },
+      contentStyle: {overflow: 'auto'},
       baseZIndex: 10
     });
 
@@ -56,6 +59,10 @@ export class LibraryCreatorComponent {
     this.libraryServiceV2.createLibrary(newLibrary).subscribe({
       next: (createdLibrary) => {
         console.log('Library successfully created:', createdLibrary);
+        this.router.navigate(
+          ['/library', createdLibrary.id, 'books'],
+          {queryParams: {watch: true}}
+        );
       },
       error: (err) => {
         console.error('Failed to create library:', err);

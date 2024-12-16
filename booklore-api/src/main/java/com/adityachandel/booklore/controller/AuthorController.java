@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.controller;
 
-import com.adityachandel.booklore.dto.AuthorDTO;
+import com.adityachandel.booklore.model.dto.AuthorDTO;
 import com.adityachandel.booklore.service.AuthorService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

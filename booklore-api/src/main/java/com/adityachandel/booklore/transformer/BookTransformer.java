@@ -1,9 +1,7 @@
 package com.adityachandel.booklore.transformer;
 
-import com.adityachandel.booklore.dto.BookDTO;
-import com.adityachandel.booklore.entity.Book;
-
-import java.util.stream.Collectors;
+import com.adityachandel.booklore.model.dto.BookDTO;
+import com.adityachandel.booklore.model.entity.Book;
 
 public class BookTransformer {
 
@@ -12,10 +10,9 @@ public class BookTransformer {
         bookDTO.setId(book.getId());
         bookDTO.setLibraryId(book.getLibrary().getId());
         bookDTO.setFileName(book.getFileName());
-        bookDTO.setTitle(book.getTitle());
         bookDTO.setLastReadTime(book.getLastReadTime());
         bookDTO.setAddedOn(book.getAddedOn());
-        bookDTO.setAuthors(book.getAuthors().stream().map(AuthorTransformer::toAuthorDTO).collect(Collectors.toList()));
+        bookDTO.setMetadata(BookMetadataTransformer.convertToBookDTO(book.getMetadata()));
         return bookDTO;
     }
 }

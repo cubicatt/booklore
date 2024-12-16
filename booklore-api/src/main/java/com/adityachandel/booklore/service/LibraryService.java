@@ -1,41 +1,48 @@
 package com.adityachandel.booklore.service;
 
-import com.adityachandel.booklore.dto.BookDTO;
-import com.adityachandel.booklore.dto.LibraryDTO;
-import com.adityachandel.booklore.dto.request.CreateLibraryRequest;
-import com.adityachandel.booklore.entity.Author;
-import com.adityachandel.booklore.entity.Book;
-import com.adityachandel.booklore.entity.Library;
+import com.adityachandel.booklore.model.FileProcessResult;
+import com.adityachandel.booklore.model.LibraryFile;
+import com.adityachandel.booklore.model.ParseLibraryEvent;
+import com.adityachandel.booklore.model.enums.ParsingStatus;
+import com.adityachandel.booklore.model.dto.*;
+import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
+import com.adityachandel.booklore.model.entity.Book;
+import com.adityachandel.booklore.model.entity.Library;
 import com.adityachandel.booklore.exception.ErrorCode;
-import com.adityachandel.booklore.repository.AuthorRepository;
-import com.adityachandel.booklore.repository.BookRepository;
-import com.adityachandel.booklore.repository.BookViewerSettingRepository;
-import com.adityachandel.booklore.repository.LibraryRepository;
+import com.adityachandel.booklore.repository.*;
 import com.adityachandel.booklore.transformer.BookTransformer;
 import com.adityachandel.booklore.transformer.LibraryTransformer;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
-import static com.adityachandel.booklore.transformer.LibraryTransformer.createLibraryFromRequest;
-
+@Slf4j
 @Service
 @AllArgsConstructor
 public class LibraryService {
 
     private LibraryRepository libraryRepository;
     private BookRepository bookRepository;
-    private BooksService booksService;
-    private AuthorRepository authorRepository;
-    private BookViewerSettingRepository bookViewerSettingRepository;
+    private PdfFileProcessor pdfFileProcessor;
 
+    public LibraryDTO createLibrary(CreateLibraryRequest request) {
+        Library library = Library.builder()
+                .name(request.getName())
+                .paths(request.getPaths())
+                .build();
+        return LibraryTransformer.convertToLibraryDTO(libraryRepository.save(library));
+    }
 
     public LibraryDTO getLibrary(long libraryId) {
         Library library = libraryRepository.findById(libraryId).orElseThrow(() -> ErrorCode.LIBRARY_NOT_FOUND.createException(libraryId));
@@ -53,7 +60,6 @@ public class LibraryService {
         libraryRepository.deleteById(id);
     }
 
-
     public BookDTO getBook(long libraryId, long bookId) {
         libraryRepository.findById(libraryId).orElseThrow(() -> ErrorCode.LIBRARY_NOT_FOUND.createException(libraryId));
         Book book = bookRepository.findBookByIdAndLibraryId(bookId, libraryId).orElseThrow(() -> ErrorCode.BOOK_NOT_FOUND.createException(bookId));
@@ -67,39 +73,73 @@ public class LibraryService {
         return bookPage.map(BookTransformer::convertToBookDTO);
     }
 
-
-    public SseEmitter createLibrary(CreateLibraryRequest request) {
+    public SseEmitter parseLibraryBooks(long libraryId, boolean force) {
+        Library library = libraryRepository.findById(libraryId).orElseThrow(() -> ErrorCode.LIBRARY_NOT_FOUND.createException(libraryId));
         SseEmitter emitter = new SseEmitter();
         ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
-
         sseMvcExecutor.execute(() -> {
             try {
-                Library library = createLibraryFromRequest(request);
-                List<Book> books = booksService.parseBooks(library, emitter);
-                books.forEach(book -> book.setLibrary(library));
-                library.setBooks(books);
-
-                List<Author> authors = books.stream()
-                        .flatMap(book -> book.getAuthors().stream())
-                        .distinct()
-                        .collect(Collectors.toList());
-                authorRepository.saveAll(authors);
-
-                libraryRepository.save(library);
-                bookRepository.saveAll(books);
-                bookViewerSettingRepository.saveAll(books.stream()
-                        .map(Book::getViewerSetting)
-                        .collect(Collectors.toList()));
-
+                List<LibraryFile> libraryFiles = getLibraryFiles(library);
+                for (LibraryFile libraryFile : libraryFiles) {
+                    log.info(libraryFile.getFilePath());
+                    FileProcessResult fileProcessResult = processLibraryFile(libraryFile);
+                    ParseLibraryEvent event = createParseLibraryEvent(libraryId, fileProcessResult);
+                    emitter.send(event);
+                }
+                log.info("Finished processing library files");
                 emitter.complete();
+                log.info("emitter.complete()");
             } catch (Exception ex) {
                 emitter.completeWithError(ex);
             } finally {
+                log.info("sseMvcExecutor.shutdown()");
                 sseMvcExecutor.shutdown();
             }
         });
-
         return emitter;
     }
 
+    private ParseLibraryEvent createParseLibraryEvent(long libraryId, FileProcessResult result) {
+        return ParseLibraryEvent.builder()
+                .libraryId(libraryId)
+                .file(result.getLibraryFile().getFilePath())
+                .parsingStatus(result.getParsingStatus())
+                .book(result.getBookDTO())
+                .build();
+    }
+
+    private FileProcessResult processLibraryFile(LibraryFile libraryFile) {
+        if (libraryFile.getFileType().equalsIgnoreCase("pdf")) {
+            return pdfFileProcessor.processFile(libraryFile, false);
+        } else if (libraryFile.getFileType().equalsIgnoreCase("epub")) {
+            // TODO:: To implement
+            return FileProcessResult.builder().parsingStatus(ParsingStatus.FAILED_TO_PARSE_BOOK).libraryFile(libraryFile).build();
+        }
+        // TODO:: To handle
+        return FileProcessResult.builder().parsingStatus(ParsingStatus.FAILED_TO_PARSE_BOOK).libraryFile(libraryFile).build();
+    }
+
+    private List<LibraryFile> getLibraryFiles(Library library) throws IOException {
+        List<LibraryFile> libraryFiles = new ArrayList<>();
+        for (String libraryPath : library.getPaths()) {
+            libraryFiles.addAll(findLibraryFiles(libraryPath, library));
+        }
+        return libraryFiles;
+    }
+
+    private List<LibraryFile> findLibraryFiles(String directoryPath, Library library) throws IOException {
+        List<LibraryFile> libraryFiles = new ArrayList<>();
+        try (var stream = Files.walk(Path.of(directoryPath))) {
+            stream.filter(Files::isRegularFile)
+                    .filter(file -> {
+                        String fileName = file.getFileName().toString().toLowerCase();
+                        return fileName.endsWith(".pdf") || fileName.endsWith(".epub");
+                    })
+                    .forEach(file -> {
+                        String fileType = file.getFileName().toString().toLowerCase().endsWith(".pdf") ? "PDF" : "EPUB";
+                        libraryFiles.add(new LibraryFile(library, file.toAbsolutePath().toString(), fileType));
+                    });
+        }
+        return libraryFiles;
+    }
 }

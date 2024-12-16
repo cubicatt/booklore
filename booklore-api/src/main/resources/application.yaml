@@ -3,6 +3,9 @@ app:
   path-config: '/Users/aditya.chandel/my-library-temp/config'
 
 spring:
+  mvc:
+    async:
+      request-timeout: 600000
   application:
     name: booklore-api
   datasource:

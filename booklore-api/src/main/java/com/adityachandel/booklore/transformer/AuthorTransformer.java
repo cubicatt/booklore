@@ -1,7 +1,7 @@
 package com.adityachandel.booklore.transformer;
 
-import com.adityachandel.booklore.dto.AuthorDTO;
-import com.adityachandel.booklore.entity.Author;
+import com.adityachandel.booklore.model.dto.AuthorDTO;
+import com.adityachandel.booklore.model.entity.Author;
 
 public class AuthorTransformer {
 

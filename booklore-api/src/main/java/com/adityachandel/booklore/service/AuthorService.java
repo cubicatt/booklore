@@ -1,23 +1,11 @@
 package com.adityachandel.booklore.service;
 
-import com.adityachandel.booklore.dto.AuthorDTO;
-import com.adityachandel.booklore.entity.Author;
-import com.adityachandel.booklore.exception.APIException;
+import com.adityachandel.booklore.model.dto.AuthorDTO;
+import com.adityachandel.booklore.model.entity.Author;
 import com.adityachandel.booklore.exception.ErrorCode;
 import com.adityachandel.booklore.repository.AuthorRepository;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.transformer.AuthorTransformer;
-import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

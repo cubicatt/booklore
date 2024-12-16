@@ -1,11 +1,9 @@
-package com.adityachandel.booklore.dto;
+package com.adityachandel.booklore.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -16,5 +14,5 @@ public class BookDTO {
     private String title;
     private Instant lastReadTime;
     private Instant addedOn;
-    private List<AuthorDTO> authors = new ArrayList<>();
+    private BookMetadataDTO metadata;
 }

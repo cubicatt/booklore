@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.dto;
+package com.adityachandel.booklore.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

@@ -1,9 +1,8 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BookProgressService } from '../../service/book-progress-service';
-import { BookUpdateEvent } from '../../model/book-update-event.model';
 import { BookService } from '../../service/book.service';
-import { Book } from '../../model/book.model';
+import {Book, BookUpdateEvent} from '../../model/book.model';
 import { combineLatest } from 'rxjs';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {Button} from 'primeng/button';
@@ -105,7 +104,7 @@ export class LibraryBrowserComponent implements OnInit {
     window.open(url, '_blank');
   }
 
-  openBookInfo(bookId: number) {
-    this.router.navigate(['/book', bookId, 'info']);
+  openBookInfo(bookId: number, libraryId: number) {
+    this.router.navigate(['/library', libraryId, 'book', bookId, 'info']);
   }
 }

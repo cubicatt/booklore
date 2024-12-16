@@ -3,7 +3,7 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {AppLayoutModule} from './layout/app.layout.module';
+import {AppLayoutModule} from './book/component/layout/app.layout.module';
 import {FormsModule} from '@angular/forms';
 import {DialogService} from 'primeng/dynamicdialog';
 import {DirectoryPickerComponent} from './book/component/directory-picker/directory-picker.component';
@@ -20,10 +20,10 @@ import {ToastModule} from 'primeng/toast';
 import {LibraryBrowserComponent} from './book/component/library-browser/library-browser.component';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {SearchComponent} from './book/component/search/search.component';
-import { BookMetadataComponent } from './book-metadata/book-metadata.component';
-import { BooksMetadataDialogComponent } from './books-metadata-dialog/books-metadata-dialog.component';
+import { BookMetadataComponent } from './book/component/book-metadata/book-metadata.component';
+import { BooksMetadataDialogComponent } from './book/component/books-metadata-dialog/books-metadata-dialog.component';
 import {MessageService} from 'primeng/api';
-import { NotificationComponent } from './notification/notification.component';
+import { NotificationComponent } from './book/component/notification/notification.component';
 
 @NgModule({
   declarations: [

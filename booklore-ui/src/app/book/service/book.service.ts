@@ -1,8 +1,7 @@
 import {Observable} from 'rxjs';
-import {Book, BookMetadata, PaginatedBooksResponse} from '../model/book.model';
+import {Book, BookMetadata, BookSetting, BookWithNeighborsDTO, PaginatedBooksResponse} from '../model/book.model';
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BookSetting} from '../model/book-settings.model';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +16,10 @@ export class BookService {
 
   getBook(bookId: number): Observable<Book> {
     return this.http.get<Book>(`${this.bookUrl}/${bookId}`);
+  }
+
+  getBookWithNeighbours(libraryId: number, bookId: number): Observable<BookWithNeighborsDTO> {
+    return this.http.get<BookWithNeighborsDTO>(`${this.libraryUrl}/${libraryId}/book/${bookId}/withNeighbors`);
   }
 
   loadBooks(libraryId: number, page: number): Observable<PaginatedBooksResponse> {

@@ -85,7 +85,7 @@ export class DashboardScrollerComponent implements OnInit {
     }
   }
 
-  openBookInfo(bookId: number) {
-    this.router.navigate(['/book', bookId, 'info']);
+  openBookInfo(bookId: number, libraryId: number) {
+    this.router.navigate(['/library', libraryId, 'book', bookId, 'info']);
   }
 }

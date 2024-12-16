@@ -2,6 +2,7 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.BookDTO;
 import com.adityachandel.booklore.model.dto.BookViewerSettingDTO;
+import com.adityachandel.booklore.model.dto.BookWithNeighborsDTO;
 import com.adityachandel.booklore.model.dto.response.GoogleBooksMetadata;
 import com.adityachandel.booklore.model.dto.request.SetMetadataRequest;
 import com.adityachandel.booklore.service.BooksService;

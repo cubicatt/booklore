@@ -3,11 +3,11 @@ import { MenuItem } from 'primeng/api';
 import { LayoutService } from './service/app.layout.service';
 import { RouterLink } from '@angular/router';
 import { DialogService as PrimeDialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { LibraryCreatorComponent } from '../book/component/library-creator/library-creator.component';
+import { LibraryCreatorComponent } from '../library-creator/library-creator.component';
 import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
-import { SearchComponent } from '../book/component/search/search.component';
+import { SearchComponent } from '../search/search.component';
 import { NotificationComponent } from '../notification/notification.component'; // Import the NotificationComponent
 
 @Component({

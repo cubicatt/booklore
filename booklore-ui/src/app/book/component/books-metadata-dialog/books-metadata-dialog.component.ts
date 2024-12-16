@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {BookMetadata} from '../book/model/book.model';
-import {BookService} from '../book/service/book.service';
+import {BookMetadata} from '../../model/book.model';
+import {BookService} from '../../service/book.service';
 import {NgForOf, NgIf} from '@angular/common';
 import {FormBuilder, FormsModule} from '@angular/forms';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
@@ -24,11 +24,12 @@ export class BooksMetadataDialogComponent implements OnInit {
   errorMessage: string | null = null;
   searchText: string = '';
   bookId: number = 0;
+  libraryId: number = 0;
 
-  constructor(private bookService: BookService, public dynamicDialogConfig: DynamicDialogConfig,
-              private dynamicDialogRef: DynamicDialogRef, private router: Router) {
+  constructor(private bookService: BookService, public dynamicDialogConfig: DynamicDialogConfig, private dynamicDialogRef: DynamicDialogRef, private router: Router) {
     this.searchText = dynamicDialogConfig.data.bookTitle;
     this.bookId = this.dynamicDialogConfig.data.bookId;
+    this.libraryId = this.dynamicDialogConfig.data.libraryId;
   }
 
   ngOnInit(): void {
@@ -48,7 +49,7 @@ export class BooksMetadataDialogComponent implements OnInit {
     this.bookService.setBookMetadata(metadata.googleBookId, this.bookId).subscribe({
       next: () => {
         this.dynamicDialogRef.close();
-        this.router.navigate(['/book', this.bookId, 'info']);
+        this.router.navigate(['/library', this.libraryId, 'book', this.bookId, 'info']);
       },
       error: (error) => {
         this.errorMessage = 'Failed to save book metadata';

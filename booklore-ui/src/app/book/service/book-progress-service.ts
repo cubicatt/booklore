@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {BookUpdateEvent} from '../model/book-update-event.model';
+import {BookUpdateEvent} from '../model/book.model';
 
 @Injectable({
   providedIn: 'root',

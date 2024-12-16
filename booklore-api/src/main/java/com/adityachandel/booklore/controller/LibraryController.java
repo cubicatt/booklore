@@ -1,8 +1,10 @@
 package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.BookDTO;
+import com.adityachandel.booklore.model.dto.BookWithNeighborsDTO;
 import com.adityachandel.booklore.model.dto.LibraryDTO;
 import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
+import com.adityachandel.booklore.service.BooksService;
 import com.adityachandel.booklore.service.LibraryService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -19,6 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class LibraryController {
 
     private LibraryService libraryService;
+    private BooksService booksService;
 
     @PostMapping
     public ResponseEntity<LibraryDTO> createLibraryNew(@RequestBody CreateLibraryRequest request) {
@@ -44,6 +47,11 @@ public class LibraryController {
     @GetMapping
     public ResponseEntity<Page<LibraryDTO>> getLibraries(@RequestParam(defaultValue = "0") @Min(0) int page, @RequestParam(defaultValue = "25") @Min(1) @Max(100) int size) {
         return ResponseEntity.ok(libraryService.getLibraries(page, size));
+    }
+
+    @GetMapping("/{libraryId}/book/{bookId}/withNeighbors")
+    public ResponseEntity<BookWithNeighborsDTO> getBookWithNeighbours(@PathVariable long libraryId, @PathVariable long bookId) {
+        return ResponseEntity.ok(booksService.getBookWithNeighbours(libraryId, bookId));
     }
 
     @GetMapping("/{libraryId}/book/{bookId}")

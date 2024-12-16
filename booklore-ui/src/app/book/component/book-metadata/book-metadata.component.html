@@ -1,0 +1,55 @@
+<div class="book-metadata-container">
+  <div class="book-metadata">
+    <div class="book-header">
+      <div class="cover-container">
+        <img [src]="coverImageSrc(book?.id)" class="book-cover placeholder" alt="Cover of {{ book?.metadata?.title }}" loading="lazy"/>
+        <div>
+          <div class="book-navigation">
+            <p-button
+              icon="pi pi-arrow-left"
+              class="navigation-button"
+              severity="help"
+              (click)="navigateToBook(previousBookId, book?.libraryId!)"
+              [rounded]="true"
+              [outlined]="true"
+              [disabled]="!canGoPrevious()">
+            </p-button>
+            <p-button
+              icon="pi pi-arrow-right"
+              class="navigation-button"
+              severity="help"
+              (click)="navigateToBook(nextBookId, book?.libraryId!)"
+              [rounded]="true"
+              [outlined]="true"
+              [disabled]="!canGoNext()">
+            </p-button>
+          </div>
+        </div>
+      </div>
+      <div class="metadata">
+        <div class="title-row">
+          <h1 class="book-title">
+            {{ book?.metadata?.title }}<span *ngIf="book?.metadata?.subtitle">: {{ book?.metadata?.subtitle }}</span>
+          </h1>
+          <div class="button-group">
+            <p-button [rounded]="true" [raised]="true" [outlined]="true" (onClick)="openEditDialog(book?.id, book?.libraryId)" icon="pi pi-pencil"></p-button>
+            <p-button [rounded]="true" [raised]="true" [outlined]="true" (onClick)="readBook(book?.id)" icon="pi pi-eye"></p-button>
+            <p-button [rounded]="true" [raised]="true" [outlined]="true" icon="pi pi-download"></p-button>
+          </div>
+        </div>
+        <p class="author">Author — {{ getAuthorNames(book) }}</p>
+        <div class="categories">
+          <p-button *ngFor="let category of book?.metadata?.categories" label="{{category.name}}" severity="info" [rounded]="true" [outlined]="true" size="small"></p-button>
+        </div>
+        <div class="details">
+          <p><strong>Publisher:</strong> {{ book?.metadata?.publisher || 'N/A' }}</p>
+          <p><strong>Published:</strong> {{ book?.metadata?.publishedDate || 'Unknown' }}</p>
+          <p><strong>Language:</strong> {{ book?.metadata?.language || 'Unknown' }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="book-description">
+      <p [innerHTML]="book?.metadata?.description || 'No description available.'"></p>
+    </div>
+  </div>
+</div>

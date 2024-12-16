@@ -39,7 +39,7 @@
 }
 
 .book-title {
-  font-size: 1.65rem;
+  font-size: 1.25rem;
   font-weight: bold;
   margin: 0;
 }
@@ -85,4 +85,17 @@
 
 .book-description {
   margin-top: 16px;
+}
+
+.book-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.8rem 1rem 0;
+}
+
+.book-subtitle {
+  font-size: 1rem;
+  color: var(--text-color-secondary);
+  margin-top: 0.25rem;
+  font-weight: normal;
 }

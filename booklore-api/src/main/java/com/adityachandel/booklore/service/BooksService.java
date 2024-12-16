@@ -2,6 +2,7 @@ package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.config.AppProperties;
 import com.adityachandel.booklore.model.dto.BookDTO;
+import com.adityachandel.booklore.model.dto.BookWithNeighborsDTO;
 import com.adityachandel.booklore.model.dto.response.GoogleBooksMetadata;
 import com.adityachandel.booklore.model.dto.BookViewerSettingDTO;
 import com.adityachandel.booklore.model.dto.request.SetMetadataRequest;
@@ -47,6 +48,7 @@ public class BooksService {
     private final BookMetadataRepository metadataRepository;
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
+    private final LibraryRepository libraryRepository;
 
 
     public BookDTO getBook(long bookId) {
@@ -210,4 +212,17 @@ public class BooksService {
             return fileName.substring(0, dotIndex);
         }
     }
+
+    public BookWithNeighborsDTO getBookWithNeighbours(long libraryId, long bookId) {
+        libraryRepository.findById(libraryId).orElseThrow(() -> ErrorCode.LIBRARY_NOT_FOUND.createException(libraryId));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> ErrorCode.BOOK_NOT_FOUND.createException(bookId));
+        Book previousBook = bookRepository.findFirstByLibraryIdAndIdLessThanOrderByIdDesc(libraryId, bookId).orElse(null);
+        Book nextBook = bookRepository.findFirstByLibraryIdAndIdGreaterThanOrderByIdAsc(libraryId, bookId).orElse(null);
+        return BookWithNeighborsDTO.builder()
+                .currentBook(BookTransformer.convertToBookDTO(book))
+                .previousBookId(previousBook != null ? previousBook.getId() : null)
+                .nextBookId(nextBook != null ? nextBook.getId() : null)
+                .build();
+    }
+
 }

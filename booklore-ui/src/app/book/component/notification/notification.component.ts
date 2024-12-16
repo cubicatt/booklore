@@ -1,8 +1,8 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
-import {BookProgressService} from '../book/service/book-progress-service';
-import {BookUpdateEvent} from '../book/model/book-update-event.model';
+import {BookProgressService} from '../../service/book-progress-service';
 import {Subscription} from 'rxjs';
 import {NgClass} from '@angular/common';
+import {BookUpdateEvent} from '../../model/book.model';
 
 @Component({
   selector: 'app-notification',

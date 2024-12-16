@@ -27,5 +27,9 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     Page<Book> findByLastReadTimeIsNotNull(Pageable pageable);
 
     Page<Book> findByAddedOnIsNotNull(Pageable pageable);
+
+    Optional<Book> findFirstByLibraryIdAndIdLessThanOrderByIdDesc(Long libraryId, Long currentBookId);
+
+    Optional<Book> findFirstByLibraryIdAndIdGreaterThanOrderByIdAsc(Long libraryId, Long currentBookId);
 }
 

@@ -1,18 +1,3 @@
-<div *ngIf="!isLoading && bookMetadataList.length > 0" class="search-container">
-  <div class="input-group">
-    <input type="text" [(ngModel)]="searchText" placeholder="Enter book title" />
-    <p-button severity="success" (click)="populateTitle()">Search</p-button>
-  </div>
-</div>
-
-<div *ngIf="isLoading" class="loading">
-  Loading metadata...
-</div>
-
-<div *ngIf="errorMessage" class="error">
-  {{ errorMessage }}
-</div>
-
 <div *ngIf="!isLoading && bookMetadataList.length > 0" class="metadata-list">
   <div *ngFor="let metadata of bookMetadataList" class="book-metadata">
     <div class="metadata-header">
@@ -21,8 +6,10 @@
         <p-button class="select-button" (click)="selectMetadata(metadata)">Select</p-button>
       </div>
       <div>
-        <h3>{{ metadata.title }}</h3>
-        <p><strong>Authors:</strong> {{ metadata.authors?.join(', ') || 'No authors available' }}</p>
+        <h3>
+          {{ metadata.title }}<span *ngIf="metadata.subtitle">: {{ metadata.subtitle }}</span>
+        </h3>
+        <p><strong>Authors:</strong> {{ metadata.authors.join(', ') || 'No authors available' }}</p>
         <p><strong>Publisher:</strong> {{ metadata.publisher }}</p>
         <p><strong>Published Date:</strong> {{ metadata.publishedDate }}</p>
         <p><strong>ISBN:</strong> {{ metadata.isbn10 }}</p>
@@ -32,9 +19,3 @@
     </div>
   </div>
 </div>
-
-
-<div *ngIf="!isLoading && bookMetadataList.length === 0" class="no-metadata">
-  No metadata found for this book.
-</div>
-

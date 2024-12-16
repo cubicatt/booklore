@@ -73,7 +73,7 @@ public class PdfFileProcessor implements FileProcessor {
                 }
             }
             generateCoverImage(bookFile, new File(appProperties.getPathConfig() + "/thumbs"), document);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Error while processing file {}", libraryFile.getFilePath(), e);
             return FileProcessResult.builder()
                     .libraryFile(libraryFile)

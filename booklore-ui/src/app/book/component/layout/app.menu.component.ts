@@ -2,8 +2,8 @@ import {Component, computed, OnInit} from '@angular/core';
 import {AppMenuitemComponent} from './app.menuitem.component';
 import {NgForOf, NgIf} from '@angular/common';
 import {MenuModule} from 'primeng/menu';
-import {LibraryService} from '../book/service/library.service';
-import {Library} from '../book/model/library.model';
+import {LibraryService} from '../../service/library.service';
+import {Library} from '../../model/library.model';
 
 @Component({
   selector: 'app-menu',

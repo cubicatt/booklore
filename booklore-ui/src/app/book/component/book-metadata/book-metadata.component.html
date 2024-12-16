@@ -45,6 +45,12 @@
           <p><strong>Publisher:</strong> {{ book?.metadata?.publisher || 'N/A' }}</p>
           <p><strong>Published:</strong> {{ book?.metadata?.publishedDate || 'Unknown' }}</p>
           <p><strong>Language:</strong> {{ book?.metadata?.language || 'Unknown' }}</p>
+          <p *ngIf="book?.metadata?.googleBookId">
+            <strong>Google Book:</strong>
+            <a [href]="'https://books.google.com/books?id=' + book?.metadata?.googleBookId" target="_blank">
+              Link
+            </a>
+          </p>
         </div>
       </div>
     </div>

@@ -28,6 +28,12 @@
                 <p><strong>ISBN:</strong> {{ metadata.isbn10 }}</p>
                 <p><strong>Description:</strong> {{ truncateDescription(metadata.description) }}</p>
                 <p><strong>Page Count:</strong> {{ metadata.pageCount }}</p>
+                <p *ngIf="metadata.googleBookId">
+                    <strong>Google Book Id:</strong>
+                    <a [href]="'https://books.google.com/books?id=' + metadata.googleBookId" target="_blank">
+                        {{ metadata.googleBookId }}
+                    </a>
+                </p>
             </div>
         </div>
     </div>

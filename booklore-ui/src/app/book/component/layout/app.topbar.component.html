@@ -24,8 +24,10 @@
       tooltipPosition="top">
       <i class="pi pi-plus-circle"></i>
     </button>
-    <button class="p-link layout-topbar-button">
-      <i class="pi pi-user"></i>
+    <button
+      (click)="openFileUploadDialog()"
+      class="p-link layout-topbar-button">
+      <i class="pi pi-upload"></i>
       <span>Profile</span>
     </button>
     <button class="p-link layout-topbar-button" [routerLink]="'/documentation'">

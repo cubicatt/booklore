@@ -33,7 +33,7 @@ export class DashboardComponent {
   createNewLibrary(event: MouseEvent) {
     const buttonRect = (event.target as HTMLElement).getBoundingClientRect();
 
-    const dialogWidthPercentage = 50; // Use percentage-based width
+    const dialogWidthPercentage = 50;
     const viewportWidth = window.innerWidth;
     const dialogWidth = (dialogWidthPercentage / 100) * viewportWidth;
 

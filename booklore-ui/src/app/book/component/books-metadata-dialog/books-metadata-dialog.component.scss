@@ -5,13 +5,13 @@
 .input-group {
   display: flex;
   justify-content: space-between;
-  gap: 10px; /* Add space between the text box and button */
+  gap: 10px;
 }
 
 input[type="text"] {
   padding: 10px;
   font-size: 1rem;
-  width: 90%; /* Adjust width as necessary */
+  width: 90%;
   border: 1px solid #ddd;
   border-radius: 5px;
 }
@@ -43,22 +43,22 @@ button:focus {
 
 .metadata-header {
   display: flex;
-  gap: 20px; /* Space between image and text */
+  gap: 20px;
 }
 
 .book-image {
-  width: 100px; /* Adjust the width as needed */
-  height: 150px; /* Adjust the height as needed */
-  object-fit: cover; /* Ensure the image covers the area without distorting */
+  width: 100px;
+  height: 150px;
+  object-fit: cover;
   border-radius: 5px;
-  margin-bottom: 10px; /* Add spacing between the image and the button */
+  margin-bottom: 10px;
 }
 
 .select-button {
-  width: auto; /* Button width adjusts to content */
-  padding: 8px 15px; /* Adjust the button padding */
-  margin-top: 10px; /* Space between the image and button */
-  text-align: center; /* Ensure text is centered in the button */
+  width: auto;
+  padding: 8px 15px;
+  margin-top: 10px;
+  text-align: center;
 }
 
 .book-metadata {

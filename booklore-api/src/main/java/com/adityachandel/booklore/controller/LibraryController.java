@@ -23,6 +23,16 @@ public class LibraryController {
     private LibraryService libraryService;
     private BooksService booksService;
 
+    @GetMapping("/{libraryId}")
+    public ResponseEntity<LibraryDTO> getLibrary(@PathVariable long libraryId) {
+        return ResponseEntity.ok(libraryService.getLibrary(libraryId));
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<LibraryDTO>> getLibraries(@RequestParam(defaultValue = "0") @Min(0) int page, @RequestParam(defaultValue = "25") @Min(1) @Max(100) int size) {
+        return ResponseEntity.ok(libraryService.getLibraries(page, size));
+    }
+
     @PostMapping
     public ResponseEntity<LibraryDTO> createLibraryNew(@RequestBody CreateLibraryRequest request) {
         return ResponseEntity.ok(libraryService.createLibrary(request));
@@ -33,10 +43,7 @@ public class LibraryController {
         return libraryService.parseLibraryBooks(libraryId, force);
     }
 
-    @GetMapping("/{libraryId}")
-    public ResponseEntity<LibraryDTO> getLibrary(@PathVariable long libraryId) {
-        return ResponseEntity.ok(libraryService.getLibrary(libraryId));
-    }
+
 
     @DeleteMapping("/{libraryId}")
     public ResponseEntity<?> deleteLibrary(@PathVariable long libraryId) {
@@ -44,10 +51,7 @@ public class LibraryController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping
-    public ResponseEntity<Page<LibraryDTO>> getLibraries(@RequestParam(defaultValue = "0") @Min(0) int page, @RequestParam(defaultValue = "25") @Min(1) @Max(100) int size) {
-        return ResponseEntity.ok(libraryService.getLibraries(page, size));
-    }
+
 
     @GetMapping("/{libraryId}/book/{bookId}/withNeighbors")
     public ResponseEntity<BookWithNeighborsDTO> getBookWithNeighbours(@PathVariable long libraryId, @PathVariable long bookId) {

@@ -1,7 +1,10 @@
 <div *ngIf="!isLoading && bookMetadataList.length > 0" class="search-container">
     <div class="input-group">
         <input type="text" [(ngModel)]="searchText" placeholder="Enter book title"/>
-        <p-button severity="success" (click)="populateTitle()">Search</p-button>
+        <p-button
+                severity="success"
+                [disabled]="isButtonDisabled"
+                (click)="populateTitle()">Search</p-button>
     </div>
 </div>
 

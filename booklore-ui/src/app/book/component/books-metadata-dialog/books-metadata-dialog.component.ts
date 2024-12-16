@@ -23,6 +23,7 @@ export class BooksMetadataDialogComponent implements OnInit {
   isLoading = true;
   errorMessage: string | null = null;
   searchText: string = '';
+  isButtonDisabled = false;
   bookId: number = 0;
   libraryId: number = 0;
 
@@ -64,15 +65,27 @@ export class BooksMetadataDialogComponent implements OnInit {
   }
 
   populateTitle() {
+    this.isButtonDisabled = true;
+
+    setTimeout(() => {
+      if (this.isButtonDisabled) {
+        this.isButtonDisabled = false;
+        this.errorMessage = 'Request timed out. Please try again.';
+      }
+    }, 5000);
+
     this.bookService.fetchBookMetadataByTerm(this.searchText).subscribe({
       next: (metadataList) => {
         this.bookMetadataList = metadataList;
         this.isLoading = false;
+        this.isButtonDisabled = false;
       },
       error: (error) => {
         this.errorMessage = 'Failed to load metadata';
         this.isLoading = false;
+        this.isButtonDisabled = false;
       }
-    })
+    });
   }
 }
+

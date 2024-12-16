@@ -8,7 +8,7 @@ import com.adityachandel.booklore.model.dto.*;
 import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
 import com.adityachandel.booklore.model.entity.Book;
 import com.adityachandel.booklore.model.entity.Library;
-import com.adityachandel.booklore.exception.ErrorCode;
+import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.repository.*;
 import com.adityachandel.booklore.transformer.BookTransformer;
 import com.adityachandel.booklore.transformer.LibraryTransformer;
@@ -45,7 +45,7 @@ public class LibraryService {
     }
 
     public LibraryDTO getLibrary(long libraryId) {
-        Library library = libraryRepository.findById(libraryId).orElseThrow(() -> ErrorCode.LIBRARY_NOT_FOUND.createException(libraryId));
+        Library library = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         return LibraryTransformer.convertToLibraryDTO(library);
     }
 
@@ -56,25 +56,25 @@ public class LibraryService {
     }
 
     public void deleteLibrary(long id) {
-        libraryRepository.findById(id).orElseThrow(() -> ErrorCode.LIBRARY_NOT_FOUND.createException(id));
+        libraryRepository.findById(id).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(id));
         libraryRepository.deleteById(id);
     }
 
     public BookDTO getBook(long libraryId, long bookId) {
-        libraryRepository.findById(libraryId).orElseThrow(() -> ErrorCode.LIBRARY_NOT_FOUND.createException(libraryId));
-        Book book = bookRepository.findBookByIdAndLibraryId(bookId, libraryId).orElseThrow(() -> ErrorCode.BOOK_NOT_FOUND.createException(bookId));
+        libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+        Book book = bookRepository.findBookByIdAndLibraryId(bookId, libraryId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         return BookTransformer.convertToBookDTO(book);
     }
 
     public Page<BookDTO> getBooks(long libraryId, int page, int size) {
-        libraryRepository.findById(libraryId).orElseThrow(() -> ErrorCode.LIBRARY_NOT_FOUND.createException(libraryId));
+        libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Book> bookPage = bookRepository.findBooksByLibraryId(libraryId, pageRequest);
         return bookPage.map(BookTransformer::convertToBookDTO);
     }
 
     public SseEmitter parseLibraryBooks(long libraryId, boolean force) {
-        Library library = libraryRepository.findById(libraryId).orElseThrow(() -> ErrorCode.LIBRARY_NOT_FOUND.createException(libraryId));
+        Library library = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         SseEmitter emitter = new SseEmitter();
         ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
         sseMvcExecutor.execute(() -> {

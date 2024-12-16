@@ -6,7 +6,7 @@ import com.adityachandel.booklore.model.dto.BookWithNeighborsDTO;
 import com.adityachandel.booklore.model.dto.response.GoogleBooksMetadata;
 import com.adityachandel.booklore.model.dto.BookViewerSettingDTO;
 import com.adityachandel.booklore.model.dto.request.SetMetadataRequest;
-import com.adityachandel.booklore.exception.ErrorCode;
+import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.model.entity.*;
 import com.adityachandel.booklore.repository.*;
 import com.adityachandel.booklore.transformer.BookSettingTransformer;
@@ -52,7 +52,7 @@ public class BooksService {
 
 
     public BookDTO getBook(long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ErrorCode.BOOK_NOT_FOUND.createException(bookId));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         return BookTransformer.convertToBookDTO(book);
     }
 
@@ -72,7 +72,7 @@ public class BooksService {
     }
 
     public void saveBookViewerSetting(long bookId, BookViewerSettingDTO bookViewerSettingDTO) {
-        BookViewerSetting bookViewerSetting = bookViewerSettingRepository.findById(bookId).orElseThrow(() -> ErrorCode.BOOK_NOT_FOUND.createException(bookId));
+        BookViewerSetting bookViewerSetting = bookViewerSettingRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         bookViewerSetting.setPageNumber(bookViewerSettingDTO.getPageNumber());
         bookViewerSetting.setZoom(bookViewerSettingDTO.getZoom());
         bookViewerSetting.setSpread(bookViewerSettingDTO.getSpread());
@@ -81,7 +81,7 @@ public class BooksService {
     }
 
     public Resource getBookCover(long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ErrorCode.BOOK_NOT_FOUND.createException(bookId));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         String thumbPath = appProperties.getPathConfig() + "/thumbs/" + getFileNameWithoutExtension(book.getFileName()) + ".jpg";
         Path filePath = Paths.get(thumbPath);
         try {
@@ -89,15 +89,15 @@ public class BooksService {
             if (resource.exists() && resource.isReadable()) {
                 return resource;
             } else {
-                throw ErrorCode.IMAGE_NOT_FOUND.createException(thumbPath);
+                throw ApiError.IMAGE_NOT_FOUND.createException(thumbPath);
             }
         } catch (IOException e) {
-            throw ErrorCode.IMAGE_NOT_FOUND.createException(thumbPath);
+            throw ApiError.IMAGE_NOT_FOUND.createException(thumbPath);
         }
     }
 
     public ResponseEntity<byte[]> getBookData(long bookId) throws IOException {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ErrorCode.BOOK_NOT_FOUND.createException(bookId));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         byte[] pdfBytes = Files.readAllBytes(new File(book.getPath()).toPath());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
@@ -110,18 +110,18 @@ public class BooksService {
     }
 
     public BookViewerSettingDTO getBookViewerSetting(long bookId) {
-        BookViewerSetting bookViewerSetting = bookViewerSettingRepository.findById(bookId).orElseThrow(() -> ErrorCode.BOOK_NOT_FOUND.createException(bookId));
+        BookViewerSetting bookViewerSetting = bookViewerSettingRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         return BookSettingTransformer.convertToDTO(bookViewerSetting);
     }
 
     public void updateLastReadTime(long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ErrorCode.BOOK_NOT_FOUND.createException(bookId));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         book.setLastReadTime(Instant.now());
         bookRepository.save(book);
     }
 
     public List<GoogleBooksMetadata> fetchProspectiveMetadataListByBookId(long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ErrorCode.BOOK_NOT_FOUND.createException(bookId));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         StringBuilder searchString = new StringBuilder();
         if (!book.getMetadata().getTitle().isEmpty()) {
             searchString.append(book.getMetadata().getTitle());
@@ -145,7 +145,7 @@ public class BooksService {
     }
 
     public void setMetadata(SetMetadataRequest setMetadataRequest, long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ErrorCode.BOOK_NOT_FOUND.createException(bookId));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         GoogleBooksMetadata gMetadata = googleBookMetadataService.getByGoogleBookId(setMetadataRequest.getGoogleBookId());
         BookMetadata metadata = book.getMetadata();
         metadata.setGoogleBookId(gMetadata.getGoogleBookId());
@@ -214,8 +214,8 @@ public class BooksService {
     }
 
     public BookWithNeighborsDTO getBookWithNeighbours(long libraryId, long bookId) {
-        libraryRepository.findById(libraryId).orElseThrow(() -> ErrorCode.LIBRARY_NOT_FOUND.createException(libraryId));
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ErrorCode.BOOK_NOT_FOUND.createException(bookId));
+        libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         Book previousBook = bookRepository.findFirstByLibraryIdAndIdLessThanOrderByIdDesc(libraryId, bookId).orElse(null);
         Book nextBook = bookRepository.findFirstByLibraryIdAndIdGreaterThanOrderByIdAsc(libraryId, bookId).orElse(null);
         return BookWithNeighborsDTO.builder()

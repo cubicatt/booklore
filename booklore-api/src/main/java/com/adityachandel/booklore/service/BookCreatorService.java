@@ -44,23 +44,21 @@ public class BookCreatorService {
     }
 
     public void addAuthorsToBook(Set<String> authors, Book book) {
-        for (String authorSrt : authors) {
-            Optional<Author> authorOptional = authorRepository.findByName(authorSrt);
+        for (String authorStr : authors) {
+            Optional<Author> authorOptional = authorRepository.findByName(authorStr);
             Author author;
             if (authorOptional.isPresent()) {
                 author = authorOptional.get();
-                if(book.getMetadata().getAuthors() == null) {
-                    book.getMetadata().setAuthors(new ArrayList<>());
-                }
-                book.getMetadata().getAuthors().add(author);
             } else {
                 author = Author.builder()
-                        .name(authorSrt)
+                        .name(authorStr)
                         .build();
-                author.setBookMetadataList(new ArrayList<>());
-                book.getMetadata().setAuthors(new ArrayList<>());
-                book.getMetadata().getAuthors().add(author);
+                author = authorRepository.save(author);
             }
+            if (book.getMetadata().getAuthors() == null) {
+                book.getMetadata().setAuthors(new ArrayList<>());
+            }
+            book.getMetadata().getAuthors().add(author);
         }
     }
 

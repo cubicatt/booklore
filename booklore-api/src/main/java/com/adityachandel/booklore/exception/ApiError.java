@@ -5,20 +5,24 @@ import org.springframework.http.HttpStatus;
 
 
 @Getter
-public enum ErrorCode {
+public enum ApiError {
     AUTHOR_NOT_FOUND(HttpStatus.NOT_FOUND, "Author not found with ID: %d"),
     BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "Book not found with ID: %d"),
     FILE_READ_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Error reading files from path"),
     IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Image not found or not readable"),
-    INVALID_FILE_FORMAT(HttpStatus.BAD_REQUEST, "Invalid file format"),
+    INVALID_FILE_FORMAT(HttpStatus.BAD_REQUEST, "Invalid file format, only pdf and epub are supported"),
     LIBRARY_NOT_FOUND(HttpStatus.NOT_FOUND, "Library not found with ID: %d"),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "Bad request"),
+    FILE_TOO_LARGE(HttpStatus.BAD_REQUEST, "File size exceeds the limit: 100 MB"),
+    DIRECTORY_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create the directory: %s"),
+    INVALID_LIBRARY_PATH(HttpStatus.BAD_REQUEST, "Invalid library path"),
+    FILE_ALREADY_EXISTS(HttpStatus.CONFLICT, "File already exists"),
     INVALID_QUERY_PARAMETERS(HttpStatus.BAD_REQUEST, "Query parameters are required for the search.");
 
     private final HttpStatus status;
     private final String message;
 
-    ErrorCode(HttpStatus status, String message) {
+    ApiError(HttpStatus status, String message) {
         this.status = status;
         this.message = message;
     }

@@ -3,6 +3,11 @@ app:
   path-config: '/Users/aditya.chandel/my-library-temp/config'
 
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
   mvc:
     async:
       request-timeout: 600000

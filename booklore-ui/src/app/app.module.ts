@@ -17,13 +17,11 @@ import {InputIconModule} from 'primeng/inputicon';
 import {ToggleButtonModule} from 'primeng/togglebutton';
 import {PasswordModule} from 'primeng/password';
 import {ToastModule} from 'primeng/toast';
-import {LibraryBrowserComponent} from './book/component/library-browser/library-browser.component';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {SearchComponent} from './book/component/search/search.component';
-import { BookMetadataComponent } from './book/component/book-metadata/book-metadata.component';
-import { BooksMetadataDialogComponent } from './book/component/books-metadata-dialog/books-metadata-dialog.component';
 import {MessageService} from 'primeng/api';
-import { NotificationComponent } from './book/component/notification/notification.component';
+import {FileUploadComponent} from './book/component/file-upload/file-upload.component';
+import {DropdownModule} from 'primeng/dropdown';
 
 @NgModule({
   declarations: [
@@ -47,6 +45,7 @@ import { NotificationComponent } from './book/component/notification/notificatio
     ToastModule,
     InfiniteScrollDirective,
     SearchComponent,
+    DropdownModule,
   ],
   providers: [DialogService, MessageService],
   bootstrap: [AppComponent]

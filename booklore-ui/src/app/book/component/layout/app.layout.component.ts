@@ -7,6 +7,7 @@ import { AppTopBarComponent } from './app.topbar.component';
 import {AppFooterComponent} from "./app.footer.component";
 import {AppConfigComponent} from "./config/app.config.component";
 import {NgClass} from '@angular/common';
+import {ToastModule} from 'primeng/toast';
 
 @Component({
     selector: 'app-layout',
@@ -16,7 +17,8 @@ import {NgClass} from '@angular/common';
     AppConfigComponent,
     AppSidebarComponent,
     AppTopBarComponent,
-    NgClass
+    NgClass,
+    ToastModule
   ],
     templateUrl: './app.layout.component.html'
 })

@@ -1,0 +1,105 @@
+.search-container {
+  margin-bottom: 20px;
+}
+
+.input-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px; /* Add space between the text box and button */
+}
+
+input[type="text"] {
+  padding: 10px;
+  font-size: 1rem;
+  width: 90%; /* Adjust width as necessary */
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:focus {
+  outline: none;
+}
+
+.metadata-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.metadata-header {
+  display: flex;
+  gap: 20px; /* Space between image and text */
+}
+
+.book-image {
+  width: 100px; /* Adjust the width as needed */
+  height: 150px; /* Adjust the height as needed */
+  object-fit: cover; /* Ensure the image covers the area without distorting */
+  border-radius: 5px;
+  margin-bottom: 10px; /* Add spacing between the image and the button */
+}
+
+.select-button {
+  width: auto; /* Button width adjusts to content */
+  padding: 8px 15px; /* Adjust the button padding */
+  margin-top: 10px; /* Space between the image and button */
+  text-align: center; /* Ensure text is centered in the button */
+}
+
+.book-metadata {
+  background-color: var(--surface-50);
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+  font-size: 1.5rem;
+  color: var(--text-color);
+}
+
+p {
+  margin: 5px 0;
+  color: var(--text-color-secondary);
+  font-size: 1.0rem;
+}
+
+strong {
+  font-weight: bold;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}

@@ -10,12 +10,12 @@ import {DashboardScrollerComponent} from '../dashboard-scroller/dashboard-scroll
 @Component({
   selector: 'app-home-page',
   templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
   imports: [
     Button,
     NgIf,
     DashboardScrollerComponent
   ],
-  styleUrls: ['./dashboard.component.scss'],
   providers: [DialogService],
 })
 export class DashboardComponent {

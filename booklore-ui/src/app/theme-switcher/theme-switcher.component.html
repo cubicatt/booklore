@@ -1,0 +1,11 @@
+<div>
+  <p-dropdown
+    [options]="themes"
+    [(ngModel)]="currentTheme"
+    (onChange)="changeTheme($event)"
+    id="theme"
+    optionLabel="label"
+    optionValue="value"
+    placeholder="Choose a theme">
+  </p-dropdown>
+</div>

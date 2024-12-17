@@ -29,7 +29,7 @@ export class LibraryCreatorComponent {
   show() {
     this.ref = this.dialogService.open(DirectoryPickerComponent, {
       header: 'Select Media Directory',
-      modal: false,
+      modal: true,
       width: '50%',
       height: '75%',
       contentStyle: {overflow: 'auto'},

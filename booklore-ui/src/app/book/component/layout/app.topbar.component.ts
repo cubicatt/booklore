@@ -4,6 +4,7 @@ import {LayoutService} from './service/app.layout.service';
 import {RouterLink} from '@angular/router';
 import {DialogService as PrimeDialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {LibraryCreatorComponent} from '../library-creator/library-creator.component';
+import {ThemeSwitcherComponent} from '../../../theme-switcher/theme-switcher.component';
 import {TooltipModule} from 'primeng/tooltip';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
@@ -19,7 +20,8 @@ import {FileUploadComponent} from '../file-upload/file-upload.component';
     FormsModule,
     InputTextModule,
     SearchComponent,
-    NotificationComponent
+    NotificationComponent,
+    ThemeSwitcherComponent
   ],
   templateUrl: './app.topbar.component.html',
 })
@@ -37,9 +39,20 @@ export class AppTopBarComponent implements OnDestroy {
   openLibraryCreatorDialog(): void {
     this.ref = this.dialogService.open(LibraryCreatorComponent, {
       header: 'Create New Library',
-      modal: false,
+      modal: true,
       width: '50%',
       height: '50%',
+      style: {bottom: '15%'}
+    });
+  }
+
+  openFileUploadDialog() {
+    this.ref = this.dialogService.open(FileUploadComponent, {
+      header: 'Upload Book',
+      modal: true,
+      width: '45%',
+      height: '40%',
+      style: {bottom: '20%'}
     });
   }
 
@@ -47,15 +60,5 @@ export class AppTopBarComponent implements OnDestroy {
     if (this.ref) {
       this.ref.close();
     }
-  }
-
-  openFileUploadDialog() {
-    this.ref = this.dialogService.open(FileUploadComponent, {
-      header: 'Upload Book',
-      modal: false,
-      width: '45%',
-      height: '40%',
-      style: { bottom: '20%' }
-    });
   }
 }

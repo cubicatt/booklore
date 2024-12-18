@@ -1,14 +1,20 @@
+
 <div class="book-list-container">
-  <h2 class="last-read-title">{{ title }}</h2>
+  <div class="last-read-title-container">
+    <h2 class="last-read-title">{{ title }}</h2>
+    <div *ngIf="booksSignal().length === 0">
+      <h4>No books available.</h4>
+    </div>
+  </div>
   <div class="book-list"
        infiniteScroll
        [infiniteScrollDistance]="2"
        [infiniteScrollThrottle]="50"
-       (scrolled)="loadMore()"
        #scrollContainer
+       [horizontal]="true"
+       (scrolled)="loadMore()"
        (scroll)="onScroll($event)">
-
-    <div class="book-item" *ngFor="let book of books">
+    <div class="book-item" *ngFor="let book of booksSignal()">
       <img [src]="coverImageSrc(book.id)" class="book-cover" alt="Cover of {{ book.metadata.title }}" loading="lazy"/>
       <div class="book-info">
         <h4>{{ book.metadata.title }}</h4>

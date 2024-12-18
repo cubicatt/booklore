@@ -43,15 +43,11 @@ public class LibraryController {
         return libraryService.parseLibraryBooks(libraryId, force);
     }
 
-
-
     @DeleteMapping("/{libraryId}")
     public ResponseEntity<?> deleteLibrary(@PathVariable long libraryId) {
         libraryService.deleteLibrary(libraryId);
         return ResponseEntity.noContent().build();
     }
-
-
 
     @GetMapping("/{libraryId}/book/{bookId}/withNeighbors")
     public ResponseEntity<BookWithNeighborsDTO> getBookWithNeighbours(@PathVariable long libraryId, @PathVariable long bookId) {

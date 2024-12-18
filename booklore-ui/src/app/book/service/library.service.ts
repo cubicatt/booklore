@@ -43,24 +43,4 @@ export class LibraryService {
       })
     );
   }
-
-  getLibraryById(libraryId: number): Library | undefined {
-    return this.#libraries().find(library => library.id === libraryId);
-  }
-
-  /*updateLibrary(id: number, updatedLibrary: Library): Observable<Library> {
-    const url = `${this.libraryUrl}/${id}`;
-    return this.http.put<Library>(url, updatedLibrary).pipe(
-      tap((updatedLibraryFromBackend) => {
-        const updatedLibraries = this._libraries().map((library) =>
-          library.id === id ? { ...library, ...updatedLibraryFromBackend } : library
-        );
-        this._libraries.set(updatedLibraries);
-      }),
-      catchError((error) => {
-        console.error('Error updating library:', error);
-        throw error;
-      })
-    );
-  }*/
 }

@@ -12,22 +12,24 @@ import {Library} from '../../model/library.model';
 })
 export class AppMenuComponent implements OnInit {
   home: any[] = [];
-  libraries: Signal<Library[]>;
 
-  libraryMenu = computed(() => [
-    {
-      label: 'Library',
-      separator: false,
-      items: this.libraries().map((lib: Library) => ({
-        label: lib.name,
-        icon: 'pi pi-fw pi-home',
-        routerLink: [`/library/${lib.id}/books`]
-      })),
-    },
-  ]);
+  libraryMenu = computed(() => {
+    const libraries = this.libraryService.libraries();
+    return [
+      {
+        label: 'Library',
+        separator: false,
+        items: libraries.map((lib) => ({
+          label: lib.name,
+          icon: 'pi pi-fw pi-home',
+          routerLink: [`/library/${lib.id}/books`],
+        })),
+      },
+    ];
+  });
 
   constructor(private libraryService: LibraryService) {
-    this.libraries = this.libraryService.libraries;
+
   }
 
   ngOnInit() {

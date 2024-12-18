@@ -21,7 +21,7 @@ export class LibraryCreatorComponent {
     public dialogService: DialogService,
     private dynamicDialogRef: DynamicDialogRef,
     private messageService: MessageService,
-    private libraryServiceV2: LibraryService,
+    private libraryService: LibraryService,
     private router: Router,
   ) {
   }
@@ -56,9 +56,8 @@ export class LibraryCreatorComponent {
       name: this.value,
       paths: this.folders,
     };
-    this.libraryServiceV2.createLibrary(newLibrary).subscribe({
+    this.libraryService.createLibrary(newLibrary).subscribe({
       next: (createdLibrary) => {
-        console.log('Library successfully created:', createdLibrary);
         this.router.navigate(
           ['/library', createdLibrary.id, 'books'],
           {queryParams: {watch: true}}

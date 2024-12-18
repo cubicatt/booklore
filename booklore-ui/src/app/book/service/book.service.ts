@@ -1,7 +1,9 @@
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {Book, BookMetadata, BookSetting, BookWithNeighborsDTO, PaginatedBooksResponse} from '../model/book.model';
-import {Injectable} from '@angular/core';
+import {computed, Injectable, signal} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
+import {catchError, map} from 'rxjs/operators';
+import {LibraryApiResponse} from '../model/library.model';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +12,25 @@ export class BookService {
   private readonly pageSize = 50;
   private readonly libraryUrl = 'http://localhost:8080/v1/library';
   private readonly bookUrl = 'http://localhost:8080/v1/book';
+
+  #lastReadBooks = signal<Book[]>([]);
+  lastReadBooks = computed(this.#lastReadBooks);
+
+  #latestAddedBooks = signal<Book[]>([]);
+  latestAddedBooks = computed(this.#latestAddedBooks);
+
+  getBooksByLibraryId(libraryId: number, page: number) {
+    this.http.get<PaginatedBooksResponse>(`${this.libraryUrl}/${libraryId}/book?page=${page}&size=${this.pageSize}`)
+      .pipe(
+        map(response => {
+          catchError(error => {
+            console.error('Error loading libraries:', error);
+            return of([]);
+          })
+        })
+      ).subscribe()
+  }
+
 
   constructor(private http: HttpClient) {
   }
@@ -28,15 +49,33 @@ export class BookService {
     );
   }
 
-  loadLatestBooks(page: number): Observable<PaginatedBooksResponse> {
-    return this.http.get<PaginatedBooksResponse>(
-      `${this.bookUrl}?page=${page}&size=10&sortBy=lastReadTime&sortDir=desc`
+  getLastReadBooks(page: number) {
+    this.http.get<PaginatedBooksResponse>(`${this.bookUrl}?page=${page}&size=25&sortBy=lastReadTime&sortDir=desc`).pipe(
+      map(response => response.content),
+      catchError(error => {
+        console.error('Error loading last read books:', error);
+        return of([]);
+      })
+    ).subscribe(
+      (books) => {
+        this.#lastReadBooks.set([...this.#lastReadBooks(), ...books]);
+        console.log("Loaded last read books")
+      }
     );
   }
 
-  loadLatestAddedBooks(page: number): Observable<PaginatedBooksResponse> {
-    return this.http.get<PaginatedBooksResponse>(
-      `${this.bookUrl}?page=${page}&size=10&sortBy=addedOn&sortDir=desc`
+  getLatestAddedBooks(page: number) {
+    this.http.get<PaginatedBooksResponse>(`${this.bookUrl}?page=${page}&size=25&sortBy=addedOn&sortDir=desc`).pipe(
+      map(response => response.content),
+      catchError(error => {
+        console.error('Error loading latest added books:', error);
+        return of([]);
+      })
+    ).subscribe(
+      (books) => {
+        this.#latestAddedBooks.set([...this.#latestAddedBooks(), ...books]);
+        console.log("Loaded latest added books")
+      }
     );
   }
 

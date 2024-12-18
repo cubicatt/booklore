@@ -21,6 +21,8 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
 
     Optional<Book> findBookByIdAndLibraryId(long id, long libraryId);
 
+    Optional<Book> findBookByFileNameAndLibraryId(String fileName, long libraryId);
+
     @Query("SELECT b FROM Book b JOIN b.metadata bm WHERE LOWER(bm.title) LIKE LOWER(CONCAT('%', :title, '%'))")
     List<Book> findByTitleContainingIgnoreCase(@Param("title") String title);
 

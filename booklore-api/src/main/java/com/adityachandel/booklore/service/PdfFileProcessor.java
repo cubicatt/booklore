@@ -40,7 +40,7 @@ public class PdfFileProcessor implements FileProcessor {
         File bookFile = new File(libraryFile.getFilePath());
         String fileName = bookFile.getName();
         if (!forceProcess) {
-            Optional<Book> bookOptional = bookRepository.findByFileName(fileName);
+            Optional<Book> bookOptional = bookRepository.findBookByFileNameAndLibraryId(fileName, libraryFile.getLibrary().getId());
             if (bookOptional.isPresent()) {
                 return FileProcessResult.builder()
                         .libraryFile(libraryFile)

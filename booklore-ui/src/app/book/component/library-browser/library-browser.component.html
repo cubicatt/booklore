@@ -18,7 +18,7 @@
        [ngClass]="coverSizeClass"
        [infiniteScrollDistance]="2"
        [infiniteScrollThrottle]="50"
-       (scrolled)="loadMore()">
+       (scrolled)="loadBooks()">
     <div class="book-item" *ngFor="let book of books">
       <img [src]="coverImageSrc(book.id)" class="book-cover placeholder" alt="Cover of {{ book.metadata.title }}" loading="lazy"/>
       <div class="book-info">

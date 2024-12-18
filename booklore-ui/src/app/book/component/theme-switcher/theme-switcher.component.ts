@@ -51,7 +51,6 @@ export class ThemeSwitcherComponent implements OnInit {
     const themeLink = document.getElementById('theme-link') as HTMLLinkElement;
     if (themeLink) {
       themeLink.href = `assets/layout/styles/theme/${theme}/theme.css`;
-      console.log(`Theme applied: ${theme}`);
     } else {
       console.error('Theme link element not found!');
     }

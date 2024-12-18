@@ -1,31 +1,33 @@
-import {Component, OnInit, ViewChild, ElementRef, Input} from '@angular/core';
+import {Component, OnInit, ViewChild, ElementRef, Input, computed, signal} from '@angular/core';
 import {Book} from '../../model/book.model';
 import {BookService} from '../../service/book.service';
 import {Button} from 'primeng/button';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
-import {NgForOf} from '@angular/common';
+import {NgForOf, NgIf} from '@angular/common';
 import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-dashboard-scroller',
   templateUrl: './dashboard-scroller.component.html',
+  styleUrls: ['./dashboard-scroller.component.scss'],
   imports: [
     Button,
     InfiniteScrollDirective,
-    NgForOf
+    NgForOf,
+    NgIf
   ],
-  styleUrls: ['./dashboard-scroller.component.scss']
 })
 export class DashboardScrollerComponent implements OnInit {
 
   @Input() bookListType: 'lastRead' | 'latestAdded' = 'lastRead';
   @Input() title: string = 'Last Read Books';
+  @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
-
-  books: Book[] = [];
   private currentPage: number = 0;
 
-  @ViewChild('scrollContainer') scrollContainer!: ElementRef;
+  booksSignal = computed(() => {
+    return this.bookListType === 'lastRead' ? this.bookService.lastReadBooks() : this.bookService.latestAddedBooks();
+  });
 
   constructor(private bookService: BookService, private router: Router) {
   }
@@ -36,35 +38,15 @@ export class DashboardScrollerComponent implements OnInit {
 
   loadBooks(): void {
     if (this.bookListType === 'lastRead') {
-      this.bookService.loadLatestBooks(this.currentPage).subscribe({
-        next: (response) => {
-          this.books = [...this.books, ...response.content];
-          this.currentPage++;
-        },
-        error: (err) => {
-          console.error('Error loading books:', err);
-        },
-      });
+      this.bookService.getLastReadBooks(this.currentPage);
     } else {
-      this.bookService.loadLatestAddedBooks(this.currentPage).subscribe({
-        next: (response) => {
-          this.books = [...this.books, ...response.content];
-          this.currentPage++;
-        },
-        error: (err) => {
-          console.error('Error loading books:', err);
-        },
-      });
+      this.bookService.getLatestAddedBooks(this.currentPage);
     }
+    this.currentPage++;
   }
 
   coverImageSrc(bookId: number): string {
     return this.bookService.getBookCoverUrl(bookId);
-  }
-
-  loadMore(): void {
-    console.log('Loading more books...');
-    this.loadBooks();
   }
 
   getAuthorNames(book: Book): string {
@@ -76,13 +58,18 @@ export class DashboardScrollerComponent implements OnInit {
     window.open(url, '_blank');
   }
 
+  loadMore() {
+    /*this.loadBooks();
+    this.currentPage++;*/
+  }
 
   onScroll(event: any): void {
-    const container = this.scrollContainer.nativeElement;
+    /*const container = this.scrollContainer.nativeElement;
     const scrollRight = container.scrollWidth - container.scrollLeft === container.clientWidth;
     if (scrollRight) {
-      this.loadMore();
-    }
+      this.currentPage++;
+      this.loadBooks();
+    }*/
   }
 
   openBookInfo(bookId: number, libraryId: number) {

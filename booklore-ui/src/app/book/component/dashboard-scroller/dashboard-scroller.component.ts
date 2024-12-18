@@ -23,8 +23,6 @@ export class DashboardScrollerComponent implements OnInit {
   @Input() title: string = 'Last Read Books';
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
-  private currentPage: number = 0;
-
   booksSignal = computed(() => {
     return this.bookListType === 'lastRead' ? this.bookService.lastReadBooks() : this.bookService.latestAddedBooks();
   });
@@ -37,12 +35,11 @@ export class DashboardScrollerComponent implements OnInit {
   }
 
   loadBooks(): void {
-    if (this.bookListType === 'lastRead') {
-      this.bookService.getLastReadBooks(this.currentPage);
-    } else {
-      this.bookService.getLatestAddedBooks(this.currentPage);
+    if (this.bookListType === 'lastRead' && !this.bookService.lastReadBooksLoaded) {
+      this.bookService.getLastReadBooks();
+    } else if (this.bookListType === 'latestAdded' && !this.bookService.latestAddedBooksLoaded) {
+      this.bookService.getLatestAddedBooks();
     }
-    this.currentPage++;
   }
 
   coverImageSrc(bookId: number): string {
@@ -56,20 +53,6 @@ export class DashboardScrollerComponent implements OnInit {
   openBook(bookId: number): void {
     const url = `/pdf-viewer/book/${bookId}`;
     window.open(url, '_blank');
-  }
-
-  loadMore() {
-    /*this.loadBooks();
-    this.currentPage++;*/
-  }
-
-  onScroll(event: any): void {
-    /*const container = this.scrollContainer.nativeElement;
-    const scrollRight = container.scrollWidth - container.scrollLeft === container.clientWidth;
-    if (scrollRight) {
-      this.currentPage++;
-      this.loadBooks();
-    }*/
   }
 
   openBookInfo(bookId: number, libraryId: number) {

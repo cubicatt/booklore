@@ -11,9 +11,7 @@
        [infiniteScrollDistance]="2"
        [infiniteScrollThrottle]="50"
        #scrollContainer
-       [horizontal]="true"
-       (scrolled)="loadMore()"
-       (scroll)="onScroll($event)">
+       [horizontal]="true">
     <div class="book-item" *ngFor="let book of booksSignal()">
       <img [src]="coverImageSrc(book.id)" class="book-cover" alt="Cover of {{ book.metadata.title }}" loading="lazy"/>
       <div class="book-info">

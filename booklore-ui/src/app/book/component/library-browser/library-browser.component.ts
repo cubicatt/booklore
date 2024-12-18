@@ -107,7 +107,6 @@ export class LibraryBrowserComponent implements OnInit, OnDestroy {
   }
 
   loadBooks(): void {
-    console.log('loadBooks()')
     this.bookService.loadBooks(this.libraryIdSignal(), this.currentPage).subscribe({
       next: (response) => {
         this.books = [...this.books, ...response.content];

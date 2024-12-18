@@ -15,21 +15,11 @@ export class BookService {
 
   #lastReadBooks = signal<Book[]>([]);
   lastReadBooks = computed(this.#lastReadBooks);
+  lastReadBooksLoaded: boolean = false;
 
   #latestAddedBooks = signal<Book[]>([]);
   latestAddedBooks = computed(this.#latestAddedBooks);
-
-  getBooksByLibraryId(libraryId: number, page: number) {
-    this.http.get<PaginatedBooksResponse>(`${this.libraryUrl}/${libraryId}/book?page=${page}&size=${this.pageSize}`)
-      .pipe(
-        map(response => {
-          catchError(error => {
-            console.error('Error loading libraries:', error);
-            return of([]);
-          })
-        })
-      ).subscribe()
-  }
+  latestAddedBooksLoaded: boolean = false;
 
 
   constructor(private http: HttpClient) {
@@ -49,8 +39,8 @@ export class BookService {
     );
   }
 
-  getLastReadBooks(page: number) {
-    this.http.get<PaginatedBooksResponse>(`${this.bookUrl}?page=${page}&size=25&sortBy=lastReadTime&sortDir=desc`).pipe(
+  getLastReadBooks() {
+    this.http.get<PaginatedBooksResponse>(`${this.bookUrl}?page=0&size=25&sortBy=lastReadTime&sortDir=desc`).pipe(
       map(response => response.content),
       catchError(error => {
         console.error('Error loading last read books:', error);
@@ -59,13 +49,14 @@ export class BookService {
     ).subscribe(
       (books) => {
         this.#lastReadBooks.set([...this.#lastReadBooks(), ...books]);
+        this.lastReadBooksLoaded = true;
         console.log("Loaded last read books")
       }
     );
   }
 
-  getLatestAddedBooks(page: number) {
-    this.http.get<PaginatedBooksResponse>(`${this.bookUrl}?page=${page}&size=25&sortBy=addedOn&sortDir=desc`).pipe(
+  getLatestAddedBooks() {
+    this.http.get<PaginatedBooksResponse>(`${this.bookUrl}?page=0&size=25&sortBy=addedOn&sortDir=desc`).pipe(
       map(response => response.content),
       catchError(error => {
         console.error('Error loading latest added books:', error);
@@ -74,6 +65,7 @@ export class BookService {
     ).subscribe(
       (books) => {
         this.#latestAddedBooks.set([...this.#latestAddedBooks(), ...books]);
+        this.latestAddedBooksLoaded = true;
         console.log("Loaded latest added books")
       }
     );
@@ -81,7 +73,7 @@ export class BookService {
 
   searchBooks(query: string): Observable<Book[]> {
     if (query.length < 2) {
-      return new Observable<Book[]>();
+      return of([]);
     }
     return this.http.get<Book[]>(`${this.bookUrl}/search?title=${encodeURIComponent(query)}`);
   }

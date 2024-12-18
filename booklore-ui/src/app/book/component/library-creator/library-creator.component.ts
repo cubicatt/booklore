@@ -71,7 +71,7 @@ export class LibraryCreatorComponent {
     this.dynamicDialogRef.close();
   }
 
-  validateLibraryNameAndProceed(nextCallback: any) {
+  /*validateLibraryNameAndProceed(nextCallback: any) {
     if (this.value.trim()) {
       this.libraryServiceV2.checkLibraryNameExists(this.value).subscribe(
         (response) => {
@@ -95,5 +95,5 @@ export class LibraryCreatorComponent {
         }
       );
     }
-  }
+  }*/
 }

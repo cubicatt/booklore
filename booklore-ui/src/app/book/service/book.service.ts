@@ -7,7 +7,7 @@ import {HttpClient} from '@angular/common/http';
   providedIn: 'root',
 })
 export class BookService {
-  private readonly pageSize = 25;
+  private readonly pageSize = 50;
   private readonly libraryUrl = 'http://localhost:8080/v1/library';
   private readonly bookUrl = 'http://localhost:8080/v1/book';
 

@@ -17,14 +17,36 @@
 }
 
 .cover-container {
+  position: relative;
   max-width: 200px;
   flex-shrink: 0;
+}
+
+.cover-wrapper {
+  position: relative;
 }
 
 .book-cover {
   width: 100%;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: filter 0.3s ease;
+}
+
+.cover-container:hover .book-cover {
+  filter: blur(2px);
+}
+
+.overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+.cover-container:hover .overlay {
+  display: block;
 }
 
 .metadata {

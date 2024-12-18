@@ -1,15 +1,32 @@
-<div class="book-list"
-     infiniteScroll
-     [infiniteScrollDistance]="2"
-     [infiniteScrollThrottle]="50"
-     (scrolled)="loadMore()">
-  <div class="book-item" *ngFor="let book of books">
-    <img [src]="coverImageSrc(book.id)" class="book-cover placeholder" alt="Cover of {{ book.metadata.title }}" loading="lazy"/>
-    <div class="book-info">
-      <h4>{{ book.metadata.title }}</h4>
-      <p>{{ getAuthorNames(book) }}</p>
-      <p-button [rounded]="true" icon="pi pi-eye" class="view-btn" (click)="readBook(book.id)"></p-button>
-      <p-button [rounded]="true" icon="pi pi-info" class="read-btn" (click)="openBookInfo(book.id, book.libraryId)"></p-button>
+<div>
+  <div class="library-header">
+    <h3 class="library-name">{{ libraryNameSignal() }}</h3>
+    <div class="library-header-right">
+      <p-dropdown
+        [options]="cities"
+        [(ngModel)]="selectedCity"
+        optionLabel="name"
+        placeholder="Select Sorting" />
+      <div class="zoom-controls">
+        <p-button icon="pi pi-minus" [rounded]="true" [outlined]="true" (click)="decreaseSize()" [disabled]="isDecreaseDisabled()" severity="info"></p-button>
+        <p-button icon="pi pi-plus" [rounded]="true" [outlined]="true" (click)="increaseSize()" [disabled]="isIncreaseDisabled()" severity="info"></p-button>
+      </div>
+    </div>
+  </div>
+  <div class="book-list"
+       infiniteScroll
+       [ngClass]="coverSizeClass"
+       [infiniteScrollDistance]="2"
+       [infiniteScrollThrottle]="50"
+       (scrolled)="loadMore()">
+    <div class="book-item" *ngFor="let book of books">
+      <img [src]="coverImageSrc(book.id)" class="book-cover placeholder" alt="Cover of {{ book.metadata.title }}" loading="lazy"/>
+      <div class="book-info">
+        <h4 class="book-title">{{ book.metadata.title }}</h4>
+        <p class="book-authors">{{ getAuthorNames(book) }}</p>
+        <p-button [rounded]="true" icon="pi pi-eye" class="view-btn" (click)="readBook(book.id)"></p-button>
+        <p-button [rounded]="true" icon="pi pi-info" class="read-btn" (click)="openBookInfo(book.id, book.libraryId)"></p-button>
+      </div>
     </div>
   </div>
 </div>

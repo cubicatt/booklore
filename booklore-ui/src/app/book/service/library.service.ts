@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import {computed, Injectable, signal} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
@@ -10,13 +10,12 @@ import { Library, LibraryApiResponse } from '../model/library.model';
 export class LibraryService {
   private libraryUrl: string = 'http://localhost:8080/v1/library';
 
-  libraries = signal<Library[]>([]);
+  #libraries = signal<Library[]>([]);
+  libraries = computed(this.#libraries);
 
-  constructor(private http: HttpClient) {
-    this.getLibrariesFromAPI();
-  }
+  constructor(private http: HttpClient) {}
 
-  getLibrariesFromAPI(): void {
+  initializeLibraries(): void {
     this.http.get<LibraryApiResponse>(this.libraryUrl).pipe(
       map(response => response.content),
       catchError(error => {
@@ -25,7 +24,8 @@ export class LibraryService {
       })
     ).subscribe(
       (libraries) => {
-        this.libraries.set(libraries);
+        this.#libraries.set(libraries);
+        console.log("Library Initialized")
       }
     );
   }
@@ -33,7 +33,9 @@ export class LibraryService {
   createLibrary(newLibrary: Library): Observable<Library> {
     return this.http.post<Library>(this.libraryUrl, newLibrary).pipe(
       tap((createdLibrary) => {
-        this.libraries.set([...this.libraries(), createdLibrary]);
+        const currentLibraries = this.#libraries();
+        currentLibraries.push(createdLibrary);
+        this.#libraries.set(currentLibraries);
       }),
       catchError(error => {
         console.error('Error creating library:', error);
@@ -42,12 +44,23 @@ export class LibraryService {
     );
   }
 
-  checkLibraryNameExists(name: string): Observable<any> {
-    return this.http.get<Library>(`${this.libraryUrl}/search?name=${name}`).pipe(
-      catchError(error => {
-        console.error('Error checking library name:', error);
-        return of(null);
+  getLibraryById(libraryId: number): Library | undefined {
+    return this.#libraries().find(library => library.id === libraryId);
+  }
+
+  /*updateLibrary(id: number, updatedLibrary: Library): Observable<Library> {
+    const url = `${this.libraryUrl}/${id}`;
+    return this.http.put<Library>(url, updatedLibrary).pipe(
+      tap((updatedLibraryFromBackend) => {
+        const updatedLibraries = this._libraries().map((library) =>
+          library.id === id ? { ...library, ...updatedLibraryFromBackend } : library
+        );
+        this._libraries.set(updatedLibraries);
+      }),
+      catchError((error) => {
+        console.error('Error updating library:', error);
+        throw error;
       })
     );
-  }
+  }*/
 }

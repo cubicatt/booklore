@@ -1,4 +1,4 @@
-import {Component, computed, OnInit} from '@angular/core';
+import {Component, computed, OnInit, Signal, WritableSignal} from '@angular/core';
 import {AppMenuitemComponent} from './app.menuitem.component';
 import {NgForOf, NgIf} from '@angular/common';
 import {MenuModule} from 'primeng/menu';
@@ -12,7 +12,7 @@ import {Library} from '../../model/library.model';
 })
 export class AppMenuComponent implements OnInit {
   home: any[] = [];
-  libraries: any;
+  libraries: Signal<Library[]>;
 
   libraryMenu = computed(() => [
     {

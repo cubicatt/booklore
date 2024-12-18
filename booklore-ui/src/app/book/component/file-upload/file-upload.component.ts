@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Signal, WritableSignal} from '@angular/core';
 import {Library} from '../../model/library.model';
 import {LibraryService} from '../../service/library.service';
 import {FileUploadService} from '../../../file-upload.service';
@@ -20,8 +20,8 @@ import {DynamicDialogRef} from 'primeng/dynamicdialog';
     FormsModule
   ],
 })
-export class FileUploadComponent implements OnInit {
-  libraries: Library[] = [];
+export class FileUploadComponent {
+  libraries: Signal<Library[]>;
   selectedLibrary: Library | null = null;
   selectedPath: string = '';
   selectedFileName: string = '';
@@ -32,12 +32,8 @@ export class FileUploadComponent implements OnInit {
     private libraryService: LibraryService,
     private fileUploadService: FileUploadService,
     private toastService: ToastService,
-    private dynamicDialogRef: DynamicDialogRef
-  ) {
-  }
-
-  ngOnInit() {
-    this.libraries = this.libraryService.libraries();
+    private dynamicDialogRef: DynamicDialogRef) {
+      this.libraries = this.libraryService.libraries;
   }
 
   triggerFileInput(fileInput: HTMLInputElement): void {

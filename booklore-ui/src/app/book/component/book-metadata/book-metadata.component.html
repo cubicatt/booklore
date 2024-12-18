@@ -2,7 +2,12 @@
   <div class="book-metadata">
     <div class="book-header">
       <div class="cover-container">
-        <img [src]="coverImageSrc(book?.id)" class="book-cover placeholder" alt="Cover of {{ book?.metadata?.title }}" loading="lazy"/>
+        <div class="cover-wrapper">
+          <img [src]="coverImageSrc(book?.id)" class="book-cover placeholder" alt="Cover of {{ book?.metadata?.title }}" loading="lazy"/>
+          <div class="overlay" (click)="readBook(book?.id)">
+            <p-button icon="pi pi-book" [rounded]="true"></p-button>
+          </div>
+        </div>
         <div>
           <div class="book-navigation">
             <p-button

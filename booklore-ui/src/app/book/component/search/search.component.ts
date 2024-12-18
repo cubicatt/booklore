@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { NgForOf, NgIf } from '@angular/common';
 import { ButtonDirective } from 'primeng/button';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-search',
@@ -26,7 +27,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   #searchSubject = new Subject<string>();
   #subscription!: Subscription;
 
-  constructor(private bookService: BookService) {}
+  constructor(private bookService: BookService, private router: Router) {}
 
   ngOnInit(): void {
     this.initializeSearch();
@@ -54,12 +55,13 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   onBookClick(book: Book): void {
     this.clearSearch();
-    this.openBook(book.id);
+    this.openBook(book.id, book.libraryId);
   }
 
-  openBook(bookId: number): void {
-    const url = `/pdf-viewer/book/${bookId}`;
-    window.open(url, '_blank');
+  openBook(bookId: number, libraryId: number): void {
+    /*const url = `/pdf-viewer/book/${bookId}`;
+    window.open(url, '_blank');*/
+    this.router.navigate(['/library', libraryId, 'book', bookId, 'info']);
   }
 
   getBookCoverUrl(bookId: number): string {

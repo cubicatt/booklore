@@ -1,12 +1,15 @@
-import { Component, OnInit, NgZone } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { BookProgressService } from '../../service/book-progress-service';
-import { BookService } from '../../service/book.service';
+import {Component, computed, NgZone, OnChanges, OnInit, signal} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {BookProgressService} from '../../service/book-progress-service';
+import {BookService} from '../../service/book.service';
 import {Book, BookUpdateEvent} from '../../model/book.model';
-import { combineLatest } from 'rxjs';
+import {combineLatest} from 'rxjs';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {Button} from 'primeng/button';
-import {NgForOf} from '@angular/common';
+import {NgClass, NgForOf} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {DropdownModule} from 'primeng/dropdown';
+import {LibraryService} from '../../service/library.service';
 
 @Component({
   selector: 'app-library-browser-v2',
@@ -15,20 +18,35 @@ import {NgForOf} from '@angular/common';
   imports: [
     InfiniteScrollDirective,
     Button,
-    NgForOf
+    NgForOf,
+    FormsModule,
+    DropdownModule,
+    NgClass
   ]
 })
 export class LibraryBrowserComponent implements OnInit {
   books: Book[] = [];
-  private libraryId: number = 1;
+  private libraryIdSignal = signal(1);
   private currentPage: number = 0;
+  cities: any[] | undefined;
+  selectedCity: any;
+  coverSizeClass = 'medium';
+  coverSizeClasses = ['small', 'medium', 'large', 'extra-large'];
+
+  libraryNameSignal = computed(() => {
+    const library = this.libraryService
+      .libraries()
+      .find((library) => library.id === this.libraryIdSignal());
+    return library ? library.name : 'Library not found';
+  });
 
   constructor(
     private bookService: BookService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private bookProgressService: BookProgressService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private libraryService: LibraryService
   ) {}
 
   ngOnInit(): void {
@@ -36,7 +54,7 @@ export class LibraryBrowserComponent implements OnInit {
       .subscribe(([params, queryParams]) => {
         const libraryId = params.get('libraryId');
         if (libraryId) {
-          this.libraryId = +libraryId;
+          this.libraryIdSignal.set(+libraryId);
           this.resetState();
           this.loadBooks();
         }
@@ -48,7 +66,7 @@ export class LibraryBrowserComponent implements OnInit {
   }
 
   startListeningForProgress(): void {
-    this.bookProgressService.connect(this.libraryId).subscribe({
+    this.bookProgressService.connect(this.libraryIdSignal()).subscribe({
       next: (event: BookUpdateEvent) => this.addBookToCollection(event),
       error: (error) => console.error('Error receiving progress updates:', error),
     });
@@ -72,13 +90,12 @@ export class LibraryBrowserComponent implements OnInit {
   }
 
   resetState(): void {
-    console.log("resetState")
     this.books = [];
     this.currentPage = 0;
   }
 
   loadBooks(): void {
-    this.bookService.loadBooks(this.libraryId, this.currentPage).subscribe({
+    this.bookService.loadBooks(this.libraryIdSignal(), this.currentPage).subscribe({
       next: (response) => {
         this.books = [...this.books, ...response.content];
         this.currentPage++;
@@ -106,5 +123,31 @@ export class LibraryBrowserComponent implements OnInit {
 
   openBookInfo(bookId: number, libraryId: number) {
     this.router.navigate(['/library', libraryId, 'book', bookId, 'info']);
+  }
+
+  getCurrentSizeIndex(): number {
+    return this.coverSizeClasses.indexOf(this.coverSizeClass);
+  }
+
+  increaseSize() {
+    const currentIndex = this.getCurrentSizeIndex();
+    if (currentIndex < this.coverSizeClasses.length - 1) {
+      this.coverSizeClass = this.coverSizeClasses[currentIndex + 1];
+    }
+  }
+
+  decreaseSize() {
+    const currentIndex = this.getCurrentSizeIndex();
+    if (currentIndex > 0) {
+      this.coverSizeClass = this.coverSizeClasses[currentIndex - 1];
+    }
+  }
+
+  isIncreaseDisabled(): boolean {
+    return this.coverSizeClass === this.coverSizeClasses[this.coverSizeClasses.length - 1];
+  }
+
+  isDecreaseDisabled(): boolean {
+    return this.coverSizeClass === this.coverSizeClasses[0];
   }
 }

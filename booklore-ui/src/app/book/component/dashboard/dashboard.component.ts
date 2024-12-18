@@ -1,4 +1,4 @@
-import { Component, WritableSignal } from '@angular/core';
+import {Component, Signal, WritableSignal} from '@angular/core';
 import { LibraryService } from '../../service/library.service';
 import { Library } from '../../model/library.model';
 import { Button } from 'primeng/button';
@@ -19,7 +19,7 @@ import {DashboardScrollerComponent} from '../dashboard-scroller/dashboard-scroll
   providers: [DialogService],
 })
 export class DashboardComponent {
-  private libraries: WritableSignal<Library[]>;
+  private libraries: Signal<Library[]>;
   ref: DynamicDialogRef | undefined;
 
   constructor(private libraryService: LibraryService, public dialogService: DialogService) {
@@ -32,13 +32,10 @@ export class DashboardComponent {
 
   createNewLibrary(event: MouseEvent) {
     const buttonRect = (event.target as HTMLElement).getBoundingClientRect();
-
     const dialogWidthPercentage = 50;
     const viewportWidth = window.innerWidth;
     const dialogWidth = (dialogWidthPercentage / 100) * viewportWidth;
-
     const leftPosition = buttonRect.left + (buttonRect.width / 2) - (dialogWidth / 2);
-
     this.ref = this.dialogService.open(LibraryCreatorComponent, {
       modal: true,
       width: `${dialogWidthPercentage}%`,

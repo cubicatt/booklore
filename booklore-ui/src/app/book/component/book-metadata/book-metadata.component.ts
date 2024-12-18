@@ -36,7 +36,7 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.routeSubscription = this.activatedRoute.paramMap.subscribe((paramMap) => {
-      const bookId = +paramMap.get('bookId')!;
+       const bookId = +paramMap.get('bookId')!;
       const libraryId = +paramMap.get('libraryId')!;
       if (bookId && libraryId) {
         this.loadBookWithNeighbors(bookId, libraryId);

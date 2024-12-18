@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {BookMetadata} from '../../model/book.model';
 import {BookService} from '../../service/book.service';
 import {NgForOf, NgIf} from '@angular/common';
-import {FormBuilder, FormsModule} from '@angular/forms';
+import {FormsModule} from '@angular/forms';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Router} from '@angular/router';
 import {Button} from 'primeng/button';

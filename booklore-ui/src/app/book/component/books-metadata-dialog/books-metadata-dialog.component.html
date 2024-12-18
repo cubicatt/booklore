@@ -20,8 +20,8 @@
     <div *ngFor="let metadata of bookMetadataList" class="book-metadata">
         <div class="metadata-header">
             <div class="book-image-container">
-                <img class="book-image" src="{{ metadata.thumbnail }}" alt="Book Cover"/>
-                <p-button class="select-button" (click)="selectMetadata(metadata)">Select</p-button>
+              <img class="book-image" [src]="metadata.thumbnail || 'assets/book-cover-metadata.png'" alt="Book Cover"/>
+              <p-button class="select-button" (click)="selectMetadata(metadata)">Select</p-button>
             </div>
             <div>
                 <h3>{{ metadata.title }}<span *ngIf="metadata.subtitle">: {{ metadata.subtitle }}</span></h3>
@@ -32,10 +32,8 @@
                 <p><strong>Description:</strong> {{ truncateDescription(metadata.description) }}</p>
                 <p><strong>Page Count:</strong> {{ metadata.pageCount }}</p>
                 <p *ngIf="metadata.googleBookId">
-                    <strong>Google Book Id:</strong>
-                    <a [href]="'https://books.google.com/books?id=' + metadata.googleBookId" target="_blank">
-                        {{ metadata.googleBookId }}
-                    </a>
+                    <strong>Google Book Id: </strong>
+                    <a [href]="'https://books.google.com/books?id=' + metadata.googleBookId" target="_blank">{{ metadata.googleBookId }}</a>
                 </p>
             </div>
         </div>

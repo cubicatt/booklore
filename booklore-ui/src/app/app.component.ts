@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {LibraryService} from './book/service/library.service';
 
 @Component({
@@ -7,7 +7,11 @@ import {LibraryService} from './book/service/library.service';
   standalone: false,
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
-  constructor(private libraryService: LibraryService) {
+export class AppComponent implements OnInit {
+
+  constructor(private libraryService: LibraryService) {}
+
+  ngOnInit(): void {
+    this.libraryService.initializeLibraries();
   }
 }

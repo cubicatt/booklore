@@ -1,13 +1,14 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.config.AppProperties;
-import com.adityachandel.booklore.model.enums.ParsingStatus;
-import com.adityachandel.booklore.model.FileProcessResult;
 import com.adityachandel.booklore.model.LibraryFile;
+import com.adityachandel.booklore.model.dto.BookDTO;
 import com.adityachandel.booklore.model.entity.Book;
 import com.adityachandel.booklore.model.entity.BookMetadata;
-import com.adityachandel.booklore.repository.*;
+import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.transformer.BookTransformer;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
@@ -15,6 +16,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.imageio.ImageIO;
@@ -22,7 +24,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,32 +39,24 @@ public class PdfFileProcessor implements FileProcessor {
     private BookCreatorService bookCreatorService;
     private AppProperties appProperties;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
-    public FileProcessResult processFile(LibraryFile libraryFile, boolean forceProcess) {
+    public BookDTO processFile(LibraryFile libraryFile, boolean forceProcess) {
         File bookFile = new File(libraryFile.getFilePath());
         String fileName = bookFile.getName();
         if (!forceProcess) {
             Optional<Book> bookOptional = bookRepository.findBookByFileNameAndLibraryId(fileName, libraryFile.getLibrary().getId());
-            if (bookOptional.isPresent()) {
-                return FileProcessResult.builder()
-                        .libraryFile(libraryFile)
-                        .bookDTO(BookTransformer.convertToBookDTO(bookOptional.get()))
-                        .parsingStatus(ParsingStatus.EXISTING_BOOK_NO_FORCED_UPDATE)
-                        .build();
-            } else {
-                return processNewFile(libraryFile);
-            }
+            return bookOptional.map(BookTransformer::convertToBookDTO).orElseGet(() -> processNewFile(libraryFile));
         } else {
             return processNewFile(libraryFile);
         }
     }
 
-    private FileProcessResult processNewFile(LibraryFile libraryFile) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    protected BookDTO processNewFile(LibraryFile libraryFile) {
         File bookFile = new File(libraryFile.getFilePath());
         Book book = bookCreatorService.createShellBook(libraryFile);
         BookMetadata bookMetadata = book.getMetadata();
-        FileProcessResult fileProcessResult;
         try (PDDocument document = Loader.loadPDF(bookFile)) {
             if (document.getDocumentInformation() == null) {
                 log.warn("No document information found");
@@ -74,19 +71,12 @@ public class PdfFileProcessor implements FileProcessor {
             }
             generateCoverImage(bookFile, new File(appProperties.getPathConfig() + "/thumbs"), document);
         } catch (Exception e) {
-            log.error("Error while processing file {}", libraryFile.getFilePath(), e);
-            return FileProcessResult.builder()
-                    .libraryFile(libraryFile)
-                    .parsingStatus(ParsingStatus.FAILED_TO_PARSE_BOOK)
-                    .build();
+            log.error("Error while processing file {}, error: {}", libraryFile.getFilePath(), e.getMessage());
         }
         bookCreatorService.saveConnections(book);
-        fileProcessResult = FileProcessResult.builder()
-                .bookDTO(BookTransformer.convertToBookDTO(book))
-                .parsingStatus(ParsingStatus.PARSED_NEW_BOOK)
-                .libraryFile(libraryFile)
-                .build();
-        return fileProcessResult;
+        bookRepository.save(book);
+        bookRepository.flush();
+        return BookTransformer.convertToBookDTO(book);
     }
 
     private Set<String> getAuthors(PDDocument document) {

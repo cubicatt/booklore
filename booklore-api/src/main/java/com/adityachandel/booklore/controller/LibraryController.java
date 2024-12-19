@@ -14,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/v1/library")
@@ -38,11 +41,6 @@ public class LibraryController {
         return ResponseEntity.ok(libraryService.createLibrary(request));
     }
 
-    @GetMapping(path = "/{libraryId}/parse")
-    public SseEmitter parseLibrary(@RequestParam(required = false, defaultValue = "false") boolean force, @PathVariable long libraryId) {
-        return libraryService.parseLibraryBooks(libraryId, force);
-    }
-
     @DeleteMapping("/{libraryId}")
     public ResponseEntity<?> deleteLibrary(@PathVariable long libraryId) {
         libraryService.deleteLibrary(libraryId);
@@ -60,11 +58,8 @@ public class LibraryController {
     }
 
     @GetMapping("/{libraryId}/book")
-    public ResponseEntity<Page<BookDTO>> getBooks(
-            @PathVariable long libraryId,
-            @RequestParam(defaultValue = "0") @Min(0) int page,
-            @RequestParam(defaultValue = "25") @Min(1) @Max(100) int size) {
-        Page<BookDTO> books = libraryService.getBooks(libraryId, page, size);
+    public ResponseEntity<List<BookDTO>> getBooks(@PathVariable long libraryId) {
+        List<BookDTO> books = libraryService.getBooks(libraryId);
         return ResponseEntity.ok(books);
     }
 }

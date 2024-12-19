@@ -49,6 +49,9 @@ public class BooksService {
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
     private final LibraryRepository libraryRepository;
+    private final NotificationService notificationService;
+
+
 
 
     public BookDTO getBook(long bookId) {
@@ -56,19 +59,20 @@ public class BooksService {
         return BookTransformer.convertToBookDTO(book);
     }
 
-    public Page<BookDTO> getBooks(int page, int size, String sortBy, String sortDir) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
-        PageRequest pageRequest = PageRequest.of(page, size, sort);
-        Page<Book> bookPage = Page.empty();
+    public List<BookDTO> getBooks(String sortBy, String sortDir) {
+        int size = 25;
+        PageRequest pageRequest = PageRequest.of(0, size, Sort.by(Sort.Direction.fromString(sortDir), sortBy));
+        Page<Book> bookPage;
         if (sortBy.equals("addedOn")) {
             bookPage = bookRepository.findByAddedOnIsNotNull(pageRequest);
         } else if (sortBy.equals("lastReadTime")) {
             bookPage = bookRepository.findByLastReadTimeIsNotNull(pageRequest);
+        } else {
+            throw new IllegalArgumentException("Invalid sortBy parameter");
         }
-        List<BookDTO> bookDTOs = bookPage.getContent().stream()
+        return bookPage.getContent().stream()
                 .map(BookTransformer::convertToBookDTO)
                 .collect(Collectors.toList());
-        return new PageImpl<>(bookDTOs, pageRequest, bookPage.getTotalElements());
     }
 
     public void saveBookViewerSetting(long bookId, BookViewerSettingDTO bookViewerSettingDTO) {

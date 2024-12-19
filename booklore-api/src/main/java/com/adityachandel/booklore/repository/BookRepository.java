@@ -17,7 +17,7 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
 
     Optional<Book> findByFileName(String fileName);
 
-    Page<Book> findBooksByLibraryId(Long libraryId, Pageable pageable);
+    List<Book> findBooksByLibraryId(Long libraryId);
 
     Optional<Book> findBookByIdAndLibraryId(long id, long libraryId);
 

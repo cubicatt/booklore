@@ -22,6 +22,10 @@ import {SearchComponent} from './book/component/search/search.component';
 import {MessageService} from 'primeng/api';
 import {FileUploadComponent} from './book/component/file-upload/file-upload.component';
 import {DropdownModule} from 'primeng/dropdown';
+import {rxStompServiceFactory} from './rx-stomp-service-factory';
+import {RxStompService} from './rx-stomp.service';
+import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
+import {LazyLoadImageModule} from 'ng-lazyload-image';
 
 @NgModule({
   declarations: [
@@ -46,8 +50,18 @@ import {DropdownModule} from 'primeng/dropdown';
     InfiniteScrollDirective,
     SearchComponent,
     DropdownModule,
+    VirtualScrollerModule,
+    LazyLoadImageModule
   ],
-  providers: [DialogService, MessageService],
+  providers: [
+    DialogService,
+    MessageService,
+    {
+      provide: RxStompService,
+      useFactory: rxStompServiceFactory,
+    },
+  ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

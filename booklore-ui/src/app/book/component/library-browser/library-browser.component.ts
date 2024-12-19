@@ -1,33 +1,30 @@
-import { Component, NgZone, OnDestroy, OnInit, signal, computed } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { BookProgressService } from '../../service/book-progress-service';
-import { BookService } from '../../service/book.service';
-import { Book, BookUpdateEvent } from '../../model/book.model';
-import { combineLatest, Subscription } from 'rxjs';
-import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
-import { Button } from 'primeng/button';
-import { NgClass, NgForOf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { DropdownModule } from 'primeng/dropdown';
-import { LibraryService } from '../../service/library.service';
+import {Component, computed, OnInit, signal} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {BookService} from '../../service/book.service';
+import {Book} from '../../model/book.model';
+import {combineLatest} from 'rxjs';
+import {Button} from 'primeng/button';
+import {NgForOf} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {DropdownModule} from 'primeng/dropdown';
+import {LibraryService} from '../../service/library.service';
+import {LazyLoadImageModule} from 'ng-lazyload-image';
+import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
 
 @Component({
   selector: 'app-library-browser-v2',
   templateUrl: './library-browser.component.html',
   styleUrls: ['./library-browser.component.scss'],
   imports: [
-    InfiniteScrollDirective,
     Button,
     NgForOf,
     FormsModule,
     DropdownModule,
-    NgClass
+    LazyLoadImageModule,
+    VirtualScrollerModule
   ]
 })
-export class LibraryBrowserComponent implements OnInit, OnDestroy {
-  books: Book[] = [];
-  private currentPage: number = 0;
-  private progressSubscription?: Subscription;
+export class LibraryBrowserComponent implements OnInit {
   coverSizeClass = 'medium';
   coverSizeClasses = ['small', 'medium', 'large', 'extra-large'];
 
@@ -41,79 +38,23 @@ export class LibraryBrowserComponent implements OnInit, OnDestroy {
   selectedCity: any;
   cities: any[] | undefined;
 
+  booksSignal = computed(() => {
+    return this.bookService.libraryBooks();
+  });
+
   constructor(
     private bookService: BookService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private bookProgressService: BookProgressService,
-    private ngZone: NgZone,
-    private libraryService: LibraryService
-  ) {}
+    private libraryService: LibraryService) {
+  }
 
   ngOnInit(): void {
     combineLatest([this.activatedRoute.paramMap, this.activatedRoute.queryParamMap])
       .subscribe(([params, queryParams]) => {
         const libraryId = params.get('libraryId');
         const watch = queryParams.get('watch');
-        if (libraryId) {
-          const libraryIdNum = +libraryId;
-          if (this.libraryIdSignal() !== libraryIdNum) {
-            this.libraryIdSignal.set(libraryIdNum);
-            this.resetState();
-            this.loadBooks();
-          } else if (this.books.length === 0) {
-            this.loadBooks();
-          }
-        }
-        if (watch && !this.progressSubscription) {
-          this.startListeningForProgress();
-        } else if (!watch && this.progressSubscription) {
-          this.stopListeningForProgress();
-        }
       });
-  }
-
-  startListeningForProgress(): void {
-    this.progressSubscription = this.bookProgressService
-      .connect(this.libraryIdSignal())
-      .subscribe({
-        next: (event: BookUpdateEvent) => this.addBookToCollection(event),
-        error: (error) => console.error('Error receiving progress updates:', error),
-      });
-  }
-
-  stopListeningForProgress(): void {
-    if (this.progressSubscription) {
-      this.progressSubscription.unsubscribe();
-      this.progressSubscription = undefined;
-    }
-  }
-
-  addBookToCollection(event: BookUpdateEvent): void {
-    if (event.parsingStatus === 'PARSED_NEW_BOOK') {
-      const newBook: Book = {
-        id: event.book.id,
-        libraryId: event.book.libraryId,
-        metadata: event.book.metadata,
-      };
-      this.ngZone.run(() => {
-        if (!this.books.find((book) => book.id === newBook.id)) {
-          this.books = [newBook, ...this.books];
-        }
-      });
-    } else {
-      console.warn('Status other than: PARSED_NEW_BOOK');
-    }
-  }
-
-  loadBooks(): void {
-    this.bookService.loadBooks(this.libraryIdSignal(), this.currentPage).subscribe({
-      next: (response) => {
-        this.books = [...this.books, ...response.content];
-        this.currentPage++;
-      },
-      error: (err) => console.error('Error loading books:', err),
-    });
   }
 
   coverImageSrc(bookId: number): string {
@@ -157,16 +98,6 @@ export class LibraryBrowserComponent implements OnInit, OnDestroy {
 
   isDecreaseDisabled(): boolean {
     return this.coverSizeClass === this.coverSizeClasses[0];
-  }
-
-  resetState(): void {
-    this.books = [];
-    this.currentPage = 0;
-    this.stopListeningForProgress();
-  }
-
-  ngOnDestroy(): void {
-    this.stopListeningForProgress();
   }
 
 }

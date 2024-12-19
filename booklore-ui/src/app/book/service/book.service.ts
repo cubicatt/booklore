@@ -1,15 +1,13 @@
 import {Observable, of} from 'rxjs';
-import {Book, BookMetadata, BookSetting, BookWithNeighborsDTO, PaginatedBooksResponse} from '../model/book.model';
+import {Book, BookMetadata, BookSetting, BookWithNeighborsDTO} from '../model/book.model';
 import {computed, Injectable, signal} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {catchError, map} from 'rxjs/operators';
-import {LibraryApiResponse} from '../model/library.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BookService {
-  private readonly pageSize = 50;
   private readonly libraryUrl = 'http://localhost:8080/v1/library';
   private readonly bookUrl = 'http://localhost:8080/v1/book';
 
@@ -21,8 +19,38 @@ export class BookService {
   latestAddedBooks = computed(this.#latestAddedBooks);
   latestAddedBooksLoaded: boolean = false;
 
+  #libraryBooks = signal<Book[]>([]);
+  libraryBooks = computed(this.#libraryBooks);
+  lastLibraryBooksLoaded: boolean = false;
+
 
   constructor(private http: HttpClient) {
+  }
+
+  appendBookToLibrary(book: Book) {
+    const newBook: Book = this.convertBookDTOToBook(book);
+    this.#libraryBooks.set([newBook, ...this.#libraryBooks()]);
+  }
+
+  private convertBookDTOToBook(book: Book): Book {
+    return {
+      id: book.id,
+      libraryId: book.libraryId,
+      metadata: {
+        thumbnail: book.metadata.thumbnail,
+        title: book.metadata.title,
+        subtitle: book.metadata.subtitle,
+        authors: book.metadata.authors,
+        categories: book.metadata.categories,
+        publisher: book.metadata.publisher,
+        publishedDate: book.metadata.publishedDate,
+        isbn10: book.metadata.isbn10,
+        description: book.metadata.description,
+        pageCount: book.metadata.pageCount,
+        language: book.metadata.language,
+        googleBookId: book.metadata.googleBookId,
+      }
+    };
   }
 
   getBook(bookId: number): Observable<Book> {
@@ -33,15 +61,31 @@ export class BookService {
     return this.http.get<BookWithNeighborsDTO>(`${this.libraryUrl}/${libraryId}/book/${bookId}/withNeighbors`);
   }
 
-  loadBooks(libraryId: number, page: number): Observable<PaginatedBooksResponse> {
-    return this.http.get<PaginatedBooksResponse>(
-      `${this.libraryUrl}/${libraryId}/book?page=${page}&size=${this.pageSize}`
+  loadBooksSignal(libraryId: number) {
+    this.http.get<Book[]>(`${this.libraryUrl}/${libraryId}/book`).pipe(
+      map(response => response),
+      catchError(error => {
+        console.error('Error loading library books:', error);
+        return of([]);
+      })
+    ).subscribe(
+      (books) => {
+        this.#libraryBooks.set([...this.#libraryBooks(), ...books]);
+        this.lastReadBooksLoaded = true;
+        console.log("Loaded library books")
+      }
+    );
+  }
+
+  loadBooks(libraryId: number): Observable<Book[]> {
+    return this.http.get<Book[]>(
+      `${this.libraryUrl}/${libraryId}/book`
     );
   }
 
   getLastReadBooks() {
-    this.http.get<PaginatedBooksResponse>(`${this.bookUrl}?page=0&size=25&sortBy=lastReadTime&sortDir=desc`).pipe(
-      map(response => response.content),
+    this.http.get<Book[]>(`${this.bookUrl}?sortBy=lastReadTime&sortDir=desc`).pipe(
+      map(response => response),
       catchError(error => {
         console.error('Error loading last read books:', error);
         return of([]);
@@ -56,8 +100,8 @@ export class BookService {
   }
 
   getLatestAddedBooks() {
-    this.http.get<PaginatedBooksResponse>(`${this.bookUrl}?page=0&size=25&sortBy=addedOn&sortDir=desc`).pipe(
-      map(response => response.content),
+    this.http.get<Book[]>(`${this.bookUrl}?sortBy=addedOn&sortDir=desc`).pipe(
+      map(response => response),
       catchError(error => {
         console.error('Error loading latest added books:', error);
         return of([]);

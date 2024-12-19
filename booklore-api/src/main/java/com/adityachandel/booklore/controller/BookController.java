@@ -30,15 +30,11 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<BookDTO>> getBooks(
-            @RequestParam(defaultValue = "0") @Min(0) int page,
-            @RequestParam(defaultValue = "25") @Min(1) @Max(100) int size,
-            @RequestParam(defaultValue = "lastReadTime") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDir) {
+    public ResponseEntity<List<BookDTO>> getBooks(@RequestParam(defaultValue = "lastReadTime") String sortBy, @RequestParam(defaultValue = "desc") String sortDir) {
         if (!sortBy.equals("lastReadTime") && !sortBy.equals("addedOn")) {
             return ResponseEntity.badRequest().body(null);
         }
-        Page<BookDTO> books = booksService.getBooks(page, size, sortBy, sortDir);
+        List<BookDTO> books = booksService.getBooks(sortBy, sortDir);
         return ResponseEntity.ok(books);
     }
 

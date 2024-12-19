@@ -1,32 +1,38 @@
 <div>
-  <div class="library-header">
-    <h3 class="library-name">{{ libraryNameSignal() }}</h3>
-    <div class="library-header-right">
-      <p-dropdown
-        [options]="cities"
-        [(ngModel)]="selectedCity"
-        optionLabel="name"
-        placeholder="Select Sorting" />
-      <div class="zoom-controls">
-        <p-button icon="pi pi-minus" [rounded]="true" [outlined]="true" (click)="decreaseSize()" [disabled]="isDecreaseDisabled()" severity="info"></p-button>
-        <p-button icon="pi pi-plus" [rounded]="true" [outlined]="true" (click)="increaseSize()" [disabled]="isIncreaseDisabled()" severity="info"></p-button>
+    <div class="library-header">
+      <h3 class="library-name">{{ libraryNameSignal() }}</h3>
+      <div class="library-header-right">
+        <p-dropdown
+          [options]="cities"
+          [(ngModel)]="selectedCity"
+          optionLabel="name"
+          placeholder="Select Sorting" />
+        <div class="zoom-controls">
+          <p-button icon="pi pi-minus" [rounded]="true" [outlined]="true" (click)="decreaseSize()" [disabled]="isDecreaseDisabled()" severity="info"></p-button>
+          <p-button icon="pi pi-plus" [rounded]="true" [outlined]="true" (click)="increaseSize()" [disabled]="isIncreaseDisabled()" severity="info"></p-button>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="book-list"
-       infiniteScroll
-       [ngClass]="coverSizeClass"
-       [infiniteScrollDistance]="2"
-       [infiniteScrollThrottle]="50"
-       (scrolled)="loadBooks()">
-    <div class="book-item" *ngFor="let book of books">
-      <img [src]="coverImageSrc(book.id)" class="book-cover placeholder" alt="Cover of {{ book.metadata.title }}" loading="lazy"/>
-      <div class="book-info">
-        <h4 class="book-title">{{ book.metadata.title }}</h4>
-        <p class="book-authors">{{ getAuthorNames(book) }}</p>
-        <p-button [rounded]="true" icon="pi pi-eye" class="view-btn" (click)="readBook(book.id)"></p-button>
-        <p-button [rounded]="true" icon="pi pi-info" class="read-btn" (click)="openBookInfo(book.id, book.libraryId)"></p-button>
-      </div>
+
+
+  <div class="content-container">
+    <div class="card-container">
+      <virtual-scroller class="virtual-scroller" #scroll [items]="booksSignal()">
+        <div class="grid" #container>
+          <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
+            <!--<img [lazyLoad]="coverImageSrc(book.id)" class="book-cover placeholder"/>-->
+            <img [src]="coverImageSrc(book.id)" class="book-cover placeholder" alt="Cover of {{ book.metadata.title }}" loading="lazy"/>
+            <div class="book-info">
+              <h4 class="book-title">{{ book.metadata.title }}</h4>
+              <p-button [rounded]="true" icon="pi pi-eye" class="view-btn" (click)="readBook(book.id)"></p-button>
+              <p-button [rounded]="true" icon="pi pi-info" class="read-btn" (click)="openBookInfo(book.id, book.libraryId)"></p-button>
+
+            </div>
+          </div>
+        </div>
+      </virtual-scroller>
     </div>
   </div>
+
+
 </div>

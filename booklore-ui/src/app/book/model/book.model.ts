@@ -4,16 +4,6 @@ export interface Book {
   metadata: BookMetadata
 }
 
-export interface PaginatedBooksResponse {
-  content: Book[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-  first: boolean;
-  last: boolean;
-}
-
 export interface BookMetadata {
   thumbnail: string;
   title: string;

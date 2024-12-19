@@ -26,9 +26,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
 @Service
@@ -38,6 +41,8 @@ public class LibraryService {
     private LibraryRepository libraryRepository;
     private BookRepository bookRepository;
     private PdfFileProcessor pdfFileProcessor;
+    private final Map<Long, ReentrantLock> libraryLocks = new ConcurrentHashMap<>();
+
 
     public LibraryDTO createLibrary(CreateLibraryRequest request) {
         Library library = Library.builder()
@@ -78,6 +83,12 @@ public class LibraryService {
 
 
     public SseEmitter parseLibraryBooks(long libraryId, boolean force) {
+        ReentrantLock lock = libraryLocks.computeIfAbsent(libraryId, k -> new ReentrantLock());
+        if (!lock.tryLock()) {
+            SseEmitter emitter = new SseEmitter();
+            emitter.completeWithError(new IllegalStateException("Library is already being processed"));
+            return emitter;
+        }
         Library library = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         if(library.isInitialProcessed()) {
             SseEmitter emitter = new SseEmitter();
@@ -135,6 +146,7 @@ public class LibraryService {
                 }
             } finally {
                 log.info("File processing complete. Executor shutting down.");
+                lock.unlock();
                 emitter.complete();
                 sseMvcExecutor.shutdown();
             }

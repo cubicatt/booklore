@@ -1,8 +1,9 @@
 CREATE TABLE IF NOT EXISTS library
 (
-    id    BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name  VARCHAR(255) UNIQUE NOT NULL,
-    paths TEXT
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name            VARCHAR(255) UNIQUE NOT NULL,
+    paths           TEXT,
+    initial_processed BOOLEAN DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS book

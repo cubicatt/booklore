@@ -27,4 +27,7 @@ public class Library {
 
     @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Book> books;
+
+    @Column(name = "initial_processed")
+    private boolean initialProcessed;
 }

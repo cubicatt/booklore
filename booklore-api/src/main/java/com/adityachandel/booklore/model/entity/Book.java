@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Getter
@@ -39,4 +40,12 @@ public class Book {
 
     @Column(name = "added_on")
     private Instant addedOn;
+
+    @ManyToMany
+    @JoinTable(
+            name = "book_shelf_mapping",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "shelf_id")
+    )
+    private List<Shelf> shelves;
 }

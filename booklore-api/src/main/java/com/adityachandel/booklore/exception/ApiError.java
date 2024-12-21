@@ -17,7 +17,9 @@ public enum ApiError {
     DIRECTORY_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create the directory: %s"),
     INVALID_LIBRARY_PATH(HttpStatus.BAD_REQUEST, "Invalid library path"),
     FILE_ALREADY_EXISTS(HttpStatus.CONFLICT, "File already exists"),
-    INVALID_QUERY_PARAMETERS(HttpStatus.BAD_REQUEST, "Query parameters are required for the search.");
+    INVALID_QUERY_PARAMETERS(HttpStatus.BAD_REQUEST, "Query parameters are required for the search."),
+    SHELF_ALREADY_EXISTS(HttpStatus.CONFLICT, "Shelf already exists: %s"),
+    SHELF_NOT_FOUND(HttpStatus.NOT_FOUND, "Shelf not found with ID: %d");
 
     private final HttpStatus status;
     private final String message;

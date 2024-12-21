@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS library
 (
-    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name            VARCHAR(255) UNIQUE NOT NULL,
-    paths           TEXT,
+    id                BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name              VARCHAR(255) UNIQUE NOT NULL,
+    paths             TEXT,
     initial_processed BOOLEAN DEFAULT false
 );
 
@@ -78,4 +78,20 @@ CREATE TABLE IF NOT EXISTS book_metadata_author_mapping
     CONSTRAINT fk_book_metadata_author_mapping_author FOREIGN KEY (author_id) REFERENCES author (id) ON DELETE CASCADE,
     INDEX idx_book_metadata_id (book_id),
     INDEX idx_author_id (author_id)
+);
+
+
+CREATE TABLE IF NOT EXISTS shelf
+(
+    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS book_shelf_mapping
+(
+    book_id  BIGINT NOT NULL,
+    shelf_id BIGINT NOT NULL,
+    PRIMARY KEY (book_id, shelf_id),
+    CONSTRAINT fk_book_shelf_mapping_book FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE,
+    CONSTRAINT fk_book_shelf_mapping_shelf FOREIGN KEY (shelf_id) REFERENCES shelf (id) ON DELETE CASCADE
 );

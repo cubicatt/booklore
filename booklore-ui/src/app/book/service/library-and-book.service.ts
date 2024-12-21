@@ -91,9 +91,9 @@ export class LibraryAndBookService {
   /*---------- Book Methods go below ----------*/
 
   readBook(book: Book): void {
-    this.addToLastReadBooks(book);
     const url = `/pdf-viewer/book/${book.id}`;
     window.open(url, '_blank');
+    this.addToLastReadBooks(book);
     this.updateLastReadTime(book.id).subscribe({
       complete: () => {
       },
@@ -102,8 +102,9 @@ export class LibraryAndBookService {
   }
 
   addToLastReadBooks(book: Book): void {
-    const updatedBooks = [book, ...this.#lastReadBooks()];
-    this.#lastReadBooks.set(updatedBooks.slice(0, 25));
+    this.#lastReadBooks.set([book, ...this.#lastReadBooks()
+      .filter(b => b.id !== book.id)]
+      .slice(0, 25));
   }
 
   addToLatestAddedBooks(book: Book): void {

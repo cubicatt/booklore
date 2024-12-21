@@ -1,47 +1,42 @@
-<div>
-  <div class="library-header">
-    <div class="library-header-dial">
-      <h3 class="library-name">{{ currentLibraryName() }}</h3>
-      <p-speedDial
-        [model]="items!"
-        direction="right"
-        transitionDelay="80"
-        showIcon="pi pi-bars"
-        buttonClassName="p-button-text"
-        hideIcon="pi pi-times"/>
-    </div>
-    <div class="library-header-right">
-      <p-dropdown
-        optionLabel="name"
-        placeholder="Select Sorting"/>
-      <div class="zoom-controls">
-        <p-button icon="pi pi-minus" [rounded]="true" [outlined]="true" severity="info"></p-button>
-        <p-button icon="pi pi-plus" [rounded]="true" [outlined]="true" severity="info"></p-button>
-      </div>
+<div class="library-header">
+  <div class="library-header-dial">
+    <h3 class="library-name">{{ currentLibraryName() }}</h3>
+    <p-speedDial
+      [model]="items!"
+      direction="right"
+      transitionDelay="80"
+      showIcon="pi pi-bars"
+      buttonClassName="p-button-text"
+      hideIcon="pi pi-times">
+    </p-speedDial>
+  </div>
+  <div class="library-header-right">
+    <p-dropdown
+      optionLabel="name"
+      placeholder="Select Sorting"/>
+    <div class="zoom-controls">
+      <p-button icon="pi pi-minus" [rounded]="true" [outlined]="true" severity="info"></p-button>
+      <p-button icon="pi pi-plus" [rounded]="true" [outlined]="true" severity="info"></p-button>
     </div>
   </div>
+</div>
 
-
-  <div class="content-container">
-    <div class="card-container">
-      <virtual-scroller class="virtual-scroller" #scroll [items]="currentLibraryBooks()">
-        <div class="grid" #container>
-          <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
-            <!--<img [lazyLoad]="coverImageSrc(book.id)" class="book-cover placeholder"/>-->
-            <img [src]="coverImageSrc(book.id)" class="book-cover placeholder" alt="Cover of {{ book.metadata.title }}"
-                 loading="lazy"/>
-            <div class="book-info">
+<div class="content-container">
+  <div class="card-container">
+    <virtual-scroller class="virtual-scroller" #scroll [items]="currentLibraryBooks()">
+      <div class="grid" #container>
+        <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
+          <img [src]="coverImageSrc(book.id)" class="book-cover placeholder" alt="Cover of {{ book.metadata.title }}" loading="lazy"/>
+          <div class="book-info">
+            <div class="book-title-container">
               <h4 class="book-title">{{ book.metadata.title }}</h4>
-              <p-button [rounded]="true" icon="pi pi-eye" class="view-btn" (click)="readBook(book)"></p-button>
-              <p-button [rounded]="true" icon="pi pi-info" class="read-btn"
-                        (click)="openBookInfo(book.id, book.libraryId)"></p-button>
-
+              <p-button [text]="true" [rounded]="true" icon="pi pi-ellipsis-v" class="kebab-menu-btn"></p-button>
             </div>
+            <p-button [rounded]="true" icon="pi pi-eye" class="view-btn" (click)="readBook(book)"></p-button>
+            <p-button [rounded]="true" icon="pi pi-info" class="read-btn" (click)="openBookInfo(book.id, book.libraryId)"></p-button>
           </div>
         </div>
-      </virtual-scroller>
-    </div>
+      </div>
+    </virtual-scroller>
   </div>
-
-
 </div>

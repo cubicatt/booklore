@@ -26,15 +26,7 @@
     <virtual-scroller class="virtual-scroller" #scroll [items]="currentLibraryBooks()">
       <div class="grid" #container>
         <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
-          <img [src]="coverImageSrc(book.id)" class="book-cover placeholder" alt="Cover of {{ book.metadata.title }}" loading="lazy"/>
-          <div class="book-info">
-            <div class="book-title-container">
-              <h4 class="book-title">{{ book.metadata.title }}</h4>
-              <p-button [text]="true" [rounded]="true" icon="pi pi-ellipsis-v" class="kebab-menu-btn"></p-button>
-            </div>
-            <p-button [rounded]="true" icon="pi pi-eye" class="view-btn" (click)="readBook(book)"></p-button>
-            <p-button [rounded]="true" icon="pi pi-info" class="read-btn" (click)="openBookInfo(book.id, book.libraryId)"></p-button>
-          </div>
+          <app-book-card [book]="book"></app-book-card>
         </div>
       </div>
     </virtual-scroller>

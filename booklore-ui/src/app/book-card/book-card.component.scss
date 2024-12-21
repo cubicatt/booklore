@@ -1,0 +1,67 @@
+.book-card {
+  background-color: var(--surface-card);
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.cover-container {
+  position: relative;
+}
+
+.book-title-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.book-title {
+  font-size: 0.85rem;
+  color: var(--text-color);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  padding: 6px 6px 3px;
+}
+
+.book-cover {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: cover;
+  border-radius: 8px 8px 0 0;
+  transition: filter 0.2s ease-in-out;
+}
+
+.info-btn, .read-btn {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.info-btn {
+  top: 25%; /* 30% below the top of the image */
+}
+
+.read-btn {
+  bottom: 25%; /* 30% above the bottom of the image */
+}
+
+.cover-container {
+  position: relative; /* Ensures buttons are positioned relative to the image */
+}
+
+.cover-container:hover .book-cover {
+  filter: blur(2px);
+}
+
+.cover-container:hover .info-btn,
+.cover-container:hover .read-btn {
+  display: block;
+}
+

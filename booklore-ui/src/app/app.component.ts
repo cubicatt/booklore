@@ -17,6 +17,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.libraryBookService.initializeLibraries();
+    this.libraryBookService.initializeShelves();
     this.rxStompService.watch('/topic/books').subscribe((message: Message) => {
       const book: Book = JSON.parse(message.body);
       this.libraryBookService.handleNewBook(book);

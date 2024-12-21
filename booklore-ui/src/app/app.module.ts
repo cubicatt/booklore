@@ -26,12 +26,15 @@ import {RxStompService} from './rx-stomp.service';
 import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
 import {LazyLoadImageModule} from 'ng-lazyload-image';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
+import { ShelfAssignerComponent } from './shelf-assigner/shelf-assigner.component';
+import {CheckboxModule} from 'primeng/checkbox';
 
 @NgModule({
   declarations: [
     AppComponent,
     DirectoryPickerComponent,
-    LibraryCreatorComponent
+    LibraryCreatorComponent,
+    ShelfAssignerComponent
   ],
   imports: [
     BrowserModule,
@@ -53,6 +56,7 @@ import {ConfirmDialogModule} from 'primeng/confirmdialog';
     VirtualScrollerModule,
     LazyLoadImageModule,
     ConfirmDialogModule,
+    CheckboxModule,
   ],
   providers: [
     DialogService,

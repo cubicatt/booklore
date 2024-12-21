@@ -1,7 +1,6 @@
 import {Component, computed, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {LibraryAndBookService} from '../../service/library-and-book.service';
-import {Book} from '../../model/book.model';
 import {Button} from 'primeng/button';
 import {NgForOf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
@@ -9,8 +8,9 @@ import {DropdownModule} from 'primeng/dropdown';
 import {LazyLoadImageModule} from 'ng-lazyload-image';
 import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
 import {SpeedDialModule} from 'primeng/speeddial';
-import {ConfirmationService, MenuItem, MenuItemCommandEvent, MessageService} from 'primeng/api';
+import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
+import {BookCardComponent} from '../../../book-card/book-card.component';
 
 @Component({
   selector: 'app-library-browser-v2',
@@ -24,7 +24,8 @@ import {ConfirmDialogModule} from 'primeng/confirmdialog';
     LazyLoadImageModule,
     VirtualScrollerModule,
     SpeedDialModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    BookCardComponent
   ]
 })
 export class LibraryBrowserComponent implements OnInit {
@@ -111,22 +112,6 @@ export class LibraryBrowserComponent implements OnInit {
         this.libraryBookService.loadBooksSignal(libraryId);
       }
     });
-  }
-
-  coverImageSrc(bookId: number): string {
-    return this.libraryBookService.getBookCoverUrl(bookId);
-  }
-
-  getAuthorNames(book: Book): string {
-    return book.metadata.authors?.map((author) => author.name).join(', ') || 'No authors available';
-  }
-
-  readBook(book: Book): void {
-    this.libraryBookService.readBook(book);
-  }
-
-  openBookInfo(bookId: number, libraryId: number) {
-    this.router.navigate(['/library', libraryId, 'book', bookId, 'info']);
   }
 
 }

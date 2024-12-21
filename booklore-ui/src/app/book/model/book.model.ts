@@ -1,7 +1,8 @@
 export interface Book {
   id: number;
   libraryId: number;
-  metadata: BookMetadata
+  metadata: BookMetadata;
+  shelves?: Shelf[];
 }
 
 export interface BookMetadata {
@@ -25,6 +26,11 @@ export interface Author {
 }
 
 export interface Category {
+  id: number;
+  name: string;
+}
+
+export interface Shelf {
   id: number;
   name: string;
 }

@@ -1,5 +1,5 @@
 import {Observable, of} from 'rxjs';
-import {Book, BookMetadata, BookSetting, BookWithNeighborsDTO} from '../model/book.model';
+import {Book, BookMetadata, BookSetting, BookWithNeighborsDTO, Shelf} from '../model/book.model';
 import {computed, Injectable, signal} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {catchError, map, tap} from 'rxjs/operators';
@@ -11,9 +11,13 @@ import {Library, LibraryApiResponse} from '../model/library.model';
 export class LibraryAndBookService {
   private readonly libraryUrl = 'http://localhost:8080/v1/library';
   private readonly bookUrl = 'http://localhost:8080/v1/book';
+  private readonly shelfUrl = 'http://localhost:8080/v1/shelf';
 
   #libraries = signal<Library[]>([]);
   libraries = computed(this.#libraries);
+
+  #shelves = signal<Shelf[]>([]);
+  shelves = computed(this.#shelves);
 
   #lastReadBooks = signal<Book[]>([]);
   lastReadBooks = computed(this.#lastReadBooks);
@@ -28,6 +32,24 @@ export class LibraryAndBookService {
 
 
   constructor(private http: HttpClient) {
+  }
+
+
+  /*---------- Shelf Methods go below ----------*/
+
+  initializeShelves(): void {
+    this.http.get<Shelf[]>(this.shelfUrl).pipe(
+      map(response => response),
+      catchError(error => {
+        console.error('Error loading libraries:', error);
+        return of([]);
+      })
+    ).subscribe(
+      (shelves) => {
+        this.#shelves.set(shelves);
+        console.log("Library Initialized")
+      }
+    );
   }
 
 

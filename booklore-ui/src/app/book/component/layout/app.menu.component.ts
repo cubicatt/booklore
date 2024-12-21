@@ -27,6 +27,21 @@ export class AppMenuComponent implements OnInit {
     ];
   });
 
+  shelfMenu = computed(() => {
+    const shelves = this.libraryBookService.shelves();
+    return [
+      {
+        label: 'Shelves',
+        separator: false,
+        items: shelves.map((shelf) => ({
+          label: shelf.name,
+          icon: 'pi pi-fw pi-heart',
+          routerLink: [`/shelf/${shelf.id}/books`],
+        })),
+      },
+    ];
+  });
+
   constructor(private libraryBookService: LibraryAndBookService) {
 
   }

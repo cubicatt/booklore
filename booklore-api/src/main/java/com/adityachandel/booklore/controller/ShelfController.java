@@ -1,6 +1,8 @@
 package com.adityachandel.booklore.controller;
 
+import com.adityachandel.booklore.model.dto.BookDTO;
 import com.adityachandel.booklore.model.dto.ShelfDTO;
+import com.adityachandel.booklore.model.dto.request.AssignShelvesRequest;
 import com.adityachandel.booklore.model.dto.request.ShelfCreateRequest;
 import com.adityachandel.booklore.service.ShelfService;
 import jakarta.validation.Valid;
@@ -38,9 +40,9 @@ public class ShelfController {
         return ResponseEntity.ok(shelfService.updateShelf(id, request));
     }
 
-    @PostMapping("/{shelfId}/book/{bookId}")
-    public ResponseEntity<ShelfDTO> addBookToShelf(@PathVariable Long shelfId, @PathVariable Long bookId) {
-        return ResponseEntity.ok(shelfService.addBookToShelf(shelfId, bookId));
+    @PostMapping("/assign-shelves")
+    public ResponseEntity<BookDTO> addBookToShelf(@RequestBody @Valid AssignShelvesRequest request) {
+       return ResponseEntity.ok(shelfService.addBookToShelf(request.getBookId(), request.getShelfIds()));
     }
 
     @DeleteMapping("/{shelfId}")

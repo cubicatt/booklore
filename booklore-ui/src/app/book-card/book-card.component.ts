@@ -26,9 +26,7 @@ export class BookCardComponent implements OnInit {
     constructor(
         private libraryBookService: LibraryAndBookService, private router: Router,
         private dialogService: DialogService) {
-
     }
-
 
     coverImageSrc(book: Book): string {
         return this.libraryBookService.getBookCoverUrl(book.id);
@@ -61,10 +59,10 @@ export class BookCardComponent implements OnInit {
 
     private openShelfDialog(book: Book) {
         this.dialogService.open(ShelfAssignerComponent, {
-            header: 'Edit Shelves for Book: ' + book.metadata.title,
+            header: 'Update Shelves: ' + book.metadata.title,
             modal: true,
-            width: '50%',
-            height: '75%',
+            width: '30%',
+            height: '70%',
             contentStyle: {overflow: 'auto'},
             baseZIndex: 10,
             data: {

@@ -1,0 +1,49 @@
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.bottom-section {
+  margin-top: auto;
+}
+
+.bottom-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+p-divider {
+  margin: 1rem 0;
+  border-color: var(--text-color-secondary);
+}
+
+.spacing-right {
+  margin-right: 1rem;
+}
+
+p-dialog .p-dialog-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem; /* Adds space between elements inside the dialog */
+}
+
+p-dialog .p-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dialog-container .checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Adds gap between each checkbox row */
+  padding: 1rem;
+}
+
+.checkbox-list .flex {
+  margin-bottom: 0.5rem; /* Optional: adds a smaller gap between each checkbox item */
+}

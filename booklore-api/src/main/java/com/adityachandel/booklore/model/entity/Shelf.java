@@ -22,11 +22,6 @@ public class Shelf {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "book_shelf_mapping",
-            joinColumns = @JoinColumn(name = "book_id"),
-            inverseJoinColumns = @JoinColumn(name = "shelf_id")
-    )
+    @ManyToMany(mappedBy = "shelves", fetch = FetchType.LAZY)
     private Set<Book> books = new HashSet<>();
 }

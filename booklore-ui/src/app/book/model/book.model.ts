@@ -31,7 +31,7 @@ export interface Category {
 }
 
 export interface Shelf {
-  id: number;
+  id?: number;
   name: string;
 }
 

@@ -1,24 +1,28 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.exception.ApiError;
+import com.adityachandel.booklore.model.dto.BookDTO;
 import com.adityachandel.booklore.model.dto.ShelfDTO;
 import com.adityachandel.booklore.model.dto.request.ShelfCreateRequest;
 import com.adityachandel.booklore.model.entity.Book;
 import com.adityachandel.booklore.model.entity.Shelf;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.ShelfRepository;
+import com.adityachandel.booklore.transformer.BookTransformer;
 import com.adityachandel.booklore.transformer.ShelfTransformer;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
 public class ShelfService {
 
     private final ShelfRepository shelfRepository;
-    private  final BookRepository bookRepository;
+    private final BookRepository bookRepository;
 
     public ShelfDTO createShelf(ShelfCreateRequest request) {
         boolean exists = shelfRepository.existsByName(request.getName());
@@ -36,14 +40,26 @@ public class ShelfService {
         return ShelfTransformer.convertToShelfDTO(shelfRepository.save(shelf));
     }
 
-    public ShelfDTO addBookToShelf(Long shelfId, Long bookId) {
-        Shelf shelf = shelfRepository.findById(shelfId)
-                .orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
+    @Transactional
+    public BookDTO addBookToShelf(Long bookId, List<Long> shelfIds) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        shelf.getBooks().add(book);
-        shelfRepository.save(shelf);
-        return ShelfTransformer.convertToShelfDTO(shelf);
+
+        List<Shelf> currentShelves = book.getShelves();
+        List<Shelf> shelvesToAdd = shelfRepository.findAllById(shelfIds);
+
+        currentShelves.stream()
+                .filter(shelf -> !shelfIds.contains(shelf.getId()))
+                .forEach(shelf -> shelf.getBooks().remove(book));
+
+        book.getShelves().clear();
+        book.getShelves().addAll(shelvesToAdd);
+
+        shelvesToAdd.forEach(shelf -> shelf.getBooks().add(book));
+
+        bookRepository.save(book);
+        shelfRepository.saveAll(shelvesToAdd);
+        return BookTransformer.convertToBookDTO(book);
     }
 
     public List<ShelfDTO> getShelves() {

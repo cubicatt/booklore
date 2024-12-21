@@ -18,7 +18,7 @@ export class LibraryCreatorComponent {
   ref: DynamicDialogRef | undefined;
 
   constructor(
-    public dialogService: DialogService,
+    private dialogService: DialogService,
     private dynamicDialogRef: DynamicDialogRef,
     private libraryAndBookService: LibraryAndBookService,
     private router: Router,

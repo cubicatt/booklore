@@ -1,4 +1,33 @@
-<div *ngFor="let shelf of shelves()" class="flex items-center">
-  <p-checkbox [inputId]="shelf.name" name="group" [value]="shelf" [(ngModel)]="selectedShelves" />
-  <label [for]="shelf.id" class="ml-2"> {{shelf.name }} </label>
+<div class="dialog-container">
+  <div class="checkbox-list">
+    <div *ngFor="let shelf of shelves()" class="flex items-center">
+      <p-checkbox [inputId]="shelf.name" name="group" [value]="shelf" [(ngModel)]="selectedShelves" />
+      <label [for]="shelf.id" class="ml-2">{{ shelf.name }}</label>
+    </div>
+  </div>
+
+  <!-- Divider and Bottom Section -->
+  <div class="bottom-section">
+    <p-divider></p-divider>
+    <div class="bottom-container">
+      <p-button outlined="true" label="Create Shelf" (onClick)="createShelfDialog()"></p-button>
+      <div>
+        <p-button class="spacing-right" severity="secondary" label="Cancel" (onClick)="closeDialog()"></p-button>
+        <p-button label="Save" (onClick)="updateBooksShelves()"></p-button>
+      </div>
+    </div>
+  </div>
+
+  <p-dialog [(visible)]="displayShelfDialog" header="Create Shelf" [modal]="true" [closable]="true" (onHide)="closeShelfDialog()" [style]="{ width: '400px', height: 'auto' }">
+    <div class="p-fluid">
+      <div class="field">
+        <label for="shelfName">Shelf Name</label>
+        <input id="shelfName" type="text" pInputText [(ngModel)]="shelfName"/>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="Cancel" severity="secondary" (onClick)="closeShelfDialog()" class="p-button-text"></p-button>
+      <p-button label="Save" (onClick)="saveNewShelf()"></p-button>
+    </ng-template>
+  </p-dialog>
 </div>

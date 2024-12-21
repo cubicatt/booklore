@@ -41,14 +41,51 @@ export class LibraryAndBookService {
     this.http.get<Shelf[]>(this.shelfUrl).pipe(
       map(response => response),
       catchError(error => {
-        console.error('Error loading libraries:', error);
+        console.error('Error loading shelves:', error);
         return of([]);
       })
     ).subscribe(
       (shelves) => {
         this.#shelves.set(shelves);
-        console.log("Library Initialized")
+        console.log("Shelves Initialized")
       }
+    );
+  }
+
+  createShelf(name: string): Observable<Shelf> {
+    const newShelf: Shelf = {name};
+    return this.http.post<Shelf>(this.shelfUrl, newShelf).pipe(
+      tap((createdShelf) => {
+        this.#shelves.set([...this.#shelves(), createdShelf]);
+        console.log("New Shelf Created", createdShelf);
+      }),
+      catchError((error) => {
+        console.error('Error creating shelf:', error);
+        throw error;
+      })
+    );
+  }
+
+  assignShelvesToBook(book: Book, shelfIds: number[]): Observable<Book> {
+    const requestPayload = {
+      bookId: book.id,
+      shelfIds: shelfIds
+    };
+    return this.http.post<Book>(`${this.shelfUrl}/assign-shelves`, requestPayload).pipe(
+      tap((updatedBook) => {
+        const bookLibraryId = book.libraryId;
+        const updatedMap = new Map(this.libraryBooksMap());
+        const libraryBooks = updatedMap.get(bookLibraryId) || [];
+        const updatedLibraryBooks = libraryBooks.map(b =>
+          b.id === book.id ? { ...b, shelves: updatedBook.shelves } : b
+        );
+        updatedMap.set(bookLibraryId, updatedLibraryBooks);
+        this.libraryBooksMap.set(updatedMap);
+      }),
+      catchError((error) => {
+        console.error('Error assigning shelves to book:', error);
+        throw error;
+      })
     );
   }
 
@@ -266,4 +303,6 @@ export class LibraryAndBookService {
     const requestBody = {googleBookId: googleBookId};
     return this.http.put<void>(`${this.bookUrl}/${bookId}/set-metadata`, requestBody);
   }
+
+
 }

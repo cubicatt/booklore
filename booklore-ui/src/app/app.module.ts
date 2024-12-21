@@ -28,6 +28,8 @@ import {LazyLoadImageModule} from 'ng-lazyload-image';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import { ShelfAssignerComponent } from './shelf-assigner/shelf-assigner.component';
 import {CheckboxModule} from 'primeng/checkbox';
+import {DividerModule} from 'primeng/divider';
+import {DialogModule} from 'primeng/dialog';
 
 @NgModule({
   declarations: [
@@ -57,6 +59,8 @@ import {CheckboxModule} from 'primeng/checkbox';
     LazyLoadImageModule,
     ConfirmDialogModule,
     CheckboxModule,
+    DividerModule,
+    DialogModule,
   ],
   providers: [
     DialogService,

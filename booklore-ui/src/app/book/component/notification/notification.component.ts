@@ -1,5 +1,4 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
-import {BookProgressService} from '../../service/book-progress-service';
 import {Subscription} from 'rxjs';
 import {NgClass} from '@angular/common';
 import {BookUpdateEvent} from '../../model/book.model';
@@ -15,8 +14,6 @@ import {BookUpdateEvent} from '../../model/book.model';
 export class NotificationComponent implements OnInit, OnDestroy {
   glowing: boolean = false;
   private eventSubscription!: Subscription;
-
-  constructor(private bookProgressService: BookProgressService) {}
 
   ngOnInit(): void {
     /*this.eventSubscription = this.bookProgressService.connect(1).subscribe({

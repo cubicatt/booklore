@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {BookService} from '../../service/book.service';
+import {LibraryAndBookService} from '../../service/library-and-book.service';
 import {Book} from '../../model/book.model';
 import {Button} from 'primeng/button';
 import {NgForOf, NgIf} from '@angular/common';
@@ -30,7 +30,7 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
   private dialogSubscription?: Subscription;
 
   constructor(
-    private bookService: BookService, private activatedRoute: ActivatedRoute,
+    private bookService: LibraryAndBookService, private activatedRoute: ActivatedRoute,
     private dialogService: DialogService, private router: Router) {
   }
 
@@ -106,11 +106,7 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
     }
   }
 
-  readBook(id: number | undefined) {
-    const url = `/pdf-viewer/book/${id}`;
-    window.open(url, '_blank');
-    this.routeSubscription?.unsubscribe();
-    this.dialogSubscription?.unsubscribe();
-    this.dialogRef?.close();
+  readBook(book: Book) {
+    this.bookService.readBook(book);
   }
 }

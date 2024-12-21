@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, NgZone, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgxExtendedPdfViewerModule, ScrollModeType } from 'ngx-extended-pdf-viewer';
-import { BookService } from '../../service/book.service';
+import { LibraryAndBookService } from '../../service/library-and-book.service';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -22,7 +22,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   private isInitialLoad = true;
 
   constructor(
-    private bookService: BookService,
+    private bookService: LibraryAndBookService,
     private zone: NgZone,
     private route: ActivatedRoute
   ) {}

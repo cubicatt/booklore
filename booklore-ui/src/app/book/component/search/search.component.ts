@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
 import { Book } from '../../model/book.model';
-import { BookService } from '../../service/book.service';
+import { LibraryAndBookService } from '../../service/library-and-book.service';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { NgForOf, NgIf } from '@angular/common';
@@ -27,7 +27,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   #searchSubject = new Subject<string>();
   #subscription!: Subscription;
 
-  constructor(private bookService: BookService, private router: Router) {}
+  constructor(private bookService: LibraryAndBookService, private router: Router) {}
 
   ngOnInit(): void {
     this.initializeSearch();
@@ -59,8 +59,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   openBook(bookId: number, libraryId: number): void {
-    /*const url = `/pdf-viewer/book/${bookId}`;
-    window.open(url, '_blank');*/
     this.router.navigate(['/library', libraryId, 'book', bookId, 'info']);
   }
 

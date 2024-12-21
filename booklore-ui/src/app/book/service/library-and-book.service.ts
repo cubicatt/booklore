@@ -2,14 +2,18 @@ import {Observable, of} from 'rxjs';
 import {Book, BookMetadata, BookSetting, BookWithNeighborsDTO} from '../model/book.model';
 import {computed, Injectable, signal} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {catchError, map} from 'rxjs/operators';
+import {catchError, map, tap} from 'rxjs/operators';
+import {Library, LibraryApiResponse} from '../model/library.model';
 
 @Injectable({
   providedIn: 'root',
 })
-export class BookService {
+export class LibraryAndBookService {
   private readonly libraryUrl = 'http://localhost:8080/v1/library';
   private readonly bookUrl = 'http://localhost:8080/v1/book';
+
+  #libraries = signal<Library[]>([]);
+  libraries = computed(this.#libraries);
 
   #lastReadBooks = signal<Book[]>([]);
   lastReadBooks = computed(this.#lastReadBooks);
@@ -19,17 +23,123 @@ export class BookService {
   latestAddedBooks = computed(this.#latestAddedBooks);
   latestAddedBooksLoaded: boolean = false;
 
-  #libraryBooks = signal<Book[]>([]);
-  libraryBooks = computed(this.#libraryBooks);
-  lastLibraryBooksLoaded: boolean = false;
+  private libraryBooksMap = signal<Map<number, Book[]>>(new Map());
+  private loadedLibraries = new Set<number>();
 
 
   constructor(private http: HttpClient) {
   }
 
-  appendBookToLibrary(book: Book) {
+
+  /*---------- Library Methods go below ----------*/
+
+  initializeLibraries(): void {
+    this.http.get<LibraryApiResponse>(this.libraryUrl).pipe(
+      map(response => response.content),
+      catchError(error => {
+        console.error('Error loading libraries:', error);
+        return of([]);
+      })
+    ).subscribe(
+      (libraries) => {
+        this.#libraries.set(libraries);
+        console.log("Library Initialized")
+      }
+    );
+  }
+
+  createLibrary(newLibrary: Library): Observable<Library> {
+    return this.http.post<Library>(this.libraryUrl, newLibrary).pipe(
+      tap((createdLibrary) => {
+        const currentLibraries = this.#libraries();
+        this.#libraries.set([...currentLibraries, createdLibrary]);
+        console.log("New Library Created");
+      }),
+      catchError((error) => {
+        console.error('Error creating library:', error);
+        throw error;
+      })
+    );
+  }
+
+  deleteLibrary(libraryId: number | null): Observable<void> {
+    return this.http.delete<void>(`${this.libraryUrl}/${libraryId}`).pipe(
+      tap(() => {
+        const currentLibraries = this.#libraries();
+        this.#libraries.set(currentLibraries.filter(library => library.id !== libraryId));
+
+        const updatedLastReadBooks = this.#lastReadBooks().filter(book => book.libraryId !== libraryId);
+        this.#lastReadBooks.set(updatedLastReadBooks);
+
+        const updatedLatestAddedBooks = this.#latestAddedBooks().filter(book => book.libraryId !== libraryId);
+        this.#latestAddedBooks.set(updatedLatestAddedBooks);
+
+        const updatedMap = new Map(this.libraryBooksMap());
+        updatedMap.delete(libraryId as number);
+        this.libraryBooksMap.set(updatedMap);
+
+        console.log(`Library ${libraryId} and associated books removed successfully.`);
+      }),
+      catchError((error) => {
+        console.error('Error deleting library:', error);
+        throw error;
+      })
+    );
+  }
+
+
+  /*---------- Book Methods go below ----------*/
+
+  readBook(book: Book): void {
+    this.addToLastReadBooks(book);
+    const url = `/pdf-viewer/book/${book.id}`;
+    window.open(url, '_blank');
+    this.updateLastReadTime(book.id).subscribe({
+      complete: () => {
+      },
+      error: (err) => console.error('Failed to update last read time', err),
+    });
+  }
+
+  addToLastReadBooks(book: Book): void {
+    const updatedBooks = [book, ...this.#lastReadBooks()];
+    this.#lastReadBooks.set(updatedBooks.slice(0, 25));
+  }
+
+  addToLatestAddedBooks(book: Book): void {
+    const updatedBooks = [book, ...this.#latestAddedBooks()];
+    this.#latestAddedBooks.set(updatedBooks.slice(0, 25));
+  }
+
+  getLibraryBooks(libraryId: number) {
+    return computed(() => this.libraryBooksMap().get(libraryId) || []);
+  }
+
+  loadBooksSignal(libraryId: number) {
+    if (!this.loadedLibraries.has(libraryId)) {
+      this.http.get<Book[]>(`${this.libraryUrl}/${libraryId}/book`).pipe(
+        map(response => response),
+        catchError(error => {
+          console.error(`Error loading books for library ${libraryId}:`, error);
+          return of([]);
+        })
+      ).subscribe((books) => {
+        const updatedMap = new Map(this.libraryBooksMap());
+        updatedMap.set(libraryId, books);
+        this.libraryBooksMap.set(updatedMap);
+        this.loadedLibraries.add(libraryId);
+        console.log(`Loaded books for library ${libraryId}`);
+      });
+    }
+  }
+
+  handleNewBook(book: Book) {
     const newBook: Book = this.convertBookDTOToBook(book);
-    this.#libraryBooks.set([newBook, ...this.#libraryBooks()]);
+    const updatedMap = new Map(this.libraryBooksMap());
+    const currentBooks = updatedMap.get(newBook.libraryId) || [];
+    updatedMap.set(newBook.libraryId, [newBook, ...currentBooks]);
+    this.libraryBooksMap.set(updatedMap);
+    this.addToLatestAddedBooks(book);
   }
 
   private convertBookDTOToBook(book: Book): Book {
@@ -59,28 +169,6 @@ export class BookService {
 
   getBookWithNeighbours(libraryId: number, bookId: number): Observable<BookWithNeighborsDTO> {
     return this.http.get<BookWithNeighborsDTO>(`${this.libraryUrl}/${libraryId}/book/${bookId}/withNeighbors`);
-  }
-
-  loadBooksSignal(libraryId: number) {
-    this.http.get<Book[]>(`${this.libraryUrl}/${libraryId}/book`).pipe(
-      map(response => response),
-      catchError(error => {
-        console.error('Error loading library books:', error);
-        return of([]);
-      })
-    ).subscribe(
-      (books) => {
-        this.#libraryBooks.set([...this.#libraryBooks(), ...books]);
-        this.lastReadBooksLoaded = true;
-        console.log("Loaded library books")
-      }
-    );
-  }
-
-  loadBooks(libraryId: number): Observable<Book[]> {
-    return this.http.get<Book[]>(
-      `${this.libraryUrl}/${libraryId}/book`
-    );
   }
 
   getLastReadBooks() {

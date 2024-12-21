@@ -1,9 +1,8 @@
-import {Component, computed, OnInit, Signal, WritableSignal} from '@angular/core';
+import {Component, computed, OnInit} from '@angular/core';
 import {AppMenuitemComponent} from './app.menuitem.component';
 import {NgForOf, NgIf} from '@angular/common';
 import {MenuModule} from 'primeng/menu';
-import {LibraryService} from '../../service/library.service';
-import {Library} from '../../model/library.model';
+import {LibraryAndBookService} from '../../service/library-and-book.service';
 
 @Component({
   selector: 'app-menu',
@@ -14,7 +13,7 @@ export class AppMenuComponent implements OnInit {
   home: any[] = [];
 
   libraryMenu = computed(() => {
-    const libraries = this.libraryService.libraries();
+    const libraries = this.libraryBookService.libraries();
     return [
       {
         label: 'Library',
@@ -28,7 +27,7 @@ export class AppMenuComponent implements OnInit {
     ];
   });
 
-  constructor(private libraryService: LibraryService) {
+  constructor(private libraryBookService: LibraryAndBookService) {
 
   }
 

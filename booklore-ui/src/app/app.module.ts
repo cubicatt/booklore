@@ -19,13 +19,13 @@ import {PasswordModule} from 'primeng/password';
 import {ToastModule} from 'primeng/toast';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {SearchComponent} from './book/component/search/search.component';
-import {MessageService} from 'primeng/api';
-import {FileUploadComponent} from './book/component/file-upload/file-upload.component';
+import {ConfirmationService, MessageService} from 'primeng/api';
 import {DropdownModule} from 'primeng/dropdown';
 import {rxStompServiceFactory} from './rx-stomp-service-factory';
 import {RxStompService} from './rx-stomp.service';
 import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
 import {LazyLoadImageModule} from 'ng-lazyload-image';
+import {ConfirmDialogModule} from 'primeng/confirmdialog';
 
 @NgModule({
   declarations: [
@@ -51,11 +51,13 @@ import {LazyLoadImageModule} from 'ng-lazyload-image';
     SearchComponent,
     DropdownModule,
     VirtualScrollerModule,
-    LazyLoadImageModule
+    LazyLoadImageModule,
+    ConfirmDialogModule,
   ],
   providers: [
     DialogService,
     MessageService,
+    ConfirmationService,
     {
       provide: RxStompService,
       useFactory: rxStompServiceFactory,

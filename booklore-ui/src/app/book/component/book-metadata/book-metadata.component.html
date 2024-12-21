@@ -4,7 +4,7 @@
       <div class="cover-container">
         <div class="cover-wrapper">
           <img [src]="coverImageSrc(book?.id)" class="book-cover placeholder" alt="Cover of {{ book?.metadata?.title }}" loading="lazy"/>
-          <div class="overlay" (click)="readBook(book?.id)">
+          <div class="overlay" (click)="readBook(book!)">
             <p-button icon="pi pi-book" [rounded]="true"></p-button>
           </div>
         </div>
@@ -38,7 +38,7 @@
           </h1>
           <div class="button-group">
             <p-button [rounded]="true" [raised]="true" [outlined]="true" (onClick)="openEditDialog(book?.id, book?.libraryId)" icon="pi pi-pencil"></p-button>
-            <p-button [rounded]="true" [raised]="true" [outlined]="true" (onClick)="readBook(book?.id)" icon="pi pi-eye"></p-button>
+            <p-button [rounded]="true" [raised]="true" [outlined]="true" (onClick)="readBook(book!)" icon="pi pi-eye"></p-button>
             <p-button [rounded]="true" [raised]="true" [outlined]="true" icon="pi pi-download"></p-button>
           </div>
         </div>

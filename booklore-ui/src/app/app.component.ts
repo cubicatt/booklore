@@ -1,8 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {LibraryService} from './book/service/library.service';
 import {RxStompService} from './rx-stomp.service';
 import {Message} from '@stomp/stompjs';
-import {BookService} from './book/service/book.service';
+import {LibraryAndBookService} from './book/service/library-and-book.service';
 import {Book} from './book/model/book.model';
 
 @Component({
@@ -13,17 +12,14 @@ import {Book} from './book/model/book.model';
 })
 export class AppComponent implements OnInit {
 
-  constructor(private libraryService: LibraryService, private bookService: BookService, private rxStompService: RxStompService) {
+  constructor(private libraryBookService: LibraryAndBookService, private rxStompService: RxStompService) {
   }
 
   ngOnInit(): void {
-    this.libraryService.initializeLibraries();
-    this.bookService.loadBooksSignal(1);
-
-
+    this.libraryBookService.initializeLibraries();
     this.rxStompService.watch('/topic/books').subscribe((message: Message) => {
-      const book: Book = JSON.parse(message.body);  // Parse the incoming message to book DTO
-      this.bookService.appendBookToLibrary(book);  // Call method to append to libraryBooks
+      const book: Book = JSON.parse(message.body);
+      this.libraryBookService.handleNewBook(book);
     });
   }
 

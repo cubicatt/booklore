@@ -1,6 +1,5 @@
-import {Component, OnInit, Signal, WritableSignal} from '@angular/core';
+import {Component, Signal} from '@angular/core';
 import {Library} from '../../model/library.model';
-import {LibraryService} from '../../service/library.service';
 import {FileUploadService} from '../../../file-upload.service';
 import {Button} from 'primeng/button';
 import {NgIf} from '@angular/common';
@@ -8,6 +7,7 @@ import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 import {ToastService} from '../../../toast.service';
 import {DynamicDialogRef} from 'primeng/dynamicdialog';
+import {LibraryAndBookService} from '../../service/library-and-book.service';
 
 @Component({
   selector: 'app-file-upload-v2',
@@ -29,11 +29,11 @@ export class FileUploadComponent {
   errorMessage: string | null = null;
 
   constructor(
-    private libraryService: LibraryService,
+    private libraryBookService: LibraryAndBookService,
     private fileUploadService: FileUploadService,
     private toastService: ToastService,
     private dynamicDialogRef: DynamicDialogRef) {
-      this.libraries = this.libraryService.libraries;
+      this.libraries = this.libraryBookService.libraries;
   }
 
   triggerFileInput(fileInput: HTMLInputElement): void {

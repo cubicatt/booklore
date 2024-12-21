@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild, ElementRef, Input, computed, signal} from '@angular/core';
 import {Book} from '../../model/book.model';
-import {BookService} from '../../service/book.service';
+import {LibraryAndBookService} from '../../service/library-and-book.service';
 import {Button} from 'primeng/button';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {NgForOf, NgIf} from '@angular/common';
@@ -27,7 +27,7 @@ export class DashboardScrollerComponent implements OnInit {
     return this.bookListType === 'lastRead' ? this.bookService.lastReadBooks() : this.bookService.latestAddedBooks();
   });
 
-  constructor(private bookService: BookService, private router: Router) {
+  constructor(private bookService: LibraryAndBookService, private router: Router) {
   }
 
   ngOnInit(): void {
@@ -50,9 +50,8 @@ export class DashboardScrollerComponent implements OnInit {
     return book.metadata.authors?.map((author) => author.name).join(', ') || 'No authors available';
   }
 
-  openBook(bookId: number): void {
-    const url = `/pdf-viewer/book/${bookId}`;
-    window.open(url, '_blank');
+  openBook(book: Book): void {
+    this.bookService.readBook(book);
   }
 
   openBookInfo(bookId: number, libraryId: number) {

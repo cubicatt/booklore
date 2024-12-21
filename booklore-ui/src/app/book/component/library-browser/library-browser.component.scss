@@ -7,6 +7,11 @@
   margin-bottom: 15px;
 }
 
+.library-header-dial {
+  display: flex;
+  margin-right: 5px;
+}
+
 .library-header-right {
   display: flex;
   gap: 2rem;
@@ -25,7 +30,7 @@
 
 .virtual-scroller {
   width: 100%;
-  height: calc(100vh - 200px);
+  height: calc(100vh - 210px);
   padding: 1rem;
   box-sizing: border-box;
   overflow-y: auto;

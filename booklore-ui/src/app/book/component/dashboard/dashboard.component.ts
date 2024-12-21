@@ -1,11 +1,11 @@
-import {Component, Signal, WritableSignal} from '@angular/core';
-import { LibraryService } from '../../service/library.service';
-import { Library } from '../../model/library.model';
-import { Button } from 'primeng/button';
-import { NgIf } from '@angular/common';
-import { LibraryCreatorComponent } from '../library-creator/library-creator.component';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import {Component, Signal} from '@angular/core';
+import {Library} from '../../model/library.model';
+import {Button} from 'primeng/button';
+import {NgIf} from '@angular/common';
+import {LibraryCreatorComponent} from '../library-creator/library-creator.component';
+import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {DashboardScrollerComponent} from '../dashboard-scroller/dashboard-scroller.component';
+import {LibraryAndBookService} from '../../service/library-and-book.service';
 
 @Component({
   selector: 'app-home-page',
@@ -22,8 +22,8 @@ export class DashboardComponent {
   private libraries: Signal<Library[]>;
   ref: DynamicDialogRef | undefined;
 
-  constructor(private libraryService: LibraryService, public dialogService: DialogService) {
-    this.libraries = this.libraryService.libraries;
+  constructor(private libraryBookService: LibraryAndBookService, public dialogService: DialogService) {
+    this.libraries = this.libraryBookService.libraries;
   }
 
   get isLibrariesEmpty(): boolean {

@@ -33,5 +33,8 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     Optional<Book> findFirstByLibraryIdAndIdLessThanOrderByIdDesc(Long libraryId, Long currentBookId);
 
     Optional<Book> findFirstByLibraryIdAndIdGreaterThanOrderByIdAsc(Long libraryId, Long currentBookId);
+
+    @Query("SELECT b FROM Book b JOIN b.shelves s WHERE s.id = :shelfId")
+    List<Book> findByShelfId(@Param("shelfId") Long shelfId);
 }
 

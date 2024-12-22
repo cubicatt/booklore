@@ -31,7 +31,7 @@ export class AppMenuComponent implements OnInit {
   }
 
   libraryMenu = computed(() => {
-    const libraries = this.libraryBookService.libraries();
+    const libraries = this.libraryBookService.getLibraries()();
     return [
       {
         label: 'Library',
@@ -46,7 +46,7 @@ export class AppMenuComponent implements OnInit {
   });
 
   shelfMenu = computed(() => {
-    const shelves = this.libraryBookService.shelves();
+    const shelves = this.libraryBookService.getShelves()();
     return [
       {
         label: 'Shelves',

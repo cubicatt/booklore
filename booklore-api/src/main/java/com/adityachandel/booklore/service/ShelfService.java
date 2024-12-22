@@ -75,4 +75,10 @@ public class ShelfService {
         shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
         shelfRepository.deleteById(shelfId);
     }
+
+    public List<BookDTO> getShelfBooks(Long shelfId) {
+        shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
+        List<Book> books = bookRepository.findByShelfId(shelfId);
+        return books.stream().map(BookTransformer::convertToBookDTO).toList();
+    }
 }

@@ -13,9 +13,7 @@ import {MessageService} from 'primeng/api';
 })
 export class ShelfAssignerComponent implements OnInit {
 
-  shelves = computed(() => {
-    return this.libraryBookService.shelves();
-  });
+  shelves;
 
   book: Book;
   selectedShelves: any[] = [];
@@ -25,6 +23,7 @@ export class ShelfAssignerComponent implements OnInit {
   constructor(
     private libraryBookService: LibraryAndBookService, private dynamicDialogConfig: DynamicDialogConfig,
     private dynamicDialogRef: DynamicDialogRef, private messageService: MessageService) {
+    this.shelves = this.libraryBookService.getShelves();
     this.book = this.dynamicDialogConfig.data.book;
   }
 

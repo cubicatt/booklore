@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild, ElementRef, Input, computed, signal} from '@angular/core';
+import {Component, OnInit, ViewChild, ElementRef, Input, computed, signal, Signal} from '@angular/core';
 import {Book} from '../../model/book.model';
 import {LibraryAndBookService} from '../../service/library-and-book.service';
 import {Button} from 'primeng/button';
@@ -23,21 +23,20 @@ export class DashboardScrollerComponent implements OnInit {
   @Input() title: string = 'Last Read Books';
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
-  booksSignal = computed(() => {
-    return this.bookListType === 'lastRead' ? this.bookService.lastReadBooks() : this.bookService.latestAddedBooks();
-  });
+  booksSignal: Signal<Book[]> | undefined;
 
   constructor(private bookService: LibraryAndBookService, private router: Router) {
   }
 
   ngOnInit(): void {
+    this.booksSignal = this.bookListType === 'lastRead' ? this.bookService.getLastReadBooks() : this.bookService.getLatestAddedBooks();;
     this.loadBooks();
   }
 
   loadBooks(): void {
-    if (this.bookListType === 'lastRead' && !this.bookService.lastReadBooksLoaded) {
+    if (this.bookListType === 'lastRead' && !this.bookService.getLastReadBooks()) {
       this.bookService.getLastReadBooks();
-    } else if (this.bookListType === 'latestAdded' && !this.bookService.latestAddedBooksLoaded) {
+    } else if (this.bookListType === 'latestAdded' && !this.bookService.getLatestAddedBooks()) {
       this.bookService.getLatestAddedBooks();
     }
   }
@@ -47,7 +46,7 @@ export class DashboardScrollerComponent implements OnInit {
   }
 
   getAuthorNames(book: Book): string {
-    return book.metadata.authors?.map((author) => author.name).join(', ') || 'No authors available';
+    return book.metadata?.authors?.map((author) => author.name).join(', ') || 'No authors available';
   }
 
   openBook(book: Book): void {

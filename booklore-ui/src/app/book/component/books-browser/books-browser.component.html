@@ -1,6 +1,6 @@
 <div class="library-header">
   <div class="library-header-dial">
-    <h3 class="library-name">{{ currentEntityName() }}</h3>
+    <h3 class="library-name">{{ title() }}</h3>
     <p-speedDial
       [model]="items!"
       direction="right"
@@ -23,7 +23,7 @@
 
 <div class="content-container">
   <div class="card-container">
-    <virtual-scroller class="virtual-scroller" #scroll [items]="currentEntityBooks()">
+    <virtual-scroller class="virtual-scroller" #scroll [items]="books()">
       <div class="grid" #container>
         <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
           <app-book-card [book]="book"></app-book-card>

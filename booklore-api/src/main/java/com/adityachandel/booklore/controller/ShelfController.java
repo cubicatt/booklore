@@ -30,6 +30,11 @@ public class ShelfController {
         return ResponseEntity.ok(shelfService.getShelf(shelfId));
     }
 
+    @GetMapping("/{shelfId}/books")
+    public ResponseEntity<List<BookDTO>> getShelfBooks(@PathVariable Long shelfId) {
+        return ResponseEntity.ok(shelfService.getShelfBooks(shelfId));
+    }
+
     @PostMapping
     public ResponseEntity<ShelfDTO> createShelf(@Valid @RequestBody ShelfCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(shelfService.createShelf(request));

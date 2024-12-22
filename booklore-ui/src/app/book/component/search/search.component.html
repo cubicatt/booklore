@@ -17,7 +17,7 @@
     <ng-container *ngIf="books.length > 0; else noResults">
       <div class="search-dropdown-item" *ngFor="let book of books" (click)="onBookClick(book)">
         <img [src]="getBookCoverUrl(book.id)" alt="Book Cover" class="search-book-cover" />
-        <span class="search-book-name">{{ book.metadata.title }}</span>
+        <span class="search-book-name">{{ book.metadata?.title }}</span>
       </div>
     </ng-container>
 

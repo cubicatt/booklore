@@ -1,7 +1,7 @@
 export interface Book {
   id: number;
   libraryId: number;
-  metadata: BookMetadata;
+  metadata?: BookMetadata;
   shelves?: Shelf[];
 }
 

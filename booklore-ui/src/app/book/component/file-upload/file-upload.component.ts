@@ -33,7 +33,7 @@ export class FileUploadComponent {
     private fileUploadService: FileUploadService,
     private toastService: ToastService,
     private dynamicDialogRef: DynamicDialogRef) {
-      this.libraries = this.libraryBookService.libraries;
+      this.libraries = this.libraryBookService.getLibraries();
   }
 
   triggerFileInput(fileInput: HTMLInputElement): void {

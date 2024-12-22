@@ -65,7 +65,7 @@ export class BookCardComponent implements OnInit {
 
     private openShelfDialog(book: Book) {
         this.dialogService.open(ShelfAssignerComponent, {
-            header: 'Update Shelves: ' + book.metadata.title,
+            header: 'Update Shelves: ' + book.metadata?.title,
             modal: true,
             width: '30%',
             height: '70%',

@@ -82,7 +82,7 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
       data: {
         bookId: bookId,
         libraryId: libraryId,
-        bookTitle: this.book?.metadata.title,
+        bookTitle: this.book?.metadata?.title,
       },
     });
 

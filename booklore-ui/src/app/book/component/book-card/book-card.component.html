@@ -1,12 +1,12 @@
 <div class="book-card">
   <div class="cover-container">
-    <img [src]="coverImageSrc(book)" class="book-cover placeholder" alt="Cover of {{ book.metadata.title }}" loading="lazy" />
+    <img [src]="coverImageSrc(book)" class="book-cover placeholder" alt="Cover of {{ book.metadata?.title }}" loading="lazy" />
     <p-button [rounded]="true" icon="pi pi-info" class="read-btn" (click)="openBookInfo(book)"></p-button>
     <p-button [rounded]="true" icon="pi pi-book" class="info-btn" (click)="readBook(book)"></p-button>
   </div>
   <div class="book-info">
     <div class="book-title-container">
-      <h4 class="book-title">{{ book.metadata.title }}</h4>
+      <h4 class="book-title">{{ book.metadata?.title }}</h4>
         <p-menu #menu [model]="items" [popup]="true" appendTo="body" />
         <p-button [text]="true" (click)="menu.toggle($event)" icon="pi pi-ellipsis-v" />
     </div>

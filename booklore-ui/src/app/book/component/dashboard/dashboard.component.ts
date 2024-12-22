@@ -23,7 +23,7 @@ export class DashboardComponent {
   ref: DynamicDialogRef | undefined;
 
   constructor(private libraryBookService: LibraryAndBookService, public dialogService: DialogService) {
-    this.libraries = this.libraryBookService.libraries;
+    this.libraries = this.libraryBookService.getLibraries();
   }
 
   get isLibrariesEmpty(): boolean {

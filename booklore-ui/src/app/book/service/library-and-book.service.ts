@@ -121,6 +121,24 @@ export class LibraryAndBookService {
     );
   }
 
+  loadLibraryBooks(libraryId: number) {
+    if (!this.loadedLibraries.has(libraryId)) {
+      this.http.get<Book[]>(`${this.libraryUrl}/${libraryId}/book`).pipe(
+        map(response => response),
+        catchError(error => {
+          console.error(`Error loading books for library ${libraryId}:`, error);
+          return of([]);
+        })
+      ).subscribe((books) => {
+        const updatedMap = new Map(this.libraryBooksMap());
+        updatedMap.set(libraryId, books);
+        this.libraryBooksMap.set(updatedMap);
+        this.loadedLibraries.add(libraryId);
+        console.log(`Loaded books for library ${libraryId}`);
+      });
+    }
+  }
+
   deleteLibrary(libraryId: number | null): Observable<void> {
     return this.http.delete<void>(`${this.libraryUrl}/${libraryId}`).pipe(
       tap(() => {
@@ -180,24 +198,6 @@ export class LibraryAndBookService {
       const allBooks = Array.from(this.libraryBooksMap().values()).flat();
       return allBooks.filter(book => book.shelves?.some(shelf => shelf.id === shelfId));
     });
-  }
-
-  loadBooksSignal(libraryId: number) {
-    if (!this.loadedLibraries.has(libraryId)) {
-      this.http.get<Book[]>(`${this.libraryUrl}/${libraryId}/book`).pipe(
-        map(response => response),
-        catchError(error => {
-          console.error(`Error loading books for library ${libraryId}:`, error);
-          return of([]);
-        })
-      ).subscribe((books) => {
-        const updatedMap = new Map(this.libraryBooksMap());
-        updatedMap.set(libraryId, books);
-        this.libraryBooksMap.set(updatedMap);
-        this.loadedLibraries.add(libraryId);
-        console.log(`Loaded books for library ${libraryId}`);
-      });
-    }
   }
 
   handleNewBook(book: Book) {
@@ -310,6 +310,4 @@ export class LibraryAndBookService {
     const requestBody = {googleBookId: googleBookId};
     return this.http.put<void>(`${this.bookUrl}/${bookId}/set-metadata`, requestBody);
   }
-
-
 }

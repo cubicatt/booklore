@@ -48,11 +48,11 @@ export class BooksBrowserComponent implements OnInit {
             if (libraryId) {
                 this.entityType.set('library');
                 this.currentEntityId.set(libraryId);
-                this.libraryBookService.loadBooksSignal(libraryId);
+                this.libraryBookService.loadLibraryBooks(libraryId);
             } else if (shelfId) {
                 this.entityType.set('shelf');
                 this.currentEntityId.set(shelfId);
-                this.libraryBookService.loadBooksSignal(shelfId);
+                this.libraryBookService.loadLibraryBooks(shelfId);
             }
         });
 

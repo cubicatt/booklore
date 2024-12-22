@@ -1,12 +1,12 @@
 <div class="library-header">
   <div class="library-header-dial">
-    <h3 class="library-name">{{ currentLibraryName() }}</h3>
+    <h3 class="library-name">{{ currentEntityName() }}</h3>
     <p-speedDial
       [model]="items!"
       direction="right"
       transitionDelay="80"
-      showIcon="pi pi-bars"
-      buttonClassName="p-button-text"
+      showIcon="pi pi-ellipsis-v"
+      buttonClassName="p-button-text p-button-contrast"
       hideIcon="pi pi-times">
     </p-speedDial>
   </div>
@@ -23,7 +23,7 @@
 
 <div class="content-container">
   <div class="card-container">
-    <virtual-scroller class="virtual-scroller" #scroll [items]="currentLibraryBooks()">
+    <virtual-scroller class="virtual-scroller" #scroll [items]="currentEntityBooks()">
       <div class="grid" #container>
         <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
           <app-book-card [book]="book"></app-book-card>

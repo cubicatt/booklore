@@ -30,13 +30,17 @@ import { ShelfAssignerComponent } from './shelf-assigner/shelf-assigner.componen
 import {CheckboxModule} from 'primeng/checkbox';
 import {DividerModule} from 'primeng/divider';
 import {DialogModule} from 'primeng/dialog';
+import { BooksBrowserComponent } from './book/component/books-browser/books-browser.component';
+import {BookCardComponent} from './book-card/book-card.component';
+import {SpeedDialModule} from 'primeng/speeddial';
 
 @NgModule({
   declarations: [
     AppComponent,
     DirectoryPickerComponent,
     LibraryCreatorComponent,
-    ShelfAssignerComponent
+    ShelfAssignerComponent,
+    BooksBrowserComponent
   ],
   imports: [
     BrowserModule,
@@ -61,6 +65,8 @@ import {DialogModule} from 'primeng/dialog';
     CheckboxModule,
     DividerModule,
     DialogModule,
+    BookCardComponent,
+    SpeedDialModule,
   ],
   providers: [
     DialogService,

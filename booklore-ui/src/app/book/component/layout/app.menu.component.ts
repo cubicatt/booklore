@@ -20,7 +20,7 @@ export class AppMenuComponent implements OnInit {
         separator: false,
         items: libraries.map((lib) => ({
           label: lib.name,
-          icon: 'pi pi-fw pi-home',
+          icon: 'pi pi-fw pi-book',
           routerLink: [`/library/${lib.id}/books`],
         })),
       },
@@ -48,16 +48,5 @@ export class AppMenuComponent implements OnInit {
 
   ngOnInit() {
     this.populateHome();
-  }
-
-  private populateHome() {
-    this.home = [
-      {
-        label: 'Home',
-        items: [
-          {label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/']},
-        ],
-      },
-    ];
   }
 }

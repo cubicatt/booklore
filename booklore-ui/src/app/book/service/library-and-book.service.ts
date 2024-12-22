@@ -175,6 +175,13 @@ export class LibraryAndBookService {
     return computed(() => this.libraryBooksMap().get(libraryId) || []);
   }
 
+  getShelfBooks(shelfId: number) {
+    return computed(() => {
+      const allBooks = Array.from(this.libraryBooksMap().values()).flat();
+      return allBooks.filter(book => book.shelves?.some(shelf => shelf.id === shelfId));
+    });
+  }
+
   loadBooksSignal(libraryId: number) {
     if (!this.loadedLibraries.has(libraryId)) {
       this.http.get<Book[]>(`${this.libraryUrl}/${libraryId}/book`).pipe(

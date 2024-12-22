@@ -5,18 +5,17 @@ import {LibraryAndBookService} from '../book/service/library-and-book.service';
 import {Router} from '@angular/router';
 import {MenuModule} from 'primeng/menu';
 import {MenuItem} from 'primeng/api';
-import {DirectoryPickerComponent} from "../book/component/directory-picker/directory-picker.component";
 import {DialogService} from "primeng/dynamicdialog";
 import {ShelfAssignerComponent} from "../shelf-assigner/shelf-assigner.component";
 
 @Component({
     selector: 'app-book-card',
     templateUrl: './book-card.component.html',
+    styleUrls: ['./book-card.component.scss'],
     imports: [
         Button,
         MenuModule
-    ],
-    styleUrls: ['./book-card.component.scss']
+    ]
 })
 export class BookCardComponent implements OnInit {
     @Input() book!: Book;
@@ -50,6 +49,13 @@ export class BookCardComponent implements OnInit {
                         icon: 'pi pi-folder',
                         command: () => {
                             this.openShelfDialog(this.book);
+                        }
+                    },
+                    {
+                        label: 'View metadata',
+                        icon: 'pi pi-info-circle',
+                        command: () => {
+                            this.openBookInfo(this.book);
                         }
                     }
                 ]

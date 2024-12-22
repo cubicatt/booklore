@@ -26,13 +26,15 @@ import {RxStompService} from './rx-stomp.service';
 import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
 import {LazyLoadImageModule} from 'ng-lazyload-image';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
-import { ShelfAssignerComponent } from './book/component/shelf-assigner/shelf-assigner.component';
+import {ShelfAssignerComponent} from './book/component/shelf-assigner/shelf-assigner.component';
 import {CheckboxModule} from 'primeng/checkbox';
 import {DividerModule} from 'primeng/divider';
 import {DialogModule} from 'primeng/dialog';
-import { BooksBrowserComponent } from './book/component/books-browser/books-browser.component';
+import {BooksBrowserComponent} from './book/component/books-browser/books-browser.component';
 import {BookCardComponent} from './book/component/book-card/book-card.component';
 import {SpeedDialModule} from 'primeng/speeddial';
+import {RouteReuseStrategy} from '@angular/router';
+import {CustomReuseStrategy} from './custom-reuse-strategy';
 
 @NgModule({
   declarations: [
@@ -76,6 +78,10 @@ import {SpeedDialModule} from 'primeng/speeddial';
       provide: RxStompService,
       useFactory: rxStompServiceFactory,
     },
+    {
+      provide: RouteReuseStrategy,
+      useClass: CustomReuseStrategy
+    }
   ],
   bootstrap: [AppComponent]
 })

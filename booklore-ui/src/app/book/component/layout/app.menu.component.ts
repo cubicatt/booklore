@@ -12,6 +12,24 @@ import {LibraryAndBookService} from '../../service/library-and-book.service';
 export class AppMenuComponent implements OnInit {
   home: any[] = [];
 
+  constructor(private libraryBookService: LibraryAndBookService) {
+  }
+
+  ngOnInit() {
+    this.populateHome();
+  }
+
+  populateHome() {
+    this.home = [
+      {
+        label: 'Home',
+        items: [
+          {label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/']},
+        ],
+      },
+    ];
+  }
+
   libraryMenu = computed(() => {
     const libraries = this.libraryBookService.libraries();
     return [
@@ -41,12 +59,4 @@ export class AppMenuComponent implements OnInit {
       },
     ];
   });
-
-  constructor(private libraryBookService: LibraryAndBookService) {
-
-  }
-
-  ngOnInit() {
-    this.populateHome();
-  }
 }

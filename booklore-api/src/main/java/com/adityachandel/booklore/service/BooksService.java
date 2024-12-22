@@ -70,6 +70,7 @@ public class BooksService {
         } else {
             throw new IllegalArgumentException("Invalid sortBy parameter");
         }
+
         return bookPage.getContent().stream()
                 .map(BookTransformer::convertToBookDTO)
                 .collect(Collectors.toList());

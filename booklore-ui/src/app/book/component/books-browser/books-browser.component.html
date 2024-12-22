@@ -23,12 +23,15 @@
 
 <div class="content-container">
   <div class="card-container">
-    <virtual-scroller class="virtual-scroller" #scroll [items]="books()">
+    <virtual-scroller *ngIf="books().length > 0" class="virtual-scroller" #scroll [items]="books()">
       <div class="grid" #container>
         <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
           <app-book-card [book]="book"></app-book-card>
         </div>
       </div>
     </virtual-scroller>
+    <div *ngIf="books().length === 0" class="empty-message">
+      <p>No books available to display.</p>
+    </div>
   </div>
 </div>

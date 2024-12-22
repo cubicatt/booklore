@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Book} from '../book/model/book.model';
+import {Book} from '../../model/book.model';
 import {Button} from 'primeng/button';
-import {LibraryAndBookService} from '../book/service/library-and-book.service';
+import {LibraryAndBookService} from '../../service/library-and-book.service';
 import {Router} from '@angular/router';
 import {MenuModule} from 'primeng/menu';
 import {MenuItem} from 'primeng/api';

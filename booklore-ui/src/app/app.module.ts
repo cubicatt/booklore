@@ -26,12 +26,12 @@ import {RxStompService} from './rx-stomp.service';
 import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
 import {LazyLoadImageModule} from 'ng-lazyload-image';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
-import { ShelfAssignerComponent } from './shelf-assigner/shelf-assigner.component';
+import { ShelfAssignerComponent } from './book/component/shelf-assigner/shelf-assigner.component';
 import {CheckboxModule} from 'primeng/checkbox';
 import {DividerModule} from 'primeng/divider';
 import {DialogModule} from 'primeng/dialog';
 import { BooksBrowserComponent } from './book/component/books-browser/books-browser.component';
-import {BookCardComponent} from './book-card/book-card.component';
+import {BookCardComponent} from './book/component/book-card/book-card.component';
 import {SpeedDialModule} from 'primeng/speeddial';
 
 @NgModule({

@@ -1,7 +1,7 @@
 import {Component, computed, OnInit} from '@angular/core';
-import {LibraryAndBookService} from '../book/service/library-and-book.service';
+import {LibraryAndBookService} from '../../service/library-and-book.service';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
-import {Book} from '../book/model/book.model';
+import {Book} from '../../model/book.model';
 import {MessageService} from 'primeng/api';
 
 @Component({

@@ -13,13 +13,7 @@
        #scrollContainer
        [horizontal]="true">
     <div class="book-item" *ngFor="let book of booksSignal!()">
-      <img [src]="coverImageSrc(book.id)" class="book-cover" alt="Cover of {{ book.metadata?.title }}" loading="lazy"/>
-      <div class="book-info">
-        <h4>{{ book.metadata?.title }}</h4>
-        <p>{{ getAuthorNames(book) }}</p>
-        <p-button [rounded]="true" icon="pi pi-eye" class="view-btn" (click)="openBook(book)"></p-button>
-        <p-button [rounded]="true" icon="pi pi-info" class="read-btn" (click)="openBookInfo(book.id, book.libraryId)"></p-button>
-      </div>
+      <app-book-card [book]="book"></app-book-card>
     </div>
   </div>
 </div>

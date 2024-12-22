@@ -5,6 +5,7 @@ import {Button} from 'primeng/button';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {NgForOf, NgIf} from '@angular/common';
 import {Router} from '@angular/router';
+import {BookCardComponent} from '../book-card/book-card.component';
 
 @Component({
   selector: 'app-dashboard-scroller',
@@ -14,7 +15,8 @@ import {Router} from '@angular/router';
     Button,
     InfiniteScrollDirective,
     NgForOf,
-    NgIf
+    NgIf,
+    BookCardComponent
   ],
 })
 export class DashboardScrollerComponent implements OnInit {

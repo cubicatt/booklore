@@ -32,8 +32,8 @@ public class LibraryController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<LibraryDTO>> getLibraries(@RequestParam(defaultValue = "0") @Min(0) int page, @RequestParam(defaultValue = "25") @Min(1) @Max(100) int size) {
-        return ResponseEntity.ok(libraryService.getLibraries(page, size));
+    public ResponseEntity<List<LibraryDTO>> getLibraries() {
+        return ResponseEntity.ok(libraryService.getLibraries());
     }
 
     @PostMapping

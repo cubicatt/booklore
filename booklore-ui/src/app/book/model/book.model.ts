@@ -3,6 +3,8 @@ export interface Book {
   libraryId: number;
   metadata?: BookMetadata;
   shelves?: Shelf[];
+  lastReadTime?: string;
+  addedOn?: string;
 }
 
 export interface BookMetadata {

@@ -3,9 +3,11 @@ package com.adityachandel.booklore.controller;
 import com.adityachandel.booklore.model.dto.BookDTO;
 import com.adityachandel.booklore.model.dto.BookViewerSettingDTO;
 import com.adityachandel.booklore.model.dto.BookWithNeighborsDTO;
+import com.adityachandel.booklore.model.dto.request.AssignShelvesRequest;
 import com.adityachandel.booklore.model.dto.response.GoogleBooksMetadata;
 import com.adityachandel.booklore.model.dto.request.SetMetadataRequest;
 import com.adityachandel.booklore.service.BooksService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 
 @RequestMapping("/v1/book")
@@ -30,12 +33,8 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookDTO>> getBooks(@RequestParam(defaultValue = "lastReadTime") String sortBy, @RequestParam(defaultValue = "desc") String sortDir) {
-        if (!sortBy.equals("lastReadTime") && !sortBy.equals("addedOn")) {
-            return ResponseEntity.badRequest().body(null);
-        }
-        List<BookDTO> books = booksService.getBooks(sortBy, sortDir);
-        return ResponseEntity.ok(books);
+    public ResponseEntity<List<BookDTO>> getBooks() {
+        return ResponseEntity.ok( booksService.getBooks());
     }
 
     @GetMapping("/search")
@@ -66,9 +65,8 @@ public class BookController {
     }
 
     @PutMapping("/{bookId}/update-last-read")
-    public ResponseEntity<Void> updateBookViewerSettings(@PathVariable long bookId) {
-        booksService.updateLastReadTime(bookId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<BookDTO> updateBookViewerSettings(@PathVariable long bookId) {
+        return ResponseEntity.ok(booksService.updateLastReadTime(bookId));
     }
 
     @GetMapping("/{bookId}/fetch-metadata")
@@ -85,5 +83,10 @@ public class BookController {
     public ResponseEntity<Void> setBookMetadata(@RequestBody SetMetadataRequest setMetadataRequest, @PathVariable long bookId) {
         booksService.setMetadata(setMetadataRequest, bookId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/assign-shelves")
+    public ResponseEntity<BookDTO> addBookToShelf(@RequestBody @Valid AssignShelvesRequest request) {
+        return ResponseEntity.ok(booksService.addBookToShelf(request.getBookId(), request.getShelfIds()));
     }
 }

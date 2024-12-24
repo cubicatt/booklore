@@ -45,11 +45,6 @@ public class ShelfController {
         return ResponseEntity.ok(shelfService.updateShelf(id, request));
     }
 
-    @PostMapping("/assign-shelves")
-    public ResponseEntity<BookDTO> addBookToShelf(@RequestBody @Valid AssignShelvesRequest request) {
-       return ResponseEntity.ok(shelfService.addBookToShelf(request.getBookId(), request.getShelfIds()));
-    }
-
     @DeleteMapping("/{shelfId}")
     public ResponseEntity<Void> deleteShelf(@PathVariable Long shelfId) {
         shelfService.deleteShelf(shelfId);

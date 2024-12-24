@@ -1,12 +1,12 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Book} from '../../model/book.model';
 import {Button} from 'primeng/button';
-import {LibraryAndBookService} from '../../service/library-and-book.service';
 import {Router} from '@angular/router';
 import {MenuModule} from 'primeng/menu';
 import {MenuItem} from 'primeng/api';
 import {DialogService} from "primeng/dynamicdialog";
 import {ShelfAssignerComponent} from "../shelf-assigner/shelf-assigner.component";
+import {BookService} from '../../service/book.service';
 
 @Component({
     selector: 'app-book-card',
@@ -23,16 +23,16 @@ export class BookCardComponent implements OnInit {
     items: MenuItem[] | undefined;
 
     constructor(
-        private libraryBookService: LibraryAndBookService, private router: Router,
+        private bookService: BookService, private router: Router,
         private dialogService: DialogService) {
     }
 
     coverImageSrc(book: Book): string {
-        return this.libraryBookService.getBookCoverUrl(book.id);
+        return this.bookService.getBookCoverUrl(book.id);
     }
 
     readBook(book: Book) {
-        this.libraryBookService.readBook(book);
+        this.bookService.readBook(book);
     }
 
     openBookInfo(book: Book) {

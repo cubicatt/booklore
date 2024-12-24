@@ -1,22 +1,22 @@
-import {Component, OnInit, ViewChild, ElementRef, Input, computed, signal, Signal} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {Book} from '../../model/book.model';
-import {LibraryAndBookService} from '../../service/library-and-book.service';
-import {Button} from 'primeng/button';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
-import {NgForOf, NgIf} from '@angular/common';
-import {Router} from '@angular/router';
+import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {BookCardComponent} from '../book-card/book-card.component';
+import {Observable} from 'rxjs';
+import {BookService} from '../../service/book.service';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard-scroller',
   templateUrl: './dashboard-scroller.component.html',
   styleUrls: ['./dashboard-scroller.component.scss'],
   imports: [
-    Button,
     InfiniteScrollDirective,
     NgForOf,
     NgIf,
-    BookCardComponent
+    BookCardComponent,
+    AsyncPipe
   ],
 })
 export class DashboardScrollerComponent implements OnInit {
@@ -25,37 +25,31 @@ export class DashboardScrollerComponent implements OnInit {
   @Input() title: string = 'Last Read Books';
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
-  booksSignal: Signal<Book[]> | undefined;
+  books$: Observable<Book[]> | undefined;
 
-  constructor(private bookService: LibraryAndBookService, private router: Router) {
+  constructor(private bookService: BookService) {
   }
 
   ngOnInit(): void {
-    this.booksSignal = this.bookListType === 'lastRead' ? this.bookService.getLastReadBooks() : this.bookService.getLatestAddedBooks();;
-    this.loadBooks();
-  }
-
-  loadBooks(): void {
-    if (this.bookListType === 'lastRead' && !this.bookService.getLastReadBooks()) {
-      this.bookService.getLastReadBooks();
-    } else if (this.bookListType === 'latestAdded' && !this.bookService.getLatestAddedBooks()) {
-      this.bookService.getLatestAddedBooks();
+    if (this.bookListType === 'lastRead') {
+      this.books$ = this.bookService.books$.pipe((
+        map(books =>
+            books
+              .filter(book => book.lastReadTime)
+              .sort((a, b) => new Date(b.lastReadTime!).getTime() - new Date(a.lastReadTime!).getTime())
+              .slice(0, 25)
+        )
+      ))
     }
-  }
-
-  coverImageSrc(bookId: number): string {
-    return this.bookService.getBookCoverUrl(bookId);
-  }
-
-  getAuthorNames(book: Book): string {
-    return book.metadata?.authors?.map((author) => author.name).join(', ') || 'No authors available';
-  }
-
-  openBook(book: Book): void {
-    this.bookService.readBook(book);
-  }
-
-  openBookInfo(bookId: number, libraryId: number) {
-    this.router.navigate(['/library', libraryId, 'book', bookId, 'info']);
+    if (this.bookListType === 'latestAdded') {
+      this.books$ = this.bookService.books$.pipe((
+        map(books =>
+          books
+            .filter(book => book.addedOn)
+            .sort((a, b) => new Date(b.addedOn!).getTime() - new Date(a.addedOn!).getTime())
+            .slice(0, 25)
+        )
+      ))
+    }
   }
 }

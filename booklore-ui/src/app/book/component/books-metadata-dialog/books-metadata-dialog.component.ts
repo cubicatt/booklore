@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {BookMetadata} from '../../model/book.model';
-import {LibraryAndBookService} from '../../service/library-and-book.service';
 import {NgForOf, NgIf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Router} from '@angular/router';
 import {Button} from 'primeng/button';
+import {BookService} from '../../service/book.service';
 
 @Component({
   selector: 'app-books-metadata-dialog',
@@ -27,7 +27,7 @@ export class BooksMetadataDialogComponent implements OnInit {
   bookId: number = 0;
   libraryId: number = 0;
 
-  constructor(private bookService: LibraryAndBookService, public dynamicDialogConfig: DynamicDialogConfig, private dynamicDialogRef: DynamicDialogRef, private router: Router) {
+  constructor(private bookService: BookService, public dynamicDialogConfig: DynamicDialogConfig, private dynamicDialogRef: DynamicDialogRef, private router: Router) {
     this.searchText = dynamicDialogConfig.data.bookTitle;
     this.bookId = this.dynamicDialogConfig.data.bookId;
     this.libraryId = this.dynamicDialogConfig.data.libraryId;

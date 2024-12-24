@@ -1,6 +1,6 @@
 <div class="dashboard">
 
-  <div class="dashboard-no-library" *ngIf="isLibrariesEmpty; else dashboardScroller">
+  <div class="dashboard-no-library" *ngIf="isLibrariesEmpty$ | async; else dashboardScroller">
     <h1 class="no-library-header">
       Looks like you haven't added a library yet. Let's add one!
     </h1>

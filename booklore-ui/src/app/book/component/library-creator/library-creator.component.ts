@@ -3,7 +3,7 @@ import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {DirectoryPickerComponent} from '../directory-picker/directory-picker.component';
 import {MessageService} from 'primeng/api';
 import {Router} from '@angular/router';
-import {LibraryAndBookService} from '../../service/library-and-book.service';
+import {LibraryService} from '../../service/library.service';
 
 @Component({
   selector: 'app-library-creator',
@@ -20,7 +20,7 @@ export class LibraryCreatorComponent {
   constructor(
     private dialogService: DialogService,
     private dynamicDialogRef: DynamicDialogRef,
-    private libraryAndBookService: LibraryAndBookService,
+    private libraryService: LibraryService,
     private router: Router,
   ) {
   }
@@ -55,7 +55,7 @@ export class LibraryCreatorComponent {
       name: this.value,
       paths: this.folders,
     };
-    this.libraryAndBookService.createLibrary(newLibrary).subscribe({
+    this.libraryService.createLibrary(newLibrary).subscribe({
       next: (createdLibrary) => {
         this.router.navigate(
           ['/library', createdLibrary.id, 'books']

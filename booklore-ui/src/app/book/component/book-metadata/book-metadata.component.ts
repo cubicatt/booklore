@@ -1,6 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {LibraryAndBookService} from '../../service/library-and-book.service';
 import {Book} from '../../model/book.model';
 import {Button} from 'primeng/button';
 import {NgForOf, NgIf} from '@angular/common';
@@ -8,6 +7,8 @@ import {BooksMetadataDialogComponent} from '../books-metadata-dialog/books-metad
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Subscription} from 'rxjs';
 import {TagModule} from 'primeng/tag';
+import {BookService} from '../../service/book.service';
+import {LibraryService} from '../../service/library.service';
 
 @Component({
   selector: 'app-book-metadata',
@@ -30,8 +31,9 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
   private dialogSubscription?: Subscription;
 
   constructor(
-    private bookService: LibraryAndBookService, private activatedRoute: ActivatedRoute,
-    private dialogService: DialogService, private router: Router) {
+    private bookService: BookService, private activatedRoute: ActivatedRoute,
+    private dialogService: DialogService, private router: Router,
+    private libraryService: LibraryService) {
   }
 
   ngOnInit(): void {
@@ -45,7 +47,7 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
   }
 
   private loadBookWithNeighbors(libraryId: number, bookId: number): void {
-    this.bookService.getBookWithNeighbours(bookId, libraryId).subscribe((response) => {
+    this.libraryService.getBookWithNeighbours(bookId, libraryId).subscribe((response) => {
       this.book = response.currentBook;
       this.nextBookId = response.nextBookId;
       this.previousBookId = response.previousBookId;

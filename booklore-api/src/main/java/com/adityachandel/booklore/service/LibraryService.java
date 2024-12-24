@@ -57,10 +57,9 @@ public class LibraryService {
         return LibraryTransformer.convertToLibraryDTO(library);
     }
 
-    public Page<LibraryDTO> getLibraries(int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Library> libraryPage = libraryRepository.findAll(pageRequest);
-        return libraryPage.map(LibraryTransformer::convertToLibraryDTO);
+    public List<LibraryDTO> getLibraries() {
+        List<Library> libraries = libraryRepository.findAll();
+        return libraries.stream().map(LibraryTransformer::convertToLibraryDTO).toList();
     }
 
     public void deleteLibrary(long id) {

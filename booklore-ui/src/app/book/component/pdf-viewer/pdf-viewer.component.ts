@@ -1,7 +1,7 @@
-import { ChangeDetectorRef, Component, NgZone, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { NgxExtendedPdfViewerModule, ScrollModeType } from 'ngx-extended-pdf-viewer';
-import { LibraryAndBookService } from '../../service/library-and-book.service';
+import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {NgxExtendedPdfViewerModule, ScrollModeType} from 'ngx-extended-pdf-viewer';
+import {BookService} from '../../service/book.service';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -22,7 +22,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   private isInitialLoad = true;
 
   constructor(
-    private bookService: LibraryAndBookService,
+    private bookService: BookService,
     private zone: NgZone,
     private route: ActivatedRoute
   ) {}
@@ -40,7 +40,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   }
 
   private loadBook(bookId: number): void {
-    this.bookService.getBook(bookId).subscribe((book) => {
+    this.bookService.getBookById(bookId).subscribe((book) => {
       this.zone.run(() => {
         this.bookService.getBookSetting(bookId).subscribe((bookSetting) => {
           const { pageNumber, zoom, sidebar_visible, spread } = bookSetting;

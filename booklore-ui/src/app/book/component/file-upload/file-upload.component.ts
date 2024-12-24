@@ -1,13 +1,14 @@
-import {Component, Signal} from '@angular/core';
+import {Component} from '@angular/core';
 import {Library} from '../../model/library.model';
 import {FileUploadService} from '../../../file-upload.service';
 import {Button} from 'primeng/button';
-import {NgIf} from '@angular/common';
+import {AsyncPipe, NgIf} from '@angular/common';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 import {ToastService} from '../../../toast.service';
 import {DynamicDialogRef} from 'primeng/dynamicdialog';
-import {LibraryAndBookService} from '../../service/library-and-book.service';
+import {LibraryService} from '../../service/library.service';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-file-upload-v2',
@@ -17,11 +18,12 @@ import {LibraryAndBookService} from '../../service/library-and-book.service';
     Button,
     NgIf,
     DropdownModule,
-    FormsModule
+    FormsModule,
+    AsyncPipe
   ],
 })
 export class FileUploadComponent {
-  libraries: Signal<Library[]>;
+  libraries$: Observable<Library[]>;
   selectedLibrary: Library | null = null;
   selectedPath: string = '';
   selectedFileName: string = '';
@@ -29,11 +31,11 @@ export class FileUploadComponent {
   errorMessage: string | null = null;
 
   constructor(
-    private libraryBookService: LibraryAndBookService,
+    private libraryService: LibraryService,
     private fileUploadService: FileUploadService,
     private toastService: ToastService,
     private dynamicDialogRef: DynamicDialogRef) {
-      this.libraries = this.libraryBookService.getLibraries();
+      this.libraries$ = this.libraryService.libraries$;
   }
 
   triggerFileInput(fileInput: HTMLInputElement): void {

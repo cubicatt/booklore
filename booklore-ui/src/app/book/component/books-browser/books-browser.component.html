@@ -1,6 +1,6 @@
 <div class="library-header">
   <div class="library-header-dial">
-    <h3 class="library-name">{{ title() }}</h3>
+    <h3 class="library-name">{{ (library$ | async)?.name }}</h3>
     <p-speedDial
       [model]="items!"
       direction="right"
@@ -22,15 +22,15 @@
 </div>
 
 <div class="content-container">
-  <div class="card-container">
-    <virtual-scroller *ngIf="books().length > 0" class="virtual-scroller" #scroll [items]="books()">
+  <div class="card-container" *ngIf="books$ | async as books">
+    <virtual-scroller *ngIf="books.length > 0" class="virtual-scroller" #scroll [items]="books">
       <div class="grid" #container>
         <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
           <app-book-card [book]="book"></app-book-card>
         </div>
       </div>
     </virtual-scroller>
-    <div *ngIf="books().length === 0" class="empty-message">
+    <div *ngIf="books.length === 0" class="empty-message">
       <p>No books available to display.</p>
     </div>
   </div>

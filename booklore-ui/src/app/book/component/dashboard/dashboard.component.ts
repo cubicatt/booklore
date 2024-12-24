@@ -1,11 +1,12 @@
-import {Component, Signal} from '@angular/core';
-import {Library} from '../../model/library.model';
+import {Component} from '@angular/core';
 import {Button} from 'primeng/button';
-import {NgIf} from '@angular/common';
+import {AsyncPipe, NgIf} from '@angular/common';
 import {LibraryCreatorComponent} from '../library-creator/library-creator.component';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {DashboardScrollerComponent} from '../dashboard-scroller/dashboard-scroller.component';
-import {LibraryAndBookService} from '../../service/library-and-book.service';
+import {LibraryService} from '../../service/library.service';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-home-page',
@@ -14,20 +15,19 @@ import {LibraryAndBookService} from '../../service/library-and-book.service';
   imports: [
     Button,
     NgIf,
-    DashboardScrollerComponent
+    DashboardScrollerComponent,
+    AsyncPipe
   ],
   providers: [DialogService],
 })
 export class DashboardComponent {
-  private libraries: Signal<Library[]>;
+  isLibrariesEmpty$: Observable<boolean>;
   ref: DynamicDialogRef | undefined;
 
-  constructor(private libraryBookService: LibraryAndBookService, public dialogService: DialogService) {
-    this.libraries = this.libraryBookService.getLibraries();
-  }
-
-  get isLibrariesEmpty(): boolean {
-    return this.libraries()?.length === 0;
+  constructor(private libraryService: LibraryService, public dialogService: DialogService) {
+    this.isLibrariesEmpty$ = this.libraryService.libraries$.pipe(
+      map(libraries => libraries.length === 0)
+    );
   }
 
   createNewLibrary(event: MouseEvent) {

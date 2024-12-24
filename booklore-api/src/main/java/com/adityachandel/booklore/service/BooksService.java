@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,8 +51,7 @@ public class BooksService {
     private final CategoryRepository categoryRepository;
     private final LibraryRepository libraryRepository;
     private final NotificationService notificationService;
-
-
+    private final ShelfRepository shelfRepository;
 
 
     public BookDTO getBook(long bookId) {
@@ -59,19 +59,8 @@ public class BooksService {
         return BookTransformer.convertToBookDTO(book);
     }
 
-    public List<BookDTO> getBooks(String sortBy, String sortDir) {
-        int size = 25;
-        PageRequest pageRequest = PageRequest.of(0, size, Sort.by(Sort.Direction.fromString(sortDir), sortBy));
-        Page<Book> bookPage;
-        if (sortBy.equals("addedOn")) {
-            bookPage = bookRepository.findByAddedOnIsNotNull(pageRequest);
-        } else if (sortBy.equals("lastReadTime")) {
-            bookPage = bookRepository.findByLastReadTimeIsNotNull(pageRequest);
-        } else {
-            throw new IllegalArgumentException("Invalid sortBy parameter");
-        }
-
-        return bookPage.getContent().stream()
+    public List<BookDTO> getBooks() {
+        return bookRepository.findAll().stream()
                 .map(BookTransformer::convertToBookDTO)
                 .collect(Collectors.toList());
     }
@@ -119,10 +108,10 @@ public class BooksService {
         return BookSettingTransformer.convertToDTO(bookViewerSetting);
     }
 
-    public void updateLastReadTime(long bookId) {
+    public BookDTO updateLastReadTime(long bookId) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         book.setLastReadTime(Instant.now());
-        bookRepository.save(book);
+        return BookTransformer.convertToBookDTO(bookRepository.save(book));
     }
 
     public List<GoogleBooksMetadata> fetchProspectiveMetadataListByBookId(long bookId) {
@@ -228,6 +217,28 @@ public class BooksService {
                 .previousBookId(previousBook != null ? previousBook.getId() : null)
                 .nextBookId(nextBook != null ? nextBook.getId() : null)
                 .build();
+    }
+
+    @Transactional
+    public BookDTO addBookToShelf(Long bookId, List<Long> shelfIds) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+
+        List<Shelf> currentShelves = book.getShelves();
+        List<Shelf> shelvesToAdd = shelfRepository.findAllById(shelfIds);
+
+        currentShelves.stream()
+                .filter(shelf -> !shelfIds.contains(shelf.getId()))
+                .forEach(shelf -> shelf.getBooks().remove(book));
+
+        book.getShelves().clear();
+        book.getShelves().addAll(shelvesToAdd);
+
+        shelvesToAdd.forEach(shelf -> shelf.getBooks().add(book));
+
+        bookRepository.save(book);
+        shelfRepository.saveAll(shelvesToAdd);
+        return BookTransformer.convertToBookDTO(book);
     }
 
 }

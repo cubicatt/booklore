@@ -2,7 +2,7 @@
 <div class="book-list-container">
   <div class="last-read-title-container">
     <h2 class="last-read-title">{{ title }}</h2>
-    <div *ngIf="booksSignal!().length === 0">
+    <div *ngIf="(books$ | async)?.length === 0">
       <h4>No books available.</h4>
     </div>
   </div>
@@ -12,7 +12,7 @@
        [infiniteScrollThrottle]="50"
        #scrollContainer
        [horizontal]="true">
-    <div class="book-item" *ngFor="let book of booksSignal!()">
+    <div class="book-item" *ngFor="let book of books$ | async">
       <app-book-card [book]="book"></app-book-card>
     </div>
   </div>

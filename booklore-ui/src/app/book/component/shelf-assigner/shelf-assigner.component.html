@@ -1,6 +1,6 @@
 <div class="dialog-container">
   <div class="checkbox-list">
-    <div *ngFor="let shelf of shelves()" class="flex items-center">
+    <div *ngFor="let shelf of shelves$ | async" class="flex items-center">
       <p-checkbox [inputId]="shelf.name" name="group" [value]="shelf" [(ngModel)]="selectedShelves" />
       <label [for]="shelf.id" class="ml-2">{{ shelf.name }}</label>
     </div>

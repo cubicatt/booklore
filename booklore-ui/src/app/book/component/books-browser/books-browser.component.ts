@@ -20,6 +20,7 @@ export class BooksBrowserComponent implements OnInit {
 
   books$: Observable<Book[]> | undefined;
   entity$: Observable<Library | Shelf | null> | undefined;
+  entityType$: Observable<string | null> | undefined;
   items: MenuItem[] | undefined;
 
   constructor(
@@ -38,8 +39,6 @@ export class BooksBrowserComponent implements OnInit {
       map(params => {
         const libraryId = Number(params.get('libraryId'));
         const shelfId = Number(params.get('shelfId'));
-
-        console.log(shelfId + '---' + libraryId)
         return {libraryId, shelfId};
       })
     );
@@ -74,6 +73,18 @@ export class BooksBrowserComponent implements OnInit {
         return of(null);
       })
     );
+
+    this.entityType$ = routeParam$.pipe(
+      switchMap(({libraryId, shelfId}) => {
+        if (!isNaN(libraryId) && libraryId !== 0) {
+          return of('Library');
+        } else if (!isNaN(shelfId) && shelfId !== 0) {
+          return of('Shelf');
+        }
+        return of(null);
+      })
+    );
+
 
     //this.initializeMenuItems();
   }

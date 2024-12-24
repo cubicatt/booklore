@@ -45,7 +45,7 @@ export class BookCardComponent implements OnInit {
                 label: 'Options',
                 items: [
                     {
-                        label: 'Add to shelf',
+                        label: 'Edit shelf',
                         icon: 'pi pi-folder',
                         command: () => {
                             this.openShelfDialog(this.book);

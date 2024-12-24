@@ -21,7 +21,6 @@ export class BookService {
         return of([]);
       })
     ).subscribe((libraries) => {
-      console.log('Books loaded:', libraries);
       this.books.next(libraries);
     });
   }

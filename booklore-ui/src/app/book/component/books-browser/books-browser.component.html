@@ -1,6 +1,6 @@
 <div class="library-header">
   <div class="library-header-dial">
-    <h3 class="library-name">{{ (library$ | async)?.name }}</h3>
+    <h3 class="library-name">{{ (entity$ | async)?.name }}</h3>
     <p-speedDial
       [model]="items!"
       direction="right"

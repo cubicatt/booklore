@@ -7,6 +7,7 @@ import {map, switchMap} from 'rxjs/operators';
 import {Observable, of} from 'rxjs';
 import {Book} from '../../model/book.model';
 import {Library} from '../../model/library.model';
+import {Shelf} from '../../model/book.model';
 import {ShelfService} from '../../service/shelf.service';
 
 @Component({
@@ -18,7 +19,7 @@ import {ShelfService} from '../../service/shelf.service';
 export class BooksBrowserComponent implements OnInit {
 
   books$: Observable<Book[]> | undefined;
-  library$: Observable<Library | null> | undefined;
+  entity$: Observable<Library | Shelf | null> | undefined;
   items: MenuItem[] | undefined;
 
   constructor(
@@ -33,15 +34,25 @@ export class BooksBrowserComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const libraryId$ = this.activatedRoute.paramMap.pipe(
-      map(params => Number(params.get('libraryId')))
+    const routeParam$ = this.activatedRoute.paramMap.pipe(
+      map(params => {
+        const libraryId = Number(params.get('libraryId'));
+        const shelfId = Number(params.get('shelfId'));
+
+        console.log(shelfId + '---' + libraryId)
+        return {libraryId, shelfId};
+      })
     );
 
-    this.books$ = libraryId$.pipe(
-      switchMap(libraryId => {
-        if (!isNaN(libraryId)) {
+    this.books$ = routeParam$.pipe(
+      switchMap(({libraryId, shelfId}) => {
+        if (!isNaN(libraryId) && libraryId !== 0) {
           return this.bookService.books$.pipe(
             map(books => books.filter(book => book.libraryId === libraryId))
+          );
+        } else if (!isNaN(shelfId) && shelfId !== 0) {
+          return this.bookService.books$.pipe(
+            map(books => books.filter(book => book.shelves?.some(shelf => shelf.id === shelfId)))
           );
         } else {
           return of([]);
@@ -49,22 +60,25 @@ export class BooksBrowserComponent implements OnInit {
       })
     );
 
-    this.library$ = this.activatedRoute.paramMap.pipe(
-      switchMap(params => {
-        const libraryId = Number(params.get('libraryId'));
-        if (!isNaN(libraryId)) {
+    this.entity$ = routeParam$.pipe(
+      switchMap(({libraryId, shelfId}) => {
+        if (!isNaN(libraryId) && libraryId !== 0) {
           return this.libraryService.libraries$.pipe(
             map(libraries => libraries.find(lib => lib.id === libraryId) || null)
+          );
+        } else if (!isNaN(shelfId) && shelfId !== 0) {
+          return this.shelfService.shelves$.pipe(
+            map(shelves => shelves.find(shelf => shelf.id === shelfId) || null)
           );
         }
         return of(null);
       })
     );
 
-    this.initializeLibraryMenuItems();
+    //this.initializeMenuItems();
   }
 
-  private initializeLibraryMenuItems(): void {
+  /*private initializeMenuItems(): void {
     this.items = [
       {
         icon: 'pi pi-trash',
@@ -73,18 +87,18 @@ export class BooksBrowserComponent implements OnInit {
           tooltipPosition: 'top'
         },
         command: () => {
-          this.library$?.subscribe(library => {
-            if (library) {
+          this.entity$?.subscribe(entity => {
+            if (entity) {
               this.confirmationService.confirm({
-                message: `Are you sure you want to delete ${library.name}?`,
+                message: `Are you sure you want to delete ${entity.name}?`,
                 header: 'Confirmation',
                 icon: 'pi pi-exclamation-triangle',
                 acceptIcon: 'none',
                 rejectIcon: 'none',
                 rejectButtonStyleClass: 'p-button-text',
                 accept: () => {
-                  if (library.id) {
-                    this.libraryService.deleteLibrary(library.id).subscribe({
+                  if ('libraryId' in entity) {  // Check if it's a Library
+                    this.libraryService.deleteLibrary(entity.id).subscribe({
                       complete: () => {
                         this.router.navigate(['/']);
                         this.messageService.add({
@@ -102,6 +116,25 @@ export class BooksBrowserComponent implements OnInit {
                         });
                       }
                     });
+                  } else if ('id' in entity) {  // Check if it's a Shelf
+                    this.shelfService.deleteShelf(entity.id).subscribe({
+                      complete: () => {
+                        this.router.navigate(['/']);
+                        this.messageService.add({
+                          severity: 'info',
+                          summary: 'Success',
+                          detail: 'Shelf was deleted'
+                        });
+                      },
+                      error: () => {
+                        this.messageService.add({
+                          severity: 'error',
+                          summary: 'Failed',
+                          detail: 'Failed to delete shelf',
+                          life: 3000
+                        });
+                      }
+                    });
                   }
                 }
               });
@@ -110,6 +143,5 @@ export class BooksBrowserComponent implements OnInit {
         }
       }
     ];
-  }
-
+  }*/
 }

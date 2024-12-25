@@ -24,7 +24,7 @@ export class BookService {
     });
   }
 
-  assignShelvesToBook(bookIds: Set<number | undefined>, shelvesToAssign: Set<number | undefined>, shelvesToUnassign: Set<number | undefined>): Observable<Book[]> {
+  updateBookShelves(bookIds: Set<number | undefined>, shelvesToAssign: Set<number | undefined>, shelvesToUnassign: Set<number | undefined>): Observable<Book[]> {
     const requestPayload = {
       bookIds: Array.from(bookIds),
       shelvesToAssign: Array.from(shelvesToAssign),

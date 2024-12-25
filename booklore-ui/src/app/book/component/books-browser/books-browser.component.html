@@ -13,15 +13,18 @@
 
   <div *ngIf="isAnyBookSelected()">
     <div class="button-container">
-      <p-button *ngIf="(entityType$ | async) === 'Library'" icon="pi pi-ellipsis-v" label="Options" severity="primary" [rounded]="true" [outlined]="true" (click)="menu.toggle($event)"></p-button>
-      <p-button *ngIf="(entityType$ | async) === 'Shelf'" icon="pi pi-minus-circle" label="Unshelf" severity="primary" [rounded]="true" [outlined]="true" (click)="unshelfBooks()"></p-button>
-      <p-button icon="pi pi-times" label="Deselect" severity="warning" [rounded]="true" [outlined]="true" (click)="deselectAllBooks()"></p-button>
+      <p-button *ngIf="(entityType$ | async) === 'Library'" icon="pi pi-ellipsis-v" label="Options" severity="primary"
+                [rounded]="true" [outlined]="true" (click)="menu.toggle($event)"></p-button>
+      <p-button *ngIf="(entityType$ | async) === 'Shelf'" icon="pi pi-minus-circle" label="Unshelf" severity="primary"
+                [rounded]="true" [outlined]="true" (click)="unshelfBooks()"></p-button>
+      <p-button icon="pi pi-times" label="Deselect" severity="warning" [rounded]="true" [outlined]="true"
+                (click)="deselectAllBooks()"></p-button>
     </div>
     <p-menu #menu [model]="items" [popup]="true" appendTo="body"></p-menu>
   </div>
 
   <div class="library-header-right">
-    <p-dropdown optionLabel="name" placeholder="Select Sorting" />
+    <p-dropdown optionLabel="name" placeholder="Select Sorting"/>
     <div class="zoom-controls">
       <p-button icon="pi pi-minus" [rounded]="true" [outlined]="true" severity="info"></p-button>
       <p-button icon="pi pi-plus" [rounded]="true" [outlined]="true" severity="info"></p-button>
@@ -36,7 +39,9 @@
         <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
           <app-book-card
             [book]="book"
-            [onBookSelect]="handleBookSelect.bind(this)">
+            [isCheckboxEnabled]="true"
+            [onBookSelect]="handleBookSelect.bind(this)"
+            [isSelected]="selectedBooks.has(book.id)">
           </app-book-card>
         </div>
       </div>

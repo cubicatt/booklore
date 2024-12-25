@@ -1,7 +1,7 @@
 <div class="book-card"
-  [class.selected]="book.selected"
-  (mouseover)="isHovered = true"
-  (mouseout)="isHovered = false">
+     [class.selected]="isSelected"
+     (mouseover)="isHovered = true"
+     (mouseout)="isHovered = false">
   <div class="cover-container">
     <img
       [src]="coverImageSrc(book)"
@@ -9,11 +9,11 @@
       alt="Cover of {{ book.metadata?.title }}"
       loading="lazy"/>
     <p-checkbox
-      *ngIf="isHovered || book.selected"
-      [(ngModel)]="book.selected"
+      *ngIf="isCheckboxEnabled && (isHovered || isSelected)"
+      [(ngModel)]="isSelected"
       binary="true"
       class="select-checkbox"
-      (ngModelChange)="toggleSelection(book.selected || false)"></p-checkbox>
+      (ngModelChange)="toggleSelection(isSelected || false)"></p-checkbox>
     <p-button [rounded]="true" icon="pi pi-info" class="read-btn" (click)="openBookInfo(book)"></p-button>
     <p-button [rounded]="true" icon="pi pi-book" class="info-btn" (click)="readBook(book)"></p-button>
   </div>

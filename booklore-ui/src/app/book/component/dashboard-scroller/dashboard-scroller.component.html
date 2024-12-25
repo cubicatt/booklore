@@ -13,7 +13,7 @@
        #scrollContainer
        [horizontal]="true">
     <div class="book-item" *ngFor="let book of books$ | async">
-      <app-book-card [book]="book"></app-book-card>
+      <app-book-card [book]="book" [isCheckboxEnabled]="false"></app-book-card>
     </div>
   </div>
 </div>

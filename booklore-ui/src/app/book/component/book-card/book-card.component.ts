@@ -1,15 +1,16 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Book } from '../../model/book.model';
-import { Button } from 'primeng/button';
-import { Router } from '@angular/router';
-import { MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
-import { DialogService } from 'primeng/dynamicdialog';
-import { ShelfAssignerComponent } from '../shelf-assigner/shelf-assigner.component';
-import { BookService } from '../../service/book.service';
-import { CheckboxModule } from 'primeng/checkbox';
-import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
+import {Component, Input, OnInit} from '@angular/core';
+import {Book} from '../../model/book.model';
+import {Button} from 'primeng/button';
+import {Router} from '@angular/router';
+import {MenuModule} from 'primeng/menu';
+import {MenuItem} from 'primeng/api';
+import {DialogService} from 'primeng/dynamicdialog';
+import {ShelfAssignerComponent} from '../shelf-assigner/shelf-assigner.component';
+import {BookService} from '../../service/book.service';
+import {CheckboxModule} from 'primeng/checkbox';
+import {FormsModule} from '@angular/forms';
+import {NgIf} from '@angular/common';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-book-card',
@@ -25,18 +26,42 @@ import { NgIf } from '@angular/common';
 })
 export class BookCardComponent implements OnInit {
   @Input() book!: Book;
-  @Input() onBookSelect: (book: Book, selected: boolean) => void = () => {};
+  @Input() isCheckboxEnabled: boolean = false;
+  @Input() onBookSelect?: (bookId: number, selected: boolean) => void;
+  @Input() isSelected: boolean = false;
 
   items: MenuItem[] | undefined;
-  isHovered: boolean = false; // Track hover state
+  isHovered: boolean = false;
 
   constructor(
     private bookService: BookService,
     private router: Router,
     private dialogService: DialogService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
+    this.initMenu();
+  }
+
+  coverImageSrc(book: Book): string {
+    return this.bookService.getBookCoverUrl(book.id);
+  }
+
+  readBook(book: Book): void {
+    this.bookService.readBook(book);
+  }
+
+  toggleSelection(selected: boolean): void {
+    if (this.isCheckboxEnabled) {
+      this.isSelected = selected;
+      if (this.onBookSelect) {
+        this.onBookSelect(this.book.id, selected);
+      }
+    }
+  }
+
+  private initMenu() {
     this.items = [
       {
         label: 'Options',
@@ -56,38 +81,21 @@ export class BookCardComponent implements OnInit {
     ];
   }
 
-  coverImageSrc(book: Book): string {
-    return this.bookService.getBookCoverUrl(book.id);
-  }
-
-  readBook(book: Book): void {
-    this.bookService.readBook(book);
-  }
-
-  openBookInfo(book: Book): void {
-    this.router.navigate(['/library', book.libraryId, 'book', book.id, 'info']);
-  }
-
-  toggleSelection(selected: boolean): void {
-    this.book.selected = selected;
-    this.onBookSelect(this.book, selected);  // Notify the parent component
-  }
-
-  shouldShowCheckbox(): boolean {
-    return this.book.selected || this.isHovered;
-  }
-
   private openShelfDialog(book: Book): void {
     this.dialogService.open(ShelfAssignerComponent, {
       header: `Update Shelves: ${book.metadata?.title}`,
       modal: true,
       width: '30%',
       height: '70%',
-      contentStyle: { overflow: 'auto' },
+      contentStyle: {overflow: 'auto'},
       baseZIndex: 10,
       data: {
         book: this.book
       },
     });
+  }
+
+  openBookInfo(book: Book): void {
+    this.router.navigate(['/library', book.libraryId, 'book', book.id, 'info']);
   }
 }

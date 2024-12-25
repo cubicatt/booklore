@@ -4,7 +4,7 @@ import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
 import {LibraryService} from '../../service/library.service';
 import {BookService} from '../../service/book.service';
 import {map, switchMap} from 'rxjs/operators';
-import {Observable, of} from 'rxjs';
+import {Observable, of, Subject} from 'rxjs';
 import {Book} from '../../model/book.model';
 import {Library} from '../../model/library.model';
 import {Shelf} from '../../model/book.model';
@@ -24,8 +24,9 @@ export class BooksBrowserComponent implements OnInit {
   entityType$: Observable<string | null> | undefined;
   items: MenuItem[] | undefined;
   selectedBooks: Set<number> = new Set();
-  book: Book | undefined;
   entity: Library | Shelf | null = null;
+  private deselectAllSubject = new Subject<void>(); // Subject to notify deselection
+  deselectAll$ = this.deselectAllSubject.asObservable();
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -96,14 +97,12 @@ export class BooksBrowserComponent implements OnInit {
 
   }
 
-  handleBookSelect(book: Book, selected: boolean): void {
+  handleBookSelect(bookId: number, selected: boolean): void {
     if (selected) {
-      this.selectedBooks.add(book.id);
-      this.book = book;  // Set the selected book
+      this.selectedBooks.add(bookId);
       this.setupMenu();
     } else {
-      this.selectedBooks.delete(book.id);
-      this.book = undefined; // Clear the selected book
+      this.selectedBooks.delete(bookId);
     }
   }
 
@@ -124,9 +123,6 @@ export class BooksBrowserComponent implements OnInit {
 
   deselectAllBooks(): void {
     this.selectedBooks.clear();
-    this.books$?.subscribe(books => {
-      books.forEach(book => book.selected = false);
-    });
   }
 
   isAnyBookSelected(): boolean {
@@ -143,7 +139,6 @@ export class BooksBrowserComponent implements OnInit {
       baseZIndex: 10,
       data: {
         isMultiBooks: true,
-        book: this.book,
         bookIds: this.selectedBooks
       },
     });
@@ -151,7 +146,7 @@ export class BooksBrowserComponent implements OnInit {
 
   unshelfBooks() {
     if (this.entity) {
-      this.bookService.assignShelvesToBook(this.selectedBooks, new Set(), new Set([this.entity.id])).subscribe(
+      this.bookService.updateBookShelves(this.selectedBooks, new Set(), new Set([this.entity.id])).subscribe(
         () => {
           this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book\'s shelves updated'});
           this.selectedBooks = new Set<number>();

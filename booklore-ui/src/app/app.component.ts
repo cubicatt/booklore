@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {RxStompService} from './rx-stomp.service';
+import {RxStompService} from './book/service/rx-stomp.service';
 import {Message} from '@stomp/stompjs';
 import {Book} from './book/model/book.model';
 import {BookService} from './book/service/book.service';

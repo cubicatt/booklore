@@ -1,11 +1,11 @@
 import {Component} from '@angular/core';
 import {Library} from '../../model/library.model';
-import {FileUploadService} from '../../../file-upload.service';
+import {FileUploadService} from '../../service/file-upload.service';
 import {Button} from 'primeng/button';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
-import {ToastService} from '../../../toast.service';
+import {ToastService} from '../../service/toast.service';
 import {DynamicDialogRef} from 'primeng/dynamicdialog';
 import {LibraryService} from '../../service/library.service';
 import {Observable} from 'rxjs';

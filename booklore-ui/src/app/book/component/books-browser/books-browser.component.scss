@@ -55,3 +55,8 @@
   display: flex;
   justify-content: space-around;
 }
+
+.button-container {
+  display: flex;
+  gap: 10px; /* Adds 10px space between buttons */
+}

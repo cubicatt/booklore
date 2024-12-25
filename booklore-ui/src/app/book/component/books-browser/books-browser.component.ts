@@ -25,6 +25,7 @@ export class BooksBrowserComponent implements OnInit {
   items: MenuItem[] | undefined;
   selectedBooks: Set<number> = new Set();
   book: Book | undefined;
+  entity: Library | Shelf | null = null;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -88,6 +89,11 @@ export class BooksBrowserComponent implements OnInit {
         return of(null);
       })
     );
+
+    this.entity$.subscribe(entity => {
+      this.entity = entity;  // Store resolved value in local variable
+    });
+
   }
 
   handleBookSelect(book: Book, selected: boolean): void {
@@ -142,4 +148,19 @@ export class BooksBrowserComponent implements OnInit {
       },
     });
   }
+
+  unshelfBooks() {
+    if (this.entity) {
+      this.bookService.assignShelvesToBook(this.selectedBooks, new Set(), new Set([this.entity.id])).subscribe(
+        () => {
+          this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book\'s shelves updated'});
+          this.selectedBooks = new Set<number>();
+        },
+        (error) => {
+          this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book\'s shelves'});
+        }
+      );
+    }
+  }
+
 }

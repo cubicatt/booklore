@@ -221,26 +221,23 @@ public class BooksService {
         List<Shelf> shelvesToUnassign = shelfRepository.findAllById(shelfIdsToUnassign);
 
         for (Book book : books) {
-            for (Shelf shelf : shelvesToUnassign) {
-                Optional<Shelf> shelfOpt = book.getShelves().stream().filter(s -> s.getId().equals(shelf.getId())).findAny();
-                shelfOpt.ifPresent(value -> book.getShelves().remove(value));
-                shelf.getBooks().remove(book);
-                shelfRepository.save(shelf);
-            }
-            for (Shelf shelf : shelvesToAssign) {
-                Optional<Shelf> shelfOpt = book.getShelves().stream().filter(s -> s.getId().equals(shelf.getId())).findAny();
-                if (shelfOpt.isEmpty()) {
+            book.getShelves().removeIf(shelf -> shelfIdsToUnassign.contains(shelf.getId()));
+            shelvesToUnassign.forEach(shelf -> shelf.getBooks().remove(book));
+
+            shelvesToAssign.forEach(shelf -> {
+                if (!book.getShelves().contains(shelf)) {
                     book.getShelves().add(shelf);
                 }
-                Optional<Book> bookOpt = shelf.getBooks().stream().filter(b -> b.getId().equals(book.getId())).findAny();
-                if (bookOpt.isEmpty()) {
+                if (!shelf.getBooks().contains(book)) {
                     shelf.getBooks().add(book);
                 }
-                shelfRepository.save(shelf);
-            }
+            });
+
             bookRepository.save(book);
+            shelfRepository.saveAll(shelvesToAssign);
         }
-        return books.stream().map(BookTransformer::convertToBookDTO).toList();
+
+        return books.stream().map(BookTransformer::convertToBookDTO).collect(Collectors.toList());
     }
 
 }

@@ -12,9 +12,12 @@
   </div>
 
   <div *ngIf="isAnyBookSelected()">
-    <p-button icon="pi pi-ellipsis-v" label="Options" severity="primary" [rounded]="true" [outlined]="true" (click)="menu.toggle($event)"></p-button>
+    <div class="button-container">
+      <p-button *ngIf="(entityType$ | async) === 'Library'" icon="pi pi-ellipsis-v" label="Options" severity="primary" [rounded]="true" [outlined]="true" (click)="menu.toggle($event)"></p-button>
+      <p-button *ngIf="(entityType$ | async) === 'Shelf'" icon="pi pi-minus-circle" label="Unshelf" severity="primary" [rounded]="true" [outlined]="true" (click)="unshelfBooks()"></p-button>
+      <p-button icon="pi pi-times" label="Deselect" severity="warning" [rounded]="true" [outlined]="true" (click)="deselectAllBooks()"></p-button>
+    </div>
     <p-menu #menu [model]="items" [popup]="true" appendTo="body"></p-menu>
-    <p-button icon="pi pi-times" label="Deselect All" severity="warning" [rounded]="true" [outlined]="true" (click)="deselectAllBooks()"></p-button>
   </div>
 
   <div class="library-header-right">

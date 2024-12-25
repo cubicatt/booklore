@@ -25,8 +25,6 @@ export class BooksBrowserComponent implements OnInit {
   items: MenuItem[] | undefined;
   selectedBooks: Set<number> = new Set();
   entity: Library | Shelf | null = null;
-  private deselectAllSubject = new Subject<void>(); // Subject to notify deselection
-  deselectAll$ = this.deselectAllSubject.asObservable();
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -92,15 +90,16 @@ export class BooksBrowserComponent implements OnInit {
     );
 
     this.entity$.subscribe(entity => {
-      this.entity = entity;  // Store resolved value in local variable
+      this.entity = entity;
     });
+
+    this.setupMenu();
 
   }
 
   handleBookSelect(bookId: number, selected: boolean): void {
     if (selected) {
       this.selectedBooks.add(bookId);
-      this.setupMenu();
     } else {
       this.selectedBooks.delete(bookId);
     }

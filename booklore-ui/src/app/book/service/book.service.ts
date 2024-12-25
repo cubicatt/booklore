@@ -75,7 +75,7 @@ export class BookService {
         console.log(updatedBook);
         const currentBooks = this.books.getValue();
         const updatedBooks = currentBooks.map(book =>
-          book.id === updatedBook.id ? { ...book, lastReadTime: updatedBook.lastReadTime } : book
+          book.id === updatedBook.id ? {...book, lastReadTime: updatedBook.lastReadTime} : book
         );
         this.books.next(updatedBooks);
         return [updatedBook];
@@ -97,7 +97,10 @@ export class BookService {
     if (query.length < 2) {
       return of([]);
     }
-    return this.http.get<Book[]>(`${this.url}/search?title=${encodeURIComponent(query)}`);
+    const filteredBooks = this.books.value.filter(book =>
+      book.metadata?.title?.toLowerCase().includes(query.toLowerCase()) || false
+    );
+    return of(filteredBooks);
   }
 
   getBookDataUrl(bookId: number): string {

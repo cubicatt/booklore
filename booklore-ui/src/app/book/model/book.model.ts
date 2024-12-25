@@ -5,6 +5,7 @@ export interface Book {
   shelves?: Shelf[];
   lastReadTime?: string;
   addedOn?: string;
+  selected?: boolean;
 }
 
 export interface BookMetadata {

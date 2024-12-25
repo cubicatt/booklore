@@ -9,6 +9,8 @@ import {Book} from '../../model/book.model';
 import {Library} from '../../model/library.model';
 import {Shelf} from '../../model/book.model';
 import {ShelfService} from '../../service/shelf.service';
+import {ShelfAssignerComponent} from '../shelf-assigner/shelf-assigner.component';
+import {DialogService} from 'primeng/dynamicdialog';
 
 @Component({
   selector: 'app-books-browser',
@@ -17,11 +19,12 @@ import {ShelfService} from '../../service/shelf.service';
   styleUrls: ['./books-browser.component.scss']
 })
 export class BooksBrowserComponent implements OnInit {
-
   books$: Observable<Book[]> | undefined;
   entity$: Observable<Library | Shelf | null> | undefined;
   entityType$: Observable<string | null> | undefined;
   items: MenuItem[] | undefined;
+  selectedBooks: Set<number> = new Set();
+  book: Book | undefined;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -30,7 +33,8 @@ export class BooksBrowserComponent implements OnInit {
     private messageService: MessageService,
     private libraryService: LibraryService,
     private bookService: BookService,
-    private shelfService: ShelfService
+    private shelfService: ShelfService,
+    private dialogService: DialogService
   ) {
   }
 
@@ -84,75 +88,58 @@ export class BooksBrowserComponent implements OnInit {
         return of(null);
       })
     );
-
-
-    //this.initializeMenuItems();
   }
 
-  /*private initializeMenuItems(): void {
+  handleBookSelect(book: Book, selected: boolean): void {
+    if (selected) {
+      this.selectedBooks.add(book.id);
+      this.book = book;  // Set the selected book
+      this.setupMenu();
+    } else {
+      this.selectedBooks.delete(book.id);
+      this.book = undefined; // Clear the selected book
+    }
+  }
+
+  setupMenu(): void {
     this.items = [
       {
-        icon: 'pi pi-trash',
-        tooltipOptions: {
-          tooltipLabel: 'Delete',
-          tooltipPosition: 'top'
-        },
-        command: () => {
-          this.entity$?.subscribe(entity => {
-            if (entity) {
-              this.confirmationService.confirm({
-                message: `Are you sure you want to delete ${entity.name}?`,
-                header: 'Confirmation',
-                icon: 'pi pi-exclamation-triangle',
-                acceptIcon: 'none',
-                rejectIcon: 'none',
-                rejectButtonStyleClass: 'p-button-text',
-                accept: () => {
-                  if ('libraryId' in entity) {  // Check if it's a Library
-                    this.libraryService.deleteLibrary(entity.id).subscribe({
-                      complete: () => {
-                        this.router.navigate(['/']);
-                        this.messageService.add({
-                          severity: 'info',
-                          summary: 'Success',
-                          detail: 'Library was deleted'
-                        });
-                      },
-                      error: () => {
-                        this.messageService.add({
-                          severity: 'error',
-                          summary: 'Failed',
-                          detail: 'Failed to delete library',
-                          life: 3000
-                        });
-                      }
-                    });
-                  } else if ('id' in entity) {  // Check if it's a Shelf
-                    this.shelfService.deleteShelf(entity.id).subscribe({
-                      complete: () => {
-                        this.router.navigate(['/']);
-                        this.messageService.add({
-                          severity: 'info',
-                          summary: 'Success',
-                          detail: 'Shelf was deleted'
-                        });
-                      },
-                      error: () => {
-                        this.messageService.add({
-                          severity: 'error',
-                          summary: 'Failed',
-                          detail: 'Failed to delete shelf',
-                          life: 3000
-                        });
-                      }
-                    });
-                  }
-                }
-              });
-            }
-          });
-        }
-      }
+        label: 'Options',
+        items: [
+          {
+            label: 'Edit shelf',
+            icon: 'pi pi-folder',
+            command: () => this.openShelfDialog(),
+          }
+        ],
+      },
     ];
-  }*/
+  }
+
+  deselectAllBooks(): void {
+    this.selectedBooks.clear();
+    this.books$?.subscribe(books => {
+      books.forEach(book => book.selected = false);
+    });
+  }
+
+  isAnyBookSelected(): boolean {
+    return this.selectedBooks.size > 0;
+  }
+
+  openShelfDialog(): void {
+    this.dialogService.open(ShelfAssignerComponent, {
+      header: `Update Books Shelves`,
+      modal: true,
+      width: '30%',
+      height: '70%',
+      contentStyle: {overflow: 'auto'},
+      baseZIndex: 10,
+      data: {
+        isMultiBooks: true,
+        book: this.book,
+        bookIds: this.selectedBooks
+      },
+    });
+  }
 }

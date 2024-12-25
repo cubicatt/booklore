@@ -35,6 +35,7 @@ import {BookCardComponent} from './book/component/book-card/book-card.component'
 import {SpeedDialModule} from 'primeng/speeddial';
 import {RouteReuseStrategy} from '@angular/router';
 import {CustomReuseStrategy} from './custom-reuse-strategy';
+import {MenuModule} from 'primeng/menu';
 
 @NgModule({
   declarations: [
@@ -69,6 +70,7 @@ import {CustomReuseStrategy} from './custom-reuse-strategy';
     DialogModule,
     BookCardComponent,
     SpeedDialModule,
+    MenuModule,
   ],
   providers: [
     DialogService,

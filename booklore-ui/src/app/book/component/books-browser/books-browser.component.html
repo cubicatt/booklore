@@ -10,10 +10,15 @@
       hideIcon="pi pi-times">
     </p-speedDial>
   </div>
+
+  <div *ngIf="isAnyBookSelected()">
+    <p-button icon="pi pi-ellipsis-v" label="Options" severity="primary" [rounded]="true" [outlined]="true" (click)="menu.toggle($event)"></p-button>
+    <p-menu #menu [model]="items" [popup]="true" appendTo="body"></p-menu>
+    <p-button icon="pi pi-times" label="Deselect All" severity="warning" [rounded]="true" [outlined]="true" (click)="deselectAllBooks()"></p-button>
+  </div>
+
   <div class="library-header-right">
-    <p-dropdown
-      optionLabel="name"
-      placeholder="Select Sorting"/>
+    <p-dropdown optionLabel="name" placeholder="Select Sorting" />
     <div class="zoom-controls">
       <p-button icon="pi pi-minus" [rounded]="true" [outlined]="true" severity="info"></p-button>
       <p-button icon="pi pi-plus" [rounded]="true" [outlined]="true" severity="info"></p-button>
@@ -26,7 +31,10 @@
     <virtual-scroller *ngIf="books.length > 0" class="virtual-scroller" #scroll [items]="books">
       <div class="grid" #container>
         <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
-          <app-book-card [book]="book"></app-book-card>
+          <app-book-card
+            [book]="book"
+            [onBookSelect]="handleBookSelect.bind(this)">
+          </app-book-card>
         </div>
       </div>
     </virtual-scroller>

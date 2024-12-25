@@ -2,22 +2,17 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.BookDTO;
 import com.adityachandel.booklore.model.dto.BookViewerSettingDTO;
-import com.adityachandel.booklore.model.dto.BookWithNeighborsDTO;
-import com.adityachandel.booklore.model.dto.request.AssignShelvesRequest;
-import com.adityachandel.booklore.model.dto.response.GoogleBooksMetadata;
+import com.adityachandel.booklore.model.dto.request.ShelvesAssignmentRequest;
 import com.adityachandel.booklore.model.dto.request.SetMetadataRequest;
+import com.adityachandel.booklore.model.dto.response.GoogleBooksMetadata;
 import com.adityachandel.booklore.service.BooksService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.List;
 
 @RequestMapping("/v1/book")
@@ -86,7 +81,7 @@ public class BookController {
     }
 
     @PostMapping("/assign-shelves")
-    public ResponseEntity<BookDTO> addBookToShelf(@RequestBody @Valid AssignShelvesRequest request) {
-        return ResponseEntity.ok(booksService.addBookToShelf(request.getBookId(), request.getShelfIds()));
+    public ResponseEntity<List<BookDTO>> addBookToShelf(@RequestBody @Valid ShelvesAssignmentRequest request) {
+        return ResponseEntity.ok(booksService.assignShelvesToBooks(request.getBookIds(), request.getShelvesToAssign(), request.getShelvesToUnassign()));
     }
 }

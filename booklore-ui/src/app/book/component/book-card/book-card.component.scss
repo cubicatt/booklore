@@ -1,8 +1,13 @@
 .book-card {
   background-color: var(--surface-card);
-  border-radius: 8px 8px 0 0;
+  border-radius: 8px;
   position: relative;
   overflow: hidden;
+  transition: border 0.2s;
+
+  &.selected {
+    border: 2px solid var(--primary-color);
+  }
 }
 
 .cover-container {
@@ -13,7 +18,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-direction: row;
 }
 
 .book-title {
@@ -24,19 +28,18 @@
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
-  padding: 6px 6px 3px;
+  padding: 6px;
 }
 
 .book-cover {
   width: 100%;
   height: auto;
-  max-height: 100%;
-  object-fit: cover;
   border-radius: 8px 8px 0 0;
   transition: filter 0.2s ease-in-out;
 }
 
-.info-btn, .read-btn {
+.info-btn,
+.read-btn {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -45,15 +48,11 @@
 }
 
 .info-btn {
-  top: 25%; /* 30% below the top of the image */
+  top: 25%;
 }
 
 .read-btn {
-  bottom: 25%; /* 30% above the bottom of the image */
-}
-
-.cover-container {
-  position: relative; /* Ensures buttons are positioned relative to the image */
+  bottom: 25%;
 }
 
 .cover-container:hover .book-cover {
@@ -65,3 +64,20 @@
   display: block;
 }
 
+.select-checkbox {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: none; /* Hidden by default */
+  z-index: 1;
+}
+
+/* Show checkbox on hover */
+.cover-container:hover .select-checkbox {
+  display: block;
+}
+
+/* Keep checkbox visible for selected books */
+.book-card.selected .select-checkbox {
+  display: block;
+}

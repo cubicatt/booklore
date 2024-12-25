@@ -1,9 +1,8 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, filter, Observable, of, tap} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {catchError, map, switchMap} from 'rxjs/operators';
-import {Book, BookMetadata, BookSetting, BookWithNeighborsDTO} from '../model/book.model';
-import {ShelfService} from './shelf.service';
+import {Book, BookMetadata, BookSetting} from '../model/book.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +13,7 @@ export class BookService {
   private books = new BehaviorSubject<Book[]>([]);
   books$ = this.books.asObservable();
 
-  constructor(private http: HttpClient, private shelfService: ShelfService) {
+  constructor(private http: HttpClient) {
     this.http.get<Book[]>(this.url).pipe(
       catchError(error => {
         console.error('Error loading books:', error);
@@ -25,23 +24,26 @@ export class BookService {
     });
   }
 
-  assignShelvesToBook(book: Book, shelfIds: number[]): Observable<Book> {
+  assignShelvesToBook(bookIds: Set<number | undefined>, shelvesToAssign: Set<number | undefined>, shelvesToUnassign: Set<number | undefined>): Observable<Book[]> {
     const requestPayload = {
-      bookId: book.id,
-      shelfIds: shelfIds,
+      bookIds: Array.from(bookIds),
+      shelvesToAssign: Array.from(shelvesToAssign),
+      shelvesToUnassign: Array.from(shelvesToUnassign),
     };
-    return this.http.post<Book>(`${this.url}/assign-shelves`, requestPayload).pipe(
-      map((updatedBook) => {
+    return this.http.post<Book[]>(`${this.url}/assign-shelves`, requestPayload).pipe(
+      map((updatedBooks) => {
         const currentBooks = this.books.value;
-        const bookIndex = currentBooks.findIndex(b => b.id === updatedBook.id);
-        if (bookIndex !== -1) {
-          currentBooks[bookIndex] = updatedBook;
-          this.books.next([...currentBooks]);
-        }
-        return updatedBook;
+        updatedBooks.forEach(updatedBook => {
+          const bookIndex = currentBooks.findIndex(b => b.id === updatedBook.id);
+          if (bookIndex !== -1) {
+            currentBooks[bookIndex] = updatedBook;
+          }
+        });
+        this.books.next([...currentBooks]);
+        return updatedBooks;
       }),
       catchError(error => {
-        console.error('Error assigning shelves to book:', error);
+        console.error('Error assigning shelves to books:', error);
         throw error;
       })
     );

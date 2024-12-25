@@ -2,7 +2,6 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.BookDTO;
 import com.adityachandel.booklore.model.dto.ShelfDTO;
-import com.adityachandel.booklore.model.dto.request.AssignShelvesRequest;
 import com.adityachandel.booklore.model.dto.request.ShelfCreateRequest;
 import com.adityachandel.booklore.service.ShelfService;
 import jakarta.validation.Valid;

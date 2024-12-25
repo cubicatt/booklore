@@ -15,10 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -33,8 +29,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -220,25 +215,32 @@ public class BooksService {
     }
 
     @Transactional
-    public BookDTO addBookToShelf(Long bookId, List<Long> shelfIds) {
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+    public List<BookDTO> assignShelvesToBooks(Set<Long> bookIds, Set<Long> shelfIdsToAssign, Set<Long> shelfIdsToUnassign) {
+        List<Book> books = bookRepository.findAllById(bookIds);
+        List<Shelf> shelvesToAssign = shelfRepository.findAllById(shelfIdsToAssign);
+        List<Shelf> shelvesToUnassign = shelfRepository.findAllById(shelfIdsToUnassign);
 
-        List<Shelf> currentShelves = book.getShelves();
-        List<Shelf> shelvesToAdd = shelfRepository.findAllById(shelfIds);
-
-        currentShelves.stream()
-                .filter(shelf -> !shelfIds.contains(shelf.getId()))
-                .forEach(shelf -> shelf.getBooks().remove(book));
-
-        book.getShelves().clear();
-        book.getShelves().addAll(shelvesToAdd);
-
-        shelvesToAdd.forEach(shelf -> shelf.getBooks().add(book));
-
-        bookRepository.save(book);
-        shelfRepository.saveAll(shelvesToAdd);
-        return BookTransformer.convertToBookDTO(book);
+        for (Book book : books) {
+            for (Shelf shelf : shelvesToUnassign) {
+                Optional<Shelf> shelfOpt = book.getShelves().stream().filter(s -> s.getId().equals(shelf.getId())).findAny();
+                shelfOpt.ifPresent(value -> book.getShelves().remove(value));
+                shelf.getBooks().remove(book);
+                shelfRepository.save(shelf);
+            }
+            for (Shelf shelf : shelvesToAssign) {
+                Optional<Shelf> shelfOpt = book.getShelves().stream().filter(s -> s.getId().equals(shelf.getId())).findAny();
+                if (shelfOpt.isEmpty()) {
+                    book.getShelves().add(shelf);
+                }
+                Optional<Book> bookOpt = shelf.getBooks().stream().filter(b -> b.getId().equals(book.getId())).findAny();
+                if (bookOpt.isEmpty()) {
+                    shelf.getBooks().add(book);
+                }
+                shelfRepository.save(shelf);
+            }
+            bookRepository.save(book);
+        }
+        return books.stream().map(BookTransformer::convertToBookDTO).toList();
     }
 
 }

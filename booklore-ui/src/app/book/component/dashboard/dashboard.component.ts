@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {Button} from 'primeng/button';
+import {Button, ButtonDirective} from 'primeng/button';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {LibraryCreatorComponent} from '../library-creator/library-creator.component';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
@@ -7,6 +7,7 @@ import {DashboardScrollerComponent} from '../dashboard-scroller/dashboard-scroll
 import {LibraryService} from '../../service/library.service';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {IconPickerComponent} from '../icon-picker/icon-picker.component';
 
 @Component({
   selector: 'app-home-page',
@@ -16,7 +17,8 @@ import {map} from 'rxjs/operators';
     Button,
     NgIf,
     DashboardScrollerComponent,
-    AsyncPipe
+    AsyncPipe,
+    IconPickerComponent
   ],
   providers: [DialogService],
 })

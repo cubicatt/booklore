@@ -112,11 +112,11 @@ public class BooksService {
     public List<GoogleBooksMetadata> fetchProspectiveMetadataListByBookId(long bookId) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         StringBuilder searchString = new StringBuilder();
-        if (!book.getMetadata().getTitle().isEmpty()) {
+        if (book.getMetadata().getTitle() != null && !book.getMetadata().getTitle().isEmpty()) {
             searchString.append(book.getMetadata().getTitle());
         }
         if (searchString.isEmpty()) {
-            searchString.append(book.getFileName());
+            searchString.append(cleanFileName(book.getFileName()));
         }
         if (book.getMetadata().getAuthors() != null && !book.getMetadata().getAuthors().isEmpty()) {
             if (!searchString.isEmpty()) {
@@ -129,11 +129,19 @@ public class BooksService {
         return googleBookMetadataService.queryByTerm(searchString.toString());
     }
 
+    private char[] cleanFileName(String fileName) {
+        if (fileName == null) {
+            return null;
+        }
+        String cleanedFileName = fileName.replace("(Z-Library)", "").trim();
+        return cleanedFileName.toCharArray();
+    }
+
     public List<GoogleBooksMetadata> fetchProspectiveMetadataListBySearchTerm(String searchTerm) {
         return googleBookMetadataService.queryByTerm(searchTerm);
     }
 
-    public void setMetadata(SetMetadataRequest setMetadataRequest, long bookId) {
+    public BookDTO setMetadata(SetMetadataRequest setMetadataRequest, long bookId) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         GoogleBooksMetadata gMetadata = googleBookMetadataService.getByGoogleBookId(setMetadataRequest.getGoogleBookId());
         BookMetadata metadata = book.getMetadata();
@@ -178,6 +186,8 @@ public class BooksService {
         authorRepository.saveAll(metadata.getAuthors());
         categoryRepository.saveAll(metadata.getCategories());
         metadataRepository.save(metadata);
+
+        return BookTransformer.convertToBookDTO(book);
     }
 
     public String normalizeDate(String input) {

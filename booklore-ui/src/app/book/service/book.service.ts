@@ -56,7 +56,7 @@ export class BookService {
 
   removeBooksFromShelf(shelfId: number): void {
     const books = this.books.value.filter(book => {
-      if(book.shelves) {
+      if (book.shelves) {
         book.shelves = book.shelves.filter(shelf => shelf.id !== shelfId);
       }
       return book;
@@ -129,9 +129,21 @@ export class BookService {
     return this.http.get<BookMetadata[]>(`${this.url}/fetch-metadata?term=${term}`);
   }
 
-  setBookMetadata(googleBookId: string, bookId: number): Observable<void> {
+  setBookMetadata(googleBookId: string, bookId: number): Observable<Book> {
     const requestBody = {googleBookId: googleBookId};
-    return this.http.put<void>(`${this.url}/${bookId}/set-metadata`, requestBody);
+    return this.http.put<Book>(`${this.url}/${bookId}/set-metadata`, requestBody).pipe(
+      map(book => {
+        const updatedBooks = this.books.getValue().map(existingBook =>
+          existingBook.id === book.id ? book : existingBook
+        );
+        this.books.next(updatedBooks);
+        return book;
+      }),
+      catchError(error => {
+        console.error('Error assigning shelves to books:', error);
+        throw error;
+      })
+    );
   }
 
   handleNewlyCreatedBook(book: Book): void {

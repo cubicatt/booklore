@@ -37,13 +37,13 @@
 }
 
 .virtual-scroller-item {
-  height: 243px;
-  width: 150px;
+  height: 210px;
+  width: 130px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 1.3rem;
   padding: 1rem;
   width: 100%;

@@ -3,6 +3,7 @@ package com.adityachandel.booklore.service;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.model.LibraryFile;
 import com.adityachandel.booklore.model.entity.Library;
+import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +44,7 @@ public class FileUploadService {
             file.transferTo(storageFile);
             LibraryFile libraryFile = LibraryFile.builder()
                     .library(library)
-                    .fileType(getFileType(fileType))
+                    .bookFileType(getFileType(fileType))
                     .filePath(storageFile.getAbsolutePath())
                     .build();
             fileProcessor.processFile(libraryFile, false);
@@ -54,11 +55,11 @@ public class FileUploadService {
         }
     }
 
-    private String getFileType(String f) {
+    private BookFileType getFileType(String f) {
         if (f.equalsIgnoreCase("application/pdf")) {
-            return "pdf";
+            return BookFileType.PDF;
         } else if (f.equalsIgnoreCase("application/epub+zip")) {
-            return "epub";
+            return BookFileType.EPUB;
         } else {
             return null;
         }

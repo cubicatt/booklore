@@ -52,6 +52,10 @@ export class LibraryService {
     );
   }
 
+  refreshLibrary(libraryId: number): Observable<void> {
+    return this.http.put<void>(`${this.url}/${libraryId}/refresh`, {});
+  }
+
   updateSort(libraryId: number, sort: SortOption): Observable<Library> {
     return this.http.put<Library>(`${this.url}/${libraryId}/sort`, sort).pipe(
       map(updatedLibrary => {

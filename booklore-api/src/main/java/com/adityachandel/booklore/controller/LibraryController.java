@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -63,4 +64,11 @@ public class LibraryController {
     public ResponseEntity<LibraryDTO> updateLibrary(@PathVariable long libraryId, @RequestBody Sort sort) {
         return ResponseEntity.ok(libraryService.updateSort(libraryId, sort));
     }
+
+    @PutMapping("/{libraryId}/refresh")
+    public ResponseEntity<?> refreshLibrary(@PathVariable long libraryId) {
+        libraryService.refreshLibrary(libraryId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -29,17 +29,12 @@ public class LibraryService {
     private final LibraryProcessingService libraryProcessingService;
 
     public LibraryDTO createLibrary(CreateLibraryRequest request) {
-        Library library = Library.builder()
-                .name(request.getName())
-                .paths(request.getPaths())
-                .build();
+        Library library = Library.builder().name(request.getName()).paths(request.getPaths()).build();
         library = libraryRepository.save(library);
         Long libraryId = library.getId();
-
         Thread.startVirtualThread(() -> {
-            log.info("Running in a virtual thread: {}", Thread.currentThread());
             try {
-                libraryProcessingService.parseLibraryBooks(libraryId);
+                libraryProcessingService.processLibrary(libraryId);
             } catch (InvalidDataAccessApiUsageException e) {
                 log.warn("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
             } catch (IOException e) {
@@ -47,8 +42,21 @@ public class LibraryService {
             }
             log.info("Parsing task completed!");
         });
-
         return LibraryTransformer.convertToLibraryDTO(library);
+    }
+
+    public void refreshLibrary(long libraryId) {
+        libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+        Thread.startVirtualThread(() -> {
+            try {
+                libraryProcessingService.refreshLibrary(libraryId);
+            } catch (InvalidDataAccessApiUsageException e) {
+                log.warn("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
+            } catch (IOException e) {
+                log.error("Error while parsing library books", e);
+            }
+            log.info("Parsing task completed!");
+        });
     }
 
     public LibraryDTO getLibrary(long libraryId) {

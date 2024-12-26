@@ -158,4 +158,17 @@ export class BookService {
     this.books.next(updatedBooks);
   }
 
+  handleRemovedBookIds(removedBookIds: Set<number>) {
+    console.log(removedBookIds);
+
+    if (!(removedBookIds instanceof Set)) {
+      console.error("removedBookIds should be a Set");
+      return; // Or throw an error if preferred
+    }
+
+    const currentBooks = this.books.getValue();
+    let filteredBooks = currentBooks.filter(currentBook => !removedBookIds.has(currentBook.id));
+    this.books.next(filteredBooks);
+  }
+
 }

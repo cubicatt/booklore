@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {RxStompService} from './book/service/rx-stomp.service';
 import {Message} from '@stomp/stompjs';
-import {Book} from './book/model/book.model';
 import {BookService} from './book/service/book.service';
+import {Action, parseBookNotification} from './book/model/book-notification.model';
 
 @Component({
   selector: 'app-root',
@@ -17,8 +17,12 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.rxStompService.watch('/topic/books').subscribe((message: Message) => {
-      const book: Book = JSON.parse(message.body);
-      this.bookService.handleNewlyCreatedBook(book);
+      const notification = parseBookNotification(message.body);
+      if (notification.action === Action.BOOK_ADDED) {
+        this.bookService.handleNewlyCreatedBook(notification.addedBook!);
+      } else if (notification.action === Action.BOOKS_REMOVED) {
+        this.bookService.handleRemovedBookIds(notification.removedBookIds!);
+      }
     });
   }
 

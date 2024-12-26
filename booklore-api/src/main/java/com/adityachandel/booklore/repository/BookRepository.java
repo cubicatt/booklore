@@ -5,12 +5,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
@@ -36,5 +39,9 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
 
     @Query("SELECT b FROM Book b JOIN b.shelves s WHERE s.id = :shelfId")
     List<Book> findByShelfId(@Param("shelfId") Long shelfId);
+
+    @Modifying
+    @Query("DELETE FROM Book b WHERE b.id IN (:ids)")
+    void deleteByIdIn(Collection<Long> ids);
 }
 

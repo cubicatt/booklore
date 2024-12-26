@@ -225,7 +225,7 @@ export class BooksBrowserComponent implements OnInit {
         },
         command: () => {
           this.confirmationService.confirm({
-            message: 'Sure you want to delete ' + this.entity?.name + "?",
+            message: 'Sure you want to delete library: ' + this.entity?.name + "?",
             header: 'Confirmation',
             icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'none',
@@ -242,6 +242,38 @@ export class BooksBrowserComponent implements OnInit {
                     severity: 'error',
                     summary: 'Failed',
                     detail: 'Failed to delete library',
+                    life: 3000
+                  });
+                }
+              });
+            }
+          });
+        }
+      },
+      {
+        icon: 'pi pi-refresh',
+        tooltipOptions: {
+          tooltipLabel: 'Refresh',
+          tooltipPosition: 'top'
+        },
+        command: () => {
+          this.confirmationService.confirm({
+            message: 'Sure you want to refresh library: ' + this.entity?.name + "?",
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            acceptIcon: 'none',
+            rejectIcon: 'none',
+            rejectButtonStyleClass: 'p-button-text',
+            accept: () => {
+              this.libraryService.refreshLibrary(this.entity?.id!).subscribe({
+                complete: () => {
+                  this.messageService.add({severity: 'info', summary: 'Success', detail: 'Library refresh scheduled'});
+                },
+                error: () => {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Failed',
+                    detail: 'Failed to refresh library',
                     life: 3000
                   });
                 }

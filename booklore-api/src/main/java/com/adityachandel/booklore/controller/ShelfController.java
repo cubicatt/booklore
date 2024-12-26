@@ -1,8 +1,10 @@
 package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.BookDTO;
+import com.adityachandel.booklore.model.dto.LibraryDTO;
 import com.adityachandel.booklore.model.dto.ShelfDTO;
 import com.adityachandel.booklore.model.dto.request.ShelfCreateRequest;
+import com.adityachandel.booklore.model.entity.Sort;
 import com.adityachandel.booklore.service.ShelfService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -48,6 +50,11 @@ public class ShelfController {
     public ResponseEntity<Void> deleteShelf(@PathVariable Long shelfId) {
         shelfService.deleteShelf(shelfId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping("/{shelfId}/sort")
+    public ResponseEntity<ShelfDTO> updateShelf(@PathVariable long shelfId, @RequestBody Sort sort) {
+        return ResponseEntity.ok(shelfService.updateSort(shelfId, sort));
     }
 
 }

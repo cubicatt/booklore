@@ -38,7 +38,7 @@ export class ShelfService {
   }
 
   updateSort(shelfId: number, sort: SortOption): Observable<Shelf> {
-    return this.http.put<Shelf>(`${this.url}/${shelfId}/sort`, { shelfId, sort }).pipe(
+    return this.http.put<Shelf>(`${this.url}/${shelfId}/sort`, sort).pipe(
       map(updatedShelf => {
         const updatedShelves = this.shelves.value.map(shelf =>
           shelf.id === shelfId ? updatedShelf : shelf

@@ -6,6 +6,7 @@ import com.adityachandel.booklore.model.dto.ShelfDTO;
 import com.adityachandel.booklore.model.dto.request.ShelfCreateRequest;
 import com.adityachandel.booklore.model.entity.Book;
 import com.adityachandel.booklore.model.entity.Shelf;
+import com.adityachandel.booklore.model.entity.Sort;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.ShelfRepository;
 import com.adityachandel.booklore.transformer.BookTransformer;
@@ -56,5 +57,11 @@ public class ShelfService {
         shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
         List<Book> books = bookRepository.findByShelfId(shelfId);
         return books.stream().map(BookTransformer::convertToBookDTO).toList();
+    }
+
+    public ShelfDTO updateSort(long shelfId, Sort sort) {
+        Shelf shelf = shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
+        shelf.setSort(sort);
+        return ShelfTransformer.convertToShelfDTO(shelfRepository.save(shelf));
     }
 }

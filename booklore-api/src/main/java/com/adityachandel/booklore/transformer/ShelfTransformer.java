@@ -9,6 +9,7 @@ public class ShelfTransformer {
         return ShelfDTO.builder()
                 .id(shelf.getId())
                 .name(shelf.getName())
+                .sort(shelf.getSort())
                 .build();
     }
 }

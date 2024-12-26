@@ -1,3 +1,5 @@
+import {Shelf} from './shelf.model';
+
 export interface Book {
   id: number;
   libraryId: number;
@@ -32,10 +34,6 @@ export interface Category {
   name: string;
 }
 
-export interface Shelf {
-  id?: number;
-  name: string;
-}
 
 export interface BookWithNeighborsDTO {
   currentBook: Book;

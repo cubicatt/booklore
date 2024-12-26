@@ -10,6 +10,7 @@ public class LibraryTransformer {
         return LibraryDTO.builder()
                 .id(library.getId())
                 .name(library.getName())
+                .sort(library.getSort())
                 .paths(library.getPaths())
                 .build();
     }

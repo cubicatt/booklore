@@ -1,6 +1,7 @@
 package com.adityachandel.booklore.model.entity;
 
 import com.adityachandel.booklore.convertor.PathsConverter;
+import com.adityachandel.booklore.convertor.SortConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,13 +22,13 @@ public class Library {
     @Column(nullable = false)
     private String name;
 
+    @Convert(converter = SortConverter.class)
+    private Sort sort;
+
     @Convert(converter = PathsConverter.class)
     @Column(name = "paths")
     private List<String> paths;
 
     @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Book> books;
-
-    @Column(name = "initial_processed")
-    private boolean initialProcessed;
 }

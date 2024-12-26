@@ -6,13 +6,13 @@ import {BookService} from '../../service/book.service';
 import {map, switchMap} from 'rxjs/operators';
 import {Observable, of} from 'rxjs';
 import {Book} from '../../model/book.model';
-import {Shelf} from '../../model/book.model';
 import {ShelfService} from '../../service/shelf.service';
 import {ShelfAssignerComponent} from '../shelf-assigner/shelf-assigner.component';
 import {DialogService} from 'primeng/dynamicdialog';
 import {SortOption} from '../../model/sort-option.model';
 import {SortService} from '../../service/sort.service';
 import {Library} from '../../model/library.model';
+import {Shelf} from '../../model/shelf.model';
 
 @Component({
   selector: 'app-books-browser',
@@ -31,10 +31,10 @@ export class BooksBrowserComponent implements OnInit {
   entityType: string = '';
   selectedSort: SortOption | null = null;
   sortOptions: SortOption[] = [
-    {label: '↑ Title', value: 'ascendingTitle'},
-    {label: '↓ Title', value: 'descendingTitle'},
-    {label: '↑ Published Date', value: 'ascendingDate'},
-    {label: '↓ Published Date', value: 'descendingDate'}
+    {label: '↑ Title', field: 'title', direction: 'ascending'},
+    {label: '↓ Title', field: 'title', direction: 'descending'},
+    {label: '↑ Published Date', field: 'publishedDate', direction: 'ascending'},
+    {label: '↓ Published Date', field: 'publishedDate', direction: 'descending'}
   ];
 
   constructor(
@@ -75,7 +75,7 @@ export class BooksBrowserComponent implements OnInit {
       this.entity = entity;
     });
 
-    routeParam$.subscribe(({ libraryId, shelfId }) => {
+    routeParam$.subscribe(({libraryId, shelfId}) => {
       this.handleSortingState(libraryId, shelfId);
     });
 
@@ -172,22 +172,21 @@ export class BooksBrowserComponent implements OnInit {
       this.books$ = this.books$.pipe(
         map(books => {
           return books.sort((a, b) => {
-            const titleA = a.metadata?.title?.toLowerCase() || '';
-            const titleB = b.metadata?.title?.toLowerCase() || '';
-            const dateA = new Date(a.metadata?.publishedDate || 0);
-            const dateB = new Date(b.metadata?.publishedDate || 0);
-
-            switch (this.selectedSort?.value) {
-              case 'ascendingTitle':
-                return titleA.localeCompare(titleB);
-              case 'descendingTitle':
-                return titleB.localeCompare(titleA);
-              case 'ascendingDate':
-                return dateA.getTime() - dateB.getTime();
-              case 'descendingDate':
-                return dateB.getTime() - dateA.getTime();
-              default:
-                return 0;
+            const field = this.selectedSort?.field;
+            const direction = this.selectedSort?.direction;
+            let valueA: any, valueB: any;
+            if (field === 'title') {
+              valueA = a.metadata?.title?.toLowerCase() || '';
+              valueB = b.metadata?.title?.toLowerCase() || '';
+            } else if (field === 'publishedDate') {
+              valueA = new Date(a.metadata?.publishedDate || 0).getTime();
+              valueB = new Date(b.metadata?.publishedDate || 0).getTime();
+            }
+            if (valueA === undefined || valueB === undefined) return 0;
+            if (direction === 'ascending') {
+              return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
+            } else {
+              return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
             }
           });
         })

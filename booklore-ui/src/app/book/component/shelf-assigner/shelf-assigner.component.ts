@@ -1,11 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
-import {Book, Shelf} from '../../model/book.model';
+import {Book} from '../../model/book.model';
 import {MessageService} from 'primeng/api';
 import {ShelfService} from '../../service/shelf.service';
 import {Observable} from 'rxjs';
 import {BookService} from '../../service/book.service';
 import {map, tap} from 'rxjs/operators';
+import {Shelf} from '../../model/shelf.model';
 
 @Component({
   selector: 'app-shelf-assigner',

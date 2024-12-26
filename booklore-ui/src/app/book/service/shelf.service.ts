@@ -1,9 +1,8 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
-import {Shelf} from '../model/book.model';
 import {catchError, map} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
-import {Library} from '../model/library.model';
+import {Shelf} from '../model/shelf.model';
 
 @Injectable({
   providedIn: 'root'

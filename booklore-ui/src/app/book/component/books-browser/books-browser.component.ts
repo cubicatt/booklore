@@ -30,11 +30,12 @@ export class BooksBrowserComponent implements OnInit {
   entity: Library | Shelf | null = null;
   entityType: string = '';
   selectedSort: SortOption | null = null;
+
   sortOptions: SortOption[] = [
-    {label: '↑ Title', field: 'title', direction: 'ascending'},
-    {label: '↓ Title', field: 'title', direction: 'descending'},
-    {label: '↑ Published Date', field: 'publishedDate', direction: 'ascending'},
-    {label: '↓ Published Date', field: 'publishedDate', direction: 'descending'}
+    {label: '↑ Title', field: 'title', direction: 'ASCENDING'},
+    {label: '↓ Title', field: 'title', direction: 'DESCENDING'},
+    {label: '↑ Published Date', field: 'publishedDate', direction: 'ASCENDING'},
+    {label: '↓ Published Date', field: 'publishedDate', direction: 'DESCENDING'}
   ];
 
   constructor(
@@ -45,9 +46,19 @@ export class BooksBrowserComponent implements OnInit {
     private libraryService: LibraryService,
     private bookService: BookService,
     private shelfService: ShelfService,
-    private dialogService: DialogService,
-    private sortService: SortService
+    private dialogService: DialogService
   ) {
+  }
+
+  private setSelectedSortFromEntity(entity: Library | Shelf | null): void {
+    if (entity?.sort) {
+      const {field, direction} = entity.sort;
+      this.selectedSort = this.sortOptions.find(
+        option => option.field === field && option.direction === direction
+      ) || null;
+    } else {
+      this.selectedSort = null;
+    }
   }
 
   ngOnInit(): void {
@@ -73,38 +84,10 @@ export class BooksBrowserComponent implements OnInit {
 
     this.entity$.subscribe(entity => {
       this.entity = entity;
-    });
-
-    routeParam$.subscribe(({libraryId, shelfId}) => {
-      this.handleSortingState(libraryId, shelfId);
+      this.setSelectedSortFromEntity(entity);
     });
 
     this.setupMenu();
-  }
-
-  private handleSortingState(libraryId: number, shelfId: number): void {
-    let entityType: string | null = null;
-    let entityId: number | null = null;
-
-    if (libraryId) {
-      entityType = 'Library';
-      entityId = libraryId;
-    } else if (shelfId) {
-      entityType = 'Shelf';
-      entityId = shelfId;
-    }
-
-    if (entityType && entityId !== null) {
-      const key = this.sortService.generateKey(entityType, entityId);
-      if (key) {
-        const storedSort = this.sortService.getSortOption(key);
-        if (storedSort) {
-          this.selectedSort = storedSort;
-        } else {
-          this.selectedSort = null;
-        }
-      }
-    }
   }
 
   private fetchEntityType(libraryId: number, shelfId: number): Observable<string> {
@@ -119,16 +102,17 @@ export class BooksBrowserComponent implements OnInit {
   }
 
   private fetchBooks(libraryId: number, shelfId: number): Observable<Book[]> {
-    if (libraryId) {
-      return this.bookService.books$.pipe(
-        map(books => books.filter(book => book.libraryId === libraryId))
-      );
-    } else if (shelfId) {
-      return this.bookService.books$.pipe(
-        map(books => books.filter(book => book.shelves?.some(shelf => shelf.id === shelfId)))
-      );
-    }
-    return of([]);
+    return this.bookService.books$.pipe(
+      map(books => {
+        let filteredBooks = books;
+        if (libraryId) {
+          filteredBooks = books.filter(book => book.libraryId === libraryId);
+        } else if (shelfId) {
+          filteredBooks = books.filter(book => book.shelves?.some(shelf => shelf.id === shelfId));
+        }
+        return this.applySort(filteredBooks);
+      })
+    );
   }
 
   private fetchEntity(libraryId: number, shelfId: number): Observable<Library | Shelf | null> {
@@ -167,31 +151,26 @@ export class BooksBrowserComponent implements OnInit {
     ];
   }
 
-  sortBooks(): void {
-    if (this.books$ && this.selectedSort) {
-      this.books$ = this.books$.pipe(
-        map(books => {
-          return books.sort((a, b) => {
-            const field = this.selectedSort?.field;
-            const direction = this.selectedSort?.direction;
-            let valueA: any, valueB: any;
-            if (field === 'title') {
-              valueA = a.metadata?.title?.toLowerCase() || '';
-              valueB = b.metadata?.title?.toLowerCase() || '';
-            } else if (field === 'publishedDate') {
-              valueA = new Date(a.metadata?.publishedDate || 0).getTime();
-              valueB = new Date(b.metadata?.publishedDate || 0).getTime();
-            }
-            if (valueA === undefined || valueB === undefined) return 0;
-            if (direction === 'ascending') {
-              return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
-            } else {
-              return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
-            }
-          });
-        })
-      );
-    }
+  private applySort(books: Book[]): Book[] {
+    if (!this.selectedSort) return books;
+
+    const {field, direction} = this.selectedSort;
+    return books.sort((a, b) => {
+      let valueA: any, valueB: any;
+      if (field === 'title') {
+        valueA = a.metadata?.title?.toLowerCase() || '';
+        valueB = b.metadata?.title?.toLowerCase() || '';
+      } else if (field === 'publishedDate') {
+        valueA = new Date(a.metadata?.publishedDate || 0).getTime();
+        valueB = new Date(b.metadata?.publishedDate || 0).getTime();
+      }
+      if (valueA === undefined || valueB === undefined) return 0;
+      if (direction === 'ASCENDING') {
+        return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
+      } else {
+        return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
+      }
+    });
   }
 
   deselectAllBooks(): void {
@@ -232,11 +211,19 @@ export class BooksBrowserComponent implements OnInit {
   }
 
   updateSortOption(sortOption: SortOption): void {
-    const key = this.sortService.generateKey(this.entityType, this.entity?.id!);
-    if (key) {
-      this.sortService.setSortOption(key, sortOption);
-      this.selectedSort = sortOption;
-      this.sortBooks();
+    this.selectedSort = sortOption;
+    this.books$ = this.activatedRoute.paramMap.pipe(
+      map(params => {
+        const libraryId = Number(params.get('libraryId'));
+        const shelfId = Number(params.get('shelfId'));
+        return {libraryId, shelfId};
+      }),
+      switchMap(({libraryId, shelfId}) => this.fetchBooks(libraryId, shelfId))
+    );
+    if (this.entityType === 'Library') {
+      this.libraryService.updateSort(this.entity?.id!, sortOption).subscribe();
+    } else if (this.entityType === 'Shelf') {
+      this.shelfService.updateSort(this.entity?.id!, sortOption).subscribe();
     }
   }
 

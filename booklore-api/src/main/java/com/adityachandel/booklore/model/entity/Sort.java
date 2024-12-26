@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class Sort {
-    private String sortField;
-    private SortDirection sortDirection;
+    private String field;
+    private SortDirection direction;
 }

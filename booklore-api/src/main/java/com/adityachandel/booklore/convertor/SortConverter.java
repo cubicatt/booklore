@@ -13,7 +13,7 @@ public class SortConverter implements AttributeConverter<Sort, String> {
         if (sort == null) {
             return null;
         }
-        return sort.getSortField() + "," + sort.getSortDirection().name();
+        return sort.getField() + "," + sort.getDirection().name();
     }
 
     @Override
@@ -23,8 +23,8 @@ public class SortConverter implements AttributeConverter<Sort, String> {
         }
         String[] parts = dbData.split(",");
         Sort sort = new Sort();
-        sort.setSortField(parts[0]);
-        sort.setSortDirection(SortDirection.valueOf(parts[1]));
+        sort.setField(parts[0]);
+        sort.setDirection(SortDirection.valueOf(parts[1]));
         return sort;
     }
 }

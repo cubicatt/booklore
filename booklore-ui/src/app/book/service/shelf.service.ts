@@ -3,6 +3,7 @@ import {BehaviorSubject, Observable, of} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {Shelf} from '../model/shelf.model';
+import {Sort} from '../model/sort.model';
 
 @Injectable({
   providedIn: 'root'
@@ -35,4 +36,21 @@ export class ShelfService {
       })
     );
   }
+
+  updateSort(shelfId: number, sort: Sort): Observable<Shelf> {
+    return this.http.put<Shelf>(`${this.url}/${shelfId}/sort`, { shelfId, sort }).pipe(
+      map(updatedShelf => {
+        const updatedShelves = this.shelves.value.map(shelf =>
+          shelf.id === shelfId ? updatedShelf : shelf
+        );
+        this.shelves.next(updatedShelves);
+        return updatedShelf;
+      }),
+      catchError(error => {
+        console.error('Error updating shelf sort:', error);
+        throw error;
+      })
+    );
+  }
+
 }

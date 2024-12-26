@@ -1,10 +1,11 @@
-import {Injectable, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of, tap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {catchError, map} from 'rxjs/operators';
 import {Library} from '../model/library.model';
 import {BookService} from './book.service';
 import {BookWithNeighborsDTO} from '../model/book.model';
+import {Sort} from '../model/sort.model';
 
 @Injectable({
   providedIn: 'root'
@@ -47,6 +48,22 @@ export class LibraryService {
       }),
       catchError(error => {
         return of(null);
+      })
+    );
+  }
+
+  updateSort(libraryId: number, sort: Sort): Observable<Library> {
+    return this.http.put<Library>(`${this.url}/${libraryId}/sort`, sort).pipe(
+      map(updatedLibrary => {
+        const updatedShelves = this.libraries.value.map(library =>
+          library.id === libraryId ? updatedLibrary : library
+        );
+        this.libraries.next(updatedShelves);
+        return updatedLibrary;
+      }),
+      catchError(error => {
+        console.error('Error updating library sort:', error);
+        throw error;
       })
     );
   }

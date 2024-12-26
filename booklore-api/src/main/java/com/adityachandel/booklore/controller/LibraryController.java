@@ -4,17 +4,13 @@ import com.adityachandel.booklore.model.dto.BookDTO;
 import com.adityachandel.booklore.model.dto.BookWithNeighborsDTO;
 import com.adityachandel.booklore.model.dto.LibraryDTO;
 import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
+import com.adityachandel.booklore.model.entity.Sort;
 import com.adityachandel.booklore.service.BooksService;
 import com.adityachandel.booklore.service.LibraryService;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.List;
 
 
@@ -61,5 +57,10 @@ public class LibraryController {
     public ResponseEntity<List<BookDTO>> getBooks(@PathVariable long libraryId) {
         List<BookDTO> books = libraryService.getBooks(libraryId);
         return ResponseEntity.ok(books);
+    }
+
+    @PutMapping("/{libraryId}/sort")
+    public ResponseEntity<LibraryDTO> updateLibrary(@PathVariable long libraryId, @RequestBody Sort sort) {
+        return ResponseEntity.ok(libraryService.updateSort(libraryId, sort));
     }
 }

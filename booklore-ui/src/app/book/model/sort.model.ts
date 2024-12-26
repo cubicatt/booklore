@@ -1,4 +1,4 @@
 export interface Sort {
-  name: string;
+  field: string;
   direction: string;
 }

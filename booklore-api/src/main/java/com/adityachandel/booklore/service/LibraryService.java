@@ -6,6 +6,7 @@ import com.adityachandel.booklore.model.dto.LibraryDTO;
 import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
 import com.adityachandel.booklore.model.entity.Book;
 import com.adityachandel.booklore.model.entity.Library;
+import com.adityachandel.booklore.model.entity.Sort;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.transformer.BookTransformer;
@@ -13,8 +14,6 @@ import com.adityachandel.booklore.transformer.LibraryTransformer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -77,5 +76,11 @@ public class LibraryService {
         libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         List<Book> books = bookRepository.findBooksByLibraryId(libraryId);
         return books.stream().map(BookTransformer::convertToBookDTO).toList();
+    }
+
+    public LibraryDTO updateSort(long libraryId, Sort sort) {
+        Library library = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+        library.setSort(sort);
+        return LibraryTransformer.convertToLibraryDTO(libraryRepository.save(library));
     }
 }

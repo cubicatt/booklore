@@ -28,7 +28,8 @@ export class BooksBrowserComponent implements OnInit {
 
   entity: Library | Shelf | null = null;
   entityType: string = '';
-  items: MenuItem[] | undefined;
+  speedDialItems: MenuItem[] | undefined;
+  multiSelectItems: MenuItem[] | undefined;
   selectedBooks: Set<number> = new Set();
   selectedSort: SortOption | null = null;
   sortOptions: SortOption[] = [];
@@ -182,7 +183,7 @@ export class BooksBrowserComponent implements OnInit {
   }
 
   setupMenu(): void {
-    this.items = [
+    this.multiSelectItems = [
       {
         label: 'Options',
         items: [
@@ -210,7 +211,7 @@ export class BooksBrowserComponent implements OnInit {
   }
 
   private initializeLibraryMenuItems(): void {
-    this.items = [
+    this.speedDialItems = [
       {
         icon: 'pi pi-trash',
         tooltipOptions: {
@@ -229,19 +230,10 @@ export class BooksBrowserComponent implements OnInit {
               this.libraryService.deleteLibrary(this.entity?.id!).subscribe({
                 complete: () => {
                   this.router.navigate(['/']);
-                  this.messageService.add({
-                    severity: 'info',
-                    summary: 'Success',
-                    detail: 'Library was deleted'
-                  });
+                  this.messageService.add({severity: 'info', summary: 'Success', detail: 'Library was deleted'});
                 },
                 error: () => {
-                  this.messageService.add({
-                    severity: 'error',
-                    summary: 'Failed',
-                    detail: 'Failed to delete library',
-                    life: 3000
-                  });
+                  this.messageService.add({severity: 'error', summary: 'Failed', detail: 'Failed to delete library', life: 3000});
                 }
               });
             }
@@ -252,7 +244,7 @@ export class BooksBrowserComponent implements OnInit {
   }
 
   private initializeShelfMenuItems(): void {
-    this.items = [
+    this.speedDialItems = [
       {
         icon: 'pi pi-trash',
         tooltipOptions: {
@@ -271,19 +263,10 @@ export class BooksBrowserComponent implements OnInit {
               this.shelfService.deleteShelf(this.entity?.id!).subscribe({
                 complete: () => {
                   this.router.navigate(['/']);
-                  this.messageService.add({
-                    severity: 'info',
-                    summary: 'Success',
-                    detail: 'Shelf was deleted'
-                  });
+                  this.messageService.add({severity: 'info', summary: 'Success', detail: 'Shelf was deleted'});
                 },
                 error: () => {
-                  this.messageService.add({
-                    severity: 'error',
-                    summary: 'Failed',
-                    detail: 'Failed to delete shelf',
-                    life: 3000
-                  });
+                  this.messageService.add({severity: 'error', summary: 'Failed', detail: 'Failed to delete shelf', life: 3000});
                 }
               });
             }

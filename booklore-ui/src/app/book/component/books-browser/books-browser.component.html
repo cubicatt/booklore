@@ -2,7 +2,7 @@
   <div class="library-header-dial">
     <h3 class="library-name">{{ (entityType$ | async) }}: {{ (entity$ | async)?.name }}</h3>
     <p-speedDial
-      [model]="items!"
+      [model]="speedDialItems!"
       direction="right"
       transitionDelay="80"
       showIcon="pi pi-ellipsis-v"
@@ -17,7 +17,7 @@
       <p-button *ngIf="(entityType$ | async) === 'Shelf'" icon="pi pi-minus-circle" label="Unshelf" severity="primary" [rounded]="true" [outlined]="true" (click)="unshelfBooks()"></p-button>
       <p-button icon="pi pi-times" label="Deselect" severity="warning" [rounded]="true" [outlined]="true" (click)="deselectAllBooks()"></p-button>
     </div>
-    <p-menu #menu [model]="items" [popup]="true" appendTo="body"></p-menu>
+    <p-menu #menu [model]="multiSelectItems" [popup]="true" appendTo="body"></p-menu>
   </div>
 
   <div class="library-header-right">

@@ -15,7 +15,7 @@
                 <p-button label="Select Icon" icon="pi pi-search" (onClick)="openIconPicker()"></p-button>
               </div>
               <div *ngIf="selectedIcon" class="selected-icon-container">
-                <i [class]="selectedIcon" style="font-size: 1.5rem; margin-right: 0.5rem;"></i>
+                <i [class]="selectedIcon" style="font-size: 1.25rem; margin-right: 0.75rem;"></i>
                 <p-button icon="pi pi-times" (onClick)="clearSelectedIcon()" [rounded]="true" [text]="true" [outlined]="true" class="remove-icon-button" severity="danger"></p-button>
               </div>
             </div>

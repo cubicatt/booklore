@@ -1,4 +1,10 @@
-export interface Sort {
+export enum SortDirection {
+  ASCENDING = 'ASCENDING',
+  DESCENDING = 'DESCENDING'
+}
+
+export interface SortOption {
+  label: string;
   field: string;
-  direction: string;
+  direction: SortDirection;
 }

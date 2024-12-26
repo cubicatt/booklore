@@ -5,7 +5,7 @@ import {catchError, map} from 'rxjs/operators';
 import {Library} from '../model/library.model';
 import {BookService} from './book.service';
 import {BookWithNeighborsDTO} from '../model/book.model';
-import {Sort} from '../model/sort.model';
+import {SortOption} from '../model/sort.model';
 
 @Injectable({
   providedIn: 'root'
@@ -52,7 +52,7 @@ export class LibraryService {
     );
   }
 
-  updateSort(libraryId: number, sort: Sort): Observable<Library> {
+  updateSort(libraryId: number, sort: SortOption): Observable<Library> {
     return this.http.put<Library>(`${this.url}/${libraryId}/sort`, sort).pipe(
       map(updatedLibrary => {
         const updatedShelves = this.libraries.value.map(library =>

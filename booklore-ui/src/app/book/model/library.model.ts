@@ -1,8 +1,8 @@
-import {Sort} from './sort.model';
+import {SortOption} from './sort.model';
 
 export interface Library {
   id?: number;
   name: string;
-  sort?: Sort;
+  sort?: SortOption;
   paths: string[];
 }

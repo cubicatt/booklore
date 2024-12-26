@@ -1,7 +1,7 @@
-import {Sort} from './sort.model';
+import {SortOption} from './sort.model';
 
 export interface Shelf {
   id?: number;
   name: string;
-  sort?: Sort;
+  sort?: SortOption;
 }

@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
-import { LibraryService } from '../../service/library.service';
-import { BookService } from '../../service/book.service';
-import { map, switchMap } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
-import { Book } from '../../model/book.model';
-import { ShelfService } from '../../service/shelf.service';
-import { ShelfAssignerComponent } from '../shelf-assigner/shelf-assigner.component';
-import { DialogService } from 'primeng/dynamicdialog';
-import { Library } from '../../model/library.model';
-import { Shelf } from '../../model/shelf.model';
-import { SortService } from '../../service/sort.service';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
+import {LibraryService} from '../../service/library.service';
+import {BookService} from '../../service/book.service';
+import {map, switchMap} from 'rxjs/operators';
+import {Observable, of} from 'rxjs';
+import {Book} from '../../model/book.model';
+import {ShelfService} from '../../service/shelf.service';
+import {ShelfAssignerComponent} from '../shelf-assigner/shelf-assigner.component';
+import {DialogService} from 'primeng/dynamicdialog';
+import {Library} from '../../model/library.model';
+import {Shelf} from '../../model/shelf.model';
+import {SortService} from '../../service/sort.service';
 import {SortOptionsHelper} from '../../service/sort-options.helper';
 import {SortOption} from '../../model/sort.model';
 
@@ -43,7 +43,8 @@ export class BooksBrowserComponent implements OnInit {
     private shelfService: ShelfService,
     private dialogService: DialogService,
     private sortService: SortService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.sortOptions = SortOptionsHelper.generateSortOptions();
@@ -51,15 +52,15 @@ export class BooksBrowserComponent implements OnInit {
     const routeParam$ = this.getRouteParams();
 
     this.books$ = routeParam$.pipe(
-      switchMap(({ libraryId, shelfId }) => this.fetchBooks(libraryId, shelfId))
+      switchMap(({libraryId, shelfId}) => this.fetchBooks(libraryId, shelfId))
     );
 
     this.entity$ = routeParam$.pipe(
-      switchMap(({ libraryId, shelfId }) => this.fetchEntity(libraryId, shelfId))
+      switchMap(({libraryId, shelfId}) => this.fetchEntity(libraryId, shelfId))
     );
 
     this.entityType$ = routeParam$.pipe(
-      map(({ libraryId, shelfId }) => libraryId ? 'Library' : shelfId ? 'Shelf' : null)
+      map(({libraryId, shelfId}) => libraryId ? 'Library' : shelfId ? 'Shelf' : null)
     );
 
     this.entity$.subscribe(entity => {
@@ -75,7 +76,7 @@ export class BooksBrowserComponent implements OnInit {
       map(params => {
         const libraryId = Number(params.get('libraryId'));
         const shelfId = Number(params.get('shelfId'));
-        return { libraryId, shelfId };
+        return {libraryId, shelfId};
       })
     );
   }
@@ -92,9 +93,11 @@ export class BooksBrowserComponent implements OnInit {
   private fetchEntity(libraryId: number, shelfId: number): Observable<Library | Shelf | null> {
     if (libraryId) {
       this.entityType = 'Library';
+      this.initializeLibraryMenuItems();
       return this.fetchLibrary(libraryId);
     } else if (shelfId) {
       this.entityType = 'Shelf';
+      this.initializeShelfMenuItems();
       return this.fetchShelf(shelfId);
     }
     return of(null);
@@ -146,11 +149,11 @@ export class BooksBrowserComponent implements OnInit {
     if (this.entity) {
       this.bookService.updateBookShelves(this.selectedBooks, new Set(), new Set([this.entity.id])).subscribe(
         () => {
-          this.messageService.add({ severity: 'info', summary: 'Success', detail: 'Books shelves updated' });
+          this.messageService.add({severity: 'info', summary: 'Success', detail: 'Books shelves updated'});
           this.selectedBooks = new Set<number>();
         },
         (error) => {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to update books shelves' });
+          this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update books shelves'});
         }
       );
     }
@@ -160,7 +163,7 @@ export class BooksBrowserComponent implements OnInit {
     this.selectedSort = sortOption;
     const routeParam$ = this.getRouteParams();
     this.books$ = routeParam$.pipe(
-      switchMap(({ libraryId, shelfId }) => this.fetchBooks(libraryId, shelfId))
+      switchMap(({libraryId, shelfId}) => this.fetchBooks(libraryId, shelfId))
     );
     if (this.entityType === 'Library') {
       this.libraryService.updateSort(this.entity?.id!, sortOption).subscribe();
@@ -171,7 +174,7 @@ export class BooksBrowserComponent implements OnInit {
 
   private setSelectedSortFromEntity(entity: Library | Shelf | null): void {
     if (entity?.sort) {
-      const { field, direction } = entity.sort;
+      const {field, direction} = entity.sort;
       this.selectedSort = this.sortOptions.find(option => option.field === field && option.direction === direction) || null;
     } else {
       this.selectedSort = null;
@@ -192,7 +195,7 @@ export class BooksBrowserComponent implements OnInit {
                 modal: true,
                 width: '30%',
                 height: '70%',
-                contentStyle: { overflow: 'auto' },
+                contentStyle: {overflow: 'auto'},
                 baseZIndex: 10,
                 data: {
                   isMultiBooks: true,
@@ -203,6 +206,90 @@ export class BooksBrowserComponent implements OnInit {
           }
         ],
       },
+    ];
+  }
+
+  private initializeLibraryMenuItems(): void {
+    this.items = [
+      {
+        icon: 'pi pi-trash',
+        tooltipOptions: {
+          tooltipLabel: 'Delete',
+          tooltipPosition: 'top'
+        },
+        command: () => {
+          this.confirmationService.confirm({
+            message: 'Sure you want to delete ' + this.entity?.name + "?",
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            acceptIcon: 'none',
+            rejectIcon: 'none',
+            rejectButtonStyleClass: 'p-button-text',
+            accept: () => {
+              this.libraryService.deleteLibrary(this.entity?.id!).subscribe({
+                complete: () => {
+                  this.router.navigate(['/']);
+                  this.messageService.add({
+                    severity: 'info',
+                    summary: 'Success',
+                    detail: 'Library was deleted'
+                  });
+                },
+                error: () => {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Failed',
+                    detail: 'Failed to delete library',
+                    life: 3000
+                  });
+                }
+              });
+            }
+          });
+        }
+      }
+    ];
+  }
+
+  private initializeShelfMenuItems(): void {
+    this.items = [
+      {
+        icon: 'pi pi-trash',
+        tooltipOptions: {
+          tooltipLabel: 'Delete',
+          tooltipPosition: 'top'
+        },
+        command: () => {
+          this.confirmationService.confirm({
+            message: 'Sure you want to delete ' + this.entity?.name + "?",
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            acceptIcon: 'none',
+            rejectIcon: 'none',
+            rejectButtonStyleClass: 'p-button-text',
+            accept: () => {
+              this.shelfService.deleteShelf(this.entity?.id!).subscribe({
+                complete: () => {
+                  this.router.navigate(['/']);
+                  this.messageService.add({
+                    severity: 'info',
+                    summary: 'Success',
+                    detail: 'Shelf was deleted'
+                  });
+                },
+                error: () => {
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Failed',
+                    detail: 'Failed to delete shelf',
+                    life: 3000
+                  });
+                }
+              });
+            }
+          });
+        }
+      }
     ];
   }
 

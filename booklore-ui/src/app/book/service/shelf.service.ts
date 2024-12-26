@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {BehaviorSubject, Observable, of, tap} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {Shelf} from '../model/shelf.model';
 import {SortOption} from '../model/sort.model';
+import {BookService} from "./book.service";
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class ShelfService {
   private shelves = new BehaviorSubject<Shelf[]>([]);
   shelves$ = this.shelves.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private bookService: BookService) {
     this.http.get<Shelf[]>(this.url).pipe(
       catchError(error => {
         return of([]);
@@ -53,4 +54,16 @@ export class ShelfService {
     );
   }
 
+  deleteShelf(shelfId: number) {
+    return this.http.delete<void>(`${this.url}/${shelfId}`).pipe(
+        tap(() => {
+          this.bookService.removeBooksByLibraryId(shelfId);
+          let shelves = this.shelves.value.filter(shelf => shelf.id !== shelfId);
+          this.shelves.next(shelves);
+        }),
+        catchError(error => {
+          return of();
+        })
+    );
+  }
 }

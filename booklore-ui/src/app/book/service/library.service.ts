@@ -39,15 +39,15 @@ export class LibraryService {
     );
   }
 
-  deleteLibrary(libraryId: number) {
-    return this.http.delete(`${this.url}/${libraryId}`).pipe(
+  deleteLibrary(libraryId: number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${libraryId}`).pipe(
       tap(() => {
         this.bookService.removeBooksByLibraryId(libraryId);
         const updatedLibraries = this.libraries.value.filter(library => library.id !== libraryId);
         this.libraries.next(updatedLibraries);
       }),
       catchError(error => {
-        return of(null);
+        return of();
       })
     );
   }

@@ -54,6 +54,16 @@ export class BookService {
     this.books.next(filteredBooks);
   }
 
+  removeBooksFromShelf(shelfId: number): void {
+    const books = this.books.value.filter(book => {
+      if(book.shelves) {
+        book.shelves = book.shelves.filter(shelf => shelf.id !== shelfId);
+      }
+      return book;
+    })
+    this.books.next(books);
+  }
+
   getBookById(bookId: number): Observable<Book | undefined> {
     return this.books$.pipe(
       map(books => books.find(book => book.id === bookId))

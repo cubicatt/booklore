@@ -1,2 +1,1 @@
-INSERT INTO booklore.shelf (name) VALUES ('Favorites');
-INSERT INTO booklore.shelf (name) VALUES ('Read Later');
+INSERT INTO booklore.shelf (name, icon) VALUES ('Favorites', 'heart');

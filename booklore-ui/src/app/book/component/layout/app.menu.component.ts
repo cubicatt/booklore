@@ -28,7 +28,7 @@ export class AppMenuComponent implements OnInit {
           separator: false,
           items: libraries.map((library) => ({
             label: library.name,
-            icon: 'pi pi-fw pi-book',
+            icon: 'pi pi-' + library.icon,
             routerLink: [`/library/${library.id}/books`],
           })),
         },
@@ -42,7 +42,7 @@ export class AppMenuComponent implements OnInit {
           separator: false,
           items: shelves.map((shelf) => ({
             label: shelf.name,
-            icon: 'pi pi-fw pi-heart',
+            icon: 'pi pi-' + shelf.icon,
             routerLink: [`/shelf/${shelf.id}/books`],
           })),
         },

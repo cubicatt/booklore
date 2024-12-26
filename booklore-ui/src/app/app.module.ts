@@ -36,6 +36,7 @@ import {SpeedDialModule} from 'primeng/speeddial';
 import {RouteReuseStrategy} from '@angular/router';
 import {CustomReuseStrategy} from './custom-reuse-strategy';
 import {MenuModule} from 'primeng/menu';
+import {IconPickerComponent} from './book/component/icon-picker/icon-picker.component';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import {MenuModule} from 'primeng/menu';
     BookCardComponent,
     SpeedDialModule,
     MenuModule,
+    IconPickerComponent,
   ],
   providers: [
     DialogService,

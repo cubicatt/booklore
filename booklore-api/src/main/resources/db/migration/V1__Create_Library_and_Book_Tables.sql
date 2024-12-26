@@ -2,8 +2,9 @@ CREATE TABLE IF NOT EXISTS library
 (
     id    BIGINT AUTO_INCREMENT PRIMARY KEY,
     name  VARCHAR(255) UNIQUE NOT NULL,
-    paths TEXT,
-    sort  VARCHAR(255) NULL
+    sort  VARCHAR(255)        NULL,
+    icon  VARCHAR(64)         NOT NULL,
+    paths TEXT
 );
 
 CREATE TABLE IF NOT EXISTS book
@@ -85,7 +86,8 @@ CREATE TABLE IF NOT EXISTS shelf
 (
     id   BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
-    sort VARCHAR(255) NULL
+    sort VARCHAR(255) NULL,
+    icon VARCHAR(64)  NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS book_shelf_mapping

@@ -1,9 +1,10 @@
-import {Component} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {DirectoryPickerComponent} from '../directory-picker/directory-picker.component';
 import {MessageService} from 'primeng/api';
 import {Router} from '@angular/router';
 import {LibraryService} from '../../service/library.service';
+import {IconPickerComponent} from '../icon-picker/icon-picker.component';
 
 @Component({
   selector: 'app-library-creator',
@@ -16,13 +17,15 @@ export class LibraryCreatorComponent {
   value: string = '';
   folders: string[] = [];
   ref: DynamicDialogRef | undefined;
+  @ViewChild(IconPickerComponent) iconPicker: IconPickerComponent | undefined;
+
+  selectedIcon: string | null = null;
 
   constructor(
     private dialogService: DialogService,
     private dynamicDialogRef: DynamicDialogRef,
     private libraryService: LibraryService,
-    private router: Router,
-  ) {
+    private router: Router) {
   }
 
   show() {
@@ -50,10 +53,25 @@ export class LibraryCreatorComponent {
     this.folders.splice(index, 1);
   }
 
+  openIconPicker() {
+    if (this.iconPicker) {
+      this.iconPicker.open();
+    }
+  }
+
+  onIconSelected(icon: string) {
+    this.selectedIcon = icon;
+  }
+
+  clearSelectedIcon() {
+    this.selectedIcon = null;
+  }
+
   addLibrary() {
     const newLibrary = {
       name: this.value,
       paths: this.folders,
+      icon: this.selectedIcon ? this.selectedIcon.replace('pi pi-', '') : 'heart'
     };
     this.libraryService.createLibrary(newLibrary).subscribe({
       next: (createdLibrary) => {
@@ -93,4 +111,5 @@ export class LibraryCreatorComponent {
       );
     }
   }*/
+
 }

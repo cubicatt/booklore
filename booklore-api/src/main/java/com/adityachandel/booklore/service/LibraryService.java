@@ -29,7 +29,11 @@ public class LibraryService {
     private final LibraryProcessingService libraryProcessingService;
 
     public LibraryDTO createLibrary(CreateLibraryRequest request) {
-        Library library = Library.builder().name(request.getName()).paths(request.getPaths()).build();
+        Library library = Library.builder()
+                .name(request.getName())
+                .paths(request.getPaths())
+                .icon(request.getIcon())
+                .build();
         library = libraryRepository.save(library);
         Long libraryId = library.getId();
         Thread.startVirtualThread(() -> {

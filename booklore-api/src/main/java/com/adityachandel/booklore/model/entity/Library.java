@@ -31,4 +31,6 @@ public class Library {
 
     @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Book> books;
+
+    private String icon;
 }

@@ -14,6 +14,7 @@ public class LibraryDTO {
     private Long id;
     private String name;
     private Sort sort;
+    private String icon;
     private List<String> paths;
 }
 

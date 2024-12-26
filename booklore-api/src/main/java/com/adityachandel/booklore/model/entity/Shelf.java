@@ -28,4 +28,6 @@ public class Shelf {
 
     @ManyToMany(mappedBy = "shelves", fetch = FetchType.LAZY)
     private Set<Book> books = new HashSet<>();
+
+    private String icon;
 }

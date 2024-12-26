@@ -40,7 +40,7 @@ export class AppTopBarComponent implements OnDestroy {
     this.ref = this.dialogService.open(LibraryCreatorComponent, {
       header: 'Create New Library',
       modal: true,
-      width: '50%',
+      width: '40%',
       height: '50%',
       style: {bottom: '15%'}
     });

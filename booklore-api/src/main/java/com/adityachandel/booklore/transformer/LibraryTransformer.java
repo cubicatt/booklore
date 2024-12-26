@@ -11,6 +11,7 @@ public class LibraryTransformer {
                 .id(library.getId())
                 .name(library.getName())
                 .sort(library.getSort())
+                .icon(library.getIcon())
                 .paths(library.getPaths())
                 .build();
     }

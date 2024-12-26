@@ -2,27 +2,35 @@
   <p-stepperPanel header="Library Name">
     <ng-template pTemplate="content" let-nextCallback="nextCallback" let-index="index">
       <div class="flex flex-column h-21rem">
-        <div
-          class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
-          <input
-            type="text"
-            pInputText
-            [(ngModel)]="value"
-            placeholder="Enter library name..."/>
+        <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
+
+          <div class="library-name-icon-parent">
+            <div class="library-name-div">
+              <div>Library Name: </div>
+              <input type="text" pInputText [(ngModel)]="value" placeholder="Enter library name..."/>
+            </div>
+            <div class="library-icon-div">
+              <div>Library Icon:</div>
+              <div *ngIf="!selectedIcon">
+                <p-button label="Select Icon" icon="pi pi-search" (onClick)="openIconPicker()"></p-button>
+              </div>
+              <div *ngIf="selectedIcon" class="selected-icon-container">
+                <i [class]="selectedIcon" style="font-size: 1.5rem; margin-right: 0.5rem;"></i>
+                <p-button icon="pi pi-times" (onClick)="clearSelectedIcon()" [rounded]="true" [text]="true" [outlined]="true" class="remove-icon-button" severity="danger"></p-button>
+              </div>
+            </div>
+          </div>
+          <app-icon-picker (iconSelected)="onIconSelected($event)"></app-icon-picker>
         </div>
       </div>
       <div class="flex pt-4 justify-content-end">
-        <p-button
-          label="Next"
-          icon="pi pi-arrow-right"
-          iconPos="right"
-          (onClick)="nextCallback.emit()"/>
+        <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="nextCallback.emit()"/>
       </div>
     </ng-template>
   </p-stepperPanel>
   <p-stepperPanel header="Media Location">
     <ng-template pTemplate="content" let-prevCallback="prevCallback" let-index="index">
-      <div class="flex flex-column">
+      <div class="flex flex-column xxx">
         <div
           class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex align-items-start"
           style="padding-top: 2.5rem;">

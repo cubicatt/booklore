@@ -28,7 +28,7 @@ public class ShelfService {
         if (exists) {
             throw ApiError.SHELF_ALREADY_EXISTS.createException(request.getName());
         }
-        Shelf shelf = Shelf.builder().name(request.getName()).build();
+        Shelf shelf = Shelf.builder().icon(request.getIcon()).name(request.getName()).build();
         return ShelfTransformer.convertToShelfDTO(shelfRepository.save(shelf));
     }
 

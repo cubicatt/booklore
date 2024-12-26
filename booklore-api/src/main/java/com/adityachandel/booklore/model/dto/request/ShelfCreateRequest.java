@@ -12,4 +12,7 @@ public class ShelfCreateRequest {
 
     @NotBlank(message = "Shelf name must not be empty.")
     private String name;
+
+    @NotBlank(message = "Shelf icon must not be empty.")
+    private String icon;
 }

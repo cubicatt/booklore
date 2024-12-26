@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Book} from '../../model/book.model';
 import {MessageService} from 'primeng/api';
@@ -7,6 +7,7 @@ import {Observable} from 'rxjs';
 import {BookService} from '../../service/book.service';
 import {map, tap} from 'rxjs/operators';
 import {Shelf} from '../../model/shelf.model';
+import {IconPickerComponent} from '../icon-picker/icon-picker.component';
 
 @Component({
   selector: 'app-shelf-assigner',
@@ -22,6 +23,8 @@ export class ShelfAssignerComponent implements OnInit {
   shelfName: string = '';
   bookIds: Set<number> = new Set();
   isMultiBooks: boolean = false;
+  selectedIcon: string | null = null;
+  @ViewChild(IconPickerComponent) iconPicker: IconPickerComponent | undefined;
 
   constructor(
     private shelfService: ShelfService,
@@ -46,7 +49,11 @@ export class ShelfAssignerComponent implements OnInit {
   }
 
   saveNewShelf(): void {
-    this.shelfService.createShelf(this.shelfName).subscribe(
+    const newShelf = {
+      name: this.shelfName,
+      icon: this.selectedIcon ? this.selectedIcon.replace('pi pi-', '') : 'heart'
+    };
+    this.shelfService.createShelf(newShelf).subscribe(
       () => {
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Shelf created: ' + this.shelfName});
         this.displayShelfDialog = false;
@@ -99,4 +106,19 @@ export class ShelfAssignerComponent implements OnInit {
   closeDialog(): void {
     this.dynamicDialogRef.close();
   }
+
+  openIconPicker() {
+    if (this.iconPicker) {
+      this.iconPicker.open();
+    }
+  }
+
+  clearSelectedIcon() {
+    this.selectedIcon = null;
+  }
+
+  onIconSelected(icon: string) {
+    this.selectedIcon = icon;
+  }
+
 }

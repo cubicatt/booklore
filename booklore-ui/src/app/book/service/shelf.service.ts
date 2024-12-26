@@ -25,8 +25,8 @@ export class ShelfService {
     });
   }
 
-  createShelf(name: string): Observable<Shelf> {
-    return this.http.post<Shelf>(this.url, {name}).pipe(
+  createShelf(shelf: Shelf): Observable<Shelf> {
+    return this.http.post<Shelf>(this.url, shelf).pipe(
       map(newShelf => {
         this.shelves.next([...this.shelves.value, newShelf])
         return newShelf;
@@ -56,14 +56,14 @@ export class ShelfService {
 
   deleteShelf(shelfId: number) {
     return this.http.delete<void>(`${this.url}/${shelfId}`).pipe(
-        tap(() => {
-          this.bookService.removeBooksByLibraryId(shelfId);
-          let shelves = this.shelves.value.filter(shelf => shelf.id !== shelfId);
-          this.shelves.next(shelves);
-        }),
-        catchError(error => {
-          return of();
-        })
+      tap(() => {
+        this.bookService.removeBooksByLibraryId(shelfId);
+        let shelves = this.shelves.value.filter(shelf => shelf.id !== shelfId);
+        this.shelves.next(shelves);
+      }),
+      catchError(error => {
+        return of();
+      })
     );
   }
 }

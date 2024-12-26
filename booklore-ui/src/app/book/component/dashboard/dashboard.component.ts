@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {Button, ButtonDirective} from 'primeng/button';
+import {Button} from 'primeng/button';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {LibraryCreatorComponent} from '../library-creator/library-creator.component';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
@@ -7,7 +7,6 @@ import {DashboardScrollerComponent} from '../dashboard-scroller/dashboard-scroll
 import {LibraryService} from '../../service/library.service';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {IconPickerComponent} from '../icon-picker/icon-picker.component';
 
 @Component({
   selector: 'app-home-page',
@@ -17,8 +16,7 @@ import {IconPickerComponent} from '../icon-picker/icon-picker.component';
     Button,
     NgIf,
     DashboardScrollerComponent,
-    AsyncPipe,
-    IconPickerComponent
+    AsyncPipe
   ],
   providers: [DialogService],
 })
@@ -32,21 +30,13 @@ export class DashboardComponent {
     );
   }
 
-  createNewLibrary(event: MouseEvent) {
-    const buttonRect = (event.target as HTMLElement).getBoundingClientRect();
-    const dialogWidthPercentage = 50;
-    const viewportWidth = window.innerWidth;
-    const dialogWidth = (dialogWidthPercentage / 100) * viewportWidth;
-    const leftPosition = buttonRect.left + (buttonRect.width / 2) - (dialogWidth / 2);
+  createNewLibrary() {
     this.ref = this.dialogService.open(LibraryCreatorComponent, {
+      header: 'Create New Library',
       modal: true,
-      width: `${dialogWidthPercentage}%`,
-      height: 'auto',
-      style: {
-        position: 'absolute',
-        top: `${buttonRect.bottom + 10}px`,
-        left: `${Math.max(leftPosition, 0)}px`
-      },
+      width: '50%',
+      height: '50%',
+      style: {bottom: '15%'}
     });
   }
 }

@@ -10,6 +10,7 @@ public class ShelfTransformer {
                 .id(shelf.getId())
                 .name(shelf.getName())
                 .sort(shelf.getSort())
+                .icon(shelf.getIcon())
                 .build();
     }
 }

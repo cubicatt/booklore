@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, EventEmitter, Output} from '@angular/core';
 import {DialogModule} from 'primeng/dialog';
 import {NgForOf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
@@ -14,10 +14,9 @@ import {FormsModule} from '@angular/forms';
   ],
 })
 export class IconPickerComponent {
-  iconDialogVisible: boolean = true;
+  iconDialogVisible: boolean = false;
   selectedIcon: string | null = null;
   searchText: string = '';
-
   iconCategories: string[] = [
     "address-book", "align-center", "align-justify", "align-left", "align-right", "android",
     "angle-double-down", "angle-double-left", "angle-double-right", "angle-double-up", "angle-down", "angle-left",
@@ -53,6 +52,8 @@ export class IconPickerComponent {
 
   icons: string[] = this.createIconList(this.iconCategories);
 
+  @Output() iconSelected = new EventEmitter<string>();
+
   createIconList(categories: string[]): string[] {
     return categories.map(iconName => `pi pi-${iconName}`);
   }
@@ -64,14 +65,14 @@ export class IconPickerComponent {
     return this.icons.filter(icon => icon.toLowerCase().includes(this.searchText.toLowerCase()));
   }
 
-  openIconDialog() {
+  open() {
     this.iconDialogVisible = true;
   }
 
   selectIcon(icon: string) {
     this.selectedIcon = icon;
     this.iconDialogVisible = false;
-    console.log('Selected Icon:', icon);
+    this.iconSelected.emit(icon);
   }
 
 }

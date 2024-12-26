@@ -13,5 +13,6 @@ import java.time.Instant;
 public class ShelfDTO {
     private Long id;
     private String name;
+    private String icon;
     private Sort sort;
 }

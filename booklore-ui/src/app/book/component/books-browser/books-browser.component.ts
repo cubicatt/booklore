@@ -8,7 +8,7 @@ import {Observable, of} from 'rxjs';
 import {Book} from '../../model/book.model';
 import {ShelfService} from '../../service/shelf.service';
 import {ShelfAssignerComponent} from '../shelf-assigner/shelf-assigner.component';
-import {DialogService} from 'primeng/dynamicdialog';
+import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Library} from '../../model/library.model';
 import {Shelf} from '../../model/shelf.model';
 import {SortService} from '../../service/sort.service';
@@ -33,6 +33,8 @@ export class BooksBrowserComponent implements OnInit {
   selectedBooks: Set<number> = new Set();
   selectedSort: SortOption | null = null;
   sortOptions: SortOption[] = [];
+
+  ref: DynamicDialogRef | undefined;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -191,7 +193,7 @@ export class BooksBrowserComponent implements OnInit {
             label: 'Edit shelf',
             icon: 'pi pi-folder',
             command: () => {
-              this.dialogService.open(ShelfAssignerComponent, {
+              this.ref = this.dialogService.open(ShelfAssignerComponent, {
                 header: `Update Books Shelves`,
                 modal: true,
                 width: '30%',
@@ -202,6 +204,9 @@ export class BooksBrowserComponent implements OnInit {
                   isMultiBooks: true,
                   bookIds: this.selectedBooks
                 },
+              });
+              this.ref.onClose.subscribe(() => {
+                this.selectedBooks.clear();
               });
             }
           }
@@ -233,7 +238,12 @@ export class BooksBrowserComponent implements OnInit {
                   this.messageService.add({severity: 'info', summary: 'Success', detail: 'Library was deleted'});
                 },
                 error: () => {
-                  this.messageService.add({severity: 'error', summary: 'Failed', detail: 'Failed to delete library', life: 3000});
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Failed',
+                    detail: 'Failed to delete library',
+                    life: 3000
+                  });
                 }
               });
             }
@@ -266,7 +276,12 @@ export class BooksBrowserComponent implements OnInit {
                   this.messageService.add({severity: 'info', summary: 'Success', detail: 'Shelf was deleted'});
                 },
                 error: () => {
-                  this.messageService.add({severity: 'error', summary: 'Failed', detail: 'Failed to delete shelf', life: 3000});
+                  this.messageService.add({
+                    severity: 'error',
+                    summary: 'Failed',
+                    detail: 'Failed to delete shelf',
+                    life: 3000
+                  });
                 }
               });
             }

@@ -69,6 +69,7 @@ public class LibraryProcessingService {
             if (bookDTO != null) {
                 BookNotification notification = BookNotification.builder().action(BOOK_ADDED).addedBook(bookDTO).build();
                 notificationService.sendMessage("/topic/books", notification);
+                notificationService.sendMessage("/topic/logs", "Book added: " + bookDTO.getFileName());
                 log.info("Processed file: {}", libraryFile.getFilePath());
             }
         }

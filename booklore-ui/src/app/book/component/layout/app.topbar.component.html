@@ -1,8 +1,6 @@
 <div class="layout-topbar">
-
   <a class="layout-topbar-logo" routerLink="">
-    <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg"
-         alt="logo">
+    <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="logo">
     <span>BookLore</span>
   </a>
 
@@ -19,20 +17,25 @@
   </button>
 
   <div #topbarmenu class="layout-topbar-menu">
-    <button
-      class="p-link layout-menu-button layout-topbar-button"
-      (click)="openLibraryCreatorDialog()"
-      pTooltip="Create New Library"
-      tooltipPosition="top">
+    <button class="p-link layout-topbar-button"
+            (click)="toggleEventDisplay()"
+            (mouseenter)="onMouseEnter()"
+            (mouseleave)="onMouseLeave()"
+            [class.pi-spin]="eventHighlight"
+            [class.highlight]="eventHighlight">
+      <i class="pi pi-sync"></i>
+    </button>
+
+    <div *ngIf="showEvents" class="live-event-container" (mouseleave)="onMouseLeave()">
+      {{ latestEvent }}
+    </div>
+    <button class="p-link layout-menu-button layout-topbar-button" (click)="openLibraryCreatorDialog()" pTooltip="Create New Library" tooltipPosition="top">
       <i class="pi pi-plus-circle"></i>
     </button>
-    <button
-      (click)="openFileUploadDialog()"
-      class="p-link layout-topbar-button">
+    <button (click)="openFileUploadDialog()" class="p-link layout-topbar-button">
       <i class="pi pi-upload"></i>
       <span>Profile</span>
     </button>
-    <app-notification></app-notification>
     <div class="top-bar-app-theme-switcher">
       <app-theme-switcher></app-theme-switcher>
     </div>

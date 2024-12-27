@@ -3,6 +3,7 @@ import {RxStompService} from './book/service/rx-stomp.service';
 import {Message} from '@stomp/stompjs';
 import {BookService} from './book/service/book.service';
 import {Action, parseBookNotification} from './book/model/book-notification.model';
+import {EventService} from './book/service/event.service';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +13,7 @@ import {Action, parseBookNotification} from './book/model/book-notification.mode
 })
 export class AppComponent implements OnInit {
 
-  constructor(private bookService: BookService, private rxStompService: RxStompService) {
+  constructor(private bookService: BookService, private rxStompService: RxStompService, private eventService: EventService) {
   }
 
   ngOnInit(): void {
@@ -23,6 +24,10 @@ export class AppComponent implements OnInit {
       } else if (notification.action === Action.BOOKS_REMOVED) {
         this.bookService.handleRemovedBookIds(notification.removedBookIds!);
       }
+    });
+
+    this.rxStompService.watch('/topic/logs').subscribe((message: Message) => {
+      this.eventService.handleIncomingEvent(message.body);
     });
   }
 

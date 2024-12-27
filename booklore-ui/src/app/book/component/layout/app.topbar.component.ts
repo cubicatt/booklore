@@ -12,6 +12,7 @@ import {SearchComponent} from '../search/search.component';
 import {FileUploadComponent} from '../file-upload/file-upload.component';
 import {NgClass, NgIf} from '@angular/common';
 import {EventService} from '../../service/event.service';
+import {LogNotification} from '../../model/log-notification.model';
 
 @Component({
   selector: 'app-topbar',
@@ -31,7 +32,7 @@ export class AppTopBarComponent implements OnDestroy {
   items!: MenuItem[];
   ref: DynamicDialogRef | undefined;
 
-  latestEvent: string = 'No recent events...';
+  latestEvent: LogNotification = { message: 'No recent notifications...' };
   eventHighlight: boolean = false;
   showEvents: boolean = false;
   eventTimeout: any;

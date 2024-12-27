@@ -4,6 +4,7 @@ import {Message} from '@stomp/stompjs';
 import {BookService} from './book/service/book.service';
 import {Action, parseBookNotification} from './book/model/book-notification.model';
 import {EventService} from './book/service/event.service';
+import {parseLogNotification} from './book/model/log-notification.model';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.rxStompService.watch('/topic/books').subscribe((message: Message) => {
+    this.rxStompService.watch('/topic/book').subscribe((message: Message) => {
       const notification = parseBookNotification(message.body);
       if (notification.action === Action.BOOK_ADDED) {
         this.bookService.handleNewlyCreatedBook(notification.addedBook!);
@@ -26,8 +27,9 @@ export class AppComponent implements OnInit {
       }
     });
 
-    this.rxStompService.watch('/topic/logs').subscribe((message: Message) => {
-      this.eventService.handleIncomingEvent(message.body);
+    this.rxStompService.watch('/topic/log').subscribe((message: Message) => {
+      let logNotification = parseLogNotification(message.body);
+      this.eventService.handleIncomingLog(logNotification);
     });
   }
 

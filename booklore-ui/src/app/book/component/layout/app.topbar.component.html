@@ -21,13 +21,14 @@
             (click)="toggleEventDisplay()"
             (mouseenter)="onMouseEnter()"
             (mouseleave)="onMouseLeave()"
-            [class.pi-spin]="eventHighlight"
+            [class.pulsating]="eventHighlight"
             [class.highlight]="eventHighlight">
-      <i class="pi pi-sync"></i>
+      <i class="pi pi-wave-pulse"></i>
     </button>
 
     <div *ngIf="showEvents" class="live-event-container" (mouseleave)="onMouseLeave()">
-      {{ latestEvent }}
+      <p *ngIf="latestEvent.timestamp">{{ latestEvent.timestamp }}</p>
+      <p>{{ latestEvent.message }}</p>
     </div>
     <button class="p-link layout-menu-button layout-topbar-button" (click)="openLibraryCreatorDialog()" pTooltip="Create New Library" tooltipPosition="top">
       <i class="pi pi-plus-circle"></i>

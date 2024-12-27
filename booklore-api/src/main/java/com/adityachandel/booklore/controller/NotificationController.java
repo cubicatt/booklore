@@ -1,9 +1,9 @@
 package com.adityachandel.booklore.controller;
 
+import com.adityachandel.booklore.model.stomp.Topic;
 import com.adityachandel.booklore.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -28,7 +28,7 @@ public class NotificationController {
         System.out.println("Received message: " + message);
     }
 
-    public void sendMessageToTopic(String topic, Object message) {
+    public void sendMessageToTopic(Topic topic, Object message) {
         notificationService.sendMessage(topic, message);
     }
 }

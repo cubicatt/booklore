@@ -7,6 +7,8 @@ import com.adityachandel.booklore.model.entity.Book;
 import com.adityachandel.booklore.model.entity.Library;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.model.stomp.BookNotification;
+import com.adityachandel.booklore.model.stomp.LogNotification;
+import com.adityachandel.booklore.model.stomp.Topic;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import lombok.AllArgsConstructor;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 
 import static com.adityachandel.booklore.model.stomp.BookNotification.Action.BOOKS_REMOVED;
 import static com.adityachandel.booklore.model.stomp.BookNotification.Action.BOOK_ADDED;
+import static com.adityachandel.booklore.model.stomp.LogNotification.createLogNotification;
 
 @Service
 @AllArgsConstructor
@@ -39,15 +42,19 @@ public class LibraryProcessingService {
     @Transactional
     public void processLibrary(long libraryId) throws IOException {
         Library library = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+        notificationService.sendMessage(Topic.LOG, createLogNotification("Started processing library: " + library.getName()));
         List<LibraryFile> libraryFiles = getLibraryFiles(library);
         processLibraryFiles(libraryFiles);
+        notificationService.sendMessage(Topic.LOG, createLogNotification("Finished processing library: " + library.getName()));
     }
 
     @Transactional
     public void refreshLibrary(long libraryId) throws IOException {
         Library library = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+        notificationService.sendMessage(Topic.LOG, createLogNotification("Started refreshing library: " + library.getName()));
         processLibraryFiles(getUnProcessedFiles(library));
         deleteRemovedBooks(getRemovedBooks(library));
+        notificationService.sendMessage(Topic.LOG, createLogNotification("Finished refreshing library: " + library.getName()));
     }
 
     @Transactional
@@ -56,7 +63,7 @@ public class LibraryProcessingService {
             Set<Long> bookIds = removedBooks.stream().map(Book::getId).collect(Collectors.toSet());
             bookRepository.deleteByIdIn(bookIds);
             BookNotification notification = BookNotification.builder().action(BOOKS_REMOVED).removedBookIds(bookIds).build();
-            notificationService.sendMessage("/topic/books", notification);
+            notificationService.sendMessage(Topic.BOOK, notification);
             log.info("Books removed: {}", bookIds);
         }
     }
@@ -68,8 +75,8 @@ public class LibraryProcessingService {
             BookDTO bookDTO = processLibraryFile(libraryFile);
             if (bookDTO != null) {
                 BookNotification notification = BookNotification.builder().action(BOOK_ADDED).addedBook(bookDTO).build();
-                notificationService.sendMessage("/topic/books", notification);
-                notificationService.sendMessage("/topic/logs", "Book added: " + bookDTO.getFileName());
+                notificationService.sendMessage(Topic.BOOK, notification);
+                notificationService.sendMessage(Topic.LOG, createLogNotification("Book added: " + bookDTO.getFileName()));
                 log.info("Processed file: {}", libraryFile.getFilePath());
             }
         }
@@ -130,7 +137,4 @@ public class LibraryProcessingService {
         }
         return libraryFiles;
     }
-
-
 }
-

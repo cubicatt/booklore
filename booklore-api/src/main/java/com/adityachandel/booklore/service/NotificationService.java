@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.service;
 
+import com.adityachandel.booklore.model.stomp.Topic;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ public class NotificationService {
         this.messagingTemplate = messagingTemplate;
     }
 
-    public void sendMessage(String topic, Object message) {
-        messagingTemplate.convertAndSend(topic, message);
+    public void sendMessage(Topic topic, Object message) {
+        messagingTemplate.convertAndSend(String.valueOf(topic), message);
     }
 }

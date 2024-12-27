@@ -1,11 +1,12 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject} from 'rxjs';
+import {LogNotification} from '../model/log-notification.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EventService {
-  private latestEventSubject = new BehaviorSubject<string>('No recent events...');
+  private latestEventSubject = new BehaviorSubject<LogNotification>({message: 'No recent notifications...'});
   latestEvent$ = this.latestEventSubject.asObservable();
 
   private eventHighlightSubject = new BehaviorSubject<boolean>(false);
@@ -13,10 +14,11 @@ export class EventService {
 
   private eventTimeout: any;
 
-  constructor() {}
+  constructor() {
+  }
 
-  handleIncomingEvent(event: string): void {
-    this.latestEventSubject.next(event);
+  handleIncomingLog(logNotification: LogNotification): void {
+    this.latestEventSubject.next(logNotification);
     this.eventHighlightSubject.next(true);
 
     if (this.eventTimeout) {
@@ -25,12 +27,12 @@ export class EventService {
 
     this.eventTimeout = setTimeout(() => {
       this.eventHighlightSubject.next(false);
-    }, 1000);
+    }, 2500);
 
     setTimeout(() => {
       if (!this.eventHighlightSubject.value) {
-        this.latestEventSubject.next('No recent events...');
+        this.latestEventSubject.next({message: 'No recent notifications...'});
       }
-    }, 2500);
+    }, 7500);
   }
 }

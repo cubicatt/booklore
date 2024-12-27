@@ -66,4 +66,10 @@ export class ShelfService {
       })
     );
   }
+
+  getBookCount(shelfId: number): Observable<number> {
+    return this.bookService.books$.pipe(
+      map(books => books.filter(book => book.shelves?.some(shelf => shelf.id === shelfId)).length)
+    );
+  }
 }

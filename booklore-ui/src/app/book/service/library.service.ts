@@ -76,4 +76,10 @@ export class LibraryService {
     return this.http.get<BookWithNeighborsDTO>(`${this.url}/${libraryId}/book/${bookId}/withNeighbors`);
   }
 
+  getBookCount(libraryId: number): Observable<number> {
+    return this.bookService.books$.pipe(
+      map(books => books.filter(book => book.libraryId === libraryId).length)
+    );
+  }
+
 }

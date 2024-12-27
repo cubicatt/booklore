@@ -3,7 +3,7 @@ import {AppMenuitemComponent} from './app.menuitem.component';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {MenuModule} from 'primeng/menu';
 import {LibraryService} from '../../service/library.service';
-import {Observable} from 'rxjs';
+import {async, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {ShelfService} from '../../service/shelf.service';
 
@@ -30,6 +30,7 @@ export class AppMenuComponent implements OnInit {
             label: library.name,
             icon: 'pi pi-' + library.icon,
             routerLink: [`/library/${library.id}/books`],
+            bookCount$: this.libraryService.getBookCount(library.id ?? 0),
           })),
         },
       ])
@@ -44,10 +45,11 @@ export class AppMenuComponent implements OnInit {
             label: shelf.name,
             icon: 'pi pi-' + shelf.icon,
             routerLink: [`/shelf/${shelf.id}/books`],
+            bookCount$: this.shelfService.getBookCount(shelf.id ?? 0),
           })),
         },
       ])
-    )
+    );
 
     this.populateHome();
   }

@@ -5,7 +5,7 @@ import {Subscription} from 'rxjs';
 import {filter} from 'rxjs/operators';
 import {MenuService} from './app.menu.service';
 import {LayoutService} from './service/app.layout.service';
-import {NgClass, NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {Ripple} from 'primeng/ripple';
 
 @Component({
@@ -19,7 +19,9 @@ import {Ripple} from 'primeng/ripple';
          (click)="itemClick($event)"
          [ngClass]="item.class" [attr.target]="item.target" tabindex="0" pRipple>
         <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
-        <span class="layout-menuitem-text">{{ item.label }}</span>
+        <span class="layout-menuitem-text">
+          {{ item.label }}
+        </span>
         <i class="pi pi-fw pi-angle-down layout-submenu-toggler" *ngIf="item.items"></i>
       </a>
 
@@ -33,7 +35,12 @@ import {Ripple} from 'primeng/ripple';
          [queryParams]="item.queryParams"
          [attr.target]="item.target" tabindex="0" pRipple>
         <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
-        <span class="layout-menuitem-text">{{ item.label }}</span>
+        <span class="layout-menuitem-text flex justify-content-between w-full">
+          {{ item.label }}
+          <span *ngIf="item.bookCount$ | async as bookCount">
+            {{ bookCount }}
+          </span>
+        </span>
         <i class="pi pi-fw pi-angle-down layout-submenu-toggler" *ngIf="item.items"></i>
       </a>
 
@@ -50,7 +57,8 @@ import {Ripple} from 'primeng/ripple';
     NgClass,
     NgForOf,
     Ripple,
-    NgIf
+    NgIf,
+    AsyncPipe
   ],
   animations: [
     trigger('children', [

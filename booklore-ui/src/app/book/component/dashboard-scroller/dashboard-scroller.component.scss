@@ -1,12 +1,8 @@
-.book-list-container {
+.dashboard-scroller-container {
   margin-bottom: 20px;
 }
 
-.last-read-title-container {
-
-}
-
-.last-read-title {
+.dashboard-scroller-title {
   font-size: 1.5rem;
   color: var(--text-color);
   margin-bottom: 10px;
@@ -14,79 +10,23 @@
   text-align: left;
 }
 
-.book-list {
+.infinite-scroller {
   display: flex;
   flex-direction: row;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
-  padding: 10px;
+  padding: 5px;
   gap: 20px;
   height: 100%;
   box-sizing: border-box;
 }
 
-.book-item {
+.infinite-scroller-a-book {
   overflow: hidden;
   background-color: var(--surface-card);
   border-radius: 8px;
-  flex: 0 0 12%;
+  flex: 0 0 9.5%;
   scroll-snap-align: start;
   position: relative;
-}
-
-.book-cover {
-  height: 225px;
-  object-fit: cover;
-  background-color: #444;
-  transition: background-color 0.3s ease, filter 0.3s ease;
-  position: relative;
-  border: none;
-}
-
-.book-item:hover .book-cover {
-  filter: blur(2px);
-}
-
-.book-info {
-  padding: 5px;
-  text-align: center;
-}
-
-h4 {
-  font-size: 0.9rem;
-  color: var(--text-color);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-  margin-bottom: 3px;
-}
-
-p {
-  color: var(--text-color-secondary);
-  font-size: 0.8rem;
-  line-height: 1.2;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.info-btn, .read-btn {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -20%);
-  display: none;
-  margin: -60px 0;
-}
-
-.book-item:hover .info-btn {
-  display: block;
-}
-
-.book-item:hover .read-btn {
-  display: block;
-  top: 75%;
 }

@@ -35,6 +35,7 @@ export class BooksBrowserComponent implements OnInit {
   sortOptions: SortOption[] = [];
 
   ref: DynamicDialogRef | undefined;
+  isDrawerVisible: boolean = false;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -138,10 +139,12 @@ export class BooksBrowserComponent implements OnInit {
     } else {
       this.selectedBooks.delete(bookId);
     }
+    this.isDrawerVisible = this.selectedBooks.size > 0;
   }
 
   deselectAllBooks(): void {
     this.selectedBooks.clear();
+    this.isDrawerVisible = false;
   }
 
   isAnyBookSelected(): boolean {

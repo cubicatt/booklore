@@ -46,9 +46,9 @@
   </div>
   <div class="book-browser-footer" *ngIf="selectedBooks.size > 0">
     <div class="footer-items-container">
-      <p-button *ngIf="(entityType$ | async) === 'Library'" icon="pi pi-ellipsis-v" label="Options" severity="primary" [outlined]="true" (click)="menu.toggle($event)"></p-button>
-      <p-button *ngIf="(entityType$ | async) === 'Shelf'" icon="pi pi-minus-circle" label="Unshelf" severity="primary" [outlined]="true" (click)="unshelfBooks()"></p-button>
-      <p-button icon="pi pi-times" label="Deselect" severity="warning" [outlined]="true" (click)="deselectAllBooks()"></p-button>
+      <p-button *ngIf="(entityType$ | async) === 'Library'" icon="pi pi-ellipsis-v" label="Options" severity="info" (click)="menu.toggle($event)"></p-button>
+      <p-button *ngIf="(entityType$ | async) === 'Shelf'" icon="pi pi-minus-circle" label="Unshelf" severity="info" (click)="unshelfBooks()"></p-button>
+      <p-button icon="pi pi-times" label="Deselect" severity="warning" (click)="deselectAllBooks()"></p-button>
     </div>
     <p-menu #menu [model]="multiSelectItems" [popup]="true" appendTo="body"></p-menu>
   </div>

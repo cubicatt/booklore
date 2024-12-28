@@ -31,15 +31,15 @@
 
 .virtual-scroller {
   width: 100%;
-  height: calc(100vh - 210px);
+  height: calc(100vh - 11.5rem);
   padding: 1rem;
   box-sizing: border-box;
   overflow-y: auto;
 }
 
 .virtual-scroller-item {
-  height: 210px;
-  width: 130px;
+  height: 220px;
+  width: 135px;
 }
 
 .grid {
@@ -47,7 +47,6 @@
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 1.3rem;
   padding: 1rem;
-  width: 100%;
   overflow: hidden;
   align-items: start;
 }

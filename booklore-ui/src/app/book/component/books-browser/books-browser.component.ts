@@ -4,7 +4,7 @@ import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
 import {LibraryService} from '../../service/library.service';
 import {BookService} from '../../service/book.service';
 import {map, switchMap} from 'rxjs/operators';
-import {Observable, of} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import {Book} from '../../model/book.model';
 import {ShelfService} from '../../service/shelf.service';
 import {ShelfAssignerComponent} from '../shelf-assigner/shelf-assigner.component';
@@ -25,17 +25,19 @@ export class BooksBrowserComponent implements OnInit {
   books$: Observable<Book[]> | undefined;
   entity$: Observable<Library | Shelf | null> | undefined;
   entityType$: Observable<string | null> | undefined;
+  bookTitle$ = new BehaviorSubject<string>('');
 
   entity: Library | Shelf | null = null;
   entityType: string = '';
-  speedDialItems: MenuItem[] | undefined;
+  bookTitle: string = '';
+  entityOptions: MenuItem[] | undefined;
   multiSelectItems: MenuItem[] | undefined;
   selectedBooks: Set<number> = new Set();
   selectedSort: SortOption | null = null;
   sortOptions: SortOption[] = [];
-
-  ref: DynamicDialogRef | undefined;
   isDrawerVisible: boolean = false;
+  ref: DynamicDialogRef | undefined;
+
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -52,11 +54,10 @@ export class BooksBrowserComponent implements OnInit {
 
   ngOnInit(): void {
     this.sortOptions = SortOptionsHelper.generateSortOptions();
-
     const routeParam$ = this.getRouteParams();
 
     this.books$ = routeParam$.pipe(
-      switchMap(({libraryId, shelfId}) => this.fetchBooks(libraryId, shelfId))
+      switchMap(({libraryId, shelfId}) => this.fetchBooks(libraryId, shelfId)),
     );
 
     this.entity$ = routeParam$.pipe(
@@ -70,6 +71,11 @@ export class BooksBrowserComponent implements OnInit {
     this.entity$.subscribe(entity => {
       this.entity = entity;
       this.setSelectedSortFromEntity(entity);
+    });
+
+    this.activatedRoute.paramMap.subscribe(() => {
+      this.bookTitle$.next('');
+      this.bookTitle = '';
     });
 
     this.setupMenu();
@@ -110,14 +116,30 @@ export class BooksBrowserComponent implements OnInit {
   private fetchBooksByLibrary(libraryId: number): Observable<Book[]> {
     return this.bookService.books$.pipe(
       map(books => books.filter(book => book.libraryId === libraryId)),
-      map(books => this.sortService.applySort(books, this.selectedSort))
+      map(books => this.sortService.applySort(books, this.selectedSort)),
+      switchMap(books => this.bookTitle$.pipe(
+        map(title => {
+          if (title && title.trim() !== '') {
+            return books.filter(book => book.metadata?.title?.toLowerCase().includes(title.toLowerCase()));
+          }
+          return books;
+        })
+      ))
     );
   }
 
   private fetchBooksByShelf(shelfId: number): Observable<Book[]> {
     return this.bookService.books$.pipe(
       map(books => books.filter(book => book.shelves?.some(shelf => shelf.id === shelfId))),
-      map(books => this.sortService.applySort(books, this.selectedSort))
+      map(books => this.sortService.applySort(books, this.selectedSort)),
+      switchMap(books => this.bookTitle$.pipe(
+        map(title => {
+          if (title && title.trim() !== '') {
+            return books.filter(book => book.metadata?.title?.toLowerCase().includes(title.toLowerCase()));
+          }
+          return books;
+        })
+      ))
     );
   }
 
@@ -145,10 +167,6 @@ export class BooksBrowserComponent implements OnInit {
   deselectAllBooks(): void {
     this.selectedBooks.clear();
     this.isDrawerVisible = false;
-  }
-
-  isAnyBookSelected(): boolean {
-    return this.selectedBooks.size > 0;
   }
 
   unshelfBooks() {
@@ -187,6 +205,10 @@ export class BooksBrowserComponent implements OnInit {
     }
   }
 
+  onBookTitleChange(newTitle: string): void {
+    this.bookTitle$.next(newTitle);
+  }
+
   setupMenu(): void {
     this.multiSelectItems = [
       {
@@ -219,110 +241,115 @@ export class BooksBrowserComponent implements OnInit {
   }
 
   private initializeLibraryMenuItems(): void {
-    this.speedDialItems = [
+    this.entityOptions = [
       {
-        icon: 'pi pi-trash',
-        tooltipOptions: {
-          tooltipLabel: 'Delete',
-          tooltipPosition: 'top'
-        },
-        command: () => {
-          this.confirmationService.confirm({
-            message: 'Sure you want to delete library: ' + this.entity?.name + "?",
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            acceptIcon: 'none',
-            rejectIcon: 'none',
-            rejectButtonStyleClass: 'p-button-text',
-            accept: () => {
-              this.libraryService.deleteLibrary(this.entity?.id!).subscribe({
-                complete: () => {
-                  this.router.navigate(['/']);
-                  this.messageService.add({severity: 'info', summary: 'Success', detail: 'Library was deleted'});
-                },
-                error: () => {
-                  this.messageService.add({
-                    severity: 'error',
-                    summary: 'Failed',
-                    detail: 'Failed to delete library',
-                    life: 3000
+        label: 'Options',
+        items: [
+          {
+            label: 'Delete Library',
+            icon: 'pi pi-trash',
+            command: () => {
+              this.confirmationService.confirm({
+                message: 'Sure you want to delete library: ' + this.entity?.name + "?",
+                header: 'Confirmation',
+                icon: 'pi pi-exclamation-triangle',
+                acceptIcon: 'none',
+                rejectIcon: 'none',
+                rejectButtonStyleClass: 'p-button-text',
+                accept: () => {
+                  this.libraryService.deleteLibrary(this.entity?.id!).subscribe({
+                    complete: () => {
+                      this.router.navigate(['/']);
+                      this.messageService.add({severity: 'info', summary: 'Success', detail: 'Library was deleted'});
+                    },
+                    error: () => {
+                      this.messageService.add({
+                        severity: 'error',
+                        summary: 'Failed',
+                        detail: 'Failed to delete library',
+                        life: 3000
+                      });
+                    }
                   });
                 }
               });
             }
-          });
-        }
+          },
+          {
+            label: 'Refresh Library',
+            icon: 'pi pi-refresh',
+            command: () => {
+              this.confirmationService.confirm({
+                message: 'Sure you want to refresh library: ' + this.entity?.name + "?",
+                header: 'Confirmation',
+                icon: 'pi pi-exclamation-triangle',
+                acceptIcon: 'none',
+                rejectIcon: 'none',
+                rejectButtonStyleClass: 'p-button-text',
+                accept: () => {
+                  this.libraryService.refreshLibrary(this.entity?.id!).subscribe({
+                    complete: () => {
+                      this.messageService.add({
+                        severity: 'info',
+                        summary: 'Success',
+                        detail: 'Library refresh scheduled'
+                      });
+                    },
+                    error: () => {
+                      this.messageService.add({
+                        severity: 'error',
+                        summary: 'Failed',
+                        detail: 'Failed to refresh library',
+                        life: 3000
+                      });
+                    }
+                  });
+                }
+              });
+            }
+          }
+        ],
       },
-      {
-        icon: 'pi pi-refresh',
-        tooltipOptions: {
-          tooltipLabel: 'Refresh',
-          tooltipPosition: 'top'
-        },
-        command: () => {
-          this.confirmationService.confirm({
-            message: 'Sure you want to refresh library: ' + this.entity?.name + "?",
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            acceptIcon: 'none',
-            rejectIcon: 'none',
-            rejectButtonStyleClass: 'p-button-text',
-            accept: () => {
-              this.libraryService.refreshLibrary(this.entity?.id!).subscribe({
-                complete: () => {
-                  this.messageService.add({severity: 'info', summary: 'Success', detail: 'Library refresh scheduled'});
-                },
-                error: () => {
-                  this.messageService.add({
-                    severity: 'error',
-                    summary: 'Failed',
-                    detail: 'Failed to refresh library',
-                    life: 3000
-                  });
-                }
-              });
-            }
-          });
-        }
-      }
     ];
   }
 
   private initializeShelfMenuItems(): void {
-    this.speedDialItems = [
+    this.entityOptions = [
       {
-        icon: 'pi pi-trash',
-        tooltipOptions: {
-          tooltipLabel: 'Delete',
-          tooltipPosition: 'top'
-        },
-        command: () => {
-          this.confirmationService.confirm({
-            message: 'Sure you want to delete ' + this.entity?.name + "?",
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            acceptIcon: 'none',
-            rejectIcon: 'none',
-            rejectButtonStyleClass: 'p-button-text',
-            accept: () => {
-              this.shelfService.deleteShelf(this.entity?.id!).subscribe({
-                complete: () => {
-                  this.router.navigate(['/']);
-                  this.messageService.add({severity: 'info', summary: 'Success', detail: 'Shelf was deleted'});
-                },
-                error: () => {
-                  this.messageService.add({
-                    severity: 'error',
-                    summary: 'Failed',
-                    detail: 'Failed to delete shelf',
-                    life: 3000
+        label: 'Options',
+        items: [
+          {
+            label: 'Delete Shelf',
+            icon: 'pi pi-trash',
+            command: () => {
+              this.confirmationService.confirm({
+                message: 'Sure you want to delete ' + this.entity?.name + "?",
+                header: 'Confirmation',
+                icon: 'pi pi-exclamation-triangle',
+                acceptIcon: 'none',
+                rejectIcon: 'none',
+                rejectButtonStyleClass: 'p-button-text',
+                accept: () => {
+                  this.shelfService.deleteShelf(this.entity?.id!).subscribe({
+                    complete: () => {
+                      this.router.navigate(['/']);
+                      this.messageService.add({severity: 'info', summary: 'Success', detail: 'Shelf was deleted'});
+                    },
+                    error: () => {
+                      this.messageService.add({
+                        severity: 'error',
+                        summary: 'Failed',
+                        detail: 'Failed to delete shelf',
+                        life: 3000
+                      });
+                    }
                   });
                 }
               });
             }
-          });
-        }
-      }
+          }
+        ],
+      },
     ];
   }
 

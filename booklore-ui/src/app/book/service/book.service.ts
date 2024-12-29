@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { Book, BookMetadata, BookSetting } from '../model/book.model';
-import { BookState } from '../model/state/book-state.model';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable, of} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {catchError, map, switchMap, tap} from 'rxjs/operators';
+import {Book, BookMetadata, BookSetting} from '../model/book.model';
+import {BookState} from '../model/state/book-state.model';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +24,13 @@ export class BookService {
 
   private loadBooks(): void {
     this.http.get<Book[]>(this.url).pipe(
+      tap(books => {
+        this.bookStateSubject.next({
+          books: books || [],
+          loaded: true,
+          error: null,
+        });
+      }),
       catchError(error => {
         this.bookStateSubject.next({
           books: null,
@@ -32,13 +39,7 @@ export class BookService {
         });
         return of(null);
       })
-    ).subscribe(books => {
-      this.bookStateSubject.next({
-        books: books || [],
-        loaded: true,
-        error: null,
-      });
-    });
+    ).subscribe();
   }
 
   updateBookShelves(bookIds: Set<number | undefined>, shelvesToAssign: Set<number | undefined>, shelvesToUnassign: Set<number | undefined>): Observable<Book[]> {
@@ -57,12 +58,12 @@ export class BookService {
             currentBooks[index] = updatedBook;
           }
         });
-        this.bookStateSubject.next({ ...currentState, books: [...currentBooks] });
+        this.bookStateSubject.next({...currentState, books: [...currentBooks]});
         return updatedBooks;
       }),
       catchError(error => {
         const currentState = this.bookStateSubject.value;
-        this.bookStateSubject.next({ ...currentState, error: error.message });
+        this.bookStateSubject.next({...currentState, error: error.message});
         throw error;
       })
     );
@@ -72,7 +73,7 @@ export class BookService {
     const currentState = this.bookStateSubject.value;
     const currentBooks = currentState.books || [];
     const filteredBooks = currentBooks.filter(book => book.libraryId !== libraryId);
-    this.bookStateSubject.next({ ...currentState, books: filteredBooks });
+    this.bookStateSubject.next({...currentState, books: filteredBooks});
   }
 
   removeBooksFromShelf(shelfId: number): void {
@@ -82,7 +83,7 @@ export class BookService {
       ...book,
       shelves: book.shelves?.filter(shelf => shelf.id !== shelfId),
     }));
-    this.bookStateSubject.next({ ...currentState, books: updatedBooks });
+    this.bookStateSubject.next({...currentState, books: updatedBooks});
   }
 
   getBookById(bookId: number): Observable<Book | undefined> {
@@ -104,9 +105,9 @@ export class BookService {
       switchMap(updatedBook => {
         const currentState = this.bookStateSubject.value;
         const updatedBooks = (currentState.books || []).map(book =>
-          book.id === updatedBook.id ? { ...book, lastReadTime: updatedBook.lastReadTime } : book
+          book.id === updatedBook.id ? {...book, lastReadTime: updatedBook.lastReadTime} : book
         );
-        this.bookStateSubject.next({ ...currentState, books: updatedBooks });
+        this.bookStateSubject.next({...currentState, books: updatedBooks});
         return [updatedBook];
       })
     );
@@ -150,19 +151,19 @@ export class BookService {
   }
 
   setBookMetadata(googleBookId: string, bookId: number): Observable<Book> {
-    const requestBody = { googleBookId };
+    const requestBody = {googleBookId};
     return this.http.put<Book>(`${this.url}/${bookId}/set-metadata`, requestBody).pipe(
       map(book => {
         const currentState = this.bookStateSubject.value;
         const updatedBooks = (currentState.books || []).map(existingBook =>
           existingBook.id === book.id ? book : existingBook
         );
-        this.bookStateSubject.next({ ...currentState, books: updatedBooks });
+        this.bookStateSubject.next({...currentState, books: updatedBooks});
         return book;
       }),
       catchError(error => {
         const currentState = this.bookStateSubject.value;
-        this.bookStateSubject.next({ ...currentState, error: error.message });
+        this.bookStateSubject.next({...currentState, error: error.message});
         throw error;
       })
     );
@@ -177,12 +178,12 @@ export class BookService {
     } else {
       updatedBooks.push(book);
     }
-    this.bookStateSubject.next({ ...currentState, books: updatedBooks });
+    this.bookStateSubject.next({...currentState, books: updatedBooks});
   }
 
   handleRemovedBookIds(removedBookIds: Set<number>): void {
     const currentState = this.bookStateSubject.value;
     const filteredBooks = (currentState.books || []).filter(book => !removedBookIds.has(book.id));
-    this.bookStateSubject.next({ ...currentState, books: filteredBooks });
+    this.bookStateSubject.next({...currentState, books: filteredBooks});
   }
 }

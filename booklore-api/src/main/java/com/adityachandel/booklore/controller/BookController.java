@@ -28,7 +28,7 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookDTO>> getBooks() throws InterruptedException {
+    public ResponseEntity<List<BookDTO>> getBooks() {
         return ResponseEntity.ok(booksService.getBooks());
     }
 

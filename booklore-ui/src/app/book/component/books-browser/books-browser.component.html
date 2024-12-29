@@ -27,8 +27,10 @@
   </div>
 
   <div class="virtual-scroller-container">
-    <div *ngIf="(bookState$ | async)?.error">
-      <p class="no-books-text">Failed to load library's books!</p>
+    <div class="no-books-container" *ngIf="(bookState$ | async)?.error">
+      <p class="no-books-text">
+        {{ entityType === 'Library' ? "Failed to load library's books!" : "Failed to load shelf's books!" }}
+      </p>
     </div>
     <div class="no-books-container" *ngIf="!(bookState$ | async)?.error && (bookState$ | async)?.loaded && (bookState$ | async)?.books?.length === 0">
       <p class="no-books-text">

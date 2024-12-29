@@ -38,6 +38,9 @@ import {CustomReuseStrategy} from './custom-reuse-strategy';
 import {MenuModule} from 'primeng/menu';
 import {IconPickerComponent} from './book/component/icon-picker/icon-picker.component';
 import {ProgressSpinnerModule} from 'primeng/progressspinner';
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
+import {providePrimeNG} from 'primeng/config';
+import Aura from '@primeng/themes/aura';
 
 @NgModule({
   declarations: [
@@ -87,7 +90,13 @@ import {ProgressSpinnerModule} from 'primeng/progressspinner';
     {
       provide: RouteReuseStrategy,
       useClass: CustomReuseStrategy
-    }
+    },
+    provideAnimationsAsync(),
+    providePrimeNG({
+      theme: {
+        preset: Aura
+      }
+    })
   ],
   bootstrap: [AppComponent]
 })

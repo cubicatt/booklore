@@ -33,10 +33,12 @@
     <button class="p-link layout-menu-button layout-topbar-button" (click)="openLibraryCreatorDialog()" pTooltip="Create New Library" tooltipPosition="top">
       <i class="pi pi-plus-circle"></i>
     </button>
-    <button (click)="openFileUploadDialog()" class="p-link layout-topbar-button">
+    <p-button [rounded]="true" [outlined]="true" severity="help" (click)="openFileUploadDialog()">
       <i class="pi pi-upload"></i>
-      <span>Profile</span>
-    </button>
+    </p-button>
+    <p-button [rounded]="true" [outlined]="true" severity="help"> </p-button>
+    <app-configurator></app-configurator>
+
     <div class="top-bar-app-theme-switcher">
       <app-theme-switcher></app-theme-switcher>
     </div>

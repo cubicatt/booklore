@@ -13,6 +13,8 @@ import {FileUploadComponent} from '../file-upload/file-upload.component';
 import {NgClass, NgIf} from '@angular/common';
 import {EventService} from '../../service/event.service';
 import {LogNotification} from '../../model/log-notification.model';
+import {Button} from 'primeng/button';
+import {AppConfiguratorComponent} from '../../../configurator/configurator.component';
 
 @Component({
   selector: 'app-topbar',
@@ -25,7 +27,9 @@ import {LogNotification} from '../../model/log-notification.model';
     InputTextModule,
     SearchComponent,
     ThemeSwitcherComponent,
-    NgIf
+    NgIf,
+    Button,
+    AppConfiguratorComponent
   ],
 })
 export class AppTopBarComponent implements OnDestroy {

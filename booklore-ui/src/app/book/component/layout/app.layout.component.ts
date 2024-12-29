@@ -4,7 +4,6 @@ import { filter, Subscription } from 'rxjs';
 import { LayoutService } from "./service/app.layout.service";
 import { AppSidebarComponent } from "./app.sidebar.component";
 import { AppTopBarComponent } from './app.topbar.component';
-import {AppConfigComponent} from "./config/app.config.component";
 import {NgClass} from '@angular/common';
 import {ToastModule} from 'primeng/toast';
 
@@ -12,7 +11,6 @@ import {ToastModule} from 'primeng/toast';
     selector: 'app-layout',
   imports: [
     RouterOutlet,
-    AppConfigComponent,
     AppSidebarComponent,
     AppTopBarComponent,
     NgClass,

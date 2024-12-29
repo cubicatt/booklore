@@ -1,5 +1,5 @@
 <p-stepper>
-  <p-stepperPanel header="Library Name">
+  <p-stepper header="Library Name">
     <ng-template pTemplate="content" let-nextCallback="nextCallback" let-index="index">
       <div class="flex flex-column h-21rem">
         <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
@@ -27,8 +27,8 @@
         <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="nextCallback.emit()"/>
       </div>
     </ng-template>
-  </p-stepperPanel>
-  <p-stepperPanel header="Media Location">
+  </p-stepper>
+  <p-stepper header="Media Location">
     <ng-template pTemplate="content" let-prevCallback="prevCallback" let-index="index">
       <div class="flex flex-column xxx">
         <div
@@ -64,5 +64,5 @@
         <p-button severity="success" label="Save" icon="pi pi-save" (onClick)="addLibrary()"></p-button>
       </div>
     </ng-template>
-  </p-stepperPanel>
+  </p-stepper>
 </p-stepper>

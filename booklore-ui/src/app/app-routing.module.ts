@@ -1,10 +1,10 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {AppLayoutComponent} from './book/component/layout/app.layout.component';
 import {PdfViewerComponent} from './book/component/pdf-viewer/pdf-viewer.component';
 import {DashboardComponent} from './book/component/dashboard/dashboard.component';
 import {BookMetadataComponent} from './book/component/book-metadata/book-metadata.component';
 import {BooksBrowserComponent} from './book/component/books-browser/books-browser.component';
+import {AppLayoutComponent} from './book/component/layout/app.layout.component';
 
 const routes: Routes = [
   {

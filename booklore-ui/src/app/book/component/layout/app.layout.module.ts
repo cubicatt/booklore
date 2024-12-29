@@ -13,9 +13,7 @@ import { AppMenuComponent } from './app.menu.component';
 import { AppMenuitemComponent } from './app.menuitem.component';
 import { RouterModule } from '@angular/router';
 import { AppTopBarComponent } from './app.topbar.component';
-import { AppConfigModule } from './config/config.module';
 import { AppSidebarComponent } from "./app.sidebar.component";
-import { AppLayoutComponent } from "./app.layout.component";
 
 @NgModule({
     declarations: [
@@ -33,13 +31,10 @@ import { AppLayoutComponent } from "./app.layout.component";
         InputSwitchModule,
         RippleModule,
         RouterModule,
-        AppConfigModule,
         AppMenuitemComponent,
         AppTopBarComponent,
         AppMenuComponent,
         AppSidebarComponent,
-        AppLayoutComponent
-    ],
-    exports: [AppLayoutComponent]
+    ]
 })
 export class AppLayoutModule { }

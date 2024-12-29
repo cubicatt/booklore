@@ -1,12 +1,11 @@
 <div class="dialog-container">
   <div class="checkbox-list">
-    <div *ngFor="let shelf of shelves$ | async" class="flex items-center">
-      <p-checkbox [inputId]="shelf.name" name="group" [value]="shelf" [(ngModel)]="selectedShelves"/>
+    <div *ngFor="let shelf of (shelfState$ | async)?.shelves" class="flex items-center">
+      <p-checkbox [inputId]="shelf.name" name="group" [value]="shelf" [(ngModel)]="selectedShelves"></p-checkbox>
       <label [for]="shelf.id" class="ml-2">{{ shelf.name }}</label>
     </div>
   </div>
 
-  <!-- Divider and Bottom Section -->
   <div class="bottom-section">
     <p-divider></p-divider>
     <div class="bottom-container">
@@ -17,12 +16,13 @@
       </div>
     </div>
   </div>
+
   <app-icon-picker (iconSelected)="onIconSelected($event)"></app-icon-picker>
   <p-dialog [(visible)]="displayShelfDialog" header="Create Shelf" [modal]="true" [draggable]="false" [closable]="true" (onHide)="closeShelfDialog()" [style]="{ width: '400px', height: 'auto' }">
     <div class="p-fluid">
       <div class="field">
         <label for="shelfName">Shelf Name</label>
-        <input id="shelfName" type="text" pInputText [(ngModel)]="shelfName"/>
+        <input id="shelfName" type="text" pInputText [(ngModel)]="shelfName" />
       </div>
       <div class="field">
         <label>Shelf Icon</label>
@@ -31,7 +31,7 @@
         </div>
         <div *ngIf="selectedIcon" class="mt-2 flex align-items-center">
           <i [class]="selectedIcon" class="mr-2"></i>
-          <p-button label="Remove" icon="pi pi-times" [text]="true" [outlined]="true" severity="warning" (onClick)="clearSelectedIcon()"></p-button>
+          <p-button label="Remove" icon="pi pi-times" text="true" outlined="true" severity="warning" (onClick)="clearSelectedIcon()"></p-button>
         </div>
       </div>
     </div>

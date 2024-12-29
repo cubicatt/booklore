@@ -1,11 +1,11 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {Book} from '../../model/book.model';
-import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
-import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
-import {BookCardComponent} from '../book-card/book-card.component';
-import {Observable} from 'rxjs';
-import {BookService} from '../../service/book.service';
-import {map} from 'rxjs/operators';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { BookService } from '../../service/book.service';
+import { BookState } from '../../model/state/book-state.model';
+import { BookCardComponent } from '../book-card/book-card.component';
+import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
+import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard-scroller',
@@ -25,31 +25,33 @@ export class DashboardScrollerComponent implements OnInit {
   @Input() title: string = 'Last Read Books';
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
-  books$: Observable<Book[]> | undefined;
+  bookState$: Observable<BookState> | undefined;
 
-  constructor(private bookService: BookService) {
-  }
+  constructor(private bookService: BookService) {}
 
   ngOnInit(): void {
     if (this.bookListType === 'lastRead') {
-      this.books$ = this.bookService.books$.pipe((
-        map(books =>
-            books
-              .filter(book => book.lastReadTime)
-              .sort((a, b) => new Date(b.lastReadTime!).getTime() - new Date(a.lastReadTime!).getTime())
-              .slice(0, 25)
-        )
-      ))
+      this.bookState$ = this.bookService.bookState$.pipe(
+        map((state: BookState) => ({
+          ...state,
+          books: (state.books || [])
+            .filter(book => book.lastReadTime)
+            .sort((a, b) => new Date(b.lastReadTime!).getTime() - new Date(a.lastReadTime!).getTime())
+            .slice(0, 25)
+        }))
+      );
     }
+
     if (this.bookListType === 'latestAdded') {
-      this.books$ = this.bookService.books$.pipe((
-        map(books =>
-          books
+      this.bookState$ = this.bookService.bookState$.pipe(
+        map((state: BookState) => ({
+          ...state,
+          books: (state.books || [])
             .filter(book => book.addedOn)
             .sort((a, b) => new Date(b.addedOn!).getTime() - new Date(a.addedOn!).getTime())
             .slice(0, 25)
-        )
-      ))
+        }))
+      );
     }
   }
 }

@@ -1,38 +1,58 @@
-import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable, of, tap} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
-import {HttpClient} from '@angular/common/http';
-import {Shelf} from '../model/shelf.model';
-import {SortOption} from '../model/sort.model';
-import {BookService} from "./book.service";
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, of, tap } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Shelf } from '../model/shelf.model';
+import { SortOption } from '../model/sort.model';
+import { BookService } from './book.service';
+import { ShelfState } from '../model/state/shelf-state.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ShelfService {
-
   private readonly url = 'http://localhost:8080/v1/shelf';
-  private shelves = new BehaviorSubject<Shelf[]>([]);
-  shelves$ = this.shelves.asObservable();
+  private shelfStateSubject = new BehaviorSubject<ShelfState>({
+    shelves: null,
+    loaded: false,
+    error: null,
+  });
+  shelfState$ = this.shelfStateSubject.asObservable();
 
   constructor(private http: HttpClient, private bookService: BookService) {
+    this.loadShelves();
+  }
+
+  private loadShelves(): void {
     this.http.get<Shelf[]>(this.url).pipe(
       catchError(error => {
+        this.shelfStateSubject.next({
+          shelves: null,
+          loaded: true,
+          error: error.message,
+        });
         return of([]);
       })
-    ).subscribe((shelves) => {
-      this.shelves.next(shelves);
+    ).subscribe(shelves => {
+      this.shelfStateSubject.next({
+        shelves,
+        loaded: true,
+        error: null,
+      });
     });
   }
 
   createShelf(shelf: Shelf): Observable<Shelf> {
     return this.http.post<Shelf>(this.url, shelf).pipe(
       map(newShelf => {
-        this.shelves.next([...this.shelves.value, newShelf])
+        const currentState = this.shelfStateSubject.value;
+        const updatedShelves = currentState.shelves ? [...currentState.shelves, newShelf] : [newShelf];
+        this.shelfStateSubject.next({ ...currentState, shelves: updatedShelves });
         return newShelf;
       }),
       catchError(error => {
-        console.error('Error creating shelf:', error);
+        const currentState = this.shelfStateSubject.value;
+        this.shelfStateSubject.next({ ...currentState, error: error.message });
         throw error;
       })
     );
@@ -41,35 +61,42 @@ export class ShelfService {
   updateSort(shelfId: number, sort: SortOption): Observable<Shelf> {
     return this.http.put<Shelf>(`${this.url}/${shelfId}/sort`, sort).pipe(
       map(updatedShelf => {
-        const updatedShelves = this.shelves.value.map(shelf =>
+        const currentState = this.shelfStateSubject.value;
+        const updatedShelves = currentState.shelves?.map(shelf =>
           shelf.id === shelfId ? updatedShelf : shelf
-        );
-        this.shelves.next(updatedShelves);
+        ) || [];
+        this.shelfStateSubject.next({ ...currentState, shelves: updatedShelves });
         return updatedShelf;
       }),
       catchError(error => {
-        console.error('Error updating shelf sort:', error);
+        const currentState = this.shelfStateSubject.value;
+        this.shelfStateSubject.next({ ...currentState, error: error.message });
         throw error;
       })
     );
   }
 
-  deleteShelf(shelfId: number) {
+  deleteShelf(shelfId: number): Observable<void> {
     return this.http.delete<void>(`${this.url}/${shelfId}`).pipe(
       tap(() => {
-        this.bookService.removeBooksByLibraryId(shelfId);
-        let shelves = this.shelves.value.filter(shelf => shelf.id !== shelfId);
-        this.shelves.next(shelves);
+        this.bookService.removeBooksFromShelf(shelfId);
+        const currentState = this.shelfStateSubject.value;
+        const updatedShelves = currentState.shelves?.filter(shelf => shelf.id !== shelfId) || [];
+        this.shelfStateSubject.next({ ...currentState, shelves: updatedShelves });
       }),
       catchError(error => {
+        const currentState = this.shelfStateSubject.value;
+        this.shelfStateSubject.next({ ...currentState, error: error.message });
         return of();
       })
     );
   }
 
   getBookCount(shelfId: number): Observable<number> {
-    return this.bookService.books$.pipe(
-      map(books => books.filter(book => book.shelves?.some(shelf => shelf.id === shelfId)).length)
+    return this.bookService.bookState$.pipe(
+      map(state =>
+        (state.books || []).filter(book => book.shelves?.some(shelf => shelf.id === shelfId)).length
+      )
     );
   }
 }

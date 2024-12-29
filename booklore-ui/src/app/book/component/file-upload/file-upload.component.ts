@@ -9,6 +9,7 @@ import {ToastService} from '../../service/toast.service';
 import {DynamicDialogRef} from 'primeng/dynamicdialog';
 import {LibraryService} from '../../service/library.service';
 import {Observable} from 'rxjs';
+import {LibraryState} from '../../model/state/library-state.model';
 
 @Component({
   selector: 'app-file-upload-v2',
@@ -23,7 +24,7 @@ import {Observable} from 'rxjs';
   ],
 })
 export class FileUploadComponent {
-  libraries$: Observable<Library[]>;
+  libraryState$: Observable<LibraryState>;
   selectedLibrary: Library | null = null;
   selectedPath: string = '';
   selectedFileName: string = '';
@@ -35,7 +36,7 @@ export class FileUploadComponent {
     private fileUploadService: FileUploadService,
     private toastService: ToastService,
     private dynamicDialogRef: DynamicDialogRef) {
-      this.libraries$ = this.libraryService.libraries$;
+      this.libraryState$ = this.libraryService.libraryState$;
   }
 
   triggerFileInput(fileInput: HTMLInputElement): void {

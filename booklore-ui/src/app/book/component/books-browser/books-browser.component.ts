@@ -5,7 +5,6 @@ import {LibraryService} from '../../service/library.service';
 import {BookService} from '../../service/book.service';
 import {map, switchMap} from 'rxjs/operators';
 import {BehaviorSubject, Observable, of} from 'rxjs';
-import {Book} from '../../model/book.model';
 import {ShelfService} from '../../service/shelf.service';
 import {ShelfAssignerComponent} from '../shelf-assigner/shelf-assigner.component';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
@@ -14,6 +13,7 @@ import {Shelf} from '../../model/shelf.model';
 import {SortService} from '../../service/sort.service';
 import {SortOptionsHelper} from '../../service/sort-options.helper';
 import {SortOption} from '../../model/sort.model';
+import {BookState} from '../../model/state/book-state.model';
 
 @Component({
   selector: 'app-books-browser',
@@ -22,7 +22,7 @@ import {SortOption} from '../../model/sort.model';
   styleUrls: ['./books-browser.component.scss']
 })
 export class BooksBrowserComponent implements OnInit {
-  books$: Observable<Book[]> | undefined;
+  bookState$: Observable<BookState> | undefined;
   entity$: Observable<Library | Shelf | null> | undefined;
   entityType$: Observable<string | null> | undefined;
   bookTitle$ = new BehaviorSubject<string>('');
@@ -37,7 +37,6 @@ export class BooksBrowserComponent implements OnInit {
   sortOptions: SortOption[] = [];
   isDrawerVisible: boolean = false;
   ref: DynamicDialogRef | undefined;
-
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -56,7 +55,7 @@ export class BooksBrowserComponent implements OnInit {
     this.sortOptions = SortOptionsHelper.generateSortOptions();
     const routeParam$ = this.getRouteParams();
 
-    this.books$ = routeParam$.pipe(
+    this.bookState$ = routeParam$.pipe(
       switchMap(({libraryId, shelfId}) => this.fetchBooks(libraryId, shelfId)),
     );
 
@@ -91,13 +90,17 @@ export class BooksBrowserComponent implements OnInit {
     );
   }
 
-  private fetchBooks(libraryId: number, shelfId: number): Observable<Book[]> {
+  private fetchBooks(libraryId: number, shelfId: number): Observable<BookState> {
     if (libraryId) {
       return this.fetchBooksByLibrary(libraryId);
     } else if (shelfId) {
       return this.fetchBooksByShelf(shelfId);
     }
-    return of([]);
+    return of({
+      books: [],
+      loaded: false,
+      error: null
+    });
   }
 
   private fetchEntity(libraryId: number, shelfId: number): Observable<Library | Shelf | null> {
@@ -113,45 +116,89 @@ export class BooksBrowserComponent implements OnInit {
     return of(null);
   }
 
-  private fetchBooksByLibrary(libraryId: number): Observable<Book[]> {
-    return this.bookService.books$.pipe(
-      map(books => books.filter(book => book.libraryId === libraryId)),
-      map(books => this.sortService.applySort(books, this.selectedSort)),
-      switchMap(books => this.bookTitle$.pipe(
-        map(title => {
-          if (title && title.trim() !== '') {
-            return books.filter(book => book.metadata?.title?.toLowerCase().includes(title.toLowerCase()));
-          }
-          return books;
-        })
-      ))
+  private fetchBooksByLibrary(libraryId: number): Observable<BookState> {
+    return this.bookService.bookState$.pipe(
+      map(bookState => {
+        if (bookState.books) {
+          const filteredBooks = bookState.books.filter(book => book.libraryId === libraryId);
+          return this.sortService.applySort(filteredBooks, this.selectedSort);
+        } else {
+          return [];
+        }
+      }),
+      switchMap(books =>
+        this.bookTitle$.pipe(
+          map(title => {
+            if (title && title.trim() !== '') {
+              return books.filter(book => book.metadata?.title?.toLowerCase().includes(title.toLowerCase()));
+            }
+            return books;
+          })
+        )
+      ),
+      map(filteredBooks => {
+        return {
+          books: filteredBooks,
+          loaded: true,
+          error: null
+        } as BookState;
+      })
     );
   }
 
-  private fetchBooksByShelf(shelfId: number): Observable<Book[]> {
-    return this.bookService.books$.pipe(
-      map(books => books.filter(book => book.shelves?.some(shelf => shelf.id === shelfId))),
-      map(books => this.sortService.applySort(books, this.selectedSort)),
-      switchMap(books => this.bookTitle$.pipe(
-        map(title => {
-          if (title && title.trim() !== '') {
-            return books.filter(book => book.metadata?.title?.toLowerCase().includes(title.toLowerCase()));
-          }
-          return books;
-        })
-      ))
+  private fetchBooksByShelf(shelfId: number): Observable<BookState> {
+    return this.bookService.bookState$.pipe(
+      map(bookState => {
+        if (bookState.books) {
+          const filteredBooks = bookState.books.filter(book =>
+            book.shelves?.some(shelf => shelf.id === shelfId)
+          );
+          return this.sortService.applySort(filteredBooks, this.selectedSort);
+        } else {
+          return [];
+        }
+      }),
+      switchMap(books =>
+        this.bookTitle$.pipe(
+          map(title => {
+            if (title && title.trim() !== '') {
+              return books.filter(book =>
+                book.metadata?.title?.toLowerCase().includes(title.toLowerCase())
+              );
+            }
+            return books;
+          })
+        )
+      ),
+      map(filteredBooks => {
+        return {
+          books: filteredBooks,
+          loaded: true,
+          error: null
+        } as BookState;
+      })
     );
   }
 
   private fetchLibrary(libraryId: number): Observable<Library | null> {
-    return this.libraryService.libraries$.pipe(
-      map(libraries => libraries.find(lib => lib.id === libraryId) || null)
+    return this.libraryService.libraryState$.pipe(
+      map(libraryState => {
+        if (libraryState.libraries) {
+          return libraryState.libraries.find(lib => lib.id === libraryId) || null;
+        }
+        return null;
+      })
     );
   }
 
   private fetchShelf(shelfId: number): Observable<Shelf | null> {
-    return this.shelfService.shelves$.pipe(
-      map(shelves => shelves.find(shelf => shelf.id === shelfId) || null)
+    return this.shelfService.shelfState$.pipe(
+      map(shelfState => {
+        if (shelfState.shelves) {
+          return shelfState.shelves.find(shelf => shelf.id === shelfId) || null;
+        }
+        return null;
+      })
     );
   }
 
@@ -186,7 +233,7 @@ export class BooksBrowserComponent implements OnInit {
   updateSortOption(sortOption: SortOption): void {
     this.selectedSort = sortOption;
     const routeParam$ = this.getRouteParams();
-    this.books$ = routeParam$.pipe(
+    this.bookState$ = routeParam$.pipe(
       switchMap(({libraryId, shelfId}) => this.fetchBooks(libraryId, shelfId))
     );
     if (this.entityType === 'Library') {
@@ -255,7 +302,7 @@ export class BooksBrowserComponent implements OnInit {
                 icon: 'pi pi-exclamation-triangle',
                 acceptIcon: 'none',
                 rejectIcon: 'none',
-                rejectButtonStyleClass: 'p-button-text',
+                acceptButtonStyleClass: 'p-button-text',
                 accept: () => {
                   this.libraryService.deleteLibrary(this.entity?.id!).subscribe({
                     complete: () => {
@@ -285,7 +332,7 @@ export class BooksBrowserComponent implements OnInit {
                 icon: 'pi pi-exclamation-triangle',
                 acceptIcon: 'none',
                 rejectIcon: 'none',
-                rejectButtonStyleClass: 'p-button-text',
+                acceptButtonStyleClass: 'p-button-text',
                 accept: () => {
                   this.libraryService.refreshLibrary(this.entity?.id!).subscribe({
                     complete: () => {
@@ -328,7 +375,7 @@ export class BooksBrowserComponent implements OnInit {
                 icon: 'pi pi-exclamation-triangle',
                 acceptIcon: 'none',
                 rejectIcon: 'none',
-                rejectButtonStyleClass: 'p-button-text',
+                acceptButtonStyleClass: 'p-button-text',
                 accept: () => {
                   this.shelfService.deleteShelf(this.entity?.id!).subscribe({
                     complete: () => {
@@ -352,5 +399,4 @@ export class BooksBrowserComponent implements OnInit {
       },
     ];
   }
-
 }

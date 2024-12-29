@@ -1,26 +1,43 @@
-import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable, of} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
-import {catchError, map, switchMap} from 'rxjs/operators';
-import {Book, BookMetadata, BookSetting} from '../model/book.model';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { Book, BookMetadata, BookSetting } from '../model/book.model';
+import { BookState } from '../model/state/book-state.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BookService {
-
   private readonly url = 'http://localhost:8080/v1/book';
-  private books = new BehaviorSubject<Book[]>([]);
-  books$ = this.books.asObservable();
+
+  private bookStateSubject = new BehaviorSubject<BookState>({
+    books: null,
+    loaded: false,
+    error: null,
+  });
+  bookState$ = this.bookStateSubject.asObservable();
 
   constructor(private http: HttpClient) {
+    this.loadBooks();
+  }
+
+  private loadBooks(): void {
     this.http.get<Book[]>(this.url).pipe(
       catchError(error => {
-        console.error('Error loading books:', error);
-        return of([]);
+        this.bookStateSubject.next({
+          books: null,
+          loaded: true,
+          error: error.message,
+        });
+        return of(null);
       })
-    ).subscribe((libraries) => {
-      this.books.next(libraries);
+    ).subscribe(books => {
+      this.bookStateSubject.next({
+        books: books || [],
+        loaded: true,
+        error: null,
+      });
     });
   }
 
@@ -31,42 +48,46 @@ export class BookService {
       shelvesToUnassign: Array.from(shelvesToUnassign),
     };
     return this.http.post<Book[]>(`${this.url}/assign-shelves`, requestPayload).pipe(
-      map((updatedBooks) => {
-        const currentBooks = this.books.value;
+      map(updatedBooks => {
+        const currentState = this.bookStateSubject.value;
+        const currentBooks = currentState.books || [];
         updatedBooks.forEach(updatedBook => {
-          const bookIndex = currentBooks.findIndex(b => b.id === updatedBook.id);
-          if (bookIndex !== -1) {
-            currentBooks[bookIndex] = updatedBook;
+          const index = currentBooks.findIndex(b => b.id === updatedBook.id);
+          if (index !== -1) {
+            currentBooks[index] = updatedBook;
           }
         });
-        this.books.next([...currentBooks]);
+        this.bookStateSubject.next({ ...currentState, books: [...currentBooks] });
         return updatedBooks;
       }),
       catchError(error => {
-        console.error('Error assigning shelves to books:', error);
+        const currentState = this.bookStateSubject.value;
+        this.bookStateSubject.next({ ...currentState, error: error.message });
         throw error;
       })
     );
   }
 
   removeBooksByLibraryId(libraryId: number): void {
-    const filteredBooks = this.books.value.filter(book => book.libraryId !== libraryId);
-    this.books.next(filteredBooks);
+    const currentState = this.bookStateSubject.value;
+    const currentBooks = currentState.books || [];
+    const filteredBooks = currentBooks.filter(book => book.libraryId !== libraryId);
+    this.bookStateSubject.next({ ...currentState, books: filteredBooks });
   }
 
   removeBooksFromShelf(shelfId: number): void {
-    const books = this.books.value.filter(book => {
-      if (book.shelves) {
-        book.shelves = book.shelves.filter(shelf => shelf.id !== shelfId);
-      }
-      return book;
-    })
-    this.books.next(books);
+    const currentState = this.bookStateSubject.value;
+    const currentBooks = currentState.books || [];
+    const updatedBooks = currentBooks.map(book => ({
+      ...book,
+      shelves: book.shelves?.filter(shelf => shelf.id !== shelfId),
+    }));
+    this.bookStateSubject.next({ ...currentState, books: updatedBooks });
   }
 
   getBookById(bookId: number): Observable<Book | undefined> {
-    return this.books$.pipe(
-      map(books => books.find(book => book.id === bookId))
+    return this.bookState$.pipe(
+      map(state => state.books?.find(book => book.id === bookId))
     );
   }
 
@@ -75,19 +96,17 @@ export class BookService {
   }
 
   updateViewerSetting(viewerSetting: any, bookId: number): Observable<void> {
-    const url = `${this.url}/${bookId}/viewer-setting`;
-    return this.http.put<void>(url, viewerSetting);
+    return this.http.put<void>(`${this.url}/${bookId}/viewer-setting`, viewerSetting);
   }
 
   updateLastReadTime(bookId: number): Observable<Book> {
     return this.http.put<Book>(`${this.url}/${bookId}/update-last-read`, {}).pipe(
       switchMap(updatedBook => {
-        console.log(updatedBook);
-        const currentBooks = this.books.getValue();
-        const updatedBooks = currentBooks.map(book =>
-          book.id === updatedBook.id ? {...book, lastReadTime: updatedBook.lastReadTime} : book
+        const currentState = this.bookStateSubject.value;
+        const updatedBooks = (currentState.books || []).map(book =>
+          book.id === updatedBook.id ? { ...book, lastReadTime: updatedBook.lastReadTime } : book
         );
-        this.books.next(updatedBooks);
+        this.bookStateSubject.next({ ...currentState, books: updatedBooks });
         return [updatedBook];
       })
     );
@@ -97,9 +116,7 @@ export class BookService {
     const url = `/pdf-viewer/book/${book.id}`;
     window.open(url, '_blank');
     this.updateLastReadTime(book.id).subscribe({
-      complete: () => {
-      },
-      error: (err) => console.error('Failed to update last read time', err),
+      error: err => console.error('Failed to update last read time', err),
     });
   }
 
@@ -107,10 +124,13 @@ export class BookService {
     if (query.length < 2) {
       return of([]);
     }
-    const filteredBooks = this.books.value.filter(book =>
-      book.metadata?.title?.toLowerCase().includes(query.toLowerCase()) || false
+    return this.bookState$.pipe(
+      map(state =>
+        (state.books || []).filter(book =>
+          book.metadata?.title?.toLowerCase().includes(query.toLowerCase())
+        )
+      )
     );
-    return of(filteredBooks);
   }
 
   getBookDataUrl(bookId: number): string {
@@ -130,45 +150,39 @@ export class BookService {
   }
 
   setBookMetadata(googleBookId: string, bookId: number): Observable<Book> {
-    const requestBody = {googleBookId: googleBookId};
+    const requestBody = { googleBookId };
     return this.http.put<Book>(`${this.url}/${bookId}/set-metadata`, requestBody).pipe(
       map(book => {
-        const updatedBooks = this.books.getValue().map(existingBook =>
+        const currentState = this.bookStateSubject.value;
+        const updatedBooks = (currentState.books || []).map(existingBook =>
           existingBook.id === book.id ? book : existingBook
         );
-        this.books.next(updatedBooks);
+        this.bookStateSubject.next({ ...currentState, books: updatedBooks });
         return book;
       }),
       catchError(error => {
-        console.error('Error assigning shelves to books:', error);
+        const currentState = this.bookStateSubject.value;
+        this.bookStateSubject.next({ ...currentState, error: error.message });
         throw error;
       })
     );
   }
 
   handleNewlyCreatedBook(book: Book): void {
-    const currentBooks = this.books.getValue();
-    const bookIndex = currentBooks.findIndex(existingBook => existingBook.id === book.id);
-    const updatedBooks = [...currentBooks];
+    const currentState = this.bookStateSubject.value;
+    const updatedBooks = currentState.books ? [...currentState.books] : [];
+    const bookIndex = updatedBooks.findIndex(existingBook => existingBook.id === book.id);
     if (bookIndex > -1) {
       updatedBooks[bookIndex] = book;
     } else {
       updatedBooks.push(book);
     }
-    this.books.next(updatedBooks);
+    this.bookStateSubject.next({ ...currentState, books: updatedBooks });
   }
 
-  handleRemovedBookIds(removedBookIds: Set<number>) {
-    console.log(removedBookIds);
-
-    if (!(removedBookIds instanceof Set)) {
-      console.error("removedBookIds should be a Set");
-      return; // Or throw an error if preferred
-    }
-
-    const currentBooks = this.books.getValue();
-    let filteredBooks = currentBooks.filter(currentBook => !removedBookIds.has(currentBook.id));
-    this.books.next(filteredBooks);
+  handleRemovedBookIds(removedBookIds: Set<number>): void {
+    const currentState = this.bookStateSubject.value;
+    const filteredBooks = (currentState.books || []).filter(book => !removedBookIds.has(book.id));
+    this.bookStateSubject.next({ ...currentState, books: filteredBooks });
   }
-
 }

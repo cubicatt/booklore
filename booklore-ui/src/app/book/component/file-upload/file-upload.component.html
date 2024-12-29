@@ -2,7 +2,7 @@
 
   <div class="flex">
     <p-dropdown
-      [options]="(libraries$ | async) || []"
+      [options]="(libraryState$ | async)?.libraries || []"
       optionLabel="name"
       placeholder="Select Library"
       [(ngModel)]="selectedLibrary">

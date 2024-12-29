@@ -22,7 +22,7 @@
 </div>
 
 <div class="virtual-scroller-container">
-  <div class="book-card-container" *ngIf="books$ | async as books">
+  <div class="book-card-container" *ngIf="(bookState$ | async)?.books as books">
     <virtual-scroller *ngIf="books.length > 0" class="virtual-scroller" #scroll [items]="books">
       <div class="grid" #container>
         <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">

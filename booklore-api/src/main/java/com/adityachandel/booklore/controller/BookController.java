@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 
 @RequestMapping("/v1/book")
@@ -28,8 +29,9 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookDTO>> getBooks() {
-        return ResponseEntity.ok( booksService.getBooks());
+    public ResponseEntity<List<BookDTO>> getBooks() throws InterruptedException {
+        Thread.sleep(Duration.ofSeconds(3));
+        return ResponseEntity.ok(booksService.getBooks());
     }
 
     @GetMapping("/search")

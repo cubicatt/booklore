@@ -6,6 +6,7 @@ import { BookState } from '../../model/state/book-state.model';
 import { BookCardComponent } from '../book-card/book-card.component';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
+import {ProgressSpinnerModule} from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-dashboard-scroller',
@@ -16,7 +17,8 @@ import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
     NgForOf,
     NgIf,
     BookCardComponent,
-    AsyncPipe
+    AsyncPipe,
+    ProgressSpinnerModule
   ],
 })
 export class DashboardScrollerComponent implements OnInit {

@@ -2,8 +2,8 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.BookDTO;
 import com.adityachandel.booklore.model.dto.BookViewerSettingDTO;
-import com.adityachandel.booklore.model.dto.request.ShelvesAssignmentRequest;
 import com.adityachandel.booklore.model.dto.request.SetMetadataRequest;
+import com.adityachandel.booklore.model.dto.request.ShelvesAssignmentRequest;
 import com.adityachandel.booklore.model.dto.response.GoogleBooksMetadata;
 import com.adityachandel.booklore.service.BooksService;
 import jakarta.validation.Valid;
@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.List;
 
 @RequestMapping("/v1/book")
@@ -30,7 +29,6 @@ public class BookController {
 
     @GetMapping
     public ResponseEntity<List<BookDTO>> getBooks() throws InterruptedException {
-        Thread.sleep(Duration.ofSeconds(3));
         return ResponseEntity.ok(booksService.getBooks());
     }
 

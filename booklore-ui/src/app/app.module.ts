@@ -37,6 +37,7 @@ import {RouteReuseStrategy} from '@angular/router';
 import {CustomReuseStrategy} from './custom-reuse-strategy';
 import {MenuModule} from 'primeng/menu';
 import {IconPickerComponent} from './book/component/icon-picker/icon-picker.component';
+import {ProgressSpinnerModule} from 'primeng/progressspinner';
 
 @NgModule({
   declarations: [
@@ -73,6 +74,7 @@ import {IconPickerComponent} from './book/component/icon-picker/icon-picker.comp
     SpeedDialModule,
     MenuModule,
     IconPickerComponent,
+    ProgressSpinnerModule,
   ],
   providers: [
     DialogService,

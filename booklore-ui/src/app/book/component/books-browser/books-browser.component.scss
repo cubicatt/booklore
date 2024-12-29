@@ -25,8 +25,21 @@
   align-items: center;
 }
 
+
 .virtual-scroller-container {
   position: relative;
+}
+
+.no-books-text {
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.no-books-container {
+  padding-top: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .virtual-scroller {
@@ -72,3 +85,4 @@
   justify-content: space-between;
   gap: 1.5rem;
 }
+

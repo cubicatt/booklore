@@ -14,6 +14,7 @@ import {SortService} from '../../service/sort.service';
 import {SortOptionsHelper} from '../../service/sort-options.helper';
 import {SortOption} from '../../model/sort.model';
 import {BookState} from '../../model/state/book-state.model';
+import {Book} from '../../model/book.model';
 
 @Component({
   selector: 'app-books-browser',
@@ -56,7 +57,7 @@ export class BooksBrowserComponent implements OnInit {
     const routeParam$ = this.getRouteParams();
 
     this.bookState$ = routeParam$.pipe(
-      switchMap(({libraryId, shelfId}) => this.fetchBooks(libraryId, shelfId)),
+      switchMap(({libraryId, shelfId}) => this.fetchBooksByEntity(libraryId, shelfId)),
     );
 
     this.entity$ = routeParam$.pipe(
@@ -90,19 +91,6 @@ export class BooksBrowserComponent implements OnInit {
     );
   }
 
-  private fetchBooks(libraryId: number, shelfId: number): Observable<BookState> {
-    if (libraryId) {
-      return this.fetchBooksByLibrary(libraryId);
-    } else if (shelfId) {
-      return this.fetchBooksByShelf(shelfId);
-    }
-    return of({
-      books: [],
-      loaded: false,
-      error: null
-    });
-  }
-
   private fetchEntity(libraryId: number, shelfId: number): Observable<Library | Shelf | null> {
     if (libraryId) {
       this.entityType = 'Library';
@@ -116,67 +104,53 @@ export class BooksBrowserComponent implements OnInit {
     return of(null);
   }
 
+  private fetchBooksByEntity(libraryId: number, shelfId: number): Observable<BookState> {
+    if (libraryId) {
+      return this.fetchBooksByLibrary(libraryId);
+    } else if (shelfId) {
+      return this.fetchBooksByShelf(shelfId);
+    }
+    return of({
+      books: null,
+      loaded: true,
+      error: 'Invalid entity type'
+    });
+  }
+
   private fetchBooksByLibrary(libraryId: number): Observable<BookState> {
-    return this.bookService.bookState$.pipe(
-      map(bookState => {
-        if (bookState.books) {
-          const filteredBooks = bookState.books.filter(book => book.libraryId === libraryId);
-          return this.sortService.applySort(filteredBooks, this.selectedSort);
-        } else {
-          return [];
-        }
-      }),
-      switchMap(books =>
-        this.bookTitle$.pipe(
-          map(title => {
-            if (title && title.trim() !== '') {
-              return books.filter(book => book.metadata?.title?.toLowerCase().includes(title.toLowerCase()));
-            }
-            return books;
-          })
-        )
-      ),
-      map(filteredBooks => {
-        return {
-          books: filteredBooks,
-          loaded: true,
-          error: null
-        } as BookState;
-      })
-    );
+    return this.fetchBooks(book => book.libraryId === libraryId);
   }
 
   private fetchBooksByShelf(shelfId: number): Observable<BookState> {
+    return this.fetchBooks(book => {
+      return book.shelves?.some(shelf => shelf.id === shelfId) ?? false;
+    });
+  }
+
+  private fetchBooks(bookFilter: (book: Book) => boolean): Observable<BookState> {
     return this.bookService.bookState$.pipe(
       map(bookState => {
-        if (bookState.books) {
-          const filteredBooks = bookState.books.filter(book =>
-            book.shelves?.some(shelf => shelf.id === shelfId)
-          );
-          return this.sortService.applySort(filteredBooks, this.selectedSort);
+        if (bookState.loaded && !bookState.error) {
+          const filteredBooks = bookState.books!.filter(book => {
+            return bookFilter(book);
+          });
+          const sortedBooks = this.sortService.applySort(filteredBooks, this.selectedSort);
+          return { ...bookState, books: sortedBooks };
         } else {
-          return [];
+          return bookState;
         }
       }),
-      switchMap(books =>
+      switchMap(bookState =>
         this.bookTitle$.pipe(
           map(title => {
             if (title && title.trim() !== '') {
-              return books.filter(book =>
-                book.metadata?.title?.toLowerCase().includes(title.toLowerCase())
-              );
+              const filteredBooks = bookState.books?.filter(book => book.metadata?.title?.toLowerCase().includes(title.toLowerCase())) || null;
+              return { ...bookState, books: filteredBooks };
             }
-            return books;
+            return bookState;
           })
         )
-      ),
-      map(filteredBooks => {
-        return {
-          books: filteredBooks,
-          loaded: true,
-          error: null
-        } as BookState;
-      })
+      )
     );
   }
 
@@ -234,7 +208,7 @@ export class BooksBrowserComponent implements OnInit {
     this.selectedSort = sortOption;
     const routeParam$ = this.getRouteParams();
     this.bookState$ = routeParam$.pipe(
-      switchMap(({libraryId, shelfId}) => this.fetchBooks(libraryId, shelfId))
+      switchMap(({libraryId, shelfId}) => this.fetchBooksByEntity(libraryId, shelfId))
     );
     if (this.entityType === 'Library') {
       this.libraryService.updateSort(this.entity?.id!, sortOption).subscribe();

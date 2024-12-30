@@ -67,17 +67,17 @@ export class BookBrowserComponent implements OnInit {
       this.bookState$ = this.fetchAllBooks();
     } else {
 
-      const routeParam$ = this.getEntityInfoFromRoute();
+      const routeEntityInfo$ = this.getEntityInfoFromRoute();
 
-      this.bookState$ = routeParam$.pipe(
+      this.bookState$ = routeEntityInfo$.pipe(
         switchMap(({entityId, entityType}) => this.fetchBooksByEntity(entityId, entityType)),
       );
 
-      this.entity$ = routeParam$.pipe(
+      this.entity$ = routeEntityInfo$.pipe(
         switchMap(({entityId, entityType}) => this.fetchEntity(entityId, entityType))
       );
 
-      this.entityType$ = routeParam$.pipe(
+      this.entityType$ = routeEntityInfo$.pipe(
         map(({ entityType }) => entityType)
       );
 
@@ -143,25 +143,8 @@ export class BookBrowserComponent implements OnInit {
 
   private fetchAllBooks(): Observable<BookState> {
     return this.bookService.bookState$.pipe(
-      map(bookState => {
-        if (bookState.loaded && !bookState.error) {
-          const sortedBooks = this.sortService.applySort(bookState.books || [], this.selectedSort);
-          return {...bookState, books: sortedBooks};
-        } else {
-          return bookState;
-        }
-      }),
-      switchMap(bookState =>
-        this.bookTitle$.pipe(
-          map(title => {
-            if (title && title.trim() !== '') {
-              const filteredBooks = bookState.books?.filter(book => book.metadata?.title?.toLowerCase().includes(title.toLowerCase())) || null;
-              return {...bookState, books: filteredBooks};
-            }
-            return bookState;
-          })
-        )
-      )
+      map(bookState => this.processBookState(bookState)),
+      switchMap(bookState => this.filterBooksByTitle(bookState))
     );
   }
 
@@ -169,26 +152,35 @@ export class BookBrowserComponent implements OnInit {
     return this.bookService.bookState$.pipe(
       map(bookState => {
         if (bookState.loaded && !bookState.error) {
-          const filteredBooks = bookState.books!.filter(book => {
-            return bookFilter(book);
-          });
+          const filteredBooks = bookState.books?.filter(bookFilter) || [];
           const sortedBooks = this.sortService.applySort(filteredBooks, this.selectedSort);
-          return {...bookState, books: sortedBooks};
-        } else {
-          return bookState;
+          return { ...bookState, books: sortedBooks };
         }
+        return bookState;
       }),
-      switchMap(bookState =>
-        this.bookTitle$.pipe(
-          map(title => {
-            if (title && title.trim() !== '') {
-              const filteredBooks = bookState.books?.filter(book => book.metadata?.title?.toLowerCase().includes(title.toLowerCase())) || null;
-              return {...bookState, books: filteredBooks};
-            }
-            return bookState;
-          })
-        )
-      )
+      switchMap(bookState => this.filterBooksByTitle(bookState))
+    );
+  }
+
+  private processBookState(bookState: BookState): BookState {
+    if (bookState.loaded && !bookState.error) {
+      const sortedBooks = this.sortService.applySort(bookState.books || [], this.selectedSort);
+      return { ...bookState, books: sortedBooks };
+    }
+    return bookState;
+  }
+
+  private filterBooksByTitle(bookState: BookState): Observable<BookState> {
+    return this.bookTitle$.pipe(
+      map(title => {
+        if (title && title.trim() !== '') {
+          const filteredBooks = bookState.books?.filter(book =>
+            book.metadata?.title?.toLowerCase().includes(title.toLowerCase())
+          ) || null;
+          return { ...bookState, books: filteredBooks };
+        }
+        return bookState;
+      })
     );
   }
 

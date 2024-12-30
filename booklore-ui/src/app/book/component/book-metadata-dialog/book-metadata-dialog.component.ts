@@ -18,7 +18,7 @@ import {BookService} from '../../service/book.service';
   ],
   styleUrls: ['./books-metadata-dialog.component.scss']
 })
-export class BooksMetadataDialogComponent implements OnInit {
+export class BookMetadataDialogComponent implements OnInit {
   bookMetadataList: BookMetadata[] = [];
   isLoading = true;
   errorMessage: string | null = null;

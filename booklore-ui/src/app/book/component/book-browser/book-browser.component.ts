@@ -22,7 +22,7 @@ import {Book} from '../../model/book.model';
   templateUrl: './books-browser.component.html',
   styleUrls: ['./books-browser.component.scss']
 })
-export class BooksBrowserComponent implements OnInit {
+export class BookBrowserComponent implements OnInit {
   bookState$: Observable<BookState> | undefined;
   entity$: Observable<Library | Shelf | null> | undefined;
   entityType$: Observable<string | null> | undefined;

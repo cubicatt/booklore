@@ -12,7 +12,7 @@ import {InputSwitchModule} from 'primeng/inputswitch';
 import {RadioButtonModule} from 'primeng/radiobutton';
 import {SelectButton} from 'primeng/selectbutton';
 import {ToggleSwitchModule} from 'primeng/toggleswitch';
-import {AppConfigService} from '../book/service/app-config.service';
+import {AppConfigService} from '../../service/app-config.service';
 
 interface ColorPalette {
   [key: string]: string;

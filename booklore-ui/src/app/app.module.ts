@@ -30,7 +30,7 @@ import {ShelfAssignerComponent} from './book/component/shelf-assigner/shelf-assi
 import {CheckboxModule} from 'primeng/checkbox';
 import {DividerModule} from 'primeng/divider';
 import {DialogModule} from 'primeng/dialog';
-import {BooksBrowserComponent} from './book/component/books-browser/books-browser.component';
+import {BookBrowserComponent} from './book/component/book-browser/book-browser.component';
 import {BookCardComponent} from './book/component/book-card/book-card.component';
 import {SpeedDialModule} from 'primeng/speeddial';
 import {RouteReuseStrategy} from '@angular/router';
@@ -48,7 +48,7 @@ import Aura from '@primeng/themes/aura';
     DirectoryPickerComponent,
     LibraryCreatorComponent,
     ShelfAssignerComponent,
-    BooksBrowserComponent
+    BookBrowserComponent
   ],
   imports: [
     BrowserModule,

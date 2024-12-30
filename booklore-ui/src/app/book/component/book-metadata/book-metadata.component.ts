@@ -3,7 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {Book} from '../../model/book.model';
 import {Button} from 'primeng/button';
 import {NgForOf, NgIf} from '@angular/common';
-import {BooksMetadataDialogComponent} from '../books-metadata-dialog/books-metadata-dialog.component';
+import {BookMetadataDialogComponent} from '../book-metadata-dialog/book-metadata-dialog.component';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Subscription} from 'rxjs';
 import {TagModule} from 'primeng/tag';
@@ -76,7 +76,7 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
   }
 
   openEditDialog(bookId: number | undefined, libraryId: number | undefined) {
-    this.dialogRef = this.dialogService.open(BooksMetadataDialogComponent, {
+    this.dialogRef = this.dialogService.open(BookMetadataDialogComponent, {
       header: 'Metadata: Google Books',
       modal: true,
       width: '65%',

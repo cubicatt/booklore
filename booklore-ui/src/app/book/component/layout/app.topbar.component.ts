@@ -13,7 +13,7 @@ import {NgIf} from '@angular/common';
 import {EventService} from '../../service/event.service';
 import {LogNotification} from '../../model/log-notification.model';
 import {Button} from 'primeng/button';
-import {AppConfiguratorComponent} from '../../../configurator/configurator.component';
+import {AppConfiguratorComponent} from '../configurator/configurator.component';
 import {StyleClass} from 'primeng/styleclass';
 
 @Component({

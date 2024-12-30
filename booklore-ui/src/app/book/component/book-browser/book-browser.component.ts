@@ -17,10 +17,10 @@ import {BookState} from '../../model/state/book-state.model';
 import {Book} from '../../model/book.model';
 
 @Component({
-  selector: 'app-books-browser',
+  selector: 'app-book-browser',
   standalone: false,
-  templateUrl: './books-browser.component.html',
-  styleUrls: ['./books-browser.component.scss']
+  templateUrl: './book-browser.component.html',
+  styleUrls: ['./book-browser.component.scss']
 })
 export class BookBrowserComponent implements OnInit {
   bookState$: Observable<BookState> | undefined;

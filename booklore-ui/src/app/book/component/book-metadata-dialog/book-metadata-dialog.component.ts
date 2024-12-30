@@ -1,22 +1,22 @@
 import {Component, OnInit} from '@angular/core';
 import {BookMetadata} from '../../model/book.model';
-import {NgForOf, NgIf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Router} from '@angular/router';
-import {Button} from 'primeng/button';
 import {BookService} from '../../service/book.service';
+import {Button} from 'primeng/button';
+import {NgForOf, NgIf} from '@angular/common';
 
 @Component({
-  selector: 'app-books-metadata-dialog',
-  templateUrl: './books-metadata-dialog.component.html',
+  selector: 'app-book-metadata-dialog',
+  templateUrl: './book-metadata-dialog.component.html',
+  styleUrls: ['./book-metadata-dialog.component.scss'],
   imports: [
-    NgIf,
-    NgForOf,
     FormsModule,
-    Button
-  ],
-  styleUrls: ['./books-metadata-dialog.component.scss']
+    Button,
+    NgIf,
+    NgForOf
+  ]
 })
 export class BookMetadataDialogComponent implements OnInit {
   bookMetadataList: BookMetadata[] = [];

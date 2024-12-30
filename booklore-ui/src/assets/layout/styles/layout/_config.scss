@@ -86,9 +86,7 @@
         border-radius: 50%;
         padding: 0;
         cursor: pointer;
-        outline-color: transparent;
-        outline-width: 2px;
-        outline-style: solid;
+        outline: transparent solid 2px;
         outline-offset: 1px;
 
         &.active-color {

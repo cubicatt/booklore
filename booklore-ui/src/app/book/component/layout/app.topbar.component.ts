@@ -15,6 +15,7 @@ import {LogNotification} from '../../model/log-notification.model';
 import {Button} from 'primeng/button';
 import {AppConfiguratorComponent} from '../configurator/configurator.component';
 import {StyleClass} from 'primeng/styleclass';
+import {Divider} from 'primeng/divider';
 
 @Component({
   selector: 'app-topbar',
@@ -30,7 +31,8 @@ import {StyleClass} from 'primeng/styleclass';
     Button,
     AppConfiguratorComponent,
     StyleClass,
-    NgClass
+    NgClass,
+    Divider
   ],
 })
 export class AppTopBarComponent implements OnDestroy {

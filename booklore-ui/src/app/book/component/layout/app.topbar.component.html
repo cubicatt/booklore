@@ -19,8 +19,9 @@
   <div class="topbar-right-items">
     <app-search></app-search>
     <ul class="topbar-items">
+      <p-divider layout="vertical" />
       <li>
-        <i class="topbar-item pi pi-wave-pulse p-link layout-topbar-menu-button layout-topbar-button"
+        <i class="pi pi-wave-pulse" style="font-size: 1.5rem"
            (click)="toggleEventDisplay()"
            (mouseenter)="onMouseEnter()"
            (mouseleave)="onMouseLeave()"
@@ -31,6 +32,7 @@
           <p>{{ latestEvent.message }}</p>
         </div>
       </li>
+      <p-divider layout="vertical" />
       <li>
         <a class="topbar-item">
           <i class="pi pi-plus-circle text-surface-700 dark:text-surface-100" (click)="openLibraryCreatorDialog()"

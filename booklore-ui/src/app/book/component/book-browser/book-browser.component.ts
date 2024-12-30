@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
+import {ActivatedRoute} from '@angular/router';
+import {MenuItem, MessageService} from 'primeng/api';
 import {LibraryService} from '../../service/library.service';
 import {BookService} from '../../service/book.service';
 import {map, switchMap} from 'rxjs/operators';
@@ -43,7 +43,7 @@ export class BookBrowserComponent implements OnInit {
   selectedSort: SortOption | null = null;
   sortOptions: SortOption[] = [];
   isDrawerVisible: boolean = false;
-  ref: DynamicDialogRef | undefined;
+  dynamicDialogRef: DynamicDialogRef | undefined;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -62,27 +62,23 @@ export class BookBrowserComponent implements OnInit {
     const isAllBooksRoute = this.activatedRoute.snapshot.routeConfig?.path === 'all-books';
 
     if (isAllBooksRoute) {
-      this.entityType$ = this.activatedRoute.url.pipe(
-        map(segments => {
-          return EntityType.ALL_BOOKS;
-        })
-      );
       this.entityType = EntityType.ALL_BOOKS;
+      this.entityType$ = of(EntityType.ALL_BOOKS);
       this.bookState$ = this.fetchAllBooks();
     } else {
 
-      const routeParam$ = this.getRouteParams();
+      const routeParam$ = this.getEntityInfoFromRoute();
 
       this.bookState$ = routeParam$.pipe(
-        switchMap(({libraryId, shelfId}) => this.fetchBooksByEntity(libraryId, shelfId)),
+        switchMap(({entityId, entityType}) => this.fetchBooksByEntity(entityId, entityType)),
       );
 
       this.entity$ = routeParam$.pipe(
-        switchMap(({libraryId, shelfId}) => this.fetchEntity(libraryId, shelfId))
+        switchMap(({entityId, entityType}) => this.fetchEntity(entityId, entityType))
       );
 
       this.entityType$ = routeParam$.pipe(
-        map(({libraryId, shelfId}) => libraryId ? EntityType.LIBRARY : shelfId ? EntityType.SHELF : EntityType.ALL_BOOKS)
+        map(({ entityType }) => entityType)
       );
 
       this.entity$.subscribe(entity => {
@@ -98,40 +94,41 @@ export class BookBrowserComponent implements OnInit {
 
   }
 
-  private getRouteParams(): Observable<{ libraryId: number; shelfId: number }> {
+  private getEntityInfoFromRoute(): Observable<{ entityId: number; entityType: EntityType }> {
     return this.activatedRoute.paramMap.pipe(
       map(params => {
-        const libraryId = Number(params.get('libraryId'));
-        const shelfId = Number(params.get('shelfId'));
-        return {libraryId, shelfId};
+        const libraryId = Number(params.get('libraryId') || NaN);
+        const shelfId = Number(params.get('shelfId') || NaN);
+        if (!isNaN(libraryId)) {
+          return { entityId: libraryId, entityType: EntityType.LIBRARY };
+        } else if (!isNaN(shelfId)) {
+          return { entityId: shelfId, entityType: EntityType.SHELF };
+        } else {
+          return { entityId: NaN, entityType: EntityType.ALL_BOOKS };
+        }
       })
     );
   }
 
-  private fetchEntity(libraryId: number, shelfId: number): Observable<Library | Shelf | null> {
-    if (libraryId) {
-      this.entityType = EntityType.LIBRARY;
+  private fetchEntity(entityId: number, entityType: EntityType): Observable<Library | Shelf | null> {
+    if (entityType == EntityType.LIBRARY) {
       this.libraryShelfMenuService.initializeLibraryMenuItems(this.entity);
-      return this.fetchLibrary(libraryId);
-    } else if (shelfId) {
-      this.entityType = EntityType.SHELF;
+      return this.fetchLibrary(entityId);
+    } else if (EntityType.SHELF) {
       this.libraryShelfMenuService.initializeLibraryMenuItems(this.entity);
-      return this.fetchShelf(shelfId);
+      return this.fetchShelf(entityId);
     }
     return of(null);
   }
 
-  private fetchBooksByEntity(libraryId: number, shelfId: number): Observable<BookState> {
-    if (libraryId) {
-      return this.fetchBooksByLibrary(libraryId);
-    } else if (shelfId) {
-      return this.fetchBooksByShelf(shelfId);
+  private fetchBooksByEntity(entityId: number, entityType: EntityType): Observable<BookState> {
+    if (entityType == EntityType.LIBRARY) {
+      return this.fetchBooksByLibrary(entityId);
+    } else if (entityType == EntityType.SHELF) {
+      return this.fetchBooksByShelf(entityId);
+    } else {
+      return this.fetchAllBooks();
     }
-    return of({
-      books: null,
-      loaded: true,
-      error: 'Invalid entity type'
-    });
   }
 
   private fetchBooksByLibrary(libraryId: number): Observable<BookState> {
@@ -250,9 +247,9 @@ export class BookBrowserComponent implements OnInit {
     if (this.entityType === EntityType.ALL_BOOKS) {
       this.bookState$ = this.fetchAllBooks();
     } else {
-      const routeParam$ = this.getRouteParams();
+      const routeParam$ = this.getEntityInfoFromRoute();
       this.bookState$ = routeParam$.pipe(
-        switchMap(({libraryId, shelfId}) => this.fetchBooksByEntity(libraryId, shelfId))
+        switchMap(({entityId, entityType}) => this.fetchBooksByEntity(entityId, entityType))
       );
     }
     if (this.entityType === EntityType.LIBRARY) {
@@ -276,7 +273,7 @@ export class BookBrowserComponent implements OnInit {
   }
 
   openShelfAssigner() {
-    this.ref = this.dialogService.open(ShelfAssignerComponent, {
+    this.dynamicDialogRef = this.dialogService.open(ShelfAssignerComponent, {
       header: `Update Books Shelves`,
       modal: true,
       closable: true,
@@ -293,7 +290,7 @@ export class BookBrowserComponent implements OnInit {
         bookIds: this.selectedBooks
       },
     });
-    this.ref.onClose.subscribe(() => {
+    this.dynamicDialogRef.onClose.subscribe(() => {
       this.selectedBooks.clear();
     });
   }

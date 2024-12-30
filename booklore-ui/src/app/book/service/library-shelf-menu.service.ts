@@ -3,6 +3,8 @@ import { MenuItem, ConfirmationService, MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
 import {LibraryService} from './library.service';
 import {ShelfService} from './shelf.service';
+import {Library} from '../model/library.model';
+import {Shelf} from '../model/shelf.model';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +18,7 @@ export class LibraryShelfMenuService {
     private router: Router
   ) {}
 
-  initializeLibraryMenuItems(entity: any): MenuItem[] {
+  initializeLibraryMenuItems(entity: Library | Shelf | null): MenuItem[] {
     return [
       {
         label: 'Options',

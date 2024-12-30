@@ -78,7 +78,7 @@ export class BookBrowserComponent implements OnInit {
       this.bookTitle = '';
     });
 
-    this.setupMenu();
+    //this.setupMenu();
   }
 
   private getRouteParams(): Observable<{ libraryId: number; shelfId: number }> {
@@ -230,7 +230,30 @@ export class BookBrowserComponent implements OnInit {
     this.bookTitle$.next(newTitle);
   }
 
-  setupMenu(): void {
+  openShelfAssigner() {
+    this.ref = this.dialogService.open(ShelfAssignerComponent, {
+      header: `Update Books Shelves`,
+      modal: true,
+      closable: true,
+      width: '30%',
+      height: '60%',
+      contentStyle: {overflow: 'auto'},
+      baseZIndex: 10,
+      style: {
+        position: 'absolute',
+        top: '15%',
+      },
+      data: {
+        isMultiBooks: true,
+        bookIds: this.selectedBooks
+      },
+    });
+    this.ref.onClose.subscribe(() => {
+      this.selectedBooks.clear();
+    });
+  }
+
+  /*setupMenu(): void {
     this.multiSelectItems = [
       {
         label: 'Options',
@@ -239,27 +262,13 @@ export class BookBrowserComponent implements OnInit {
             label: 'Edit shelf',
             icon: 'pi pi-folder',
             command: () => {
-              this.ref = this.dialogService.open(ShelfAssignerComponent, {
-                header: `Update Books Shelves`,
-                modal: true,
-                width: '30%',
-                height: '70%',
-                contentStyle: {overflow: 'auto'},
-                baseZIndex: 10,
-                data: {
-                  isMultiBooks: true,
-                  bookIds: this.selectedBooks
-                },
-              });
-              this.ref.onClose.subscribe(() => {
-                this.selectedBooks.clear();
-              });
+
             }
           }
         ],
       },
     ];
-  }
+  }*/
 
   private initializeLibraryMenuItems(): void {
     this.entityOptions = [

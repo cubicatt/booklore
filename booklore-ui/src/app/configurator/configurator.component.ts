@@ -60,18 +60,15 @@ const presets = {
               [title]="surface.name"
               (click)="updateColors($event, 'surface', surface)"
               [ngClass]="{ 'active-color': selectedSurfaceColor() ? selectedSurfaceColor() === surface.name : configService.appState().darkTheme ? surface.name === 'zinc' : surface.name === 'slate' }"
-              [style]="{
-                                'background-color': surface.name === 'noir' ? 'var(--text-color)' : surface.palette['500']
-                            }"
-            ></button>
+              [style]="{'background-color': surface.name === 'noir' ? 'var(--text-color)' : surface.palette['500'] }">
+            </button>
           }
         </div>
       </div>
 
       <div class="config-panel-settings">
         <span class="config-panel-label">Presets</span>
-        <p-selectbutton [options]="presets" [ngModel]="selectedPreset()" (ngModelChange)="onPresetChange($event)"
-                        [allowEmpty]="false" size="small"/>
+        <p-selectbutton [options]="presets" [ngModel]="selectedPreset()" (ngModelChange)="onPresetChange($event)" [allowEmpty]="false" size="small"/>
       </div>
       <div class="flex">
         <div class="flex-1">

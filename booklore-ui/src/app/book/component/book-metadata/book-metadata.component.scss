@@ -2,7 +2,7 @@
   height: calc(100vh - 10rem);
   overflow-y: auto;
   transition: transform 0.2s, left 0.2s;
-  background-color: var(--surface-card);
+  background-color: var(--card-background);
   border-radius: 12px;
   padding: 1.5rem 2rem;
 }

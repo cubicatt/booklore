@@ -82,7 +82,7 @@ export class AppConfigService {
       preset: 'Aura',
       primary: 'noir',
       surface: null,
-      darkTheme: false,
+      darkTheme: true,
       menuActive: false,
       designerKey: 'primeng-designer-theme',
       RTL: false

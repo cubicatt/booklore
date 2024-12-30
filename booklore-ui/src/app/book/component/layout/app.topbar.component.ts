@@ -4,7 +4,6 @@ import {LayoutService} from './service/app.layout.service';
 import {RouterLink} from '@angular/router';
 import {DialogService as PrimeDialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {LibraryCreatorComponent} from '../library-creator/library-creator.component';
-import {ThemeSwitcherComponent} from '../theme-switcher/theme-switcher.component';
 import {TooltipModule} from 'primeng/tooltip';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
@@ -26,7 +25,6 @@ import {AppConfiguratorComponent} from '../../../configurator/configurator.compo
     FormsModule,
     InputTextModule,
     SearchComponent,
-    ThemeSwitcherComponent,
     NgIf,
     Button,
     AppConfiguratorComponent

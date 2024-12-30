@@ -62,6 +62,7 @@ export class BookBrowserComponent implements OnInit {
           return fullPath === 'all-books' ? 'all-books' : null;
         })
       );
+      this.entityType = 'all-books';
       this.bookState$ = this.fetchAllBooks();
     } else {
 
@@ -241,10 +242,14 @@ export class BookBrowserComponent implements OnInit {
 
   updateSortOption(sortOption: SortOption): void {
     this.selectedSort = sortOption;
-    const routeParam$ = this.getRouteParams();
-    this.bookState$ = routeParam$.pipe(
-      switchMap(({libraryId, shelfId}) => this.fetchBooksByEntity(libraryId, shelfId))
-    );
+    if (this.entityType === 'all-books') {
+      this.bookState$ = this.fetchAllBooks();
+    } else {
+      const routeParam$ = this.getRouteParams();
+      this.bookState$ = routeParam$.pipe(
+        switchMap(({libraryId, shelfId}) => this.fetchBooksByEntity(libraryId, shelfId))
+      );
+    }
     if (this.entityType === 'Library') {
       this.libraryService.updateSort(this.entity?.id!, sortOption).subscribe();
     } else if (this.entityType === 'Shelf') {

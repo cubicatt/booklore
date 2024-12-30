@@ -17,16 +17,18 @@
 .book-title-container {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .book-title {
+  flex-grow: 1;
   font-size: 0.85rem;
   color: var(--text-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
-  padding: 6px;
+  padding: 0 6px;
 }
 
 .book-cover {

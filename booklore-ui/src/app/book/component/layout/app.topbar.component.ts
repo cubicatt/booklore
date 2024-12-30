@@ -9,7 +9,7 @@ import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {SearchComponent} from '../search/search.component';
 import {FileUploadComponent} from '../file-upload/file-upload.component';
-import {NgIf} from '@angular/common';
+import {NgClass, NgIf} from '@angular/common';
 import {EventService} from '../../service/event.service';
 import {LogNotification} from '../../model/log-notification.model';
 import {Button} from 'primeng/button';
@@ -29,7 +29,8 @@ import {StyleClass} from 'primeng/styleclass';
     NgIf,
     Button,
     AppConfiguratorComponent,
-    StyleClass
+    StyleClass,
+    NgClass
   ],
 })
 export class AppTopBarComponent implements OnDestroy {
@@ -52,6 +53,13 @@ export class AppTopBarComponent implements OnDestroy {
     this.eventService.eventHighlight$.subscribe(highlight => {
       this.eventHighlight = highlight;
     });
+  }
+
+  isMenuVisible: boolean = true;
+
+  toggleMenu() {
+    this.isMenuVisible = !this.isMenuVisible;
+    this.layoutService.onMenuToggle();
   }
 
   onMouseEnter() {

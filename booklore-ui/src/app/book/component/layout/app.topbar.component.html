@@ -6,9 +6,17 @@
     <span>BookLore</span>
   </a>
 
-  <p-button #menubutton icon="pi pi-arrow-left" [rounded]="true" [outlined]="true" (click)="layoutService.onMenuToggle()"></p-button>
+  <p-button
+    #menubutton
+    icon="pi pi-arrow-left"
+    [rounded]="true"
+    [outlined]="true"
+    (click)="toggleMenu()"
+    [ngClass]="{ 'rotate-right': !isMenuVisible, 'rotate-left': isMenuVisible }"
+  >
+  </p-button>
 
-  <div class="xxx">
+  <div class="topbar-right-items">
     <app-search></app-search>
     <ul class="topbar-items">
       <li>

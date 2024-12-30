@@ -316,8 +316,18 @@
   }
 }
 
-.xxx {
+.topbar-right-items {
   display: flex;
   width: 100%;
   justify-content: space-between;
+}
+
+.rotate-left {
+  transform: rotate(0deg);
+  transition: transform 0.3s ease-in-out;
+}
+
+.rotate-right {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease-in-out;
 }

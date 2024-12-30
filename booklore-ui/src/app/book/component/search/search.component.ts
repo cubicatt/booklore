@@ -5,7 +5,7 @@ import {Book} from '../../model/book.model';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {NgForOf, NgIf} from '@angular/common';
-import {ButtonDirective} from 'primeng/button';
+import {Button} from 'primeng/button';
 import {Router} from '@angular/router';
 import {BookService} from '../../service/book.service';
 
@@ -17,7 +17,7 @@ import {BookService} from '../../service/book.service';
     InputTextModule,
     NgForOf,
     NgIf,
-    ButtonDirective
+    Button
   ],
   styleUrls: ['./search.component.scss']
 })

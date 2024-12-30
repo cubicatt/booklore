@@ -9,11 +9,12 @@ import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {SearchComponent} from '../search/search.component';
 import {FileUploadComponent} from '../file-upload/file-upload.component';
-import {NgClass, NgIf} from '@angular/common';
+import {NgIf} from '@angular/common';
 import {EventService} from '../../service/event.service';
 import {LogNotification} from '../../model/log-notification.model';
 import {Button} from 'primeng/button';
 import {AppConfiguratorComponent} from '../../../configurator/configurator.component';
+import {StyleClass} from 'primeng/styleclass';
 
 @Component({
   selector: 'app-topbar',
@@ -27,7 +28,8 @@ import {AppConfiguratorComponent} from '../../../configurator/configurator.compo
     SearchComponent,
     NgIf,
     Button,
-    AppConfiguratorComponent
+    AppConfiguratorComponent,
+    StyleClass
   ],
 })
 export class AppTopBarComponent implements OnDestroy {

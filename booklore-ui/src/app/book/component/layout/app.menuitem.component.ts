@@ -35,7 +35,7 @@ import {Ripple} from 'primeng/ripple';
          [queryParams]="item.queryParams"
          [attr.target]="item.target" tabindex="0" pRipple>
         <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
-        <span class="layout-menuitem-text flex justify-content-between w-full">
+        <span class="layout-menuitem-text w-full">
           {{ item.label }}
           <span *ngIf="item.bookCount$ | async as bookCount">
             {{ bookCount }}

@@ -1,42 +1,47 @@
 <div class="layout-topbar">
+
   <a class="layout-topbar-logo" routerLink="">
-    <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="logo">
+    <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg"
+         alt="logo">
     <span>BookLore</span>
   </a>
 
-  <button #menubutton class="p-link layout-menu-button layout-topbar-button" (click)="layoutService.onMenuToggle()">
-    <i class="pi pi-bars"></i>
-  </button>
+  <p-button #menubutton icon="pi pi-arrow-left" [rounded]="true" [outlined]="true" (click)="layoutService.onMenuToggle()"></p-button>
 
-  <div>
+  <div class="xxx">
     <app-search></app-search>
+    <ul class="topbar-items">
+      <li>
+        <i class="topbar-item pi pi-wave-pulse p-link layout-topbar-menu-button layout-topbar-button"
+           (click)="toggleEventDisplay()"
+           (mouseenter)="onMouseEnter()"
+           (mouseleave)="onMouseLeave()"
+           [class.pulsating]="eventHighlight"
+           [class.highlight]="eventHighlight"></i>
+        <div *ngIf="showEvents" class="live-event-container" (mouseleave)="onMouseLeave()">
+          <p *ngIf="latestEvent.timestamp">{{ latestEvent.timestamp }}</p>
+          <p>{{ latestEvent.message }}</p>
+        </div>
+      </li>
+      <li>
+        <a class="topbar-item">
+          <i class="pi pi-plus-circle text-surface-700 dark:text-surface-100" (click)="openLibraryCreatorDialog()"
+             pTooltip="Create New Library" tooltipPosition="top"></i>
+        </a>
+      </li>
+      <li>
+        <a class="topbar-item">
+          <i class="pi pi-upload text-surface-700 dark:text-surface-100" (click)="openFileUploadDialog()"
+             pTooltip="Upload book" tooltipPosition="top"></i>
+        </a>
+      </li>
+      <li class="relative">
+        <button type="button" class="topbar-item config-item" enterActiveClass="animate-scalein" enterFromClass="hidden" leaveActiveClass="animate-fadeout" leaveToClass="hidden" pStyleClass="@next" [hideOnOutsideClick]="true">
+          <i class="pi pi-palette"></i>
+        </button>
+        <app-configurator></app-configurator>
+      </li>
+    </ul>
   </div>
 
-  <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button" (click)="layoutService.showProfileSidebar()">
-    <i class="pi pi-ellipsis-v"></i>
-  </button>
-
-  <div #topbarmenu class="layout-topbar-menu">
-    <button class="p-link layout-topbar-button"
-            (click)="toggleEventDisplay()"
-            (mouseenter)="onMouseEnter()"
-            (mouseleave)="onMouseLeave()"
-            [class.pulsating]="eventHighlight"
-            [class.highlight]="eventHighlight">
-      <i class="pi pi-wave-pulse"></i>
-    </button>
-
-    <div *ngIf="showEvents" class="live-event-container" (mouseleave)="onMouseLeave()">
-      <p *ngIf="latestEvent.timestamp">{{ latestEvent.timestamp }}</p>
-      <p>{{ latestEvent.message }}</p>
-    </div>
-    <button class="p-link layout-menu-button layout-topbar-button" (click)="openLibraryCreatorDialog()" pTooltip="Create New Library" tooltipPosition="top">
-      <i class="pi pi-plus-circle"></i>
-    </button>
-    <p-button [rounded]="true" [outlined]="true" severity="help" (click)="openFileUploadDialog()">
-      <i class="pi pi-upload"></i>
-    </p-button>
-    <p-button [rounded]="true" [outlined]="true" severity="help"> </p-button>
-    <app-configurator></app-configurator>
-  </div>
 </div>

@@ -39,7 +39,7 @@
     </div>
     <div class="book-card-container" *ngIf="(bookState$ | async)?.books as books">
       <virtual-scroller *ngIf="books.length > 0" class="virtual-scroller" #scroll [items]="books">
-        <div class="grid" #container>
+        <div class="grid grid-cols-12 gap-4" #container>
           <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
             <app-book-card
               [book]="book"

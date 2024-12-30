@@ -1,1 +1,46 @@
-<p>configurator works!</p>
+<div class="config-panel-content">
+
+  <div class="config-panel-colors">
+    <span class="config-panel-label">Primary</span>
+    <div>
+      @for (primaryColor of primaryColors(); track primaryColor.name) {
+        <button
+          type="button"
+          [title]="primaryColor.name"
+          (click)="updateColors($event, 'primary', primaryColor)"
+          [ngClass]="{ 'active-color': primaryColor.name === selectedPrimaryColor() }"
+          [style]="{ 'background-color': primaryColor.name === 'noir'  ? 'var(--text-color)' : primaryColor.palette?.['500'] || 'transparent' }"
+        ></button>
+      }
+    </div>
+  </div>
+
+  <div class="config-panel-colors">
+    <span class="config-panel-label">Surface</span>
+    <div>
+      @for (surface of surfaces; track surface.name) {
+        <button
+          type="button"
+          [title]="surface.name"
+          (click)="updateColors($event, 'surface', surface)"
+          [ngClass]="{ 'active-color': selectedSurfaceColor() ? selectedSurfaceColor() === surface.name : surface.name === 'zinc' }"
+          [style]="{'background-color': surface.name === 'noir' ? 'var(--text-color)' : surface.palette['500'] }">
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="config-panel-settings">
+    <span class="config-panel-label">Presets</span>
+    <p-selectbutton [options]="presets" [ngModel]="selectedPreset()" (ngModelChange)="onPresetChange($event)" [allowEmpty]="false" size="small"/>
+  </div>
+  <div class="flex">
+    <div class="flex-1">
+      <div class="config-panel-settings">
+        <span class="config-panel-label">Ripple</span>
+        <p-toggleswitch [(ngModel)]="ripple"/>
+      </div>
+    </div>
+  </div>
+
+</div>

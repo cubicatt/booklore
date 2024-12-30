@@ -15,10 +15,9 @@ import {ToggleSwitchModule} from 'primeng/toggleswitch';
 import {AppConfigService} from '../book/service/app-config.service';
 
 interface ColorPalette {
-  [key: string]: string; // Allows dynamic string keys like '500', '400', etc.
+  [key: string]: string;
 }
 
-// Define interface for Palette
 interface Palette {
   name: string;
   palette: ColorPalette;
@@ -34,58 +33,7 @@ const presets = {
 @Component({
   selector: 'app-configurator',
   standalone: true,
-  template: `
-    <div class="config-panel-content">
-      <div class="config-panel-colors">
-        <span class="config-panel-label">Primary</span>
-        <div>
-          @for (primaryColor of primaryColors(); track primaryColor.name) {
-            <button
-              type="button"
-              [title]="primaryColor.name"
-              (click)="updateColors($event, 'primary', primaryColor)"
-              [ngClass]="{ 'active-color': primaryColor.name === selectedPrimaryColor() }"
-              [style]="{ 'background-color': primaryColor.name === 'noir'  ? 'var(--text-color)'  : primaryColor.palette?.['500'] || 'transparent' }"
-            ></button>
-          }
-        </div>
-      </div>
-
-      <div class="config-panel-colors">
-        <span class="config-panel-label">Surface</span>
-        <div>
-          @for (surface of surfaces; track surface.name) {
-            <button
-              type="button"
-              [title]="surface.name"
-              (click)="updateColors($event, 'surface', surface)"
-              [ngClass]="{ 'active-color': selectedSurfaceColor() ? selectedSurfaceColor() === surface.name : configService.appState().darkTheme ? surface.name === 'zinc' : surface.name === 'slate' }"
-              [style]="{'background-color': surface.name === 'noir' ? 'var(--text-color)' : surface.palette['500'] }">
-            </button>
-          }
-        </div>
-      </div>
-
-      <div class="config-panel-settings">
-        <span class="config-panel-label">Presets</span>
-        <p-selectbutton [options]="presets" [ngModel]="selectedPreset()" (ngModelChange)="onPresetChange($event)" [allowEmpty]="false" size="small"/>
-      </div>
-      <div class="flex">
-        <div class="flex-1">
-          <div class="config-panel-settings">
-            <span class="config-panel-label">Ripple</span>
-            <p-toggleswitch [(ngModel)]="ripple"/>
-          </div>
-        </div>
-        <div class="flex-1">
-          <div class="config-panel-settings items-end">
-            <span class="config-panel-label">RTL</span>
-            <p-toggleswitch [ngModel]="isRTL" (ngModelChange)="onRTLChange($event)"/>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
+  templateUrl: './configurator.component.html',
   host: {
     class: 'config-panel hidden'
   },
@@ -100,10 +48,6 @@ export class AppConfiguratorComponent {
     this.config.ripple.set(value);
   }
 
-  get isRTL() {
-    return this.configService.appState().RTL;
-  }
-
   config: PrimeNG = inject(PrimeNG);
 
   configService: AppConfigService = inject(AppConfigService);
@@ -112,30 +56,10 @@ export class AppConfiguratorComponent {
 
   presets = Object.keys(presets);
 
-  onRTLChange(value: boolean) {
-    this.configService.appState.update((state) => ({...state, RTL: value}));
-    if (!(document as any).startViewTransition) {
-      this.toggleRTL(value);
-      return;
-    }
-
-    (document as any).startViewTransition(() => this.toggleRTL(value));
-  }
-
-  toggleRTL(value: boolean) {
-    const htmlElement = document.documentElement;
-
-    if (value) {
-      htmlElement.setAttribute('dir', 'rtl');
-    } else {
-      htmlElement.removeAttribute('dir');
-    }
-  }
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.onPresetChange(this.configService.appState().preset);
-      this.toggleRTL(this.configService.appState().RTL!);
     }
   }
 

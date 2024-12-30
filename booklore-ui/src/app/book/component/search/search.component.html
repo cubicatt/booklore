@@ -1,6 +1,6 @@
-<div class="search-container" #searchContainer>
-  <span class="p-input-icon-left">
-    <i class="pi pi-search"></i>
+<div class="search-container">
+  <div class="search-input-wrapper">
+    <i class="pi pi-search search-icon"></i>
     <input
       style="width: 400px;"
       type="text"
@@ -9,9 +9,9 @@
       (input)="onSearchInputChange()"
       placeholder="Search books..."
       class="search-input"
-      #searchInput/>
-    <button *ngIf="searchQuery" pButton icon="pi pi-times" (click)="clearSearch()" class="clear-btn" type="button" aria-label="Clear Search"></button>
-  </span>
+    />
+    <p-button *ngIf="searchQuery" icon="pi pi-times" (click)="clearSearch()" [text]="true" [rounded]="true" class="clear-btn" aria-label="Clear Search"></p-button>
+  </div>
 
   <div class="search-dropdown layout-menu" [class.show]="(books.length > 0)">
     <ng-container *ngIf="books.length > 0; else noResults">
@@ -21,7 +21,6 @@
       </div>
     </ng-container>
 
-    <!-- No results message -->
     <ng-template #noResults>
       <div class="search-dropdown-item">
         <span>No results found</span>

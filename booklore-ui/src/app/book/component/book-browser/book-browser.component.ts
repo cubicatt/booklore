@@ -32,7 +32,6 @@ export class BookBrowserComponent implements OnInit {
   entityType: string = '';
   bookTitle: string = '';
   entityOptions: MenuItem[] | undefined;
-  multiSelectItems: MenuItem[] | undefined;
   selectedBooks: Set<number> = new Set();
   selectedSort: SortOption | null = null;
   sortOptions: SortOption[] = [];
@@ -54,31 +53,43 @@ export class BookBrowserComponent implements OnInit {
 
   ngOnInit(): void {
     this.sortOptions = SortOptionsHelper.generateSortOptions();
-    const routeParam$ = this.getRouteParams();
+    const isAllBooksRoute = this.activatedRoute.snapshot.routeConfig?.path === 'all-books';
 
-    this.bookState$ = routeParam$.pipe(
-      switchMap(({libraryId, shelfId}) => this.fetchBooksByEntity(libraryId, shelfId)),
-    );
+    if (isAllBooksRoute) {
+      this.entityType$ = this.activatedRoute.url.pipe(
+        map(segments => {
+          const fullPath = segments.map(segment => segment.path).join('/');
+          return fullPath === 'all-books' ? 'all-books' : null;
+        })
+      );
+      this.bookState$ = this.fetchAllBooks();
+    } else {
 
-    this.entity$ = routeParam$.pipe(
-      switchMap(({libraryId, shelfId}) => this.fetchEntity(libraryId, shelfId))
-    );
+      const routeParam$ = this.getRouteParams();
 
-    this.entityType$ = routeParam$.pipe(
-      map(({libraryId, shelfId}) => libraryId ? 'Library' : shelfId ? 'Shelf' : null)
-    );
+      this.bookState$ = routeParam$.pipe(
+        switchMap(({libraryId, shelfId}) => this.fetchBooksByEntity(libraryId, shelfId)),
+      );
 
-    this.entity$.subscribe(entity => {
-      this.entity = entity;
-      this.setSelectedSortFromEntity(entity);
-    });
+      this.entity$ = routeParam$.pipe(
+        switchMap(({libraryId, shelfId}) => this.fetchEntity(libraryId, shelfId))
+      );
+
+      this.entityType$ = routeParam$.pipe(
+        map(({libraryId, shelfId}) => libraryId ? 'Library' : shelfId ? 'Shelf' : null)
+      );
+
+      this.entity$.subscribe(entity => {
+        this.entity = entity;
+        this.setSelectedSortFromEntity(entity);
+      });
+    }
 
     this.activatedRoute.paramMap.subscribe(() => {
       this.bookTitle$.next('');
       this.bookTitle = '';
     });
 
-    //this.setupMenu();
   }
 
   private getRouteParams(): Observable<{ libraryId: number; shelfId: number }> {
@@ -127,15 +138,12 @@ export class BookBrowserComponent implements OnInit {
     });
   }
 
-  private fetchBooks(bookFilter: (book: Book) => boolean): Observable<BookState> {
+  private fetchAllBooks(): Observable<BookState> {
     return this.bookService.bookState$.pipe(
       map(bookState => {
         if (bookState.loaded && !bookState.error) {
-          const filteredBooks = bookState.books!.filter(book => {
-            return bookFilter(book);
-          });
-          const sortedBooks = this.sortService.applySort(filteredBooks, this.selectedSort);
-          return { ...bookState, books: sortedBooks };
+          const sortedBooks = this.sortService.applySort(bookState.books || [], this.selectedSort);
+          return {...bookState, books: sortedBooks};
         } else {
           return bookState;
         }
@@ -145,7 +153,34 @@ export class BookBrowserComponent implements OnInit {
           map(title => {
             if (title && title.trim() !== '') {
               const filteredBooks = bookState.books?.filter(book => book.metadata?.title?.toLowerCase().includes(title.toLowerCase())) || null;
-              return { ...bookState, books: filteredBooks };
+              return {...bookState, books: filteredBooks};
+            }
+            return bookState;
+          })
+        )
+      )
+    );
+  }
+
+  private fetchBooks(bookFilter: (book: Book) => boolean): Observable<BookState> {
+    return this.bookService.bookState$.pipe(
+      map(bookState => {
+        if (bookState.loaded && !bookState.error) {
+          const filteredBooks = bookState.books!.filter(book => {
+            return bookFilter(book);
+          });
+          const sortedBooks = this.sortService.applySort(filteredBooks, this.selectedSort);
+          return {...bookState, books: sortedBooks};
+        } else {
+          return bookState;
+        }
+      }),
+      switchMap(bookState =>
+        this.bookTitle$.pipe(
+          map(title => {
+            if (title && title.trim() !== '') {
+              const filteredBooks = bookState.books?.filter(book => book.metadata?.title?.toLowerCase().includes(title.toLowerCase())) || null;
+              return {...bookState, books: filteredBooks};
             }
             return bookState;
           })
@@ -252,23 +287,6 @@ export class BookBrowserComponent implements OnInit {
       this.selectedBooks.clear();
     });
   }
-
-  /*setupMenu(): void {
-    this.multiSelectItems = [
-      {
-        label: 'Options',
-        items: [
-          {
-            label: 'Edit shelf',
-            icon: 'pi pi-folder',
-            command: () => {
-
-            }
-          }
-        ],
-      },
-    ];
-  }*/
 
   private initializeLibraryMenuItems(): void {
     this.entityOptions = [

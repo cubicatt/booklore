@@ -1,9 +1,26 @@
 <div>
   <div class="book-browser-header">
     <div class="left-items">
-      <p class="entity-name text-2xl">{{ (entityType$ | async) }}: {{ (entity$ | async)?.name }}</p>
-      <p-button icon="pi pi-ellipsis-v" [rounded]="true" [text]="true" severity="info" (click)="entitymenu.toggle($event)"/>
-      <p-menu #entitymenu [model]="entityOptions" [popup]="true" appendTo="body"></p-menu>
+
+      <ng-container *ngIf="entityType$ | async as entityType">
+        <p *ngIf="entityType !== 'all-books'" class="entity-name text-2xl">
+          {{ entityType }}: {{ (entity$ | async)?.name }}
+        </p>
+        <p *ngIf="entityType === 'all-books'" class="entity-name text-2xl">
+          All Books
+        </p>
+
+        <div *ngIf="entityType !== 'all-books'">
+          <p-button
+            icon="pi pi-ellipsis-v"
+            [rounded]="true"
+            [text]="true"
+            severity="info"
+            (click)="entitymenu.toggle($event)" />
+          <p-menu #entitymenu [model]="entityOptions" [popup]="true" appendTo="body"></p-menu>
+        </div>
+      </ng-container>
+
     </div>
 
     <div class="header-right-items">
@@ -53,12 +70,12 @@
     </div>
     <div class="book-browser-footer" *ngIf="selectedBooks.size > 0">
       <div class="footer-items-container">
-        <!--<p-button *ngIf="(entityType$ | async) === 'Library'" icon="pi pi-ellipsis-v" label="Options" severity="info" (click)="menu.toggle($event)"></p-button>-->
-        <p-button *ngIf="(entityType$ | async) === 'Library'" icon="pi pi-book" label="Assign Shelf" severity="info" (onClick)="openShelfAssigner()"></p-button>
-        <p-button *ngIf="(entityType$ | async) === 'Shelf'" icon="pi pi-minus-circle" label="Unshelf" severity="info" (click)="unshelfBooks()"></p-button>
-        <p-button icon="pi pi-times" label="Deselect" severity="warn" (click)="deselectAllBooks()"></p-button>
+        <ng-container *ngIf="entityType$ | async as entityType">
+          <p-button *ngIf="entityType === 'Library' || entityType ==='all-books'" icon="pi pi-book" label="Assign Shelf" severity="info" (onClick)="openShelfAssigner()"></p-button>
+          <p-button *ngIf="entityType === 'Shelf'" icon="pi pi-minus-circle" label="Unshelf" severity="info" (click)="unshelfBooks()"></p-button>
+          <p-button icon="pi pi-times" label="Deselect" severity="warn" (click)="deselectAllBooks()"></p-button>
+        </ng-container>
       </div>
-      <!--<p-menu #menu [model]="multiSelectItems" [popup]="true" appendTo="body"></p-menu>-->
     </div>
   </div>
 

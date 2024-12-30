@@ -14,6 +14,9 @@ const routes: Routes = [
         path: '', component: DashboardComponent,
       },
       {
+        path: 'all-books', component: BookBrowserComponent,
+      },
+      {
         path: 'library/:libraryId/books', component: BookBrowserComponent,
       },
       {

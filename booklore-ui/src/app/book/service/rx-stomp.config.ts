@@ -1,6 +1,6 @@
 import { RxStompConfig } from '@stomp/rx-stomp';
 
-export const myRxStompConfig: RxStompConfig = {
+export const rxStompConfig: RxStompConfig = {
   // Which server?
   brokerURL: 'ws://localhost:8080/ws',
 

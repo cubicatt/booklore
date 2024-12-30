@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
-import { Button } from 'primeng/button';
-import { AsyncPipe, NgIf } from '@angular/common';
-import { LibraryCreatorComponent } from '../library-creator/library-creator.component';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { DashboardScrollerComponent } from '../dashboard-scroller/dashboard-scroller.component';
-import { LibraryService } from '../../service/library.service';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {Component} from '@angular/core';
+import {Button} from 'primeng/button';
+import {AsyncPipe, NgIf} from '@angular/common';
+import {LibraryCreatorComponent} from '../library-creator/library-creator.component';
+import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
+import {DashboardScrollerComponent} from '../dashboard-scroller/dashboard-scroller.component';
+import {LibraryService} from '../../service/library.service';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-home-page',
@@ -34,9 +34,14 @@ export class DashboardComponent {
     this.ref = this.dialogService.open(LibraryCreatorComponent, {
       header: 'Create New Library',
       modal: true,
-      width: '50%',
-      height: '50%',
-      style: { bottom: '15%' }
+      closable: true,
+      width: '675px',
+      height: '480px',
+      style: {
+        position: 'absolute',
+        top: '15%',
+      }
     });
   }
+
 }

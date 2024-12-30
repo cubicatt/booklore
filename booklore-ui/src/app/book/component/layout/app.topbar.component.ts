@@ -70,9 +70,13 @@ export class AppTopBarComponent implements OnDestroy {
     this.ref = this.dialogService.open(LibraryCreatorComponent, {
       header: 'Create New Library',
       modal: true,
-      width: '40%',
-      height: '50%',
-      style: {bottom: '15%'}
+      closable: true,
+      width: '675px',
+      height: '480px',
+      style: {
+        position: 'absolute',
+        top: '15%',
+      }
     });
   }
 
@@ -80,9 +84,13 @@ export class AppTopBarComponent implements OnDestroy {
     this.ref = this.dialogService.open(FileUploadComponent, {
       header: 'Upload Book',
       modal: true,
-      width: '45%',
-      height: '40%',
-      style: {bottom: '20%'}
+      closable: true,
+      width: '600px',
+      height: '330px',
+      style: {
+        position: 'absolute',
+        top: '15%',
+      }
     });
   }
 

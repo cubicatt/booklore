@@ -1,68 +1,73 @@
-<p-stepper>
-  <p-stepper header="Library Name">
-    <ng-template pTemplate="content" let-nextCallback="nextCallback" let-index="index">
-      <div class="flex flex-col h-[21rem]">
-        <div class="border-2 border-dashed border-surface rounded-border bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium">
+<p-stepper [value]="1" class="basis-[50rem]">
+  <p-step-list>
+    <p-step [value]="1">Library Details</p-step>
+    <p-step [value]="2">Select Directory</p-step>
+  </p-step-list>
+  <p-step-panels>
+    <p-step-panel [value]="1">
+      <ng-template #content let-activateCallback="activateCallback">
+        <div class="flex flex-col h-48 stepper-content-custom">
+          <div class="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium">
+            <div class="library-name-icon-parent">
+              <div class="library-name-div">
+                <p>Library Name: </p>
+                <input type="text" pInputText [(ngModel)]="value" placeholder="Enter library name..."/>
+              </div>
+              <div class="library-icon-div">
+                <p>Library Icon:</p>
+                <div *ngIf="!selectedIcon">
+                  <p-button label="Select Icon" icon="pi pi-search" (onClick)="openIconPicker()"></p-button>
+                </div>
+                <div *ngIf="selectedIcon" class="selected-icon-container">
+                  <i [class]="selectedIcon" style="font-size: 1.25rem; margin-right: 0.75rem;"></i>
+                  <p-button icon="pi pi-times" (onClick)="clearSelectedIcon()" [rounded]="true" [text]="true" [outlined]="true" class="remove-icon-button" severity="danger"></p-button>
+                </div>
+              </div>
+            </div>
+            <app-icon-picker (iconSelected)="onIconSelected($event)"></app-icon-picker>
+          </div>
+          <div class="flex pt-6 justify-end">
+            <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(2)" />
+          </div>
+        </div>
+      </ng-template>
+    </p-step-panel>
 
-          <div class="library-name-icon-parent">
-            <div class="library-name-div">
-              <div>Library Name: </div>
-              <input type="text" pInputText [(ngModel)]="value" placeholder="Enter library name..."/>
-            </div>
-            <div class="library-icon-div">
-              <div>Library Icon:</div>
-              <div *ngIf="!selectedIcon">
-                <p-button label="Select Icon" icon="pi pi-search" (onClick)="openIconPicker()"></p-button>
-              </div>
-              <div *ngIf="selectedIcon" class="selected-icon-container">
-                <i [class]="selectedIcon" style="font-size: 1.25rem; margin-right: 0.75rem;"></i>
-                <p-button icon="pi pi-times" (onClick)="clearSelectedIcon()" [rounded]="true" [text]="true" [outlined]="true" class="remove-icon-button" severity="danger"></p-button>
-              </div>
+    <p-step-panel [value]="2">
+      <ng-template #content let-activateCallback="activateCallback">
+        <div class="flex flex-col h-48 stepper-content-custom">
+          <div class="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium">
+            <div class="flex flex-col justify-center items-center w-100">
+              <p-button
+                severity="info"
+                label="Add book folders"
+                [outlined]="true"
+                (onClick)="show()">
+              </p-button>
+              <p-table [value]="folders" styleClass="p-datatable-striped" class="p-table-custom mt-4">
+                <ng-template pTemplate="body" let-folder let-i="rowIndex">
+                  <tr>
+                    <td class="tr-custom">{{ folder }}</td>
+                    <td class="tr-custom td-x-custom">
+                      <p-button
+                        icon="pi pi-times"
+                        [rounded]="true"
+                        [text]="true"
+                        severity="danger"
+                        (onClick)="removeFolder(i)"
+                      />
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
             </div>
           </div>
-          <app-icon-picker (iconSelected)="onIconSelected($event)"></app-icon-picker>
-        </div>
-      </div>
-      <div class="flex pt-6 justify-end">
-        <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="nextCallback.emit()"/>
-      </div>
-    </ng-template>
-  </p-stepper>
-  <p-stepper header="Media Location">
-    <ng-template pTemplate="content" let-prevCallback="prevCallback" let-index="index">
-      <div class="flex flex-col xxx">
-        <div
-          class="border-2 border-dashed border-surface rounded-border bg-surface-50 dark:bg-surface-950 flex-auto flex items-start"
-          style="padding-top: 3rem;">
-          <div class="flex flex-col justify-center items-center w-100">
-            <p-button
-              severity="secondary"
-              label="Browse for media folders"
-              (onClick)="show()">
-            </p-button>
-            <p-table [value]="folders" styleClass="p-datatable-striped" class="p-table-custom mt-4">
-              <ng-template pTemplate="body" let-folder let-i="rowIndex">
-                <tr>
-                  <td class="tr-custom">{{ folder }}</td>
-                  <td class="tr-custom td-x-custom">
-                    <p-button
-                      icon="pi pi-times"
-                      [rounded]="true"
-                      [text]="true"
-                      severity="danger"
-                      (onClick)="removeFolder(i)"
-                    />
-                  </td>
-                </tr>
-              </ng-template>
-            </p-table>
+          <div class="flex pt-6 justify-between">
+            <p-button label="Back" icon="pi pi-arrow-left" iconPos="right" (onClick)="activateCallback(1)" />
+            <p-button severity="success" label="Save" icon="pi pi-save" (onClick)="addLibrary()"></p-button>
           </div>
         </div>
-      </div>
-      <div class="flex pt-6 justify-between">
-        <p-button label="Back" icon="pi pi-arrow-left" (onClick)="prevCallback.emit()"/>
-        <p-button severity="success" label="Save" icon="pi pi-save" (onClick)="addLibrary()"></p-button>
-      </div>
-    </ng-template>
-  </p-stepper>
+      </ng-template>
+    </p-step-panel>
+  </p-step-panels>
 </p-stepper>

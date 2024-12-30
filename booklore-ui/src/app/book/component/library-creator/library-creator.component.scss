@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1rem;
+  gap: 2.5rem;
 }
 
 .library-name-div {
@@ -49,7 +49,6 @@
 }
 
 .p-table-custom {
-  margin: 1.5rem !important;
   min-width: 35rem !important;
   max-height: 11.25rem !important;
   overflow: scroll;
@@ -86,6 +85,11 @@
   }
 }
 
-.xxx {
-  min-height: 295px;
+.stepper-content-custom {
+  height: 335px;
+  padding: 10px;
+}
+
+.p {
+  color: var(--text-color);
 }

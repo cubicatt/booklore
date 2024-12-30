@@ -1,7 +1,7 @@
 <div>
   <div class="book-browser-header">
     <div class="left-items">
-      <h4 class="entity-name">{{ (entityType$ | async) }}: {{ (entity$ | async)?.name }}</h4>
+      <p class="entity-name text-2xl">{{ (entityType$ | async) }}: {{ (entity$ | async)?.name }}</p>
       <p-button icon="pi pi-ellipsis-v" [rounded]="true" [text]="true" severity="info" (click)="entitymenu.toggle($event)"/>
       <p-menu #entitymenu [model]="entityOptions" [popup]="true" appendTo="body"></p-menu>
     </div>

@@ -52,6 +52,7 @@ export class AppConfiguratorComponent {
   config: PrimeNG = inject(PrimeNG);
   configService: AppConfigService = inject(AppConfigService);
   presets = Object.keys(presets);
+  platformId = inject(PLATFORM_ID);
 
   surfaces = [
     {
@@ -215,6 +216,14 @@ export class AppConfiguratorComponent {
 
     return palettes;
   });
+
+
+  ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.onPresetChange(this.configService.appState().preset);
+    }
+  }
+
 
   getPresetExt() {
     const color = this.primaryColors().find((c) => c.name === this.selectedPrimaryColor());

@@ -79,6 +79,7 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
     this.dialogRef = this.dialogService.open(BookMetadataDialogComponent, {
       header: 'Metadata: Google Books',
       modal: true,
+      closable: true,
       width: '65%',
       height: '85%',
       data: {

@@ -83,6 +83,7 @@ export class BookBrowserComponent implements OnInit {
 
       this.entity$.subscribe(entity => {
         this.entity = entity;
+        this.entityOptions = this.libraryShelfMenuService.initializeLibraryMenuItems(entity);
         this.setSelectedSortFromEntity(entity);
       });
     }
@@ -112,7 +113,6 @@ export class BookBrowserComponent implements OnInit {
 
   private fetchEntity(entityId: number, entityType: EntityType): Observable<Library | Shelf | null> {
     if (entityType == EntityType.LIBRARY) {
-      this.libraryShelfMenuService.initializeLibraryMenuItems(this.entity);
       return this.fetchLibrary(entityId);
     } else if (EntityType.SHELF) {
       this.libraryShelfMenuService.initializeLibraryMenuItems(this.entity);

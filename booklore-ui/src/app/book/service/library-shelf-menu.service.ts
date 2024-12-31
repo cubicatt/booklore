@@ -30,6 +30,9 @@ export class LibraryShelfMenuService {
               this.confirmationService.confirm({
                 message: `Are you sure you want to delete library: ${entity?.name}?`,
                 header: 'Confirmation',
+                rejectButtonProps: {
+                  label: 'Cancel',
+                },
                 accept: () => {
                   this.libraryService.deleteLibrary(entity?.id!).subscribe({
                     complete: () => {
@@ -55,6 +58,9 @@ export class LibraryShelfMenuService {
               this.confirmationService.confirm({
                 message: `Are you sure you want to refresh library: ${entity?.name}?`,
                 header: 'Confirmation',
+                rejectButtonProps: {
+                  label: 'Cancel',
+                },
                 accept: () => {
                   this.libraryService.refreshLibrary(entity?.id!).subscribe({
                     complete: () => {

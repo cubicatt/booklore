@@ -1,8 +1,8 @@
 <div class="book-metadata-container">
   <div class="book-metadata">
     <div class="book-header">
-      <div class="cover-container">
-        <div class="cover-wrapper">
+      <div>
+        <div class="cover-wrapper cover-container">
           <img [src]="coverImageSrc(book?.id)" class="book-cover placeholder" alt="Cover of {{ book?.metadata?.title }}" loading="lazy"/>
           <div class="overlay" (click)="readBook(book!)">
             <p-button icon="pi pi-book" [rounded]="true"></p-button>

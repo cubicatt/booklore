@@ -10,8 +10,7 @@ import {IconPickerComponent} from '../icon-picker/icon-picker.component';
   selector: 'app-library-creator',
   standalone: false,
   templateUrl: './library-creator.component.html',
-  styleUrl: './library-creator.component.scss',
-  providers: [MessageService]
+  styleUrl: './library-creator.component.scss'
 })
 export class LibraryCreatorComponent {
 
@@ -96,7 +95,7 @@ export class LibraryCreatorComponent {
     this.dynamicDialogRef.close();
   }
 
-  validateLibraryNameAndProceed(nextCallback: any) {
+  validateLibraryNameAndProceed(activateCallback: Function) {
     if (this.libraryName.trim()) {
       this.libraryService.libraryState$.subscribe(
         libraryState => {
@@ -108,7 +107,7 @@ export class LibraryCreatorComponent {
               detail: 'This library name is already taken.',
             });
           } else {
-            nextCallback();
+            activateCallback(2);
           }
         }
       )

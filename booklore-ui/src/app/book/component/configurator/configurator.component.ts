@@ -40,6 +40,7 @@ const presets = {
   imports: [CommonModule, FormsModule, InputSwitchModule, ButtonModule, RadioButtonModule, SelectButton, ToggleSwitchModule]
 })
 export class AppConfiguratorComponent {
+
   get ripple() {
     return this.config.ripple();
   }
@@ -49,19 +50,8 @@ export class AppConfiguratorComponent {
   }
 
   config: PrimeNG = inject(PrimeNG);
-
   configService: AppConfigService = inject(AppConfigService);
-
-  platformId = inject(PLATFORM_ID);
-
   presets = Object.keys(presets);
-
-
-  ngOnInit() {
-    if (isPlatformBrowser(this.platformId)) {
-      this.onPresetChange(this.configService.appState().preset);
-    }
-  }
 
   surfaces = [
     {
@@ -246,20 +236,6 @@ export class AppConfiguratorComponent {
             950: '{surface.950}'
           },
           colorScheme: {
-            light: {
-              primary: {
-                color: '{primary.950}',
-                contrastColor: '#ffffff',
-                hoverColor: '{primary.800}',
-                activeColor: '{primary.700}'
-              },
-              highlight: {
-                background: '{primary.950}',
-                focusBackground: '{primary.700}',
-                color: '#ffffff',
-                focusColor: '#ffffff'
-              }
-            },
             dark: {
               primary: {
                 color: '{primary.50}',
@@ -283,20 +259,6 @@ export class AppConfiguratorComponent {
           semantic: {
             primary: color!.palette,
             colorScheme: {
-              light: {
-                primary: {
-                  color: '{primary.600}',
-                  contrastColor: '#ffffff',
-                  hoverColor: '{primary.700}',
-                  activeColor: '{primary.800}'
-                },
-                highlight: {
-                  background: '{primary.600}',
-                  focusBackground: '{primary.700}',
-                  color: '#ffffff',
-                  focusColor: '#ffffff'
-                }
-              },
               dark: {
                 primary: {
                   color: '{primary.500}',
@@ -319,20 +281,6 @@ export class AppConfiguratorComponent {
           semantic: {
             primary: color!.palette,
             colorScheme: {
-              light: {
-                primary: {
-                  color: '{primary.500}',
-                  contrastColor: '#ffffff',
-                  hoverColor: '{primary.400}',
-                  activeColor: '{primary.300}'
-                },
-                highlight: {
-                  background: 'color-mix(in srgb, {primary.color}, transparent 88%)',
-                  focusBackground: 'color-mix(in srgb, {primary.color}, transparent 76%)',
-                  color: '{primary.700}',
-                  focusColor: '{primary.800}'
-                }
-              },
               dark: {
                 primary: {
                   color: '{primary.400}',
@@ -355,20 +303,6 @@ export class AppConfiguratorComponent {
           semantic: {
             primary: color!.palette,
             colorScheme: {
-              light: {
-                primary: {
-                  color: '{primary.500}',
-                  contrastColor: '#ffffff',
-                  hoverColor: '{primary.600}',
-                  activeColor: '{primary.700}'
-                },
-                highlight: {
-                  background: '{primary.50}',
-                  focusBackground: '{primary.100}',
-                  color: '{primary.700}',
-                  focusColor: '{primary.800}'
-                }
-              },
               dark: {
                 primary: {
                   color: '{primary.400}',

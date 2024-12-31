@@ -1,9 +1,12 @@
 <div class="layout-topbar">
 
   <a class="layout-topbar-logo" routerLink="">
-    <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg"
+    <img src="assets/layout/images/{{'logo-dark'}}.svg"
          alt="logo">
-    <span>BookLore</span>
+    <span class="flex">
+      <p>Book</p>
+      <p class="half-title">lore</p>
+    </span>
   </a>
 
   <p-button

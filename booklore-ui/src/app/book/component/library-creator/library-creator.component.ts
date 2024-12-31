@@ -14,17 +14,19 @@ import {IconPickerComponent} from '../icon-picker/icon-picker.component';
   providers: [MessageService]
 })
 export class LibraryCreatorComponent {
-  value: string = '';
-  folders: string[] = [];
-  ref: DynamicDialogRef | undefined;
+
   @ViewChild(IconPickerComponent) iconPicker: IconPickerComponent | undefined;
 
+  libraryName: string = '';
+  folders: string[] = [];
+  ref: DynamicDialogRef | undefined;
   selectedIcon: string | null = null;
 
   constructor(
     private dialogService: DialogService,
     private dynamicDialogRef: DynamicDialogRef,
     private libraryService: LibraryService,
+    private messageService: MessageService,
     private router: Router) {
   }
 
@@ -67,9 +69,17 @@ export class LibraryCreatorComponent {
     this.selectedIcon = null;
   }
 
+  isLibraryDetailsValid(): boolean {
+    return !!this.libraryName.trim() && !!this.selectedIcon;
+  }
+
+  isDirectorySelectionValid(): boolean {
+    return this.folders.length > 0;
+  }
+
   addLibrary() {
     const newLibrary = {
-      name: this.value,
+      name: this.libraryName,
       paths: this.folders,
       icon: this.selectedIcon ? this.selectedIcon.replace('pi pi-', '') : 'heart'
     };
@@ -86,30 +96,23 @@ export class LibraryCreatorComponent {
     this.dynamicDialogRef.close();
   }
 
-  /*validateLibraryNameAndProceed(nextCallback: any) {
-    if (this.value.trim()) {
-      this.libraryServiceV2.checkLibraryNameExists(this.value).subscribe(
-        (response) => {
-          const libraryExists = response && response.name === this.value;
-          if (libraryExists) {
+  validateLibraryNameAndProceed(nextCallback: any) {
+    if (this.libraryName.trim()) {
+      this.libraryService.libraryState$.subscribe(
+        libraryState => {
+          let library = libraryState.libraries?.find(library => library.name === this.libraryName.trim());
+          if(library) {
             this.messageService.add({
               severity: 'error',
               summary: 'Library Name Exists',
               detail: 'This library name is already taken.',
             });
           } else {
-            nextCallback.emit();
+            nextCallback();
           }
-        },
-        (error) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'An error occurred while checking the library name.',
-          });
         }
-      );
+      )
     }
-  }*/
+  }
 
 }

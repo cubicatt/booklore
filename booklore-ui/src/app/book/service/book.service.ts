@@ -188,7 +188,11 @@ export class BookService {
   }
 
   getBookByIdFromAPI(bookId: number, withDescription: boolean) {
-    return this.http.get<Book>(`${this.url}/${bookId}`);
+    return this.http.get<Book>(`${this.url}/${bookId}`, {
+      params: {
+        withDescription: withDescription.toString()
+      }
+    });
   }
 
   fetchMetadataFromSource(bookId: number): Observable<FetchedMetadata> {

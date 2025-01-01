@@ -29,7 +29,7 @@
                 <p><strong>Publisher:</strong> {{ metadata.publisher }}</p>
                 <p><strong>Published Date:</strong> {{ metadata.publishedDate }}</p>
                 <p><strong>ISBN:</strong> {{ metadata.isbn10 }}</p>
-                <p><strong>Description:</strong> {{ truncateDescription(metadata.description) }}</p>
+                <p><strong>Description:</strong> {{ truncateDescription(metadata.description!) }}</p>
                 <p><strong>Page Count:</strong> {{ metadata.pageCount }}</p>
                 <p *ngIf="metadata.googleBookId">
                     <strong>Google Book Id: </strong>

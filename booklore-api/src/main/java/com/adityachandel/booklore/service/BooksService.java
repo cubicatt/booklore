@@ -1,20 +1,20 @@
 package com.adityachandel.booklore.service;
 
-import com.adityachandel.booklore.config.AppProperties;
-import com.adityachandel.booklore.model.dto.BookDTO;
-import com.adityachandel.booklore.model.dto.BookWithNeighborsDTO;
-import com.adityachandel.booklore.model.dto.response.GoogleBooksMetadata;
-import com.adityachandel.booklore.model.dto.BookViewerSettingDTO;
-import com.adityachandel.booklore.model.dto.request.SetMetadataRequest;
 import com.adityachandel.booklore.exception.ApiError;
+import com.adityachandel.booklore.model.dto.*;
+import com.adityachandel.booklore.model.dto.request.SetMetadataRequest;
+import com.adityachandel.booklore.model.dto.response.GoogleBooksMetadata;
 import com.adityachandel.booklore.model.entity.*;
 import com.adityachandel.booklore.repository.*;
+import com.adityachandel.booklore.transformer.BookMetadataTransformer;
 import com.adityachandel.booklore.transformer.BookSettingTransformer;
 import com.adityachandel.booklore.transformer.BookTransformer;
+import com.adityachandel.booklore.util.BookUtils;
+import com.adityachandel.booklore.util.DateUtils;
+import com.adityachandel.booklore.util.FileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,13 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,7 +37,6 @@ import java.util.stream.Collectors;
 @Service
 public class BooksService {
 
-    private final AppProperties appProperties;
     private final BookRepository bookRepository;
     private final BookViewerSettingRepository bookViewerSettingRepository;
     private final GoogleBookMetadataService googleBookMetadataService;
@@ -47,6 +46,7 @@ public class BooksService {
     private final LibraryRepository libraryRepository;
     private final NotificationService notificationService;
     private final ShelfRepository shelfRepository;
+    private final FileService fileService;
 
 
     public BookDTO getBook(long bookId) {
@@ -67,22 +67,6 @@ public class BooksService {
         bookViewerSetting.setSpread(bookViewerSettingDTO.getSpread());
         bookViewerSetting.setSidebar_visible(bookViewerSettingDTO.isSidebar_visible());
         bookViewerSettingRepository.save(bookViewerSetting);
-    }
-
-    public Resource getBookCover(long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        String thumbPath = appProperties.getPathConfig() + "/thumbs/" + getFileNameWithoutExtension(book.getFileName()) + ".jpg";
-        Path filePath = Paths.get(thumbPath);
-        try {
-            Resource resource = new UrlResource(filePath.toUri());
-            if (resource.exists() && resource.isReadable()) {
-                return resource;
-            } else {
-                throw ApiError.IMAGE_NOT_FOUND.createException(thumbPath);
-            }
-        } catch (IOException e) {
-            throw ApiError.IMAGE_NOT_FOUND.createException(thumbPath);
-        }
     }
 
     public ResponseEntity<byte[]> getBookData(long bookId) throws IOException {
@@ -116,7 +100,7 @@ public class BooksService {
             searchString.append(book.getMetadata().getTitle());
         }
         if (searchString.isEmpty()) {
-            searchString.append(cleanFileName(book.getFileName()));
+            searchString.append(BookUtils.cleanFileName(book.getFileName()));
         }
         if (book.getMetadata().getAuthors() != null && !book.getMetadata().getAuthors().isEmpty()) {
             if (!searchString.isEmpty()) {
@@ -129,23 +113,57 @@ public class BooksService {
         return googleBookMetadataService.queryByTerm(searchString.toString());
     }
 
-    private char[] cleanFileName(String fileName) {
-        if (fileName == null) {
-            return null;
-        }
-        String cleanedFileName = fileName.replace("(Z-Library)", "").trim();
-        return cleanedFileName.toCharArray();
-    }
-
     public List<GoogleBooksMetadata> fetchProspectiveMetadataListBySearchTerm(String searchTerm) {
         return googleBookMetadataService.queryByTerm(searchTerm);
+    }
+
+    public BookMetadataDTO setMetadata(long bookId, BookMetadataDTO newMetadata) throws IOException {
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        BookMetadata metadata = book.getMetadata();
+        metadata.setTitle(newMetadata.getTitle());
+        metadata.setSubtitle(newMetadata.getSubtitle());
+        metadata.setPublisher(newMetadata.getPublisher());
+        metadata.setPublishedDate(DateUtils.parseDateToInstant(newMetadata.getPublishedDate()));
+        metadata.setLanguage(newMetadata.getLanguage());
+        metadata.setIsbn10(newMetadata.getIsbn10());
+        metadata.setIsbn13(newMetadata.getIsbn13());
+        metadata.setDescription(newMetadata.getDescription());
+        metadata.setPageCount(newMetadata.getPageCount());
+        if (newMetadata.getAuthors() != null && !newMetadata.getAuthors().isEmpty()) {
+            List<Author> authors = newMetadata.getAuthors().stream()
+                    .map(authorDTO -> authorRepository.findByName(authorDTO.getName())
+                            .orElseGet(() -> authorRepository.save(Author.builder().name(authorDTO.getName()).build())))
+                    .collect(Collectors.toList());
+            metadata.setAuthors(authors);
+        }
+        if (newMetadata.getCategories() != null && !newMetadata.getCategories().isEmpty()) {
+            List<Category> categories = newMetadata
+                    .getCategories()
+                    .stream()
+                    .map(CategoryDTO::getName)
+                    .collect(Collectors.toSet())
+                    .stream()
+                    .map(categoryName -> categoryRepository.findByName(categoryName)
+                            .orElseGet(() -> categoryRepository.save(Category.builder().name(categoryName).build())))
+                    .collect(Collectors.toList());
+            metadata.setCategories(categories);
+        }
+
+        if(newMetadata.getThumbnail() != null && !newMetadata.getThumbnail().isEmpty()) {
+            String thumbnailPath = fileService.createThumbnail(bookId, newMetadata.getThumbnail(), "amz");
+            metadata.setThumbnail(thumbnailPath);
+        }
+
+        authorRepository.saveAll(metadata.getAuthors());
+        categoryRepository.saveAll(metadata.getCategories());
+        metadataRepository.save(metadata);
+        return BookMetadataTransformer.convertToBookDTO(metadata);
     }
 
     public BookDTO setMetadata(SetMetadataRequest setMetadataRequest, long bookId) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         GoogleBooksMetadata gMetadata = googleBookMetadataService.getByGoogleBookId(setMetadataRequest.getGoogleBookId());
         BookMetadata metadata = book.getMetadata();
-        metadata.setGoogleBookId(gMetadata.getGoogleBookId());
         metadata.setDescription(gMetadata.getDescription());
         metadata.setTitle(gMetadata.getTitle());
         metadata.setLanguage(gMetadata.getLanguage());
@@ -229,11 +247,9 @@ public class BooksService {
         List<Book> books = bookRepository.findAllById(bookIds);
         List<Shelf> shelvesToAssign = shelfRepository.findAllById(shelfIdsToAssign);
         List<Shelf> shelvesToUnassign = shelfRepository.findAllById(shelfIdsToUnassign);
-
         for (Book book : books) {
             book.getShelves().removeIf(shelf -> shelfIdsToUnassign.contains(shelf.getId()));
             shelvesToUnassign.forEach(shelf -> shelf.getBooks().remove(book));
-
             shelvesToAssign.forEach(shelf -> {
                 if (!book.getShelves().contains(shelf)) {
                     book.getShelves().add(shelf);
@@ -242,12 +258,14 @@ public class BooksService {
                     shelf.getBooks().add(book);
                 }
             });
-
             bookRepository.save(book);
             shelfRepository.saveAll(shelvesToAssign);
         }
-
         return books.stream().map(BookTransformer::convertToBookDTO).collect(Collectors.toList());
     }
 
+    public Resource getBookCover(long bookId) {
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        return fileService.getBookCover(book.getMetadata().getThumbnail());
+    }
 }

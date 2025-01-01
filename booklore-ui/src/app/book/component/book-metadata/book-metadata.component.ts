@@ -9,6 +9,9 @@ import {Subscription} from 'rxjs';
 import {TagModule} from 'primeng/tag';
 import {BookService} from '../../service/book.service';
 import {LibraryService} from '../../service/library.service';
+import {MetadataSearcherComponent} from '../../../metadata-searcher/metadata-searcher.component';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {LoadingService} from '../../../loading.service';
 
 @Component({
   selector: 'app-book-metadata',
@@ -27,18 +30,18 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
   previousBookId: number | null = null;
 
   private routeSubscription!: Subscription;
-  private dialogRef: DynamicDialogRef | undefined;
+  private dialogRef!: DynamicDialogRef;
   private dialogSubscription?: Subscription;
 
   constructor(
     private bookService: BookService, private activatedRoute: ActivatedRoute,
     private dialogService: DialogService, private router: Router,
-    private libraryService: LibraryService) {
+    private libraryService: LibraryService, private loadingService: LoadingService,) {
   }
 
   ngOnInit(): void {
     this.routeSubscription = this.activatedRoute.paramMap.subscribe((paramMap) => {
-       const bookId = +paramMap.get('bookId')!;
+      const bookId = +paramMap.get('bookId')!;
       const libraryId = +paramMap.get('libraryId')!;
       if (bookId && libraryId) {
         this.loadBookWithNeighbors(bookId, libraryId);
@@ -75,7 +78,47 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
     return 'No authors available';
   }
 
-  openEditDialog(bookId: number | undefined, libraryId: number | undefined) {
+  openEditDialog(bookId: number, libraryId: number) {
+    this.loadingService.show();
+    this.bookService.getFetchBookMetadata(bookId).subscribe({
+      next: (fetchedMetadata) => {
+        this.loadingService.hide();
+        this.dialogRef = this.dialogService.open(MetadataSearcherComponent, {
+          header: 'Update Book Metadata',
+          modal: true,
+          closable: true,
+          width: '1350px',
+          height: '1000px',
+          contentStyle: {
+            'overflow-y': 'auto',
+            'max-height': 'calc(100vh - 150px)',
+            'padding': '1.25rem 1.25rem 0',
+          },
+          data: {
+            currentMetadata: this.book?.metadata,
+            fetchedMetadata: fetchedMetadata,
+            book: this.book
+          }
+        });
+
+        if (this.dialogRef) {
+          this.dialogSubscription = this.dialogRef.onClose.subscribe(() => {
+            if (this.book?.id && this.book?.libraryId) {
+              this.loadBookWithNeighbors(this.book.id, this.book.libraryId);
+            }
+          });
+        } else {
+          console.error('DialogRef is undefined or null');
+        }
+      },
+      error: (error) => {
+        this.loadingService.hide();
+        console.error('Error fetching metadata:', error);
+      }
+    });
+  }
+
+  /*openEditDialog1(bookId: number | undefined, libraryId: number | undefined) {
     this.dialogRef = this.dialogService.open(BookMetadataDialogComponent, {
       header: 'Metadata: Google Books',
       modal: true,
@@ -94,7 +137,7 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
         this.loadBookWithNeighbors(this.book.id, this.book.libraryId);
       }
     });
-  }
+  }*/
 
   coverImageSrc(bookId: number | undefined): string {
     if (bookId === null) {

@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { Library } from '../model/library.model';
 import { BookService } from './book.service';
-import { BookWithNeighborsDTO } from '../model/book.model';
+import {BookMetadata, BookWithNeighborsDTO} from '../model/book.model';
 import { SortOption } from '../model/sort.model';
 import { LibraryState } from '../model/state/library-state.model';
 
@@ -113,4 +113,5 @@ export class LibraryService {
       map(state => (state.books || []).filter(book => book.libraryId === libraryId).length)
     );
   }
+
 }

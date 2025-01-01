@@ -20,7 +20,7 @@
     <div *ngFor="let metadata of bookMetadataList" class="book-metadata">
         <div class="metadata-header">
             <div class="book-image-container">
-              <img class="book-image" [src]="metadata.thumbnail || 'assets/book-cover-metadata.png'" alt="Book Cover"/>
+              <!--<img class="book-image" [src]="metadata.thumbnail || 'assets/book-cover-metadata.png'" alt="Book Cover"/>-->
               <p-button class="select-button" (click)="selectMetadata(metadata)">Select</p-button>
             </div>
             <div>

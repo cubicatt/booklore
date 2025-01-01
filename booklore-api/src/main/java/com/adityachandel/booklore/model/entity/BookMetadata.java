@@ -19,9 +19,6 @@ public class BookMetadata {
     @Column(name = "book_id")
     private Long bookId;
 
-    @Column(name = "google_book_id", nullable = false, unique = true)
-    private String googleBookId;
-
     @Column(name = "title", nullable = false)
     private String title;
 

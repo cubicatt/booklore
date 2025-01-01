@@ -1,17 +1,16 @@
 package com.adityachandel.booklore.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
-@Builder
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public class BookMetadataDTO {
     private Long bookId;
     private String googleBookId;
+    private String amazonBookId;
     private String title;
     private String subtitle;
     private String publisher;
@@ -24,4 +23,7 @@ public class BookMetadataDTO {
     private String language;
     private List<AuthorDTO> authors;
     private List<CategoryDTO> categories;
+    private String rating;
+    private String reviewCount;
+    private String printLength;
 }

@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {catchError, map, switchMap, tap} from 'rxjs/operators';
-import {Book, BookMetadata, BookSetting} from '../model/book.model';
+import {Book, BookMetadata, BookSetting, FetchedMetadata, UpdateMedata} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 
 @Injectable({
@@ -185,5 +185,30 @@ export class BookService {
     const currentState = this.bookStateSubject.value;
     const filteredBooks = (currentState.books || []).filter(book => !removedBookIds.has(book.id));
     this.bookStateSubject.next({...currentState, books: filteredBooks});
+  }
+
+  getFetchBookMetadata(bookId: number): Observable<FetchedMetadata> {
+    return this.http.post<FetchedMetadata>(`${this.url}/${bookId}/query-for-books`, null);
+  }
+
+  updateMetadata(bookId: number, updateMedata: UpdateMedata): Observable<BookMetadata> {
+    return this.http.put<BookMetadata>(`${this.url}/${bookId}/metadata`, updateMedata).pipe(
+      map((updatedMetadata) => {
+        const currentState = this.bookStateSubject.value;
+        const updatedBooks = currentState.books?.map((book) => {
+          if (book.id === bookId) {
+            return { ...book, metadata: updatedMetadata };
+          }
+          return book;
+        }) || [];
+        this.bookStateSubject.next({ ...currentState, books: updatedBooks });
+        return updatedMetadata;
+      }),
+      catchError((error) => {
+        const currentState = this.bookStateSubject.value;
+        this.bookStateSubject.next({ ...currentState, error: error.message });
+        throw error;
+      })
+    );
   }
 }

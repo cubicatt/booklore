@@ -7,6 +7,7 @@ import com.adityachandel.booklore.model.entity.Book;
 import com.adityachandel.booklore.model.entity.BookMetadata;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.transformer.BookTransformer;
+import com.adityachandel.booklore.util.FileService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.AllArgsConstructor;
@@ -69,13 +70,16 @@ public class PdfFileProcessor implements FileProcessor {
                     bookCreatorService.addAuthorsToBook(authors, book);
                 }
             }
-            generateCoverImage(bookFile, new File(appProperties.getPathConfig() + "/thumbs"), document);
+            bookCreatorService.saveConnections(book);
+            Book saved = bookRepository.save(book);
+            boolean success = generateCoverImage(saved.getId(), new File(appProperties.getPathConfig() + "/thumbs"), document);
+            if (success) {
+                bookMetadata.setThumbnail(appProperties.getPathConfig() + "/thumbs/" + book.getId() + "/f.jpg");
+            }
+            bookRepository.flush();
         } catch (Exception e) {
             log.error("Error while processing file {}, error: {}", libraryFile.getFilePath(), e.getMessage());
         }
-        bookCreatorService.saveConnections(book);
-        bookRepository.save(book);
-        bookRepository.flush();
         return BookTransformer.convertToBookDTO(book);
     }
 
@@ -92,13 +96,19 @@ public class PdfFileProcessor implements FileProcessor {
         return authorNames.stream().map(String::trim).collect(Collectors.toSet());
     }
 
-    private void generateCoverImage(File bookFile, File coverDirectory, PDDocument document) throws IOException {
+    private boolean generateCoverImage(Long bookId, File coverDirectory, PDDocument document) throws IOException {
         PDFRenderer renderer = new PDFRenderer(document);
         BufferedImage coverImage = renderer.renderImageWithDPI(0, 300, ImageType.RGB);
         BufferedImage resizedImage = resizeImage(coverImage, 250, 350);
-        String coverImageName = getFileNameWithoutExtension(bookFile.getName()) + ".jpg";
-        File coverImageFile = new File(coverDirectory, coverImageName);
-        ImageIO.write(resizedImage, "JPEG", coverImageFile);
+        File bookDirectory = new File(coverDirectory, bookId.toString());
+        if (!bookDirectory.exists()) {
+            if (!bookDirectory.mkdirs()) {
+                throw new IOException("Failed to create directory: " + bookDirectory.getAbsolutePath());
+            }
+        }
+        String coverImageName = "f.jpg";
+        File coverImageFile = new File(bookDirectory, coverImageName);
+        return ImageIO.write(resizedImage, "JPEG", coverImageFile);
     }
 
     public static BufferedImage resizeImage(BufferedImage originalImage, int width, int height) {
@@ -108,14 +118,5 @@ public class PdfFileProcessor implements FileProcessor {
         g2d.drawImage(tmp, 0, 0, null);
         g2d.dispose();
         return resizedImage;
-    }
-
-    public static String getFileNameWithoutExtension(String fileName) {
-        int dotIndex = fileName.lastIndexOf('.');
-        if (dotIndex == -1) {
-            return fileName;
-        } else {
-            return fileName.substring(0, dotIndex);
-        }
     }
 }

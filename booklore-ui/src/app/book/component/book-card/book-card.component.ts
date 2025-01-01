@@ -74,7 +74,9 @@ export class BookCardComponent implements OnInit {
           {
             label: 'View metadata',
             icon: 'pi pi-info-circle',
-            command: () => this.openBookInfo(this.book),
+            command: () => {
+              this.openBookInfo(this.book)
+            },
           },
         ],
       },

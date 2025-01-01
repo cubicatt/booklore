@@ -1,0 +1,95 @@
+<div class="form-row">
+  <label for="title" class="label">Title</label>
+  <div class="input-container">
+    <input pInputText id="title" [(ngModel)]="toUpdateMetadata.title" class="input"/>
+    <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('title')"/>
+    <input pInputText id="titleFetched" [(ngModel)]="fetchedMetadata.title" class="input"/>
+  </div>
+</div>
+
+<div class="form-row">
+  <label for="authors" class="label">Authors</label>
+  <div class="input-container">
+    <input pInputText id="authors" [(ngModel)]="currentAuthorsString" class="input"/>
+    <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('authors')"/>
+    <input pInputText id="authorsFetched" [(ngModel)]="fetchedAuthorsString" class="input"/>
+  </div>
+</div>
+
+<div class="form-row">
+  <label for="categories" class="label">Categories</label>
+  <div class="input-container">
+    <input pInputText id="categories" [(ngModel)]="currentCategoriesString" class="input"/>
+    <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('categories')"/>
+    <input pInputText id="categoriesFetched" [(ngModel)]="fetchedCategoriesString" class="input"/>
+  </div>
+</div>
+
+<div class="form-row">
+  <label for="publisher" class="label">Publisher</label>
+  <div class="input-container">
+    <input pInputText id="publisher" [(ngModel)]="toUpdateMetadata.publisher" class="input"/>
+    <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('publisher')"/>
+    <input pInputText id="publisherFetched" [(ngModel)]="fetchedMetadata.publisher" class="input"/>
+  </div>
+</div>
+
+<div class="form-row">
+  <label for="publishedDate" class="label">Published Date</label>
+  <div class="input-container">
+    <input pInputText id="publishedDate" [(ngModel)]="toUpdateMetadata.publishedDate" class="input"/>
+    <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('publishedDate')"/>
+    <input pInputText id="publishedDateFetched" [(ngModel)]="fetchedMetadata.publishedDate" class="input"/>
+  </div>
+</div>
+
+<div class="form-row">
+  <label for="isbn10" class="label">ISBN-10</label>
+  <div class="input-container">
+    <input pInputText id="isbn10" [(ngModel)]="toUpdateMetadata.isbn10" class="input"/>
+    <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('isbn10')"/>
+    <input pInputText id="isbn10Fetched" [(ngModel)]="fetchedMetadata.isbn10" class="input"/>
+  </div>
+</div>
+
+<div class="form-row">
+  <label for="language" class="label">Language</label>
+  <div class="input-container">
+    <input pInputText id="language" [(ngModel)]="toUpdateMetadata.language" class="input"/>
+    <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('language')"/>
+    <input pInputText id="languageFetched" [(ngModel)]="fetchedMetadata.language" class="input"/>
+  </div>
+</div>
+
+<div class="form-row">
+  <label for="language" class="label">Page Count</label>
+  <div class="input-container">
+    <input pInputText id="pageCount" [(ngModel)]="toUpdateMetadata.pageCount" class="input"/>
+    <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('pageCount')"/>
+    <input pInputText id="pageCountFetched" [(ngModel)]="fetchedMetadata.pageCount" class="input"/>
+  </div>
+</div>
+
+<div class="form-row">
+  <label for="description" class="label">Description</label>
+  <div class="input-container">
+    <textarea id="description" [(ngModel)]="toUpdateMetadata.description" class="input"></textarea>
+    <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('description')"/>
+    <textarea id="descriptionFetched" [(ngModel)]="fetchedMetadata.description" class="input"></textarea>
+  </div>
+</div>
+
+<div class="form-row">
+  <label class="label"></label>
+  <div class="input-container">
+    <img *ngIf="!updateThumbnail" [src]="coverImageSrc(book)" alt="Book Thumbnail" class="thumbnail"/>
+    <img *ngIf="updateThumbnail" [src]="fetchedMetadata.thumbnail" alt="Fetched Thumbnail" class="thumbnail"/>
+    <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="shouldUpdateThumbnail()"/>
+    <img [src]="fetchedMetadata.thumbnail" alt="Fetched Thumbnail" class="thumbnail"/>
+  </div>
+</div>
+
+<div class="button-container">
+  <p-button label="Cancel" icon="pi pi-times" severity="secondary" class="cancel-button" (onClick)="closeDialog()"></p-button>
+  <p-button label="Save" icon="pi pi-check" severity="primary" class="save-button" [disabled]="loading" (onClick)="saveMetadata()"></p-button>
+</div>

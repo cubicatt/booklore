@@ -10,7 +10,6 @@ export interface Book {
 }
 
 export interface BookMetadata {
-  thumbnail: string;
   title: string;
   subtitle?: string;
   authors: Author[];
@@ -22,6 +21,39 @@ export interface BookMetadata {
   pageCount: number;
   language: string;
   googleBookId: string;
+  [key: string]: any;
+}
+
+export interface FetchedMetadata {
+  title: string;
+  subtitle?: string;
+  authors: Author[];
+  categories: Category[];
+  publisher: string;
+  publishedDate: string;
+  isbn10: string;
+  description: string;
+  pageCount: number;
+  language: string;
+  googleBookId: string;
+  thumbnail: string;
+  [key: string]: any;
+}
+
+export interface UpdateMedata {
+  title?: string;
+  subtitle?: string;
+  authors?: Author[];
+  categories?: Category[];
+  publisher?: string;
+  publishedDate?: string;
+  isbn10?: string;
+  description?: string;
+  pageCount?: number;
+  language?: string;
+  googleBookId?: string;
+  thumbnail?: string;
+  [key: string]: any;
 }
 
 export interface Author {

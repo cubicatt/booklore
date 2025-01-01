@@ -41,6 +41,9 @@ import {ProgressSpinnerModule} from 'primeng/progressspinner';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 import {providePrimeNG} from 'primeng/config';
 import Aura from '@primeng/themes/aura';
+import { MetadataSearcherComponent } from './metadata-searcher/metadata-searcher.component';
+import {IftaLabel} from 'primeng/iftalabel';
+import { LoadingOverlayComponent } from './loading-overlay/loading-overlay.component';
 
 @NgModule({
   declarations: [
@@ -48,7 +51,8 @@ import Aura from '@primeng/themes/aura';
     DirectoryPickerComponent,
     LibraryCreatorComponent,
     ShelfAssignerComponent,
-    BookBrowserComponent
+    BookBrowserComponent,
+    MetadataSearcherComponent
   ],
   imports: [
     BrowserModule,
@@ -78,6 +82,8 @@ import Aura from '@primeng/themes/aura';
     MenuModule,
     IconPickerComponent,
     ProgressSpinnerModule,
+    IftaLabel,
+    LoadingOverlayComponent,
   ],
   providers: [
     DialogService,

@@ -24,14 +24,13 @@ CREATE TABLE IF NOT EXISTS book
 CREATE TABLE IF NOT EXISTS book_metadata
 (
     book_id        BIGINT NOT NULL PRIMARY KEY,
-    google_book_id VARCHAR(255) UNIQUE,
     title          VARCHAR(255),
     subtitle       VARCHAR(255),
     publisher      VARCHAR(255),
     published_date DATE,
     description    TEXT,
-    isbn_13        VARCHAR(13),
-    isbn_10        VARCHAR(10),
+    isbn_13        VARCHAR(20),
+    isbn_10        VARCHAR(20),
     page_count     INT,
     thumbnail      VARCHAR(1000),
     language       VARCHAR(10),

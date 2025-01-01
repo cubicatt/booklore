@@ -1,16 +1,20 @@
 package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.BookDTO;
+import com.adityachandel.booklore.model.dto.BookMetadataDTO;
 import com.adityachandel.booklore.model.dto.BookWithNeighborsDTO;
 import com.adityachandel.booklore.model.dto.LibraryDTO;
 import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
 import com.adityachandel.booklore.model.entity.Sort;
 import com.adityachandel.booklore.service.BooksService;
 import com.adityachandel.booklore.service.LibraryService;
+import com.adityachandel.booklore.service.metadata.parser.AmazonParser;
+import com.adityachandel.booklore.service.metadata.parser.model.QueryData;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -21,6 +25,7 @@ public class LibraryController {
 
     private LibraryService libraryService;
     private BooksService booksService;
+    private AmazonParser amazonParser;
 
     @GetMapping("/{libraryId}")
     public ResponseEntity<LibraryDTO> getLibrary(@PathVariable long libraryId) {

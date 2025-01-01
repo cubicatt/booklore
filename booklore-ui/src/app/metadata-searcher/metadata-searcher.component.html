@@ -83,9 +83,9 @@
   <label class="label"></label>
   <div class="input-container">
     <img *ngIf="!updateThumbnail" [src]="coverImageSrc(book)" alt="Book Thumbnail" class="thumbnail"/>
-    <img *ngIf="updateThumbnail" [src]="fetchedMetadata.thumbnail" alt="Fetched Thumbnail" class="thumbnail"/>
+    <img *ngIf="updateThumbnail" [src]="fetchedMetadata.thumbnailUrl" alt="Fetched Thumbnail" class="thumbnail"/>
     <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="shouldUpdateThumbnail()"/>
-    <img [src]="fetchedMetadata.thumbnail" alt="Fetched Thumbnail" class="thumbnail"/>
+    <img [src]="fetchedMetadata.thumbnailUrl" alt="Fetched Thumbnail" class="thumbnail"/>
   </div>
 </div>
 

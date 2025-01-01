@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {catchError, map, switchMap, tap} from 'rxjs/operators';
-import {Book, BookMetadata, BookSetting, FetchedMetadata, UpdateMedata} from '../model/book.model';
+import {Book, BookMetadata, BookSetting, FetchedMetadata} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 
 @Injectable({
@@ -187,28 +187,15 @@ export class BookService {
     this.bookStateSubject.next({...currentState, books: filteredBooks});
   }
 
-  getFetchBookMetadata(bookId: number): Observable<FetchedMetadata> {
-    return this.http.post<FetchedMetadata>(`${this.url}/${bookId}/query-for-books`, null);
+  getBookByIdFromAPI(bookId: number, withDescription: boolean) {
+    return this.http.get<Book>(`${this.url}/${bookId}`);
   }
 
-  updateMetadata(bookId: number, updateMedata: UpdateMedata): Observable<BookMetadata> {
-    return this.http.put<BookMetadata>(`${this.url}/${bookId}/metadata`, updateMedata).pipe(
-      map((updatedMetadata) => {
-        const currentState = this.bookStateSubject.value;
-        const updatedBooks = currentState.books?.map((book) => {
-          if (book.id === bookId) {
-            return { ...book, metadata: updatedMetadata };
-          }
-          return book;
-        }) || [];
-        this.bookStateSubject.next({ ...currentState, books: updatedBooks });
-        return updatedMetadata;
-      }),
-      catchError((error) => {
-        const currentState = this.bookStateSubject.value;
-        this.bookStateSubject.next({ ...currentState, error: error.message });
-        throw error;
-      })
-    );
+  fetchMetadataFromSource(bookId: number): Observable<FetchedMetadata> {
+    return this.http.post<FetchedMetadata>(`${this.url}/${bookId}/source/AMAZON/metadata`, null);
+  }
+
+  updateMetadata(bookId: number, updateMedata: FetchedMetadata): Observable<BookMetadata> {
+    return this.http.put<BookMetadata>(`${this.url}/${bookId}/source/AMAZON/metadata`, updateMedata);
   }
 }

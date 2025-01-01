@@ -17,7 +17,7 @@ export interface BookMetadata {
   publisher: string;
   publishedDate: string;
   isbn10: string;
-  description: string;
+  description?: string;
   pageCount: number;
   language: string;
   googleBookId: string;
@@ -25,34 +25,23 @@ export interface BookMetadata {
 }
 
 export interface FetchedMetadata {
-  title: string;
-  subtitle?: string;
-  authors: Author[];
-  categories: Category[];
-  publisher: string;
-  publishedDate: string;
-  isbn10: string;
-  description: string;
-  pageCount: number;
-  language: string;
-  googleBookId: string;
-  thumbnail: string;
-  [key: string]: any;
-}
-
-export interface UpdateMedata {
-  title?: string;
-  subtitle?: string;
-  authors?: Author[];
-  categories?: Category[];
-  publisher?: string;
-  publishedDate?: string;
-  isbn10?: string;
-  description?: string;
-  pageCount?: number;
-  language?: string;
-  googleBookId?: string;
-  thumbnail?: string;
+  bookId: number | null;
+  googleBookId: string | null;
+  amazonBookId: string | null;
+  title: string | null;
+  subtitle?: string | null;
+  publisher: string | null;
+  publishedDate: string | null;
+  description: string | null;
+  isbn13: string | null;
+  isbn10: string | null;
+  pageCount: number | null;
+  thumbnailUrl: string | null;
+  language: string | null;
+  rating: number | null;
+  reviewCount: number | null;
+  authors: string[];
+  categories: string[];
   [key: string]: any;
 }
 
@@ -66,24 +55,10 @@ export interface Category {
   name: string;
 }
 
-
 export interface BookWithNeighborsDTO {
   currentBook: Book;
   previousBookId: number | null;
   nextBookId: number | null;
-}
-
-export interface BookUpdateEvent {
-  libraryId: number;
-  filename: string;
-  book: {
-    id: number;
-    libraryId: number;
-    fileName: string;
-    addedOn: string;
-    metadata: BookMetadata;
-  };
-  parsingStatus: string;
 }
 
 export interface BookSetting {
@@ -92,4 +67,3 @@ export interface BookSetting {
   sidebar_visible: boolean;
   spread: 'off' | 'even' | 'odd';
 }
-

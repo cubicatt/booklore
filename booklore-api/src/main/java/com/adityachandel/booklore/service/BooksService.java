@@ -1,16 +1,22 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.exception.ApiError;
-import com.adityachandel.booklore.model.dto.*;
-import com.adityachandel.booklore.model.dto.request.SetMetadataRequest;
+import com.adityachandel.booklore.model.dto.BookDTO;
+import com.adityachandel.booklore.model.dto.BookMetadataDTO;
+import com.adityachandel.booklore.model.dto.BookViewerSettingDTO;
+import com.adityachandel.booklore.model.dto.BookWithNeighborsDTO;
 import com.adityachandel.booklore.model.dto.response.GoogleBooksMetadata;
-import com.adityachandel.booklore.model.entity.*;
+import com.adityachandel.booklore.model.entity.Author;
+import com.adityachandel.booklore.model.entity.Book;
+import com.adityachandel.booklore.model.entity.BookViewerSetting;
+import com.adityachandel.booklore.model.entity.Shelf;
 import com.adityachandel.booklore.repository.*;
-import com.adityachandel.booklore.transformer.BookMetadataTransformer;
+import com.adityachandel.booklore.service.metadata.BookMetadataService;
+import com.adityachandel.booklore.service.metadata.model.BookMetadataSource;
+import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.transformer.BookSettingTransformer;
 import com.adityachandel.booklore.transformer.BookTransformer;
 import com.adityachandel.booklore.util.BookUtils;
-import com.adityachandel.booklore.util.DateUtils;
 import com.adityachandel.booklore.util.FileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +30,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,23 +42,29 @@ public class BooksService {
     private final BookRepository bookRepository;
     private final BookViewerSettingRepository bookViewerSettingRepository;
     private final GoogleBookMetadataService googleBookMetadataService;
-    private final BookMetadataRepository metadataRepository;
-    private final AuthorRepository authorRepository;
-    private final CategoryRepository categoryRepository;
     private final LibraryRepository libraryRepository;
-    private final NotificationService notificationService;
     private final ShelfRepository shelfRepository;
     private final FileService fileService;
+    private final BookMetadataService bookMetadataService;
 
 
-    public BookDTO getBook(long bookId) {
+    public BookDTO getBook(long bookId, boolean withDescription) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        return BookTransformer.convertToBookDTO(book);
+        BookDTO bookDTO = BookTransformer.convertToBookDTO(book);
+        if (!withDescription) {
+            bookDTO.getMetadata().setDescription(null);
+        }
+        return bookDTO;
     }
 
-    public List<BookDTO> getBooks() {
+    public List<BookDTO> getBooks(boolean withDescription) {
         return bookRepository.findAll().stream()
                 .map(BookTransformer::convertToBookDTO)
+                .peek(bookDTO -> {
+                    if (!withDescription) {
+                        bookDTO.getMetadata().setDescription(null);
+                    }
+                })
                 .collect(Collectors.toList());
     }
 
@@ -117,118 +125,6 @@ public class BooksService {
         return googleBookMetadataService.queryByTerm(searchTerm);
     }
 
-    public BookMetadataDTO setMetadata(long bookId, BookMetadataDTO newMetadata) throws IOException {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        BookMetadata metadata = book.getMetadata();
-        metadata.setTitle(newMetadata.getTitle());
-        metadata.setSubtitle(newMetadata.getSubtitle());
-        metadata.setPublisher(newMetadata.getPublisher());
-        metadata.setPublishedDate(DateUtils.parseDateToInstant(newMetadata.getPublishedDate()));
-        metadata.setLanguage(newMetadata.getLanguage());
-        metadata.setIsbn10(newMetadata.getIsbn10());
-        metadata.setIsbn13(newMetadata.getIsbn13());
-        metadata.setDescription(newMetadata.getDescription());
-        metadata.setPageCount(newMetadata.getPageCount());
-        if (newMetadata.getAuthors() != null && !newMetadata.getAuthors().isEmpty()) {
-            List<Author> authors = newMetadata.getAuthors().stream()
-                    .map(authorDTO -> authorRepository.findByName(authorDTO.getName())
-                            .orElseGet(() -> authorRepository.save(Author.builder().name(authorDTO.getName()).build())))
-                    .collect(Collectors.toList());
-            metadata.setAuthors(authors);
-        }
-        if (newMetadata.getCategories() != null && !newMetadata.getCategories().isEmpty()) {
-            List<Category> categories = newMetadata
-                    .getCategories()
-                    .stream()
-                    .map(CategoryDTO::getName)
-                    .collect(Collectors.toSet())
-                    .stream()
-                    .map(categoryName -> categoryRepository.findByName(categoryName)
-                            .orElseGet(() -> categoryRepository.save(Category.builder().name(categoryName).build())))
-                    .collect(Collectors.toList());
-            metadata.setCategories(categories);
-        }
-
-        if(newMetadata.getThumbnail() != null && !newMetadata.getThumbnail().isEmpty()) {
-            String thumbnailPath = fileService.createThumbnail(bookId, newMetadata.getThumbnail(), "amz");
-            metadata.setThumbnail(thumbnailPath);
-        }
-
-        authorRepository.saveAll(metadata.getAuthors());
-        categoryRepository.saveAll(metadata.getCategories());
-        metadataRepository.save(metadata);
-        return BookMetadataTransformer.convertToBookDTO(metadata);
-    }
-
-    public BookDTO setMetadata(SetMetadataRequest setMetadataRequest, long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        GoogleBooksMetadata gMetadata = googleBookMetadataService.getByGoogleBookId(setMetadataRequest.getGoogleBookId());
-        BookMetadata metadata = book.getMetadata();
-        metadata.setDescription(gMetadata.getDescription());
-        metadata.setTitle(gMetadata.getTitle());
-        metadata.setLanguage(gMetadata.getLanguage());
-        metadata.setPublisher(gMetadata.getPublisher());
-        String publishedDate = gMetadata.getPublishedDate();
-        if (publishedDate != null && !publishedDate.isEmpty()) {
-            String normalizeDate = normalizeDate(publishedDate);
-            metadata.setPublishedDate(normalizeDate);
-        }
-        metadata.setSubtitle(gMetadata.getSubtitle());
-        metadata.setPageCount(gMetadata.getPageCount());
-        metadata.setThumbnail(gMetadata.getThumbnail());
-        if (gMetadata.getAuthors() != null && !gMetadata.getAuthors().isEmpty()) {
-            List<Author> authors = gMetadata.getAuthors().stream()
-                    .map(authorName -> authorRepository.findByName(authorName)
-                            .orElseGet(() -> authorRepository.save(Author.builder().name(authorName).build())))
-                    .collect(Collectors.toList());
-            metadata.setAuthors(authors);
-        }
-        if (gMetadata.getCategories() != null && !gMetadata.getCategories().isEmpty()) {
-            List<Category> categories = gMetadata
-                    .getCategories()
-                    .stream()
-                    .map(c -> Arrays.stream(c.split("/"))
-                            .map(String::trim)
-                            .filter(s -> !s.isEmpty() && !s.equalsIgnoreCase("General"))
-                            .toList())
-                    .flatMap(List::stream)
-                    .collect(Collectors.toSet())
-                    .stream()
-                    .map(categoryName -> categoryRepository.findByName(categoryName)
-                            .orElseGet(() -> categoryRepository.save(Category.builder().name(categoryName).build())))
-                    .collect(Collectors.toList());
-            metadata.setCategories(categories);
-        }
-        metadata.setIsbn10(gMetadata.getIsbn10());
-        metadata.setIsbn13(gMetadata.getIsbn13());
-        authorRepository.saveAll(metadata.getAuthors());
-        categoryRepository.saveAll(metadata.getCategories());
-        metadataRepository.save(metadata);
-
-        return BookTransformer.convertToBookDTO(book);
-    }
-
-    public String normalizeDate(String input) {
-        DateTimeFormatter fullDateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        if (input.matches("\\d{4}")) {
-            return input + "-01-01";
-        }
-        try {
-            LocalDate.parse(input, fullDateFormatter);
-            return input;
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Invalid date format: " + input);
-        }
-    }
-
-    public String getFileNameWithoutExtension(String fileName) {
-        int dotIndex = fileName.lastIndexOf('.');
-        if (dotIndex == -1) {
-            return fileName;
-        } else {
-            return fileName.substring(0, dotIndex);
-        }
-    }
 
     public BookWithNeighborsDTO getBookWithNeighbours(long libraryId, long bookId) {
         libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
@@ -267,5 +163,9 @@ public class BooksService {
     public Resource getBookCover(long bookId) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         return fileService.getBookCover(book.getMetadata().getThumbnail());
+    }
+
+    public BookMetadataDTO setBookMetadata(long bookId, BookMetadataSource source, FetchedBookMetadata setMetadataRequest) {
+        return bookMetadataService.setBookMetadata(bookId, setMetadataRequest, source);
     }
 }

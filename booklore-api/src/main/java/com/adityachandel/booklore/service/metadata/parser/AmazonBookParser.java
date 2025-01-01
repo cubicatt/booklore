@@ -1,14 +1,10 @@
 package com.adityachandel.booklore.service.metadata.parser;
 
 import com.adityachandel.booklore.exception.ApiError;
-import com.adityachandel.booklore.model.dto.AuthorDTO;
-import com.adityachandel.booklore.model.dto.BookMetadataDTO;
-import com.adityachandel.booklore.model.dto.CategoryDTO;
 import com.adityachandel.booklore.model.entity.Book;
-import com.adityachandel.booklore.model.entity.Library;
 import com.adityachandel.booklore.repository.BookRepository;
-import com.adityachandel.booklore.repository.LibraryRepository;
-import com.adityachandel.booklore.service.metadata.parser.model.QueryData;
+import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
+import com.adityachandel.booklore.service.metadata.model.BookFetchQuery;
 import com.adityachandel.booklore.util.BookUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +16,10 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,59 +27,99 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class AmazonParser {
+public class AmazonBookParser implements BookParser {
 
     private BookRepository bookRepository;
 
-    public BookMetadataDTO queryForBookMetadata(Long bookId, QueryData queryData) {
+    public FetchedBookMetadata fetchMetadata(Long bookId, BookFetchQuery bookFetchQuery) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        if (queryData == null || (queryData.getBookTitle() == null && queryData.getAuthor() == null && queryData.getIsbn() == null)) {
+        if (bookFetchQuery == null || (bookFetchQuery.getBookTitle() == null && bookFetchQuery.getAuthor() == null && bookFetchQuery.getIsbn() == null)) {
             String title = book.getMetadata().getTitle();
             if (title == null || title.isEmpty()) {
                 String cleanFileName = BookUtils.cleanFileName(book.getFileName());
-                queryData = QueryData.builder().bookTitle(cleanFileName).build();
+                bookFetchQuery = BookFetchQuery.builder().bookTitle(cleanFileName).build();
             } else {
-                queryData = QueryData.builder().bookTitle(title).build();
+                bookFetchQuery = BookFetchQuery.builder().bookTitle(title).build();
             }
         }
-        String amazonBookId = getAmazonBookId(queryData);
+        String amazonBookId = getAmazonBookId(bookFetchQuery);
         if (amazonBookId == null) {
             return null;
         }
         return getBookMetadata(amazonBookId);
     }
 
-    public String getAmazonBookId(QueryData queryData) {
-        String queryUrl = buildQueryUrl(queryData);
+    private String getAmazonBookId(BookFetchQuery bookFetchQuery) {
+        String queryUrl = buildQueryUrl(bookFetchQuery);
         if (queryUrl == null) {
+            log.error("Query URL is null, cannot proceed.");
             return null;
         }
 
         try {
             Document doc = fetchDoc(queryUrl);
             Element searchResults = doc.select("span[data-component-type=s-search-results]").first();
+            if (searchResults == null) {
+                log.error("No search results found for query: {}", queryUrl);
+                return null;
+            }
+
             Element item = searchResults.select("div[role=listitem][data-index=2]").first();
-            return item.attr("data-asin");
+            if (item == null) {
+                log.error("No item found in the search results.");
+                return null;
+            }
+
+            String bookLink = null;
+
+            // Try to get 'Paperback' and 'Hardcover' links
+            for (String type : new String[]{"Paperback", "Hardcover"}) {
+                Element link = item.select("a:containsOwn(" + type + ")").first();
+                if (link != null) {
+                    bookLink = link.attr("href");
+                    log.info("{} link found: {}", type, bookLink);
+                    break; // Take the first found link, whether Paperback or Hardcover
+                } else {
+                    log.info("No link containing '{}' found.", type);
+                }
+            }
+
+            if (bookLink != null) {
+                String asin = extractAsinFromUrl(bookLink);
+                log.info("Book ASIN extracted: {}", asin);
+                return asin;
+            } else {
+                String asin = item.attr("data-asin");
+                log.info("No book link found, returning ASIN: {}", asin);
+                return asin;
+            }
         } catch (Exception e) {
-            log.error("Failed to get asin: {}", e.getMessage());
+            log.error("Failed to get asin: {}", e.getMessage(), e);
             return null;
         }
     }
 
-    public BookMetadataDTO getBookMetadata(String amazonBookId) {
+    private String extractAsinFromUrl(String url) {
+        // Extract the ASIN (book ID) from the URL, which will be the part after "/dp/"
+        String[] parts = url.split("/dp/");
+        if (parts.length > 1) {
+            String[] asinParts = parts[1].split("/");
+            return asinParts[0];
+        }
+        return null;
+    }
+
+    private FetchedBookMetadata getBookMetadata(String amazonBookId) {
+        log.info("Fetching book metadata for amazon book {}", amazonBookId);
 
         Document doc = fetchDoc("https://www.amazon.com/dp/" + amazonBookId);
 
-        return BookMetadataDTO.builder()
+        return FetchedBookMetadata.builder()
                 .amazonBookId(amazonBookId)
                 .title(getTitle(doc))
                 .subtitle(getSubtitle(doc))
-                .authors(getAuthors(doc).stream()
-                        .map(name -> AuthorDTO.builder().name(name).build())
-                        .collect(Collectors.toList()))
-                .categories(getBestSellerCategories(doc).stream()
-                        .map(category -> CategoryDTO.builder().name(category).build())
-                        .collect(Collectors.toList()))
+                .authors(getAuthors(doc).stream().toList())
+                .categories(getBestSellerCategories(doc).stream().toList())
                 .description(getDescription(doc))
                 .isbn13(getIsbn13(doc))
                 .isbn10(getIsbn10(doc))
@@ -87,32 +127,32 @@ public class AmazonParser {
                 .publishedDate(getPublicationDate(doc))
                 .language(getLanguage(doc))
                 .pageCount(getPageCount(doc))
-                .thumbnail(getThumbnail(doc))
+                .thumbnailUrl(getThumbnail(doc))
                 .rating(getRating(doc))
                 .reviewCount(getReviewCount(doc))
-                .printLength(getPrintLength(doc))
                 .build();
     }
 
-    private String buildQueryUrl(QueryData queryData) {
+    private String buildQueryUrl(BookFetchQuery bookFetchQuery) {
         StringBuilder queryBuilder = new StringBuilder("https://www.amazon.com/s/?search-alias=stripbooks&unfiltered=1&sort=relevanceexprank");
 
-        if (queryData.getIsbn() != null && !queryData.getIsbn().isEmpty()) {
-            queryBuilder.append("&field-isbn=").append(queryData.getIsbn());
+        if (bookFetchQuery.getIsbn() != null && !bookFetchQuery.getIsbn().isEmpty()) {
+            queryBuilder.append("&field-isbn=").append(bookFetchQuery.getIsbn());
         }
 
-        if (queryData.getBookTitle() != null && !queryData.getBookTitle().isEmpty()) {
-            queryBuilder.append("&field-title=").append(queryData.getBookTitle().replace(" ", "%20"));
+        if (bookFetchQuery.getBookTitle() != null && !bookFetchQuery.getBookTitle().isEmpty()) {
+            queryBuilder.append("&field-title=").append(bookFetchQuery.getBookTitle().replace(" ", "%20"));
         }
 
-        if (queryData.getAuthor() != null && !queryData.getAuthor().isEmpty()) {
-            queryBuilder.append("&field-author=").append(queryData.getAuthor().replace(" ", "%20"));
+        if (bookFetchQuery.getAuthor() != null && !bookFetchQuery.getAuthor().isEmpty()) {
+            queryBuilder.append("&field-author=").append(bookFetchQuery.getAuthor().replace(" ", "%20"));
         }
 
-        if (queryData.getIsbn() == null && queryData.getBookTitle() == null && queryData.getAuthor() != null) {
+        if (bookFetchQuery.getIsbn() == null && bookFetchQuery.getBookTitle() == null && bookFetchQuery.getAuthor() != null) {
             return null;
         }
 
+        log.info("Query URL: {}", queryBuilder.toString());
         return queryBuilder.toString();
     }
 
@@ -205,11 +245,11 @@ public class AmazonParser {
         return null;
     }
 
-    private String getPublicationDate(Document doc) {
+    private LocalDate getPublicationDate(Document doc) {
         try {
             Element publicationDateElement = doc.select("#rpi-attribute-book_details-publication_date .rpi-attribute-value span").first();
             if (publicationDateElement != null) {
-                return publicationDateElement.text();
+                return parseAmazonDate(publicationDateElement.text());
             }
             log.error("Error fetching publication date: Element not found.");
         } catch (Exception e) {
@@ -227,19 +267,6 @@ public class AmazonParser {
             log.error("Error fetching language: Element not found.");
         } catch (Exception e) {
             log.error("Error fetching language: {}", e.getMessage());
-        }
-        return null;
-    }
-
-    private String getPrintLength(Document doc) {
-        try {
-            Element printLengthElement = doc.select("#rpi-attribute-book_details-fiona_pages .rpi-attribute-value span").first();
-            if (printLengthElement != null) {
-                return printLengthElement.text();
-            }
-            log.error("Error fetching print length: Element not found.");
-        } catch (Exception e) {
-            log.error("Error fetching print length: {}", e.getMessage());
         }
         return null;
     }
@@ -262,13 +289,16 @@ public class AmazonParser {
         return Set.of();
     }
 
-    private String getRating(Document doc) {
+    private Float getRating(Document doc) {
         try {
             Element reviewDiv = doc.select("div#averageCustomerReviews_feature_div").first();
             if (reviewDiv != null) {
                 Elements ratingElements = reviewDiv.select("span#acrPopover span.a-size-base.a-color-base");
                 if (!ratingElements.isEmpty()) {
-                    return Objects.requireNonNull(ratingElements.first()).text();
+                    String text = Objects.requireNonNull(ratingElements.first()).text();
+                    if (!text.isEmpty()) {
+                        return Float.parseFloat(text);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -277,13 +307,16 @@ public class AmazonParser {
         return null;
     }
 
-    private String getReviewCount(Document doc) {
+    private Integer getReviewCount(Document doc) {
         try {
             Element reviewDiv = doc.select("div#averageCustomerReviews_feature_div").first();
             if (reviewDiv != null) {
                 Element reviewCountElement = reviewDiv.getElementById("acrCustomerReviewText");
                 if (reviewCountElement != null) {
-                    return Objects.requireNonNull(reviewCountElement).text().split(" ")[0];
+                    String reviewCount = Objects.requireNonNull(reviewCountElement).text().split(" ")[0];
+                    if (!reviewCount.isEmpty()) {
+                        return Integer.parseInt(reviewCount);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -354,5 +387,10 @@ public class AmazonParser {
             log.error("Error parsing url: {}", url, e);
             throw new RuntimeException(e);
         }
+    }
+
+    private LocalDate parseAmazonDate(String dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
+        return LocalDate.parse(dateString, formatter);
     }
 }

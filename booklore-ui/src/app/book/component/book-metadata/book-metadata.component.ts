@@ -3,14 +3,12 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {Book} from '../../model/book.model';
 import {Button} from 'primeng/button';
 import {NgForOf, NgIf} from '@angular/common';
-import {BookMetadataDialogComponent} from '../book-metadata-dialog/book-metadata-dialog.component';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
-import {Subscription} from 'rxjs';
+import {forkJoin, Subscription} from 'rxjs';
 import {TagModule} from 'primeng/tag';
 import {BookService} from '../../service/book.service';
 import {LibraryService} from '../../service/library.service';
 import {MetadataSearcherComponent} from '../../../metadata-searcher/metadata-searcher.component';
-import {ProgressSpinner} from 'primeng/progressspinner';
 import {LoadingService} from '../../../loading.service';
 
 @Component({
@@ -78,10 +76,13 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
     return 'No authors available';
   }
 
-  openEditDialog(bookId: number, libraryId: number) {
+  openEditDialog(bookId: number) {
     this.loadingService.show();
-    this.bookService.getFetchBookMetadata(bookId).subscribe({
-      next: (fetchedMetadata) => {
+    forkJoin({
+      book: this.bookService.getBookByIdFromAPI(bookId, true),
+      fetchedMetadata: this.bookService.fetchMetadataFromSource(bookId)
+    }).subscribe({
+      next: ({ book, fetchedMetadata }) => {
         this.loadingService.hide();
         this.dialogRef = this.dialogService.open(MetadataSearcherComponent, {
           header: 'Update Book Metadata',
@@ -95,7 +96,7 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
             'padding': '1.25rem 1.25rem 0',
           },
           data: {
-            currentMetadata: this.book?.metadata,
+            currentMetadata: book.metadata,
             fetchedMetadata: fetchedMetadata,
             book: this.book
           }
@@ -117,27 +118,6 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-  /*openEditDialog1(bookId: number | undefined, libraryId: number | undefined) {
-    this.dialogRef = this.dialogService.open(BookMetadataDialogComponent, {
-      header: 'Metadata: Google Books',
-      modal: true,
-      closable: true,
-      width: '65%',
-      height: '85%',
-      data: {
-        bookId: bookId,
-        libraryId: libraryId,
-        bookTitle: this.book?.metadata?.title,
-      },
-    });
-
-    this.dialogSubscription = this.dialogRef.onClose.subscribe(() => {
-      if (this.book?.id && this.book.libraryId) {
-        this.loadBookWithNeighbors(this.book.id, this.book.libraryId);
-      }
-    });
-  }*/
 
   coverImageSrc(bookId: number | undefined): string {
     if (bookId === null) {

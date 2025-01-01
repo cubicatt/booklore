@@ -34,6 +34,8 @@ CREATE TABLE IF NOT EXISTS book_metadata
     page_count     INT,
     thumbnail      VARCHAR(1000),
     language       VARCHAR(10),
+    rating         FLOAT,
+    review_count   INT,
     CONSTRAINT fk_book_metadata FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE
 );
 

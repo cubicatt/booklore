@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.model.dto;
+package com.adityachandel.booklore.service.metadata.model;
 
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class BookMetadataDTO {
+public class FetchedBookMetadata {
     private Long bookId;
     private String googleBookId;
     private String amazonBookId;
@@ -20,10 +20,10 @@ public class BookMetadataDTO {
     private String isbn13;
     private String isbn10;
     private Integer pageCount;
+    private String thumbnailUrl;
     private String language;
     private Float rating;
     private Integer reviewCount;
-    private List<AuthorDTO> authors;
-    private List<CategoryDTO> categories;
-
+    private List<String> authors;
+    private List<String> categories;
 }

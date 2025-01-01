@@ -3,15 +3,14 @@ package com.adityachandel.booklore.controller;
 import com.adityachandel.booklore.model.dto.BookDTO;
 import com.adityachandel.booklore.model.dto.BookMetadataDTO;
 import com.adityachandel.booklore.model.dto.BookViewerSettingDTO;
-import com.adityachandel.booklore.model.dto.request.SetMetadataRequest;
 import com.adityachandel.booklore.model.dto.request.ShelvesAssignmentRequest;
-import com.adityachandel.booklore.model.dto.response.GoogleBooksMetadata;
 import com.adityachandel.booklore.service.BooksService;
-import com.adityachandel.booklore.service.metadata.parser.AmazonParser;
-import com.adityachandel.booklore.service.metadata.parser.model.QueryData;
+import com.adityachandel.booklore.service.metadata.BookMetadataService;
+import com.adityachandel.booklore.service.metadata.model.BookFetchQuery;
+import com.adityachandel.booklore.service.metadata.model.BookMetadataSource;
+import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,16 +24,16 @@ import java.util.List;
 public class BookController {
 
     private BooksService booksService;
-    private AmazonParser amazonParser;
+    private BookMetadataService bookMetadataService;
 
     @GetMapping("/{bookId}")
-    public ResponseEntity<BookDTO> getBook(@PathVariable long bookId) {
-        return ResponseEntity.ok(booksService.getBook(bookId));
+    public ResponseEntity<BookDTO> getBook(@PathVariable long bookId, @RequestParam(required = false, defaultValue = "false") boolean withDescription) {
+        return ResponseEntity.ok(booksService.getBook(bookId, withDescription));
     }
 
     @GetMapping
-    public ResponseEntity<List<BookDTO>> getBooks() {
-        return ResponseEntity.ok(booksService.getBooks());
+    public ResponseEntity<List<BookDTO>> getBooks(@RequestParam(required = false, defaultValue = "false") boolean withDescription) {
+        return ResponseEntity.ok(booksService.getBooks(withDescription));
     }
 
     @GetMapping("/search")
@@ -69,34 +68,18 @@ public class BookController {
         return ResponseEntity.ok(booksService.updateLastReadTime(bookId));
     }
 
-    @GetMapping("/{bookId}/fetch-metadata")
-    public ResponseEntity<List<GoogleBooksMetadata>> getBookFetchMetadata(@PathVariable long bookId) {
-        return ResponseEntity.ok(booksService.fetchProspectiveMetadataListByBookId(bookId));
+    @PostMapping("/{bookId}/source/{source}/metadata")
+    public ResponseEntity<FetchedBookMetadata> getBookMetadata(@RequestBody(required = false) BookFetchQuery bookFetchQuery, @PathVariable Long bookId, @PathVariable BookMetadataSource source) {
+        return ResponseEntity.ok(bookMetadataService.fetchBookMetadata(bookId, source, bookFetchQuery));
     }
 
-    @PostMapping("/{bookId}/query-for-books")
-    public ResponseEntity<BookMetadataDTO> getBookMetadata(@RequestBody(required = false) QueryData queryData, @PathVariable Long bookId) {
-        return ResponseEntity.ok(amazonParser.queryForBookMetadata(bookId, queryData));
-    }
-
-    @GetMapping("/fetch-metadata")
-    public ResponseEntity<List<GoogleBooksMetadata>> fetchMedataByTerm(@RequestParam String term) {
-        return ResponseEntity.ok(booksService.fetchProspectiveMetadataListBySearchTerm(term));
-    }
-
-    @PutMapping("/{bookId}/set-metadata")
-    public ResponseEntity<BookDTO> setBookMetadata(@RequestBody SetMetadataRequest setMetadataRequest, @PathVariable long bookId) {
-        return ResponseEntity.ok(booksService.setMetadata(setMetadataRequest, bookId));
+    @PutMapping("/{bookId}/source/{source}/metadata")
+    public ResponseEntity<BookMetadataDTO> setBookMetadata(@RequestBody FetchedBookMetadata setMetadataRequest, @PathVariable long bookId, @PathVariable BookMetadataSource source) {
+        return ResponseEntity.ok(booksService.setBookMetadata(bookId, source, setMetadataRequest));
     }
 
     @PostMapping("/assign-shelves")
     public ResponseEntity<List<BookDTO>> addBookToShelf(@RequestBody @Valid ShelvesAssignmentRequest request) {
         return ResponseEntity.ok(booksService.assignShelvesToBooks(request.getBookIds(), request.getShelvesToAssign(), request.getShelvesToUnassign()));
     }
-
-    @PutMapping("/{bookId}/metadata")
-    public ResponseEntity<BookMetadataDTO> updateBookMetadata(@RequestBody BookMetadataDTO metadataDTO, @PathVariable long bookId) throws IOException {
-        return ResponseEntity.ok(booksService.setMetadata(bookId, metadataDTO));
-    }
-
 }

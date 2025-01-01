@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -29,7 +30,7 @@ public class BookMetadata {
     private String publisher;
 
     @Column(name = "published_date")
-    private String publishedDate;
+    private LocalDate publishedDate;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
@@ -48,6 +49,12 @@ public class BookMetadata {
 
     @Column(name = "language", length = 10)
     private String language;
+
+    @Column(name = "rating")
+    private Float rating;
+
+    @Column(name = "review_count")
+    private Integer reviewCount;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId

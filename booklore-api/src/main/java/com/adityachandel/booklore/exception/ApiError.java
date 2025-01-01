@@ -19,7 +19,8 @@ public enum ApiError {
     FILE_ALREADY_EXISTS(HttpStatus.CONFLICT, "File already exists"),
     INVALID_QUERY_PARAMETERS(HttpStatus.BAD_REQUEST, "Query parameters are required for the search."),
     SHELF_ALREADY_EXISTS(HttpStatus.CONFLICT, "Shelf already exists: %s"),
-    SHELF_NOT_FOUND(HttpStatus.NOT_FOUND, "Shelf not found with ID: %d");
+    SHELF_NOT_FOUND(HttpStatus.NOT_FOUND, "Shelf not found with ID: %d"),
+    METADATA_SOURCE_NOT_IMPLEMENT_OR_DOES_NOT_EXIST(HttpStatus.BAD_REQUEST, "Metadata source not implement or does not exist" ),;
 
     private final HttpStatus status;
     private final String message;

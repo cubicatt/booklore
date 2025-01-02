@@ -52,7 +52,7 @@ import { LoadingOverlayComponent } from './loading-overlay/loading-overlay.compo
     LibraryCreatorComponent,
     ShelfAssignerComponent,
     BookBrowserComponent,
-    MetadataSearcherComponent
+    MetadataSearcherComponent,
   ],
   imports: [
     BrowserModule,

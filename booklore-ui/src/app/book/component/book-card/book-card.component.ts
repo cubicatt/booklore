@@ -74,9 +74,7 @@ export class BookCardComponent implements OnInit {
           {
             label: 'View metadata',
             icon: 'pi pi-info-circle',
-            command: () => {
-              this.openBookInfo(this.book)
-            },
+            command: () => this.openBookInfo(this.book),
           },
         ],
       },
@@ -98,6 +96,8 @@ export class BookCardComponent implements OnInit {
   }
 
   openBookInfo(book: Book): void {
-    this.router.navigate(['/library', book.libraryId, 'book', book.id, 'info']);
+    setTimeout(() => {
+      this.router.navigate(['/library', book.libraryId, 'book', book.id, 'info']);
+    }, 10);
   }
 }

@@ -5,6 +5,7 @@ import {MessageService} from 'primeng/api';
 import {Router} from '@angular/router';
 import {LibraryService} from '../../service/library.service';
 import {IconPickerComponent} from '../icon-picker/icon-picker.component';
+import {take} from 'rxjs';
 
 @Component({
   selector: 'app-library-creator',
@@ -97,10 +98,12 @@ export class LibraryCreatorComponent {
 
   validateLibraryNameAndProceed(activateCallback: Function) {
     if (this.libraryName.trim()) {
-      this.libraryService.libraryState$.subscribe(
-        libraryState => {
-          let library = libraryState.libraries?.find(library => library.name === this.libraryName.trim());
-          if(library) {
+      const libraryName = this.libraryName.trim();
+      this.libraryService.libraryState$
+        .pipe(take(1))
+        .subscribe(libraryState => {
+          const library = libraryState.libraries?.find(library => library.name === libraryName);
+          if (library) {
             this.messageService.add({
               severity: 'error',
               summary: 'Library Name Exists',
@@ -109,8 +112,7 @@ export class LibraryCreatorComponent {
           } else {
             activateCallback(2);
           }
-        }
-      )
+        });
     }
   }
 

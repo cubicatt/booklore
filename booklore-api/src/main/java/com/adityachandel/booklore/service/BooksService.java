@@ -168,4 +168,8 @@ public class BooksService {
     public BookMetadataDTO setBookMetadata(long bookId, BookMetadataSource source, FetchedBookMetadata setMetadataRequest) {
         return bookMetadataService.setBookMetadata(bookId, setMetadataRequest, source);
     }
+
+    public BookMetadataDTO setBookMetadataV2(long bookId, FetchedBookMetadata setMetadataRequest) {
+        return bookMetadataService.setBookMetadata(bookId, setMetadataRequest, BookMetadataSource.AMAZON);
+    }
 }

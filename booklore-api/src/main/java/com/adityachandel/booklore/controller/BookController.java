@@ -78,6 +78,11 @@ public class BookController {
         return ResponseEntity.ok(booksService.setBookMetadata(bookId, source, setMetadataRequest));
     }
 
+    @PutMapping("/{bookId}/metadata")
+    public ResponseEntity<BookMetadataDTO> setBookMetadataV2(@RequestBody FetchedBookMetadata setMetadataRequest, @PathVariable long bookId) {
+        return ResponseEntity.ok(booksService.setBookMetadataV2(bookId, setMetadataRequest));
+    }
+
     @PostMapping("/assign-shelves")
     public ResponseEntity<List<BookDTO>> addBookToShelf(@RequestBody @Valid ShelvesAssignmentRequest request) {
         return ResponseEntity.ok(booksService.assignShelvesToBooks(request.getBookIds(), request.getShelvesToAssign(), request.getShelvesToUnassign()));

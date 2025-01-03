@@ -4,6 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {catchError, map, switchMap, tap} from 'rxjs/operators';
 import {Book, BookMetadata, BookSetting, FetchedMetadata} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
+import {BookMetadataForm} from '../model/book-metadata-form';
 
 @Injectable({
   providedIn: 'root',
@@ -202,4 +203,9 @@ export class BookService {
   updateMetadata(bookId: number, updateMedata: FetchedMetadata): Observable<BookMetadata> {
     return this.http.put<BookMetadata>(`${this.url}/${bookId}/source/AMAZON/metadata`, updateMedata);
   }
+
+  updateMetadataV2(bookId: number, bookMetadataForm: BookMetadataForm): Observable<BookMetadata> {
+    return this.http.put<BookMetadata>(`${this.url}/${bookId}/metadata`, bookMetadataForm);
+  }
+
 }

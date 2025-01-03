@@ -16,6 +16,7 @@ import {Button} from 'primeng/button';
 import {AppConfiguratorComponent} from '../configurator/configurator.component';
 import {StyleClass} from 'primeng/styleclass';
 import {Divider} from 'primeng/divider';
+import {BookInfoTabsComponent} from '../../../book-info-tabs/book-info-tabs.component';
 
 @Component({
   selector: 'app-topbar',
@@ -39,7 +40,7 @@ export class AppTopBarComponent implements OnDestroy {
   items!: MenuItem[];
   ref: DynamicDialogRef | undefined;
 
-  latestEvent: LogNotification = { message: 'No recent notifications...' };
+  latestEvent: LogNotification = {message: 'No recent notifications...'};
   eventHighlight: boolean = false;
   showEvents: boolean = false;
   eventTimeout: any;
@@ -74,6 +75,22 @@ export class AppTopBarComponent implements OnDestroy {
 
   toggleEventDisplay(): void {
     this.showEvents = !this.showEvents;
+  }
+
+
+  openBookDetailsDialog(): void {
+    this.ref = this.dialogService.open(BookInfoTabsComponent, {
+      header: 'Open book details',
+      modal: true,
+      closable: true,
+      width: '1000px',
+      height: '835px',
+      showHeader: false,
+      closeOnEscape: true,
+      data: {
+        bookId: 1
+      }
+    });
   }
 
   openLibraryCreatorDialog(): void {

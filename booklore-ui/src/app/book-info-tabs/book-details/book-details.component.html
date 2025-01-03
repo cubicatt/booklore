@@ -1,0 +1,87 @@
+<div class="container pt-6 px-2 flex flex-col h-full">
+  <div class="space-y-4 flex-grow">
+    <div class="flex w-full gap-x-4">
+      <div class="flex flex-col gap-1 w-2/3">
+        <label for="title">Title</label>
+        <input pInputText id="title" class="w-full" [(ngModel)]="bookForm.title"/>
+      </div>
+      <div class="flex flex-col gap-1 w-1/3">
+        <label for="subtitle">Subtitle</label>
+        <input pInputText id="subtitle" class="w-full" [(ngModel)]="bookForm.subtitle"/>
+      </div>
+    </div>
+    <div class="flex w-full gap-x-4">
+      <div class="flex flex-col gap-1 w-3/4">
+        <label for="authors">Authors</label>
+        <input pInputText
+               id="authors"
+               class="w-full"
+               [(ngModel)]="authorsInput"
+               (ngModelChange)="onAuthorsInputChange()"
+               placeholder="Enter authors separated by commas"/>
+      </div>
+      <div class="flex flex-col gap-1 w-1/4">
+        <label for="publish">Publish Date</label>
+        <input pInputText id="publish" class="w-full" [(ngModel)]="bookForm.publishedDate"/>
+      </div>
+    </div>
+    <div class="flex flex-col gap-1 w-full">
+      <label for="description">Description</label>
+      <textarea id="description" rows="5" cols="30" pTextarea [(ngModel)]="bookForm.description"></textarea>
+    </div>
+    <div class="flex flex-grow w-full justify-between gap-4">
+      <div class="w-1/3 flex justify-center items-center pt-4 pr-4 pb-4">
+        <p-image src="https://m.media-amazon.com/images/I/61GzazUmKyL._SL1462_.jpg" alt="Image" width="250"/>
+      </div>
+      <div class="w-2/3 space-y-2">
+        <div class="flex flex-col gap-1 w-full">
+          <label for="categories">Categories</label>
+          <input
+            pInputText
+            id="categories"
+            class="w-full"
+            [(ngModel)]="categoriesInput"
+            (input)="onCategoriesInputChange()"
+          />
+        </div>
+        <div class="flex w-full gap-x-4">
+          <div class="flex flex-col gap-1 w-1/2">
+            <label for="publisher">Publisher</label>
+            <input pInputText id="publisher" class="w-full" [(ngModel)]="bookForm.publisher"/>
+          </div>
+          <div class="flex flex-col w-1/2">
+            <label for="language">Language</label>
+            <input pInputText id="language" class="w-full" [(ngModel)]="bookForm.language"/>
+          </div>
+        </div>
+        <div class="flex w-full gap-x-4">
+          <div class="flex flex-col gap-1 w-1/2">
+            <label for="isbn10">ISBN10</label>
+            <input pInputText id="isbn10" class="w-full" [(ngModel)]="bookForm.isbn10"/>
+          </div>
+          <div class="flex flex-col w-1/2">
+            <label for="isbn13">ISBN13</label>
+            <input pInputText id="isbn13" class="w-full" [(ngModel)]="bookForm.isbn13"/>
+          </div>
+        </div>
+        <div class="flex w-full gap-x-4">
+          <div class="flex flex-col w-1/2">
+            <label for="aisn">AISN</label>
+            <input pInputText id="aisn" class="w-full" [(ngModel)]="bookForm.asin"/>
+          </div>
+          <div class="flex flex-col w-1/2">
+            <label for="page-count">Page Count</label>
+            <input pInputText id="page-count" class="w-full" [(ngModel)]="bookForm.pageCount"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex flex-col gap-x-4 mt-auto">
+    <p-divider></p-divider>
+    <div class="flex gap-x-4 justify-end">
+      <p-button label="Cancel" severity="secondary"/>
+      <p-button label="Save" (onClick)="onSave()"/>
+    </div>
+  </div>
+</div>

@@ -17,6 +17,8 @@ export interface BookMetadata {
   publisher: string;
   publishedDate: string;
   isbn10: string;
+  isbn13: string;
+  asin: string;
   description?: string;
   pageCount: number;
   language: string;

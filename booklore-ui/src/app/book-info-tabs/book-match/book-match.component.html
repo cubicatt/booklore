@@ -60,5 +60,5 @@
 </form>
 
 <div *ngIf="selectedMetadata" class="h-full flex-auto">
-  <app-metadata-searcher [book]="book!" [fetchedMetadata]="selectedMetadata"></app-metadata-searcher>
+  <app-metadata-searcher [book]="book!" [fetchedMetadata]="selectedMetadata" (closeDialog)="closeTheDialog($event)"></app-metadata-searcher>
 </div>

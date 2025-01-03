@@ -6,10 +6,10 @@
   </p-tablist>
   <p-tabpanels style="height: 100%; overflow: hidden; padding-bottom: 0">
     <p-tabpanel value="0" style="height: 100%; overflow: hidden;">
-      <app-book-details [bookForm]="metadataForm" (save)="saveBook($event)"></app-book-details>
+      <app-book-details [bookId]="book.id" [bookForm]="metadataForm" (save)="saveBook($event)" (closeDialog)="closeDialog($event)"></app-book-details>
     </p-tabpanel>
     <p-tabpanel value="1" style="height: 100%; overflow: hidden;">
-      <app-book-match [book]="book"></app-book-match>
+      <app-book-match [book]="book" (closeDialog)="closeDialog($event)"></app-book-match>
     </p-tabpanel>
     <p-tabpanel value="2" style="height: 100%; overflow: hidden;">
       <p>I too work!!</p>

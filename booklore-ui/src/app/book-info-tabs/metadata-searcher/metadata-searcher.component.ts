@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Book, BookMetadata, FetchedMetadata} from '../../book/model/book.model';
 import {BookService} from '../../book/service/book.service';
 import {MessageService} from 'primeng/api';
@@ -12,19 +12,21 @@ import {Divider} from 'primeng/divider';
   selector: 'app-metadata-searcher',
   standalone: true,
   templateUrl: './metadata-searcher.component.html',
+  styleUrls: ['./metadata-searcher.component.scss'],
   imports: [
     Button,
     FormsModule,
     InputText,
     NgIf,
     Divider
-  ],
-  styleUrls: ['./metadata-searcher.component.scss']
+  ]
 })
 export class MetadataSearcherComponent implements OnInit {
 
   @Input() fetchedMetadata!: FetchedMetadata;
   @Input() book!: Book;
+  @Output() closeDialog = new EventEmitter<unknown>();
+
   toUpdateMetadata!: FetchedMetadata;
   loading: boolean = false;
   updateThumbnail: boolean = false;

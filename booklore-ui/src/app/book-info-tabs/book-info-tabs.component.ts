@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 import {BookDetailsComponent} from './book-details/book-details.component';
-import {DynamicDialogConfig} from 'primeng/dynamicdialog';
+import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {BookService} from '../book/service/book.service';
 import {Book} from '../book/model/book.model';
 import {BookMetadataForm} from '../book/model/book-metadata-form';
@@ -27,7 +27,8 @@ export class BookInfoTabsComponent {
   book: Book;
   metadataForm: BookMetadataForm = {} as BookMetadataForm;
 
-  constructor(private bookService: BookService, private dynamicDialogConfig: DynamicDialogConfig, private messageService: MessageService) {
+  constructor(private bookService: BookService, private dynamicDialogConfig: DynamicDialogConfig,
+              private messageService: MessageService, private dynamicDialogRef: DynamicDialogRef) {
     this.book = this.dynamicDialogConfig.data.book;
     this.initializeBookForm();
   }
@@ -51,5 +52,9 @@ export class BookInfoTabsComponent {
         this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book metadata'});
       }
     });
+  }
+
+  closeDialog($event: any) {
+    this.dynamicDialogRef.close();
   }
 }

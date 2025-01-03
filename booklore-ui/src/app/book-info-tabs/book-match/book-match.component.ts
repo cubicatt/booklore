@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {Select} from 'primeng/select';
@@ -32,6 +32,7 @@ import {MetadataSearcherComponent} from '../metadata-searcher/metadata-searcher.
 export class BookMatchComponent implements OnInit {
 
   @Input() book!: Book;
+  @Output() closeDialog = new EventEmitter<unknown>();
 
   form: FormGroup;
   providers = Object.values(Provider);
@@ -108,5 +109,9 @@ export class BookMatchComponent implements OnInit {
 
   onBookClick(book: FetchedMetadata) {
     this.selectedMetadata = book;
+  }
+
+  closeTheDialog($event: unknown) {
+    this.closeDialog.emit()
   }
 }

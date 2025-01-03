@@ -77,7 +77,7 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
   }
 
   openEditDialog(bookId: number) {
-    this.loadingService.show();
+    /*this.loadingService.show();
     forkJoin({
       book: this.bookService.getBookByIdFromAPI(bookId, true),
       fetchedMetadata: this.bookService.fetchMetadataFromSource(bookId)
@@ -116,7 +116,7 @@ export class BookMetadataComponent implements OnInit, OnDestroy {
         this.loadingService.hide();
         console.error('Error fetching metadata:', error);
       }
-    });
+    });*/
   }
 
   coverImageSrc(bookId: number | undefined): string {

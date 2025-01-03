@@ -6,8 +6,8 @@ import com.adityachandel.booklore.model.dto.BookViewerSettingDTO;
 import com.adityachandel.booklore.model.dto.request.ShelvesAssignmentRequest;
 import com.adityachandel.booklore.service.BooksService;
 import com.adityachandel.booklore.service.metadata.BookMetadataService;
-import com.adityachandel.booklore.service.metadata.model.BookFetchQuery;
-import com.adityachandel.booklore.service.metadata.model.BookMetadataSource;
+import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
+import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -68,13 +68,13 @@ public class BookController {
         return ResponseEntity.ok(booksService.updateLastReadTime(bookId));
     }
 
-    @PostMapping("/{bookId}/source/{source}/metadata")
-    public ResponseEntity<FetchedBookMetadata> getBookMetadata(@RequestBody(required = false) BookFetchQuery bookFetchQuery, @PathVariable Long bookId, @PathVariable BookMetadataSource source) {
-        return ResponseEntity.ok(bookMetadataService.fetchBookMetadata(bookId, source, bookFetchQuery));
+    @PostMapping("/{bookId}/metadata")
+    public ResponseEntity<List<FetchedBookMetadata>> getBookMetadata(@RequestBody(required = false) FetchMetadataRequest fetchMetadataRequest, @PathVariable Long bookId) {
+        return ResponseEntity.ok(bookMetadataService.fetchBookMetadata(bookId, fetchMetadataRequest));
     }
 
     @PutMapping("/{bookId}/source/{source}/metadata")
-    public ResponseEntity<BookMetadataDTO> setBookMetadata(@RequestBody FetchedBookMetadata setMetadataRequest, @PathVariable long bookId, @PathVariable BookMetadataSource source) {
+    public ResponseEntity<BookMetadataDTO> setBookMetadata(@RequestBody FetchedBookMetadata setMetadataRequest, @PathVariable long bookId, @PathVariable MetadataProvider source) {
         return ResponseEntity.ok(booksService.setBookMetadata(bookId, source, setMetadataRequest));
     }
 

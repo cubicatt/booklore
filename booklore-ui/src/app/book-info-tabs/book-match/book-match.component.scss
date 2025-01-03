@@ -5,3 +5,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.img-fixed-dimensions {
+  height: 150px;
+  width: 100px;
+  object-fit: fill;
+}

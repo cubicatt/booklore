@@ -1,4 +1,5 @@
 import {Shelf} from './shelf.model';
+import {SafeUrl} from '@angular/platform-browser';
 
 export interface Book {
   id: number;
@@ -38,7 +39,7 @@ export interface FetchedMetadata {
   isbn13: string | null;
   isbn10: string | null;
   pageCount: number | null;
-  thumbnailUrl: string | null;
+  thumbnailUrl: string | undefined;
   language: string | null;
   rating: number | null;
   reviewCount: number | null;

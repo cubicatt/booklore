@@ -83,7 +83,7 @@ export class AppTopBarComponent implements OnDestroy {
       header: 'Open book details',
       modal: true,
       closable: true,
-      width: '1000px',
+      width: '1200px',
       height: '835px',
       showHeader: false,
       closeOnEscape: true,

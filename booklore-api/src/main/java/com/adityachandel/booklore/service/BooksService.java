@@ -12,7 +12,7 @@ import com.adityachandel.booklore.model.entity.BookViewerSetting;
 import com.adityachandel.booklore.model.entity.Shelf;
 import com.adityachandel.booklore.repository.*;
 import com.adityachandel.booklore.service.metadata.BookMetadataService;
-import com.adityachandel.booklore.service.metadata.model.BookMetadataSource;
+import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.transformer.BookSettingTransformer;
 import com.adityachandel.booklore.transformer.BookTransformer;
@@ -165,11 +165,11 @@ public class BooksService {
         return fileService.getBookCover(book.getMetadata().getThumbnail());
     }
 
-    public BookMetadataDTO setBookMetadata(long bookId, BookMetadataSource source, FetchedBookMetadata setMetadataRequest) {
+    public BookMetadataDTO setBookMetadata(long bookId, MetadataProvider source, FetchedBookMetadata setMetadataRequest) {
         return bookMetadataService.setBookMetadata(bookId, setMetadataRequest, source);
     }
 
     public BookMetadataDTO setBookMetadataV2(long bookId, FetchedBookMetadata setMetadataRequest) {
-        return bookMetadataService.setBookMetadata(bookId, setMetadataRequest, BookMetadataSource.AMAZON);
+        return bookMetadataService.setBookMetadata(bookId, setMetadataRequest, MetadataProvider.AMAZON);
     }
 }

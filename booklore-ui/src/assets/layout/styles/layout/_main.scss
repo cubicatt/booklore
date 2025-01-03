@@ -28,3 +28,11 @@ a {
 .layout-wrapper {
     min-height: 100vh;
 }
+
+p {
+  color: var(--text-color);
+}
+
+p.p-secondary {
+  color: var(--text-secondary-color);
+}

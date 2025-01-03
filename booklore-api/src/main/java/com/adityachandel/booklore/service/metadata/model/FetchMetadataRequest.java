@@ -5,8 +5,10 @@ import lombok.Data;
 
 @Builder
 @Data
-public class BookFetchQuery {
+public class FetchMetadataRequest {
+    private Long bookId;
+    private MetadataProvider provider;
     private String isbn;
-    private String bookTitle;
+    private String title;
     private String author;
 }

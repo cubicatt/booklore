@@ -5,6 +5,7 @@ import {catchError, map, switchMap, tap} from 'rxjs/operators';
 import {Book, BookMetadata, BookSetting, FetchedMetadata} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 import {BookMetadataForm} from '../model/book-metadata-form';
+import {FetchMetadataRequest} from '../model/fetch-metadata-request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -196,8 +197,8 @@ export class BookService {
     });
   }
 
-  fetchMetadataFromSource(bookId: number): Observable<FetchedMetadata> {
-    return this.http.post<FetchedMetadata>(`${this.url}/${bookId}/source/AMAZON/metadata`, null);
+  fetchMetadataFromSource(bookId: number, request: FetchMetadataRequest): Observable<FetchedMetadata[]> {
+    return this.http.post<FetchedMetadata[]>(`${this.url}/${bookId}/metadata`, request);
   }
 
   updateMetadata(bookId: number, updateMedata: FetchedMetadata): Observable<BookMetadata> {

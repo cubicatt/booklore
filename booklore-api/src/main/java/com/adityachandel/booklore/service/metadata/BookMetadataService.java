@@ -2,7 +2,6 @@ package com.adityachandel.booklore.service.metadata;
 
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.model.dto.BookMetadataDTO;
-import com.adityachandel.booklore.model.dto.CategoryDTO;
 import com.adityachandel.booklore.model.entity.Author;
 import com.adityachandel.booklore.model.entity.Book;
 import com.adityachandel.booklore.model.entity.BookMetadata;
@@ -11,8 +10,8 @@ import com.adityachandel.booklore.repository.AuthorRepository;
 import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.CategoryRepository;
-import com.adityachandel.booklore.service.metadata.model.BookFetchQuery;
-import com.adityachandel.booklore.service.metadata.model.BookMetadataSource;
+import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
+import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.service.metadata.parser.AmazonBookParser;
 import com.adityachandel.booklore.transformer.BookMetadataTransformer;
@@ -36,15 +35,15 @@ public class BookMetadataService {
     private CategoryRepository categoryRepository;
     private FileService fileService;
 
-    public FetchedBookMetadata fetchBookMetadata(long bookId, BookMetadataSource source, BookFetchQuery bookFetchQuery) {
-        if (source == BookMetadataSource.AMAZON) {
-            return amazonBookParser.fetchMetadata(bookId, bookFetchQuery);
+    public List<FetchedBookMetadata> fetchBookMetadata(long bookId, FetchMetadataRequest request) {
+        if (request.getProvider() == MetadataProvider.AMAZON) {
+            return amazonBookParser.fetchMetadata(bookId, request);
         } else {
             throw ApiError.METADATA_SOURCE_NOT_IMPLEMENT_OR_DOES_NOT_EXIST.createException();
         }
     }
 
-    public BookMetadataDTO setBookMetadata(long bookId, FetchedBookMetadata newMetadata, BookMetadataSource source) {
+    public BookMetadataDTO setBookMetadata(long bookId, FetchedBookMetadata newMetadata, MetadataProvider source) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         BookMetadata metadata = book.getMetadata();
         metadata.setTitle(newMetadata.getTitle());

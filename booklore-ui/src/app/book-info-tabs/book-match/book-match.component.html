@@ -27,27 +27,30 @@
     </div>
 
     <div>
-      <p-button label="Search" type="submit" [disabled]="!isSearchEnabled"></p-button>
+      <p-button label="Search" type="submit" [disabled]="!isSearchEnabled || loading"></p-button>
     </div>
   </div>
 
-  <!-- Scrollable books list -->
-  <div class="mt-8 flex-1 overflow-y-auto">
+  <div *ngIf="loading" class="flex justify-center items-center">
+    <p-progress-spinner ariaLabel="loading" />
+  </div>
+
+  <div *ngIf="!loading" class="mt-8 flex-1 overflow-y-auto">
     <div *ngFor="let book of books" class="flex flex-col w-full">
       <div class="flex w-full flex-row">
-        <p-image [src]="book.imageUrl" alt="Image" width="110" height="100" class="mr-4"/>
+        <img  [src]="book.thumbnailUrl" alt="Image" class="img-fixed-dimensions pr-2" />
         <div class="flex flex-col w-full m-2">
           <div class="flex flex-row gap-4 justify-between">
-            <p class="font-bold">{{ book.title }}</p>
+            <p class="font-bold">{{ truncateText(book['title'], 90) }}</p>
             <div class="flex gap-4">
-              <p>ISBN: {{ book.isbn }}</p>
+              <p>ISBN: {{ book['isbn13'] }}</p>
               <p> | </p>
-              <p>Year: {{ book.year }}</p>
+              <p>Published: {{ book['publishedDate'] }}</p>
             </div>
           </div>
-          <p>by {{ book.author }}</p>
-          <p class="mt-4 truncate-text">
-            {{ book.description }}
+          <p>by {{ truncateText(book['authors'].join(', '), 70) }}</p>
+          <p class="mt-4 truncate-text p-secondary">
+            {{ book['description'] }}
           </p>
         </div>
       </div>

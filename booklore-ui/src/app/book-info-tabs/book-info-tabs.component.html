@@ -1,11 +1,18 @@
-<p-tabs value="0">
+<p-tabs value="0" style="height: 100%; overflow: hidden;">
   <p-tablist>
     <p-tab value="0">Book Details</p-tab>
     <p-tab value="1">Match Book</p-tab>
+    <p-tab value="2">Manage File</p-tab>
   </p-tablist>
-  <p-tabpanels>
-    <p-tabpanel value="0">
-      <app-book-details [bookForm]="bookForm" (save)="saveBook($event)"></app-book-details>
+  <p-tabpanels style="height: 100%; overflow: hidden;">
+    <p-tabpanel value="0" style="height: 100%; overflow: hidden;">
+      <app-book-details [bookForm]="metadataForm" (save)="saveBook($event)"></app-book-details>
+    </p-tabpanel>
+    <p-tabpanel value="1" style="height: 100%; overflow: hidden;">
+      <app-book-match [metadata]="metadataForm"></app-book-match>
+    </p-tabpanel>
+    <p-tabpanel value="2" style="height: 100%; overflow: hidden;">
+      <p>I too work!!</p>
     </p-tabpanel>
   </p-tabpanels>
 </p-tabs>

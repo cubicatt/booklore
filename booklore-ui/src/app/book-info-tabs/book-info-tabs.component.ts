@@ -6,6 +6,7 @@ import {BookService} from '../book/service/book.service';
 import {Book} from '../book/model/book.model';
 import {BookMetadataForm} from '../book/model/book-metadata-form';
 import {MessageService} from 'primeng/api';
+import {BookMatchComponent} from './book-match/book-match.component';
 
 @Component({
   selector: 'book-info-tabs',
@@ -18,12 +19,13 @@ import {MessageService} from 'primeng/api';
     Tab,
     TabPanels,
     BookDetailsComponent,
+    BookMatchComponent,
     TabPanel
   ]
 })
 export class BookInfoTabsComponent implements OnInit {
   book: Book | undefined;
-  bookForm: BookMetadataForm = {} as BookMetadataForm;
+  metadataForm: BookMetadataForm = {} as BookMetadataForm;
 
   constructor(private bookService: BookService, private dynamicDialogConfig: DynamicDialogConfig,
               private messageService: MessageService) {}
@@ -41,7 +43,7 @@ export class BookInfoTabsComponent implements OnInit {
 
   private initializeBookForm(): void {
     if (this.book?.metadata) {
-      this.bookForm = {
+      this.metadataForm = {
         ...this.book.metadata,
         authors: this.book.metadata.authors?.map(a => a.name) || [],
         categories: this.book.metadata.categories?.map(c => c.name) || []

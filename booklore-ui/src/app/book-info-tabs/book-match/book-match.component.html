@@ -1,0 +1,58 @@
+<form class="flex flex-col w-full h-full pt-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="flex w-full gap-x-4 items-end px-2">
+    <div class="flex flex-col gap-1 w-1/6">
+      <label for="provider">Provider</label>
+      <p-select
+        id="provider"
+        class="w-full"
+        [options]="providers"
+        formControlName="provider"
+        placeholder="Select Provider.."
+      ></p-select>
+    </div>
+
+    <div class="flex flex-col gap-1 w-1/6">
+      <label for="isbn">ISBN</label>
+      <input pInputText formControlName="isbn" id="isbn" class="w-full" />
+    </div>
+
+    <div class="flex flex-col gap-1 w-2/6">
+      <label for="title">Title</label>
+      <input pInputText formControlName="title" id="title" class="w-full" />
+    </div>
+
+    <div class="flex flex-col gap-1 w-2/6">
+      <label for="author">Author</label>
+      <input pInputText formControlName="author" id="author" class="w-full" />
+    </div>
+
+    <div>
+      <p-button label="Search" type="submit" [disabled]="!isSearchEnabled"></p-button>
+    </div>
+  </div>
+
+  <!-- Scrollable books list -->
+  <div class="mt-8 flex-1 overflow-y-auto">
+    <div *ngFor="let book of books" class="flex flex-col w-full">
+      <div class="flex w-full flex-row">
+        <p-image [src]="book.imageUrl" alt="Image" width="110" height="100" class="mr-4"/>
+        <div class="flex flex-col w-full m-2">
+          <div class="flex flex-row gap-4 justify-between">
+            <p class="font-bold">{{ book.title }}</p>
+            <div class="flex gap-4">
+              <p>ISBN: {{ book.isbn }}</p>
+              <p> | </p>
+              <p>Year: {{ book.year }}</p>
+            </div>
+          </div>
+          <p>by {{ book.author }}</p>
+          <p class="mt-4 truncate-text">
+            {{ book.description }}
+          </p>
+        </div>
+      </div>
+      <p-divider></p-divider>
+    </div>
+  </div>
+
+</form>

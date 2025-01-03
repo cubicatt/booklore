@@ -41,70 +41,69 @@ import {ProgressSpinnerModule} from 'primeng/progressspinner';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 import {providePrimeNG} from 'primeng/config';
 import Aura from '@primeng/themes/aura';
-import { MetadataSearcherComponent } from './metadata-searcher/metadata-searcher.component';
+import { MetadataSearcherComponent } from './book-info-tabs/metadata-searcher/metadata-searcher.component';
 import {IftaLabel} from 'primeng/iftalabel';
 import { LoadingOverlayComponent } from './loading-overlay/loading-overlay.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    DirectoryPickerComponent,
-    LibraryCreatorComponent,
-    ShelfAssignerComponent,
-    BookBrowserComponent,
-    MetadataSearcherComponent,
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    AppLayoutModule,
-    FormsModule,
-    InputTextModule,
-    TableModule,
-    Button,
-    StepperModule,
-    IconFieldModule,
-    InputIconModule,
-    ToggleButtonModule,
-    PasswordModule,
-    ToastModule,
-    InfiniteScrollDirective,
-    SearchComponent,
-    DropdownModule,
-    VirtualScrollerModule,
-    LazyLoadImageModule,
-    ConfirmDialogModule,
-    CheckboxModule,
-    DividerModule,
-    DialogModule,
-    BookCardComponent,
-    SpeedDialModule,
-    MenuModule,
-    IconPickerComponent,
-    ProgressSpinnerModule,
-    IftaLabel,
-    LoadingOverlayComponent,
-  ],
-  providers: [
-    DialogService,
-    MessageService,
-    ConfirmationService,
-    {
-      provide: RxStompService,
-      useFactory: rxStompServiceFactory,
-    },
-    {
-      provide: RouteReuseStrategy,
-      useClass: CustomReuseStrategy
-    },
-    provideAnimationsAsync(),
-    providePrimeNG({
-      theme: {
-        preset: Aura
-      }
-    })
-  ],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        DirectoryPickerComponent,
+        LibraryCreatorComponent,
+        ShelfAssignerComponent,
+        BookBrowserComponent
+    ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        AppLayoutModule,
+        FormsModule,
+        InputTextModule,
+        TableModule,
+        Button,
+        StepperModule,
+        IconFieldModule,
+        InputIconModule,
+        ToggleButtonModule,
+        PasswordModule,
+        ToastModule,
+        InfiniteScrollDirective,
+        SearchComponent,
+        DropdownModule,
+        VirtualScrollerModule,
+        LazyLoadImageModule,
+        ConfirmDialogModule,
+        CheckboxModule,
+        DividerModule,
+        DialogModule,
+        BookCardComponent,
+        SpeedDialModule,
+        MenuModule,
+        IconPickerComponent,
+        ProgressSpinnerModule,
+        IftaLabel,
+        LoadingOverlayComponent,
+    ],
+    providers: [
+        DialogService,
+        MessageService,
+        ConfirmationService,
+        {
+            provide: RxStompService,
+            useFactory: rxStompServiceFactory,
+        },
+        {
+            provide: RouteReuseStrategy,
+            useClass: CustomReuseStrategy
+        },
+        provideAnimationsAsync(),
+        providePrimeNG({
+            theme: {
+                preset: Aura
+            }
+        })
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule {
 }

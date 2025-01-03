@@ -8,7 +8,7 @@ import {forkJoin, Subscription} from 'rxjs';
 import {TagModule} from 'primeng/tag';
 import {BookService} from '../../service/book.service';
 import {LibraryService} from '../../service/library.service';
-import {MetadataSearcherComponent} from '../../../metadata-searcher/metadata-searcher.component';
+import {MetadataSearcherComponent} from '../../../book-info-tabs/metadata-searcher/metadata-searcher.component';
 import {LoadingService} from '../../../loading.service';
 
 @Component({

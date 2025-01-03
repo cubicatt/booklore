@@ -1,29 +1,41 @@
-import {Component} from '@angular/core';
-import {Book, BookMetadata, FetchedMetadata} from '../book/model/book.model';
-import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
-import {BookService} from '../book/service/book.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {Book, BookMetadata, FetchedMetadata} from '../../book/model/book.model';
+import {BookService} from '../../book/service/book.service';
 import {MessageService} from 'primeng/api';
+import {Button} from 'primeng/button';
+import {FormsModule} from '@angular/forms';
+import {InputText} from 'primeng/inputtext';
+import {NgIf} from '@angular/common';
+import {Divider} from 'primeng/divider';
 
 @Component({
   selector: 'app-metadata-searcher',
-  standalone: false,
+  standalone: true,
   templateUrl: './metadata-searcher.component.html',
+  imports: [
+    Button,
+    FormsModule,
+    InputText,
+    NgIf,
+    Divider
+  ],
   styleUrls: ['./metadata-searcher.component.scss']
 })
-export class MetadataSearcherComponent {
+export class MetadataSearcherComponent implements OnInit {
 
-  fetchedMetadata: FetchedMetadata;
-  toUpdateMetadata: FetchedMetadata;
-  book: Book;
+  @Input() fetchedMetadata!: FetchedMetadata;
+  @Input() book!: Book;
+  toUpdateMetadata!: FetchedMetadata;
   loading: boolean = false;
   updateThumbnail: boolean = false;
 
-  constructor(public dynamicDialogConfig: DynamicDialogConfig, private dynamicDialogRef: DynamicDialogRef,
-              private bookService: BookService, private messageService: MessageService) {
+  constructor(private bookService: BookService, private messageService: MessageService) {
 
-    this.fetchedMetadata = this.dynamicDialogConfig.data.fetchedMetadata;
-    this.toUpdateMetadata = this.convertBookMetadataToFetchedMetadata(this.dynamicDialogConfig.data.currentMetadata);
-    this.book = this.dynamicDialogConfig.data.book;
+  }
+
+  ngOnInit() {
+    console.log(this.book)
+    this.toUpdateMetadata = this.convertBookMetadataToFetchedMetadata(this.book!.metadata!);
   }
 
   copyFetchedToCurrent(field: keyof FetchedMetadata) {
@@ -64,10 +76,6 @@ export class MetadataSearcherComponent {
     this.fetchedMetadata.categories = value.split(',');
   }
 
-  closeDialog() {
-    this.dynamicDialogRef.close();
-  }
-
   coverImageSrc(book: Book): string {
     return this.bookService.getBookCoverUrl(book.id);
   }
@@ -79,7 +87,6 @@ export class MetadataSearcherComponent {
       next: () => {
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
         this.loading = false;
-        this.dynamicDialogRef.close();
       },
       error: (error) => {
         this.loading = false;

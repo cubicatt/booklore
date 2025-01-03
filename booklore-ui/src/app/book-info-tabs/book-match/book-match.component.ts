@@ -1,17 +1,16 @@
-import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {Select} from 'primeng/select';
 import {InputText} from 'primeng/inputtext';
-import {BookMetadataForm} from '../../book/model/book-metadata-form';
 import {Divider} from 'primeng/divider';
 import {NgForOf, NgIf} from '@angular/common';
 import {Provider} from '../../book/model/provider.model';
 import {BookService} from '../../book/service/book.service';
 import {FetchMetadataRequest} from '../../book/model/fetch-metadata-request.model';
-import {FetchedMetadata} from '../../book/model/book.model';
-import {DomSanitizer} from '@angular/platform-browser';
+import {Book, FetchedMetadata} from '../../book/model/book.model';
 import {ProgressSpinner} from 'primeng/progressspinner';
+import {MetadataSearcherComponent} from '../metadata-searcher/metadata-searcher.component';
 
 @Component({
   selector: 'app-book-match',
@@ -25,19 +24,22 @@ import {ProgressSpinner} from 'primeng/progressspinner';
     Divider,
     NgForOf,
     NgIf,
-    ProgressSpinner
+    ProgressSpinner,
+    MetadataSearcherComponent
   ],
   standalone: true
 })
-export class BookMatchComponent implements OnChanges {
+export class BookMatchComponent implements OnInit {
 
-  @Input() metadata!: BookMetadataForm;
+  @Input() book!: Book;
+
   form: FormGroup;
   providers = Object.values(Provider);
-  books: FetchedMetadata[] = [];
+  fetchedMetadata: FetchedMetadata[] = [];
+  selectedMetadata!: FetchedMetadata;
   loading: boolean = false;
 
-  constructor(private fb: FormBuilder, private bookService: BookService, private sanitizer: DomSanitizer) {
+  constructor(private fb: FormBuilder, private bookService: BookService) {
     this.form = this.fb.group({
       provider: [null],
       isbn: [''],
@@ -46,15 +48,13 @@ export class BookMatchComponent implements OnChanges {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['metadata'] && this.metadata) {
-      const firstAuthor = this.metadata.authors && this.metadata.authors.length > 0 ? this.metadata.authors[0] : '';
+  ngOnInit() {
+      const firstAuthor = this.book!.metadata?.authors && this.book!.metadata?.authors.length > 0 ? this.book!.metadata?.authors[0].name : '';
       this.form.patchValue({
-        isbn: this.metadata.isbn10 || '',
-        title: this.metadata.title || '',
+        isbn: this.book!.metadata?.isbn10 || '',
+        title: this.book!.metadata?.title || '',
         author: firstAuthor,
       });
-    }
   }
 
   get isSearchEnabled(): boolean {
@@ -86,7 +86,7 @@ export class BookMatchComponent implements OnChanges {
           next: (fetchedMetadata) => {
             console.log('Metadata fetched successfully', fetchedMetadata);
             this.loading = false;
-            this.books = fetchedMetadata.map((book) => ({
+            this.fetchedMetadata = fetchedMetadata.map((book) => ({
               ...book,
               thumbnailUrl: book.thumbnailUrl
             }));
@@ -106,4 +106,7 @@ export class BookMatchComponent implements OnChanges {
     return safeText.length > length ? safeText.substring(0, length) + '...' : safeText;
   }
 
+  onBookClick(book: FetchedMetadata) {
+    this.selectedMetadata = book;
+  }
 }

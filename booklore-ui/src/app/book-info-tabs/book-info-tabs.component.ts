@@ -23,22 +23,13 @@ import {BookMatchComponent} from './book-match/book-match.component';
     TabPanel
   ]
 })
-export class BookInfoTabsComponent implements OnInit {
-  book: Book | undefined;
+export class BookInfoTabsComponent {
+  book: Book;
   metadataForm: BookMetadataForm = {} as BookMetadataForm;
 
-  constructor(private bookService: BookService, private dynamicDialogConfig: DynamicDialogConfig,
-              private messageService: MessageService) {}
-
-  ngOnInit(): void {
-    this.bookService.getBookByIdFromAPI(this.dynamicDialogConfig.data.bookId, true).subscribe({
-      next: (book) => {
-        this.book = book;
-        this.initializeBookForm();
-      },
-      error: (error) => {
-      }
-    });
+  constructor(private bookService: BookService, private dynamicDialogConfig: DynamicDialogConfig, private messageService: MessageService) {
+    this.book = this.dynamicDialogConfig.data.book;
+    this.initializeBookForm();
   }
 
   private initializeBookForm(): void {
@@ -52,7 +43,6 @@ export class BookInfoTabsComponent implements OnInit {
   }
 
   saveBook(bookMetadataForm: BookMetadataForm) {
-    console.log(bookMetadataForm)
     this.bookService.updateMetadataV2(this.book?.id!, bookMetadataForm).subscribe({
       next: () => {
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});

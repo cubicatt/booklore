@@ -11,6 +11,7 @@ import {CheckboxModule} from 'primeng/checkbox';
 import {FormsModule} from '@angular/forms';
 import {NgIf} from '@angular/common';
 import {Observable} from 'rxjs';
+import {BookInfoTabsComponent} from '../../../book-info-tabs/book-info-tabs.component';
 
 @Component({
   selector: 'app-book-card',
@@ -74,11 +75,34 @@ export class BookCardComponent implements OnInit {
           {
             label: 'View metadata',
             icon: 'pi pi-info-circle',
-            command: () => this.openBookInfo(this.book),
+            command: () => this.openBookDetailsDialog(this.book.id),
           },
         ],
       },
     ];
+  }
+
+  openBookDetailsDialog(bookId: number): void {
+    this.bookService.getBookByIdFromAPI(bookId, true).subscribe(({
+      next: (book) => {
+        console.log(book)
+        this.dialogService.open(BookInfoTabsComponent, {
+          header: 'Open book details',
+          modal: true,
+          closable: true,
+          width: '1200px',
+          height: '835px',
+          showHeader: false,
+          closeOnEscape: true,
+          data: {
+            book: book
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error fetching book:', error);
+      }
+    }))
   }
 
   private openShelfDialog(book: Book): void {

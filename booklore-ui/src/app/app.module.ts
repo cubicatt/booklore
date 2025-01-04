@@ -1,6 +1,5 @@
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
-
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {AppLayoutModule} from './book/component/layout/app.layout.module';
@@ -41,9 +40,8 @@ import {ProgressSpinnerModule} from 'primeng/progressspinner';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 import {providePrimeNG} from 'primeng/config';
 import Aura from '@primeng/themes/aura';
-import { MetadataSearcherComponent } from './book-info-tabs/metadata-searcher/metadata-searcher.component';
 import {IftaLabel} from 'primeng/iftalabel';
-import { LoadingOverlayComponent } from './loading-overlay/loading-overlay.component';
+import {LoadingOverlayComponent} from './loading-overlay/loading-overlay.component';
 
 @NgModule({
     declarations: [

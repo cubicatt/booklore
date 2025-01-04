@@ -77,22 +77,6 @@ export class AppTopBarComponent implements OnDestroy {
     this.showEvents = !this.showEvents;
   }
 
-
-  openBookDetailsDialog(): void {
-    this.ref = this.dialogService.open(BookInfoTabsComponent, {
-      header: 'Open book details',
-      modal: true,
-      closable: true,
-      width: '1200px',
-      height: '835px',
-      showHeader: false,
-      closeOnEscape: true,
-      data: {
-        bookId: 1
-      }
-    });
-  }
-
   openLibraryCreatorDialog(): void {
     this.ref = this.dialogService.open(LibraryCreatorComponent, {
       header: 'Create New Library',

@@ -4,8 +4,8 @@ import {HttpClient} from '@angular/common/http';
 import {catchError, map, switchMap, tap} from 'rxjs/operators';
 import {Book, BookMetadata, BookSetting, FetchedMetadata} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
-import {BookMetadataForm} from '../model/book-metadata-form';
 import {FetchMetadataRequest} from '../model/fetch-metadata-request.model';
+import {BookMetadataBI} from '../model/book-metadata-for-book-info.model';
 
 @Injectable({
   providedIn: 'root',
@@ -197,16 +197,12 @@ export class BookService {
     });
   }
 
-  fetchMetadataFromSource(bookId: number, request: FetchMetadataRequest): Observable<FetchedMetadata[]> {
+  fetchMetadata(bookId: number, request: FetchMetadataRequest): Observable<FetchedMetadata[]> {
     return this.http.post<FetchedMetadata[]>(`${this.url}/${bookId}/metadata`, request);
   }
 
-  updateMetadata(bookId: number, updateMedata: FetchedMetadata): Observable<BookMetadata> {
-    return this.http.put<BookMetadata>(`${this.url}/${bookId}/source/AMAZON/metadata`, updateMedata);
-  }
-
-  updateMetadataV2(bookId: number, bookMetadataForm: BookMetadataForm): Observable<BookMetadata> {
-    return this.http.put<BookMetadata>(`${this.url}/${bookId}/metadata`, bookMetadataForm);
+  updateMetadata(bookId: number, bookMetadata: BookMetadataBI): Observable<BookMetadata> {
+    return this.http.put<BookMetadata>(`${this.url}/${bookId}/metadata`, bookMetadata);
   }
 
 }

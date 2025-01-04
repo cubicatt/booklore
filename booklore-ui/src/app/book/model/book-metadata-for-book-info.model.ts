@@ -1,4 +1,5 @@
-export interface BookMetadataForm {
+export interface BookMetadataBI {
+  bookId: number;
   title: string;
   subtitle?: string;
   authors: Array<string>;
@@ -7,9 +8,10 @@ export interface BookMetadataForm {
   publishedDate: string;
   isbn10: string;
   isbn13: string;
-  asin: string;
+  asin?: string;
   description?: string;
-  pageCount: number;
+  pageCount?: number | null;
   language: string;
-  googleBookId: string;
+  googleBookId?: string;
+  thumbnailUrl?: string;
 }

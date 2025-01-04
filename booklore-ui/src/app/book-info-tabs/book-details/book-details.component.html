@@ -1,88 +1,76 @@
-<div class="container pt-4 flex flex-col h-full">
-  <div class="space-y-4 overflow-y-auto flex-1">
+<div *ngIf="bookMetadata$ | async as bookMetadata" class="container pt-4 flex flex-col h-full">
+  <form [formGroup]="bookMetadataForm" (ngSubmit)="onSave()" class="space-y-4 overflow-y-auto flex-1">
     <div class="flex w-full gap-x-4">
       <div class="flex flex-col gap-1 w-2/3">
         <label for="title">Title</label>
-        <input pInputText id="title" class="w-full" [(ngModel)]="bookForm.title"/>
+        <input pInputText id="title" class="w-full" formControlName="title"/>
       </div>
       <div class="flex flex-col gap-1 w-1/3">
         <label for="subtitle">Subtitle</label>
-        <input pInputText id="subtitle" class="w-full" [(ngModel)]="bookForm.subtitle"/>
+        <input pInputText id="subtitle" class="w-full" formControlName="subtitle"/>
       </div>
     </div>
     <div class="flex w-full gap-x-4">
       <div class="flex flex-col gap-1 w-3/4">
         <label for="authors">Authors</label>
-        <input pInputText
-               id="authors"
-               class="w-full"
-               [(ngModel)]="authorsInput"
-               (ngModelChange)="onAuthorsInputChange()"
-               placeholder="Enter authors separated by commas"/>
+        <input pInputText id="authors" class="w-full" formControlName="authors" placeholder="Enter authors separated by commas"/>
       </div>
       <div class="flex flex-col gap-1 w-1/4">
         <label for="publish">Publish Date</label>
-        <input pInputText id="publish" class="w-full" [(ngModel)]="bookForm.publishedDate"/>
+        <input pInputText id="publish" class="w-full" formControlName="publishedDate"/>
       </div>
     </div>
     <div class="flex flex-col gap-1 w-full">
       <label for="description">Description</label>
-      <textarea id="description" rows="5" cols="30" pTextarea [(ngModel)]="bookForm.description"></textarea>
+      <textarea id="description" rows="5" cols="30" pTextarea formControlName="description"></textarea>
     </div>
     <div class="flex flex-grow w-full justify-between gap-4">
       <div class="w-1/3 flex justify-center items-center pt-4 pr-4 pb-4">
-        <p-image [src]="coverImageSrc(bookId)" alt="Image" width="250"/>
+        <p-image [src]="coverImageSrc(bookMetadata.bookId)" alt="Image" width="250"></p-image>
       </div>
       <div class="w-2/3 space-y-2">
         <div class="flex flex-col gap-1 w-full">
           <label for="categories">Categories</label>
-          <input
-            pInputText
-            id="categories"
-            class="w-full"
-            [(ngModel)]="categoriesInput"
-            (input)="onCategoriesInputChange()"
-          />
+          <input pInputText id="categories" class="w-full" formControlName="categories"/>
         </div>
         <div class="flex w-full gap-x-4">
           <div class="flex flex-col gap-1 w-1/2">
             <label for="publisher">Publisher</label>
-            <input pInputText id="publisher" class="w-full" [(ngModel)]="bookForm.publisher"/>
+            <input pInputText id="publisher" class="w-full" formControlName="publisher"/>
           </div>
           <div class="flex flex-col w-1/2">
             <label for="language">Language</label>
-            <input pInputText id="language" class="w-full" [(ngModel)]="bookForm.language"/>
+            <input pInputText id="language" class="w-full" formControlName="language"/>
           </div>
         </div>
         <div class="flex w-full gap-x-4">
           <div class="flex flex-col gap-1 w-1/2">
             <label for="isbn10">ISBN10</label>
-            <input pInputText id="isbn10" class="w-full" [(ngModel)]="bookForm.isbn10"/>
+            <input pInputText id="isbn10" class="w-full" formControlName="isbn10"/>
           </div>
           <div class="flex flex-col w-1/2">
             <label for="isbn13">ISBN13</label>
-            <input pInputText id="isbn13" class="w-full" [(ngModel)]="bookForm.isbn13"/>
+            <input pInputText id="isbn13" class="w-full" formControlName="isbn13"/>
           </div>
         </div>
         <div class="flex w-full gap-x-4">
           <div class="flex flex-col w-1/2">
             <label for="aisn">AISN</label>
-            <input pInputText id="aisn" class="w-full" [(ngModel)]="bookForm.asin"/>
+            <input pInputText id="aisn" class="w-full" formControlName="asin"/>
           </div>
           <div class="flex flex-col w-1/2">
             <label for="page-count">Page Count</label>
-            <input pInputText id="page-count" class="w-full" [(ngModel)]="bookForm.pageCount"/>
+            <input pInputText id="page-count" class="w-full" formControlName="pageCount"/>
           </div>
         </div>
       </div>
     </div>
-  </div>
-
+  </form>
   <div class="flex flex-col gap-x-4 mt-auto">
     <p-divider></p-divider>
     <div class="flex gap-x-4 justify-end">
-      <p-button label="Cancel" icon="pi pi-times" severity="secondary" (onClick)="closeDialog.emit()"/>
-      <p-button label="Save" icon="pi pi-check" (onClick)="onSave()"/>
+      <p-button label="Cancel" icon="pi pi-times" severity="secondary"></p-button>
+      <p-button label="Save" icon="pi pi-check" type="submit"></p-button>
     </div>
   </div>
 </div>

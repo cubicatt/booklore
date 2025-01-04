@@ -1,14 +1,8 @@
-<form *ngIf="!selectedMetadata" class="flex flex-col w-full h-full pt-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+<form *ngIf="!selectedFetchedMetadata" class="flex flex-col w-full h-full pt-4" [formGroup]="form" (ngSubmit)="onSubmit()">
   <div class="flex w-full gap-x-4 items-end">
     <div class="flex flex-col gap-1 w-1/6">
       <label for="provider">Provider</label>
-      <p-select
-        id="provider"
-        class="w-full"
-        [options]="providers"
-        formControlName="provider"
-        placeholder="Select Provider.."
-      ></p-select>
+      <p-select id="provider" class="w-full" [options]="providers" formControlName="provider" placeholder="Select Provider.."></p-select>
     </div>
 
     <div class="flex flex-col gap-1 w-1/6">
@@ -36,7 +30,7 @@
   </div>
 
   <div *ngIf="!loading" class="mt-8 flex-1 overflow-y-auto">
-    <div *ngFor="let book of fetchedMetadata" class="book-item flex flex-col w-full">
+    <div *ngFor="let book of allFetchedMetadata" class="book-item flex flex-col w-full">
       <div class="flex w-full flex-row book-item-content" (click)="onBookClick(book)">
         <img [src]="book.thumbnailUrl" alt="Image" class="img-fixed-dimensions pr-2"/>
         <div class=" flex flex-col w-full m-2">
@@ -59,6 +53,6 @@
   </div>
 </form>
 
-<div *ngIf="selectedMetadata" class="h-full flex-auto">
-  <app-metadata-searcher [book]="book!" [fetchedMetadata]="selectedMetadata" (closeDialog)="closeTheDialog($event)"></app-metadata-searcher>
+<div *ngIf="selectedFetchedMetadata" class="h-full flex-auto">
+  <app-metadata-searcher [fetchedMetadata]="selectedFetchedMetadata" (goBack)="onGoBack($event)"></app-metadata-searcher>
 </div>

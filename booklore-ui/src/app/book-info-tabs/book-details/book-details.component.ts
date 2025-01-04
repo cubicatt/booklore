@@ -1,12 +1,16 @@
-import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {InputText} from 'primeng/inputtext';
 import {Textarea} from 'primeng/textarea';
 import {Image} from 'primeng/image';
 import {Button} from 'primeng/button';
 import {Divider} from 'primeng/divider';
-import {FormsModule} from '@angular/forms';
-import {BookMetadataForm} from '../../book/model/book-metadata-form';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {Observable} from 'rxjs';
+import {BookInfoService} from '../book-info.service';
+import {AsyncPipe, NgIf} from '@angular/common';
 import {BookService} from '../../book/service/book.service';
+import {BookMetadataBI} from '../../book/model/book-metadata-for-book-info.model';
+import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'app-book-details',
@@ -19,55 +23,86 @@ import {BookService} from '../../book/service/book.service';
     Image,
     Button,
     Divider,
-    FormsModule
+    FormsModule,
+    AsyncPipe,
+    NgIf,
+    ReactiveFormsModule
   ]
 })
-export class BookDetailsComponent implements OnChanges {
+export class BookDetailsComponent implements OnInit {
 
-  @Input() bookForm!: BookMetadataForm;
-  @Input() bookId!: number;
-  @Output() save = new EventEmitter<BookMetadataForm>();
-  @Output() closeDialog = new EventEmitter<unknown>();
+  bookMetadata$: Observable<BookMetadataBI | null>;
+  bookMetadataForm: FormGroup;
+  currentBookId!: number;
 
-  authorsInput: string = '';
-  categoriesInput: string = '';
-
-
-  constructor(private bookService: BookService) {
+  constructor(private bookInfoService: BookInfoService, private bookService: BookService, private messageService: MessageService) {
+    this.bookMetadata$ = this.bookInfoService.bookMetadata$;
+    this.bookMetadataForm = new FormGroup({
+      title: new FormControl(''),
+      subtitle: new FormControl(''),
+      authors: new FormControl(''),
+      categories: new FormControl(''),
+      publisher: new FormControl(''),
+      publishedDate: new FormControl(''),
+      isbn10: new FormControl(''),
+      isbn13: new FormControl(''),
+      asin: new FormControl(''),
+      description: new FormControl(''),
+      pageCount: new FormControl(''),
+      language: new FormControl(''),
+    });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.bookForm.authors) {
-      this.authorsInput = this.bookForm.authors.join(', ');
-    }
-    if (this.bookForm.categories) {
-      this.categoriesInput = this.bookForm.categories.join(', ');
-    }
+  ngOnInit(): void {
+    this.bookMetadata$.subscribe((bookMetadata) => {
+      if (bookMetadata) {
+        this.currentBookId = bookMetadata.bookId;
+        this.bookMetadataForm.setValue({
+          title: bookMetadata.title,
+          subtitle: bookMetadata.subtitle,
+          authors: bookMetadata.authors.join(', '),
+          categories: bookMetadata.categories.join(', '),
+          publisher: bookMetadata.publisher,
+          publishedDate: bookMetadata.publishedDate,
+          isbn10: bookMetadata.isbn10,
+          isbn13: bookMetadata.isbn13,
+          asin: bookMetadata.asin ? bookMetadata.asin : '',
+          description: bookMetadata.description,
+          pageCount: bookMetadata.pageCount,
+          language: bookMetadata.language
+        });
+      }
+    });
   }
 
   onSave(): void {
-    if (this.authorsInput) {
-      this.bookForm.authors = this.authorsInput.split(',').map(author => author.trim());
-    }
-    if (this.categoriesInput) {
-      this.bookForm.categories = this.categoriesInput.split(',').map(category => category.trim());
-    }
-    this.save.emit(this.bookForm);
+    const updatedBookMetadata: BookMetadataBI = {
+      bookId: this.currentBookId,
+      title: this.bookMetadataForm.get('title')?.value,
+      subtitle: this.bookMetadataForm.get('subtitle')?.value,
+      authors: this.bookMetadataForm.get('authors')?.value.split(',').map((author: string) => author.trim()),
+      categories: this.bookMetadataForm.get('categories')?.value.split(',').map((category: string) => category.trim()),
+      publisher: this.bookMetadataForm.get('publisher')?.value,
+      publishedDate: this.bookMetadataForm.get('publishedDate')?.value,
+      isbn10: this.bookMetadataForm.get('isbn10')?.value,
+      isbn13: this.bookMetadataForm.get('isbn13')?.value,
+      asin: this.bookMetadataForm.get('asin')?.value,
+      description: this.bookMetadataForm.get('description')?.value,
+      pageCount: this.bookMetadataForm.get('pageCount')?.value,
+      language: this.bookMetadataForm.get('language')?.value
+    };
+    this.bookService.updateMetadata(updatedBookMetadata.bookId, updatedBookMetadata).subscribe({
+      next: () => {
+        this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
+        this.bookInfoService.emit(updatedBookMetadata);
+      },
+      error: (error) => {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book metadata'});
+      }
+    })
   }
 
-  onAuthorsInputChange(): void {
-    if (this.authorsInput) {
-      this.bookForm.authors = this.authorsInput.split(',').map(author => author.trim());
-    }
-  }
-
-  onCategoriesInputChange(): void {
-    if (this.categoriesInput) {
-      this.bookForm.categories = this.categoriesInput.split(',').map(category => category.trim());
-    }
-  }
-
-  coverImageSrc(bookId: number) {
-      return this.bookService.getBookCoverUrl(bookId);
+  coverImageSrc(bookId: number): string {
+    return this.bookService.getBookCoverUrl(bookId);
   }
 }

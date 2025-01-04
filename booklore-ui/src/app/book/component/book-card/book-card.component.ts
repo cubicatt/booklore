@@ -85,7 +85,6 @@ export class BookCardComponent implements OnInit {
   openBookDetailsDialog(bookId: number): void {
     this.bookService.getBookByIdFromAPI(bookId, true).subscribe(({
       next: (book) => {
-        console.log(book)
         this.dialogService.open(BookInfoTabsComponent, {
           header: 'Open book details',
           modal: true,

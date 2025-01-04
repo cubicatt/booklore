@@ -45,6 +45,7 @@ export interface FetchedMetadata {
   reviewCount: number | null;
   authors: string[];
   categories: string[];
+  asin: string | null;
   [key: string]: any;
 }
 

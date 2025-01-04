@@ -33,7 +33,6 @@ export class MetadataSearcherComponent implements OnInit {
   bookMetadataForm: FormGroup;
   bookMetadata$: Observable<BookMetadataBI | null>;
   currentBookId!: number;
-  loading: boolean = false;
   updateThumbnailUrl: boolean = false;
 
   constructor(private bookService: BookService, private bookInfoService: BookInfoService, private messageService: MessageService) {
@@ -67,7 +66,7 @@ export class MetadataSearcherComponent implements OnInit {
           publishedDate: bookMetadata.publishedDate,
           isbn10: bookMetadata.isbn10,
           isbn13: bookMetadata.isbn13,
-          asin: bookMetadata.asin,
+          asin: bookMetadata.asin ?  bookMetadata.asin : null,
           description: bookMetadata.description,
           pageCount: bookMetadata.pageCount == 0 ? null : bookMetadata.pageCount,
           language: bookMetadata.language
@@ -93,8 +92,8 @@ export class MetadataSearcherComponent implements OnInit {
       bookId: this.currentBookId,
       title: this.bookMetadataForm.get('title')?.value || this.fetchedMetadata.title,
       subtitle: this.bookMetadataForm.get('subtitle')?.value || this.fetchedMetadata.subtitle,
-      authors: this.bookMetadataForm.get('authors')?.value ? this.bookMetadataForm.get('authors')?.value.split(',').map((author: string) => author.trim()) : this.fetchedMetadata.authors,
-      categories: this.bookMetadataForm.get('categories')?.value ? this.bookMetadataForm.get('categories')?.value.split(',').map((category: string) => category.trim()) : this.fetchedMetadata.categories,
+      authors: this.getArrayFromFormField('authors', this.fetchedMetadata.authors),
+      categories: this.getArrayFromFormField('categories', this.fetchedMetadata.categories),
       publisher: this.bookMetadataForm.get('publisher')?.value || this.fetchedMetadata.publisher,
       publishedDate: this.bookMetadataForm.get('publishedDate')?.value || this.fetchedMetadata.publishedDate,
       isbn10: this.bookMetadataForm.get('isbn10')?.value || this.fetchedMetadata.isbn10,
@@ -105,18 +104,23 @@ export class MetadataSearcherComponent implements OnInit {
       language: this.bookMetadataForm.get('language')?.value || this.fetchedMetadata.language,
       thumbnailUrl: this.updateThumbnailUrl ? this.fetchedMetadata.thumbnailUrl : undefined
     };
-
     this.bookService.updateMetadata(updatedBookMetadata.bookId, updatedBookMetadata).subscribe({
       next: () => {
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
         this.bookInfoService.emit(updatedBookMetadata);
-        this.loading = false;
       },
       error: (error) => {
-        this.loading = false;
         this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book metadata'});
       }
     });
+  }
+
+  private getArrayFromFormField(field: string, fallbackValue: string[]): string[] {
+    const fieldValue = this.bookMetadataForm.get(field)?.value;
+    if (fieldValue) {
+      return String(fieldValue).split(',').map((item: string) => item.trim());
+    }
+    return fallbackValue || [];
   }
 
   shouldUpdateThumbnail() {

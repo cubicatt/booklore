@@ -40,3 +40,8 @@
   padding-left: 1rem;
   padding-right: 1rem;
 }
+
+.green-outlined-button {
+  --p-button-outlined-primary-border-color: limegreen;
+  --p-button-outlined-primary-color: limegreen;
+}

@@ -4,7 +4,12 @@
       <label for="title" class="label">Title</label>
       <div class="input-container">
         <input pInputText id="title" formControlName="title" class="input"/>
-        <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('title')"/>
+        <p-button
+          [icon]="isValueCopied('title') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueCopied('title')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('title')"/>
         <input pInputText [value]="fetchedMetadata.title" class="input"/>
       </div>
     </div>
@@ -13,7 +18,12 @@
       <label for="authors" class="label">Authors</label>
       <div class="input-container">
         <input pInputText id="authors" formControlName="authors" class="input"/>
-        <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('authors')"/>
+        <p-button
+          [icon]="isValueCopied('authors') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueCopied('authors')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('authors')"/>
         <input pInputText [value]="fetchedAuthorsString()" class="input"/>
       </div>
     </div>
@@ -22,7 +32,12 @@
       <label for="categories" class="label">Categories</label>
       <div class="input-container">
         <input pInputText id="categories" formControlName="categories" class="input"/>
-        <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('categories')"/>
+        <p-button
+          [icon]="isValueCopied('categories') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueCopied('categories')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('categories')"/>
         <input pInputText [value]="fetchedCategoriesString()" class="input"/>
       </div>
     </div>
@@ -31,7 +46,12 @@
       <label for="publisher" class="label">Publisher</label>
       <div class="input-container">
         <input pInputText id="publisher" formControlName="publisher" class="input"/>
-        <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('publisher')"/>
+        <p-button
+          [icon]="isValueCopied('publisher') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueCopied('publisher')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('publisher')"/>
         <input pInputText [value]="fetchedMetadata.publisher" class="input"/>
       </div>
     </div>
@@ -40,7 +60,12 @@
       <label for="publishedDate" class="label">Published</label>
       <div class="input-container">
         <input pInputText id="publishedDate" formControlName="publishedDate" class="input"/>
-        <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('publishedDate')"/>
+        <p-button
+          [icon]="isValueCopied('publishedDate') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueCopied('publishedDate')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('publishedDate')"/>
         <input pInputText [value]="fetchedMetadata.publishedDate" class="input"/>
       </div>
     </div>
@@ -49,7 +74,12 @@
       <label for="isbn10" class="label">ISBN-10</label>
       <div class="input-container">
         <input pInputText id="isbn10" formControlName="isbn10" class="input"/>
-        <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('isbn10')"/>
+        <p-button
+          [icon]="isValueCopied('isbn10') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueCopied('isbn10')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('isbn10')"/>
         <input pInputText [value]="fetchedMetadata.isbn10" class="input"/>
       </div>
     </div>
@@ -58,15 +88,26 @@
       <label for="language" class="label">Language</label>
       <div class="input-container">
         <input pInputText id="language" formControlName="language" class="input"/>
-        <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('language')"/>
+        <p-button
+          [icon]="isValueCopied('language') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueCopied('language')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('language')"/>
         <input pInputText [value]="fetchedMetadata.language" class="input"/>
       </div>
     </div>
+
     <div class="form-row">
       <label for="pageCount" class="label">Pages</label>
       <div class="input-container">
         <input pInputText id="pageCount" formControlName="pageCount" class="input"/>
-        <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('pageCount')"/>
+        <p-button
+          [icon]="isValueCopied('pageCount') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueCopied('pageCount')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('pageCount')"/>
         <input pInputText [value]="fetchedMetadata.pageCount" class="input"/>
       </div>
     </div>
@@ -75,7 +116,12 @@
       <label for="description" class="label">Description</label>
       <div class="input-container">
         <textarea id="description" formControlName="description" class="input"></textarea>
-        <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="copyFetchedToCurrent('description')"/>
+        <p-button
+          [icon]="isValueCopied('description') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueCopied('description')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('description')"/>
         <textarea [value]="fetchedMetadata.description" class="input"></textarea>
       </div>
     </div>
@@ -85,7 +131,12 @@
       <div class="input-container">
         <img *ngIf="!updateThumbnailUrl" [src]="coverImageSrc(currentBookId)" alt="Book Thumbnail" class="thumbnail"/>
         <img *ngIf="updateThumbnailUrl" [src]="fetchedMetadata.thumbnailUrl" alt="Fetched Thumbnail" class="thumbnail"/>
-        <p-button icon="pi pi-arrow-left" [outlined]="true" class="arrow-button" (click)="shouldUpdateThumbnail()"/>
+        <p-button
+          [icon]="updateThumbnailUrl ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': updateThumbnailUrl}"
+          class="arrow-button"
+          (click)="shouldUpdateThumbnail()"/>
         <img [src]="fetchedMetadata.thumbnailUrl" alt="Fetched Thumbnail" class="thumbnail"/>
       </div>
     </div>
@@ -94,13 +145,11 @@
   <div class="flex flex-col gap-x-4 mt-auto">
     <p-divider></p-divider>
     <div class="flex justify-between">
-      <p-button label="Back" icon="pi pi-arrow-left" severity="warn" (onClick)="goBackClick()"></p-button>
+      <p-button label="Back" icon="pi pi-arrow-left" severity="info" (onClick)="goBackClick()"></p-button>
       <div class="flex gap-x-4 justify-end">
         <p-button label="Cancel" icon="pi pi-times" severity="secondary"></p-button>
         <p-button label="Save" icon="pi pi-check" severity="primary" type="submit"></p-button>
       </div>
     </div>
   </div>
-
 </form>
-

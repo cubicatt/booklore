@@ -16,7 +16,6 @@ import {Button} from 'primeng/button';
 import {AppConfiguratorComponent} from '../configurator/configurator.component';
 import {StyleClass} from 'primeng/styleclass';
 import {Divider} from 'primeng/divider';
-import {BookInfoTabsComponent} from '../../../book-info-tabs/book-info-tabs.component';
 
 @Component({
   selector: 'app-topbar',

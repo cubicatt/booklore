@@ -1,15 +1,15 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FetchedMetadata } from '../../book/model/book.model';
-import { BookService } from '../../book/service/book.service';
-import { MessageService } from 'primeng/api';
-import { Button } from 'primeng/button';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { InputText } from 'primeng/inputtext';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {FetchedMetadata} from '../../book/model/book.model';
+import {BookService} from '../../book/service/book.service';
+import {MessageService} from 'primeng/api';
+import {Button} from 'primeng/button';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {InputText} from 'primeng/inputtext';
 import {NgClass, NgIf} from '@angular/common';
-import { Divider } from 'primeng/divider';
-import { BookInfoService } from '../book-info.service';
-import { Observable } from 'rxjs';
-import { BookMetadataBI } from '../../book/model/book-metadata-for-book-info.model';
+import {Divider} from 'primeng/divider';
+import {BookInfoService} from '../book-info.service';
+import {Observable} from 'rxjs';
+import {BookMetadataBI} from '../../book/model/book-metadata-for-book-info.model';
 
 @Component({
   selector: 'app-metadata-searcher',
@@ -35,7 +35,9 @@ export class MetadataSearcherComponent implements OnInit {
   bookMetadata$: Observable<BookMetadataBI | null>;
   currentBookId!: number;
   updateThumbnailUrl: boolean = false;
+  thumbnailSaved: boolean = false;
   copiedFields: { [key: string]: boolean } = {};
+  savedFields: { [key: string]: boolean } = {};
 
   constructor(private bookService: BookService, private bookInfoService: BookInfoService, private messageService: MessageService) {
     this.bookMetadata$ = this.bookInfoService.bookMetadata$;
@@ -68,7 +70,7 @@ export class MetadataSearcherComponent implements OnInit {
           publishedDate: bookMetadata.publishedDate,
           isbn10: bookMetadata.isbn10,
           isbn13: bookMetadata.isbn13,
-          asin: bookMetadata.asin ?  bookMetadata.asin : null,
+          asin: bookMetadata.asin ? bookMetadata.asin : null,
           description: bookMetadata.description,
           pageCount: bookMetadata.pageCount == 0 ? null : bookMetadata.pageCount,
           language: bookMetadata.language
@@ -109,6 +111,14 @@ export class MetadataSearcherComponent implements OnInit {
 
     this.bookService.updateMetadata(updatedBookMetadata.bookId, updatedBookMetadata).subscribe({
       next: () => {
+        Object.keys(this.copiedFields).forEach((field) => {
+          if (this.copiedFields[field]) {
+            this.savedFields[field] = true;
+          }
+        });
+        if (this.updateThumbnailUrl) {
+          this.thumbnailSaved = true;
+        }
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
         this.bookInfoService.emit(updatedBookMetadata);
       },
@@ -160,14 +170,22 @@ export class MetadataSearcherComponent implements OnInit {
   }
 
   highlightCopiedInput(field: string): void {
-    this.copiedFields = { ...this.copiedFields, [field]: true };
+    this.copiedFields = {...this.copiedFields, [field]: true};
   }
 
   isValueCopied(field: string): boolean {
     return this.copiedFields[field];
   }
 
+  isValueSaved(field: string): boolean {
+    return this.savedFields[field];
+  }
+
   goBackClick() {
     this.goBack.emit(true);
+  }
+
+  closeDialog() {
+    this.bookInfoService.closeDialog(true);
   }
 }

@@ -34,6 +34,12 @@ export class BookInfoTabsComponent implements OnInit {
     if (initialBook?.metadata) {
       this.bookInfoService.emit(this.convertToBookMetadataBI(initialBook));
     }
+    this.bookInfoService.dialogClose$.subscribe((close) => {
+      if(close) {
+        this.bookInfoService.closeDialog(false);
+        this.dynamicDialogRef.close();
+      }
+    })
   }
 
   private convertToBookMetadataBI(book: Book): BookMetadataBI {

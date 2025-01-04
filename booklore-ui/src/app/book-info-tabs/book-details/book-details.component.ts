@@ -105,4 +105,8 @@ export class BookDetailsComponent implements OnInit {
   coverImageSrc(bookId: number): string {
     return this.bookService.getBookCoverUrl(bookId);
   }
+
+  closeDialog() {
+    this.bookInfoService.closeDialog(true);
+  }
 }

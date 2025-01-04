@@ -1,9 +1,7 @@
-
-
 .form-row {
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   width: 100%;
   justify-content: flex-start;
 }
@@ -39,6 +37,11 @@
 .arrow-button {
   padding-left: 1rem;
   padding-right: 1rem;
+}
+
+.yellow-outlined-button {
+  --p-button-outlined-primary-border-color: yellow;
+  --p-button-outlined-primary-color: yellow;
 }
 
 .green-outlined-button {

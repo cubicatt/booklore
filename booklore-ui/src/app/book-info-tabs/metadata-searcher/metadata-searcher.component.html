@@ -5,12 +5,12 @@
       <div class="input-container">
         <input pInputText id="title" formControlName="title" class="input"/>
         <p-button
-          [icon]="isValueCopied('title') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="isValueSaved('title') ? 'pi pi-check' : 'pi pi-arrow-left'"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': isValueCopied('title')}"
+          [ngClass]="{'green-outlined-button': isValueSaved('title'), 'yellow-outlined-button': isValueCopied('title')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('title')"/>
-        <input pInputText [value]="fetchedMetadata.title" class="input"/>
+        <input pInputText [value]="fetchedMetadata.title" class="input" readonly/>
       </div>
     </div>
 
@@ -19,12 +19,12 @@
       <div class="input-container">
         <input pInputText id="authors" formControlName="authors" class="input"/>
         <p-button
-          [icon]="isValueCopied('authors') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="isValueSaved('authors') ? 'pi pi-check' : 'pi pi-arrow-left'"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': isValueCopied('authors')}"
+          [ngClass]="{'green-outlined-button': isValueSaved('authors'), 'yellow-outlined-button': isValueCopied('authors')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('authors')"/>
-        <input pInputText [value]="fetchedAuthorsString()" class="input"/>
+        <input pInputText [value]="fetchedAuthorsString()" class="input" readonly/>
       </div>
     </div>
 
@@ -33,12 +33,12 @@
       <div class="input-container">
         <input pInputText id="categories" formControlName="categories" class="input"/>
         <p-button
-          [icon]="isValueCopied('categories') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="isValueSaved('categories') ? 'pi pi-check' : 'pi pi-arrow-left'"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': isValueCopied('categories')}"
+          [ngClass]="{'green-outlined-button': isValueSaved('categories'), 'yellow-outlined-button': isValueCopied('categories')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('categories')"/>
-        <input pInputText [value]="fetchedCategoriesString()" class="input"/>
+        <input pInputText [value]="fetchedCategoriesString()" class="input" readonly/>
       </div>
     </div>
 
@@ -47,12 +47,12 @@
       <div class="input-container">
         <input pInputText id="publisher" formControlName="publisher" class="input"/>
         <p-button
-          [icon]="isValueCopied('publisher') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="isValueSaved('publisher') ? 'pi pi-check' : 'pi pi-arrow-left'"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': isValueCopied('publisher')}"
+          [ngClass]="{'green-outlined-button': isValueSaved('publisher'), 'yellow-outlined-button': isValueCopied('publisher')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('publisher')"/>
-        <input pInputText [value]="fetchedMetadata.publisher" class="input"/>
+        <input pInputText [value]="fetchedMetadata.publisher" class="input" readonly/>
       </div>
     </div>
 
@@ -61,12 +61,12 @@
       <div class="input-container">
         <input pInputText id="publishedDate" formControlName="publishedDate" class="input"/>
         <p-button
-          [icon]="isValueCopied('publishedDate') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="isValueSaved('publishedDate') ? 'pi pi-check' : 'pi pi-arrow-left'"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': isValueCopied('publishedDate')}"
+          [ngClass]="{'green-outlined-button': isValueSaved('publishedDate'), 'yellow-outlined-button': isValueCopied('publishedDate')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('publishedDate')"/>
-        <input pInputText [value]="fetchedMetadata.publishedDate" class="input"/>
+        <input pInputText [value]="fetchedMetadata.publishedDate" class="input" readonly/>
       </div>
     </div>
 
@@ -75,12 +75,12 @@
       <div class="input-container">
         <input pInputText id="isbn10" formControlName="isbn10" class="input"/>
         <p-button
-          [icon]="isValueCopied('isbn10') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="isValueSaved('isbn10') ? 'pi pi-check' : 'pi pi-arrow-left'"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': isValueCopied('isbn10')}"
+          [ngClass]="{'green-outlined-button': isValueSaved('isbn10'), 'yellow-outlined-button': isValueCopied('isbn10')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('isbn10')"/>
-        <input pInputText [value]="fetchedMetadata.isbn10" class="input"/>
+        <input pInputText [value]="fetchedMetadata.isbn10" class="input" readonly/>
       </div>
     </div>
 
@@ -89,12 +89,12 @@
       <div class="input-container">
         <input pInputText id="language" formControlName="language" class="input"/>
         <p-button
-          [icon]="isValueCopied('language') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="isValueSaved('language') ? 'pi pi-check' : 'pi pi-arrow-left'"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': isValueCopied('language')}"
+          [ngClass]="{'green-outlined-button': isValueSaved('language'), 'yellow-outlined-button': isValueCopied('language')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('language')"/>
-        <input pInputText [value]="fetchedMetadata.language" class="input"/>
+        <input pInputText [value]="fetchedMetadata.language" class="input" readonly/>
       </div>
     </div>
 
@@ -103,12 +103,12 @@
       <div class="input-container">
         <input pInputText id="pageCount" formControlName="pageCount" class="input"/>
         <p-button
-          [icon]="isValueCopied('pageCount') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="isValueSaved('pageCount') ? 'pi pi-check' : 'pi pi-arrow-left'"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': isValueCopied('pageCount')}"
+          [ngClass]="{'green-outlined-button': isValueSaved('pageCount'), 'yellow-outlined-button': isValueCopied('pageCount')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('pageCount')"/>
-        <input pInputText [value]="fetchedMetadata.pageCount" class="input"/>
+        <input pInputText [value]="fetchedMetadata.pageCount" class="input" readonly/>
       </div>
     </div>
 
@@ -117,12 +117,12 @@
       <div class="input-container">
         <textarea id="description" formControlName="description" class="input"></textarea>
         <p-button
-          [icon]="isValueCopied('description') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="isValueSaved('description') ? 'pi pi-check' : 'pi pi-arrow-left'"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': isValueCopied('description')}"
+          [ngClass]="{'green-outlined-button': isValueSaved('description'), 'yellow-outlined-button': isValueCopied('description')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('description')"/>
-        <textarea [value]="fetchedMetadata.description" class="input"></textarea>
+        <textarea [value]="fetchedMetadata.description" class="input" readonly></textarea>
       </div>
     </div>
 
@@ -132,9 +132,9 @@
         <img *ngIf="!updateThumbnailUrl" [src]="coverImageSrc(currentBookId)" alt="Book Thumbnail" class="thumbnail"/>
         <img *ngIf="updateThumbnailUrl" [src]="fetchedMetadata.thumbnailUrl" alt="Fetched Thumbnail" class="thumbnail"/>
         <p-button
-          [icon]="updateThumbnailUrl ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="thumbnailSaved ? 'pi pi-check' : 'pi pi-arrow-left'"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': updateThumbnailUrl}"
+          [ngClass]="{'green-outlined-button': thumbnailSaved, 'yellow-outlined-button': updateThumbnailUrl}"
           class="arrow-button"
           (click)="shouldUpdateThumbnail()"/>
         <img [src]="fetchedMetadata.thumbnailUrl" alt="Fetched Thumbnail" class="thumbnail"/>
@@ -147,7 +147,7 @@
     <div class="flex justify-between">
       <p-button label="Back" icon="pi pi-arrow-left" severity="info" (onClick)="goBackClick()"></p-button>
       <div class="flex gap-x-4 justify-end">
-        <p-button label="Cancel" icon="pi pi-times" severity="secondary"></p-button>
+        <p-button label="Cancel" icon="pi pi-times" severity="secondary" (onClick)="closeDialog()"></p-button>
         <p-button label="Save" icon="pi pi-check" severity="primary" type="submit"></p-button>
       </div>
     </div>

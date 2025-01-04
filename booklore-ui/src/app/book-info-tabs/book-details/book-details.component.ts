@@ -46,10 +46,11 @@ export class BookDetailsComponent implements OnInit {
       publishedDate: new FormControl(''),
       isbn10: new FormControl(''),
       isbn13: new FormControl(''),
-      asin: new FormControl(''),
       description: new FormControl(''),
       pageCount: new FormControl(''),
       language: new FormControl(''),
+      rating: new FormControl(''),
+      reviewCount: new FormControl(''),
     });
   }
 
@@ -66,10 +67,11 @@ export class BookDetailsComponent implements OnInit {
           publishedDate: bookMetadata.publishedDate,
           isbn10: bookMetadata.isbn10,
           isbn13: bookMetadata.isbn13,
-          asin: bookMetadata.asin ? bookMetadata.asin : '',
           description: bookMetadata.description,
-          pageCount: bookMetadata.pageCount,
-          language: bookMetadata.language
+          pageCount: bookMetadata.pageCount == 0 ? null : bookMetadata.pageCount,
+          language: bookMetadata.language,
+          rating: bookMetadata.rating,
+          reviewCount: bookMetadata.reviewCount
         });
       }
     });
@@ -86,9 +88,10 @@ export class BookDetailsComponent implements OnInit {
       publishedDate: this.bookMetadataForm.get('publishedDate')?.value,
       isbn10: this.bookMetadataForm.get('isbn10')?.value,
       isbn13: this.bookMetadataForm.get('isbn13')?.value,
-      asin: this.bookMetadataForm.get('asin')?.value,
       description: this.bookMetadataForm.get('description')?.value,
       pageCount: this.bookMetadataForm.get('pageCount')?.value,
+      rating: this.bookMetadataForm.get('rating')?.value,
+      reviewCount: this.bookMetadataForm.get('reviewCount')?.value,
       language: this.bookMetadataForm.get('language')?.value
     };
     this.bookService.updateMetadata(updatedBookMetadata.bookId, updatedBookMetadata).subscribe({

@@ -54,9 +54,10 @@ export class BookInfoTabsComponent implements OnInit {
       publishedDate: metadata?.publishedDate || '',
       isbn10: metadata?.isbn10 || '',
       isbn13: metadata?.isbn13 || '',
-      asin: metadata?.asin || '',
       description: metadata?.description,
-      pageCount: metadata?.pageCount || 0,
+      pageCount: metadata?.pageCount || null,
+      reviewCount: metadata?.reviewCount || null,
+      rating: metadata?.rating || null,
       language: metadata?.language || '',
       googleBookId: metadata?.googleBookId || '',
     };

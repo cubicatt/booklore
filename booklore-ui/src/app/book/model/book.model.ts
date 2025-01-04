@@ -19,9 +19,10 @@ export interface BookMetadata {
   publishedDate: string;
   isbn10: string;
   isbn13: string;
-  asin: string;
   description?: string;
   pageCount: number;
+  rating: number;
+  reviewCount: number;
   language: string;
   googleBookId: string;
   [key: string]: any;
@@ -45,7 +46,6 @@ export interface FetchedMetadata {
   reviewCount: number | null;
   authors: string[];
   categories: string[];
-  asin: string | null;
   [key: string]: any;
 }
 

@@ -5,11 +5,12 @@ import {MessageService} from 'primeng/api';
 import {Button} from 'primeng/button';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
-import {NgClass, NgIf} from '@angular/common';
+import {NgClass, NgIf, NgStyle} from '@angular/common';
 import {Divider} from 'primeng/divider';
 import {BookInfoService} from '../book-info.service';
 import {Observable} from 'rxjs';
 import {BookMetadataBI} from '../../book/model/book-metadata-for-book-info.model';
+import {Tooltip} from 'primeng/tooltip';
 
 @Component({
   selector: 'app-metadata-searcher',
@@ -23,7 +24,9 @@ import {BookMetadataBI} from '../../book/model/book-metadata-for-book-info.model
     NgIf,
     Divider,
     ReactiveFormsModule,
-    NgClass
+    NgClass,
+    NgStyle,
+    Tooltip
   ]
 })
 export class MetadataSearcherComponent implements OnInit {
@@ -50,10 +53,11 @@ export class MetadataSearcherComponent implements OnInit {
       publishedDate: new FormControl(''),
       isbn10: new FormControl(''),
       isbn13: new FormControl(''),
-      asin: new FormControl(''),
       description: new FormControl(''),
       pageCount: new FormControl(''),
       language: new FormControl(''),
+      rating: new FormControl(''),
+      reviewCount: new FormControl(''),
     });
   }
 
@@ -70,10 +74,11 @@ export class MetadataSearcherComponent implements OnInit {
           publishedDate: bookMetadata.publishedDate,
           isbn10: bookMetadata.isbn10,
           isbn13: bookMetadata.isbn13,
-          asin: bookMetadata.asin ? bookMetadata.asin : null,
           description: bookMetadata.description,
           pageCount: bookMetadata.pageCount == 0 ? null : bookMetadata.pageCount,
-          language: bookMetadata.language
+          language: bookMetadata.language,
+          rating: bookMetadata.rating,
+          reviewCount: bookMetadata.reviewCount
         });
       }
     });
@@ -94,22 +99,23 @@ export class MetadataSearcherComponent implements OnInit {
   onSave(): void {
     const updatedBookMetadata: BookMetadataBI = {
       bookId: this.currentBookId,
-      title: this.getValueOrCopied('title'),
-      subtitle: this.getValueOrCopied('subtitle'),
-      authors: this.getArrayFromFormField('authors', this.fetchedMetadata.authors),
-      categories: this.getArrayFromFormField('categories', this.fetchedMetadata.categories),
-      publisher: this.getValueOrCopied('publisher'),
-      publishedDate: this.getValueOrCopied('publishedDate'),
-      isbn10: this.getValueOrCopied('isbn10'),
-      isbn13: this.getValueOrCopied('isbn13'),
-      asin: this.getValueOrCopied('asin'),
-      description: this.getValueOrCopied('description'),
-      pageCount: this.getPageCountOrCopied(),
-      language: this.getValueOrCopied('language'),
-      thumbnailUrl: this.updateThumbnailUrl ? this.fetchedMetadata.thumbnailUrl : undefined
+      title: this.bookMetadataForm.get('title')?.value || this.copiedFields['title'] ? this.getValueOrCopied('title') : '',
+      subtitle: this.bookMetadataForm.get('subtitle')?.value || this.copiedFields['subtitle'] ? this.getValueOrCopied('subtitle') : '',
+      authors: this.bookMetadataForm.get('authors')?.value || this.copiedFields['authors'] ? this.getArrayFromFormField('authors', this.fetchedMetadata.authors) : [],
+      categories: this.bookMetadataForm.get('categories')?.value || this.copiedFields['categories'] ? this.getArrayFromFormField('categories', this.fetchedMetadata.categories) : [],
+      publisher: this.bookMetadataForm.get('publisher')?.value || this.copiedFields['publisher'] ? this.getValueOrCopied('publisher') : '',
+      publishedDate: this.bookMetadataForm.get('publishedDate')?.value || this.copiedFields['publishedDate'] ? this.getValueOrCopied('publishedDate') : '',
+      isbn10: this.bookMetadataForm.get('isbn10')?.value || this.copiedFields['isbn10'] ? this.getValueOrCopied('isbn10') : '',
+      isbn13: this.bookMetadataForm.get('isbn13')?.value || this.copiedFields['isbn13'] ? this.getValueOrCopied('isbn13') : '',
+      description: this.bookMetadataForm.get('description')?.value || this.copiedFields['description'] ? this.getValueOrCopied('description') : '',
+      pageCount: this.bookMetadataForm.get('pageCount')?.value || this.copiedFields['pageCount'] ? this.getPageCountOrCopied() : null,
+      language: this.bookMetadataForm.get('language')?.value || this.copiedFields['language'] ? this.getValueOrCopied('language') : '',
+      rating: this.bookMetadataForm.get('rating')?.value || this.copiedFields['rating'] ? this.getNumberOrCopied('rating') : null,
+      reviewCount: this.bookMetadataForm.get('reviewCount')?.value || this.copiedFields['reviewCount'] ? this.getNumberOrCopied('reviewCount') : null,
+      thumbnailUrl: this.updateThumbnailUrl ? this.fetchedMetadata.thumbnailUrl : '',
     };
 
-    this.bookService.updateMetadata(updatedBookMetadata.bookId, updatedBookMetadata).subscribe({
+    this.bookService.updateMetadata(this.currentBookId, updatedBookMetadata).subscribe({
       next: () => {
         Object.keys(this.copiedFields).forEach((field) => {
           if (this.copiedFields[field]) {
@@ -127,6 +133,24 @@ export class MetadataSearcherComponent implements OnInit {
       }
     });
   }
+
+  copyMissing() {
+    Object.keys(this.fetchedMetadata).forEach((field) => {
+      if (!this.bookMetadataForm.get(field)?.value && this.fetchedMetadata[field]) {
+        this.copyFetchedToCurrent(field);
+      }
+    });
+  }
+
+  private getNumberOrCopied(field: string): number | null {
+    const formValue = this.bookMetadataForm.get(field)?.value;
+    if (formValue === '' || formValue === null || isNaN(formValue)) {
+      this.copiedFields[field] = true;
+      return this.fetchedMetadata[field] || null;
+    }
+    return Number(formValue);
+  }
+
 
   private getPageCountOrCopied(): number | null {
     const formValue = this.bookMetadataForm.get('pageCount')?.value;
@@ -165,6 +189,7 @@ export class MetadataSearcherComponent implements OnInit {
     const value = this.fetchedMetadata[field];
     if (value) {
       this.bookMetadataForm.get(field)?.setValue(value);
+      this.copiedFields[field] = true;
       this.highlightCopiedInput(field);
     }
   }
@@ -188,4 +213,5 @@ export class MetadataSearcherComponent implements OnInit {
   closeDialog() {
     this.bookInfoService.closeDialog(true);
   }
+
 }

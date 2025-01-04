@@ -8,7 +8,8 @@ export interface BookMetadataBI {
   publishedDate: string;
   isbn10: string;
   isbn13: string;
-  asin?: string;
+  rating?:  number | null;
+  reviewCount?:  number | null;
   description?: string;
   pageCount?: number | null;
   language: string;

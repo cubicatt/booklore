@@ -1,5 +1,18 @@
-<form [formGroup]="bookMetadataForm" (ngSubmit)="onSave()" class="h-full flex pt-4 flex-col">
+<form [formGroup]="bookMetadataForm" (ngSubmit)="onSave()" class="h-full flex pt-1 flex-col">
   <div class="overflow-y-scroll flex-1">
+
+    <div class="flex justify-center items-center" [ngStyle]="{'padding-bottom': '0.75rem', 'padding-left': '4.95rem'}">
+      <p class="ml-3">Current Metadata</p>
+      <p-button
+        severity="info"
+        icon='pi pi-angle-double-left'
+        [ngStyle]="{'padding-left': '2rem', 'padding-right': '2rem'}"
+        [outlined]="true"
+        [pTooltip]="'Copy all missing metadata'"
+        (onClick)="copyMissing()"></p-button>
+      <p>Fetched Metadata</p>
+    </div>
+
     <div class="form-row">
       <label for="title" class="label">Title</label>
       <div class="input-container">
@@ -99,20 +112,6 @@
     </div>
 
     <div class="form-row">
-      <label for="pageCount" class="label">Pages</label>
-      <div class="input-container">
-        <input pInputText id="pageCount" formControlName="pageCount" class="input"/>
-        <p-button
-          [icon]="isValueSaved('pageCount') ? 'pi pi-check' : 'pi pi-arrow-left'"
-          [outlined]="true"
-          [ngClass]="{'green-outlined-button': isValueSaved('pageCount'), 'yellow-outlined-button': isValueCopied('pageCount')}"
-          class="arrow-button"
-          (click)="copyFetchedToCurrent('pageCount')"/>
-        <input pInputText [value]="fetchedMetadata.pageCount" class="input" readonly/>
-      </div>
-    </div>
-
-    <div class="form-row">
       <label for="description" class="label">Description</label>
       <div class="input-container">
         <textarea id="description" formControlName="description" class="input"></textarea>
@@ -140,6 +139,63 @@
         <img [src]="fetchedMetadata.thumbnailUrl" alt="Fetched Thumbnail" class="thumbnail"/>
       </div>
     </div>
+
+    <div class="form-row">
+      <label for="isbn13" class="label">ISBN-13</label>
+      <div class="input-container">
+        <input pInputText id="isbn13" formControlName="isbn13" class="input"/>
+        <p-button
+          [icon]="isValueSaved('isbn13') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueSaved('isbn13'), 'yellow-outlined-button': isValueCopied('isbn13')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('isbn13')"/>
+        <input pInputText [value]="fetchedMetadata.isbn13" class="input" readonly/>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="rating" class="label">Rating</label>
+      <div class="input-container">
+        <input pInputText id="rating" formControlName="rating" class="input"/>
+        <p-button
+          [icon]="isValueSaved('pageCount') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueSaved('rating'), 'yellow-outlined-button': isValueCopied('rating')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('rating')"/>
+        <input pInputText [value]="fetchedMetadata.rating" class="input" readonly/>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="reviewCount" class="label">Rating</label>
+      <div class="input-container">
+        <input pInputText id="reviewCount" formControlName="reviewCount" class="input"/>
+        <p-button
+          [icon]="isValueSaved('reviewCount') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueSaved('reviewCount'), 'yellow-outlined-button': isValueCopied('reviewCount')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('reviewCount')"/>
+        <input pInputText [value]="fetchedMetadata.reviewCount" class="input" readonly/>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="pageCount" class="label">Pages</label>
+      <div class="input-container">
+        <input pInputText id="pageCount" formControlName="pageCount" class="input"/>
+        <p-button
+          [icon]="isValueSaved('pageCount') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueSaved('pageCount'), 'yellow-outlined-button': isValueCopied('pageCount')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('pageCount')"/>
+        <input pInputText [value]="fetchedMetadata.pageCount" class="input" readonly/>
+      </div>
+    </div>
+
   </div>
 
   <div class="flex flex-col gap-x-4 mt-auto">

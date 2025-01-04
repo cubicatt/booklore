@@ -136,12 +136,15 @@ export class MetadataSearcherComponent implements OnInit {
     return formValue;
   }
 
-  private getArrayFromFormField(field: string, fallbackValue: string[]): string[] {
+  getArrayFromFormField(field: string, fallbackValue: any): any[] {
     const fieldValue = this.bookMetadataForm.get(field)?.value;
-    if (fieldValue) {
-      return String(fieldValue).split(',').map((item: string) => item.trim());
+    if (!fieldValue) {
+      return fallbackValue ? (Array.isArray(fallbackValue) ? fallbackValue : [fallbackValue]) : [];
     }
-    return fallbackValue || [];
+    if (typeof fieldValue === 'string') {
+      return fieldValue.split(',').map(item => item.trim());
+    }
+    return Array.isArray(fieldValue) ? fieldValue : [];
   }
 
   shouldUpdateThumbnail() {

@@ -13,10 +13,10 @@ import {BookMetadataBI} from '../../book/model/book-metadata-for-book-info.model
 import {MessageService} from 'primeng/api';
 
 @Component({
-  selector: 'app-book-details',
+  selector: 'app-book-metadata-editor',
   standalone: true,
-  templateUrl: './book-details.component.html',
-  styleUrl: './book-details.component.scss',
+  templateUrl: './book-metadata-editor.component.html',
+  styleUrl: './book-metadata-editor.component.scss',
   imports: [
     InputText,
     Textarea,
@@ -29,7 +29,7 @@ import {MessageService} from 'primeng/api';
     ReactiveFormsModule
   ]
 })
-export class BookDetailsComponent implements OnInit {
+export class BookMetadataEditorComponent implements OnInit {
 
   bookMetadata$: Observable<BookMetadataBI | null>;
   bookMetadataForm: FormGroup;

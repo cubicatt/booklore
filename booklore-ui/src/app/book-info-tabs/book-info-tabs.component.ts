@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
-import {BookDetailsComponent} from './book-details/book-details.component';
+import {BookMetadataEditorComponent} from './book-metadata-editor/book-metadata-editor.component';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {BookService} from '../book/service/book.service';
 import {MessageService} from 'primeng/api';
@@ -20,7 +20,7 @@ import {BookMetadataViewerComponent} from './book-metadata-viewer/book-metadata-
     TabList,
     Tab,
     TabPanels,
-    BookDetailsComponent,
+    BookMetadataEditorComponent,
     TabPanel,
     BookMatchComponent,
     BookMetadataViewerComponent,

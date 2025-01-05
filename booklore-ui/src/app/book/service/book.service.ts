@@ -202,7 +202,6 @@ export class BookService {
   }
 
   updateMetadata(bookId: number, bookMetadata: BookMetadataBI): Observable<BookMetadata> {
-    console.log(bookMetadata)
     return this.http.put<BookMetadata>(`${this.url}/${bookId}/metadata`, bookMetadata);
   }
 

@@ -1,34 +1,32 @@
 import {Component, OnInit} from '@angular/core';
 import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
-import {BookMetadataEditorComponent} from './book-metadata-editor/book-metadata-editor.component';
+import {MetadataEditorComponent} from './metadata-editor/metadata-editor.component';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
-import {BookService} from '../book/service/book.service';
-import {MessageService} from 'primeng/api';
-import {BookMatchComponent} from './book-match/book-match.component';
-import {BookInfoService} from './book-info.service';
+import {MetadataSearcherComponent} from './metadata-searcher/metadata-searcher.component';
+import {BookMetadataCenterService} from './book-metadata-center.service';
 import {Book} from '../book/model/book.model';
 import {BookMetadataBI} from '../book/model/book-metadata-for-book-info.model';
-import {BookMetadataViewerComponent} from './book-metadata-viewer/book-metadata-viewer.component';
+import {MetadataViewerComponent} from './metadata-viewer/metadata-viewer.component';
 
 @Component({
-  selector: 'book-info-tabs',
+  selector: 'app-book-metadata-center',
   standalone: true,
-  templateUrl: './book-info-tabs.component.html',
-  styleUrl: './book-info-tabs.component.scss',
+  templateUrl: './book-metadata-center.component.html',
+  styleUrl: './book-metadata-center.component.scss',
   imports: [
     Tabs,
     TabList,
     Tab,
     TabPanels,
-    BookMetadataEditorComponent,
+    MetadataEditorComponent,
     TabPanel,
-    BookMatchComponent,
-    BookMetadataViewerComponent,
+    MetadataSearcherComponent,
+    MetadataViewerComponent,
   ],
 })
-export class BookInfoTabsComponent implements OnInit {
+export class BookMetadataCenterComponent implements OnInit {
 
-  constructor(private dynamicDialogConfig: DynamicDialogConfig, private dynamicDialogRef: DynamicDialogRef, private bookInfoService: BookInfoService) {
+  constructor(private dynamicDialogConfig: DynamicDialogConfig, private dynamicDialogRef: DynamicDialogRef, private bookInfoService: BookMetadataCenterService) {
   }
 
   ngOnInit(): void {

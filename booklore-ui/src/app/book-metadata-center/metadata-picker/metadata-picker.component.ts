@@ -7,16 +7,16 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
 import {InputText} from 'primeng/inputtext';
 import {NgClass, NgIf, NgStyle} from '@angular/common';
 import {Divider} from 'primeng/divider';
-import {BookInfoService} from '../book-info.service';
+import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Observable} from 'rxjs';
 import {BookMetadataBI} from '../../book/model/book-metadata-for-book-info.model';
 import {Tooltip} from 'primeng/tooltip';
 
 @Component({
-  selector: 'app-metadata-searcher',
+  selector: 'app-metadata-picker',
   standalone: true,
-  templateUrl: './metadata-searcher.component.html',
-  styleUrls: ['./metadata-searcher.component.scss'],
+  templateUrl: './metadata-picker.component.html',
+  styleUrls: ['./metadata-picker.component.scss'],
   imports: [
     Button,
     FormsModule,
@@ -29,7 +29,7 @@ import {Tooltip} from 'primeng/tooltip';
     Tooltip
   ]
 })
-export class MetadataSearcherComponent implements OnInit {
+export class MetadataPickerComponent implements OnInit {
 
   @Input() fetchedMetadata!: FetchedMetadata;
   @Output() goBack = new EventEmitter<boolean>();
@@ -42,7 +42,7 @@ export class MetadataSearcherComponent implements OnInit {
   copiedFields: { [key: string]: boolean } = {};
   savedFields: { [key: string]: boolean } = {};
 
-  constructor(private bookService: BookService, private bookInfoService: BookInfoService, private messageService: MessageService) {
+  constructor(private bookService: BookService, private bookInfoService: BookMetadataCenterService, private messageService: MessageService) {
     this.bookMetadata$ = this.bookInfoService.bookMetadata$;
     this.bookMetadataForm = new FormGroup({
       title: new FormControl(''),

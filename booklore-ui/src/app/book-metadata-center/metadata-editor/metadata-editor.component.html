@@ -1,7 +1,7 @@
 <form [formGroup]="bookMetadataForm" (ngSubmit)="onSave()" *ngIf="bookMetadata$ | async as bookMetadata" class="h-full flex pt-2 flex-col">
 
   <div [formGroup]="bookMetadataForm" (ngSubmit)="onSave()" class="overflow-y-scroll flex-1">
-    <div class="flex w-full gap-x-4 pb-4">
+    <div class="flex w-full gap-x-4 pb-2">
       <div class="flex flex-col gap-1 w-2/3">
         <label for="title">Title</label>
         <input pInputText id="title" class="w-full" formControlName="title"/>
@@ -11,7 +11,7 @@
         <input pInputText id="subtitle" class="w-full" formControlName="subtitle"/>
       </div>
     </div>
-    <div class="flex w-full gap-x-4 pb-4">
+    <div class="flex w-full gap-x-4 pb-2">
       <div class="flex flex-col gap-1 w-3/4">
         <label for="authors">Authors</label>
         <input pInputText id="authors" class="w-full" formControlName="authors" placeholder="Enter authors separated by commas"/>
@@ -21,11 +21,11 @@
         <input pInputText id="publish" class="w-full" formControlName="publishedDate"/>
       </div>
     </div>
-    <div class="flex flex-col gap-1 w-full pb-4">
+    <div class="flex flex-col gap-1 w-full pb-2">
       <label for="description">Description</label>
       <textarea id="description" rows="5" cols="30" pTextarea formControlName="description"></textarea>
     </div>
-    <div class="flex w-full gap-x-4 pb-4">
+    <div class="flex w-full gap-x-4 pb-2">
       <div class="w-1/3 flex justify-center items-center">
         <p-image [src]="coverImageSrc(bookMetadata.bookId)" alt="Image" width="250"></p-image>
       </div>

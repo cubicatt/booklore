@@ -7,7 +7,7 @@ import {BookService} from '../../book/service/book.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {LibraryService} from '../../book/service/library.service';
 import {BookMetadataBI} from '../../book/model/book-metadata-for-book-info.model';
-import {BookInfoService} from '../book-info.service';
+import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Divider} from 'primeng/divider';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
@@ -15,9 +15,10 @@ import {Chip} from 'primeng/chip';
 import {Tag} from 'primeng/tag';
 
 @Component({
-  selector: 'app-book-metadata-viewer',
+  selector: 'app-metadata-viewer',
   standalone: true,
-  templateUrl: './book-metadata-viewer.component.html',
+  templateUrl: './metadata-viewer.component.html',
+  styleUrl: './metadata-viewer.component.scss',
   imports: [
     Button,
     NgForOf,
@@ -27,15 +28,14 @@ import {Tag} from 'primeng/tag';
     Rating,
     FormsModule,
     Tag
-  ],
-  styleUrl: './book-metadata-viewer.component.scss'
+  ]
 })
-export class BookMetadataViewerComponent implements OnInit {
+export class MetadataViewerComponent implements OnInit {
 
   bookMetadata$: Observable<BookMetadataBI | null>;
   currentBookId!: number;
 
-  constructor(private bookService: BookService, private router: Router, private bookInfoService: BookInfoService) {
+  constructor(private bookService: BookService, private router: Router, private bookInfoService: BookMetadataCenterService) {
     this.bookMetadata$ = this.bookInfoService.bookMetadata$;
   }
 

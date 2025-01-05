@@ -6,17 +6,17 @@ import {Button} from 'primeng/button';
 import {Divider} from 'primeng/divider';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Observable} from 'rxjs';
-import {BookInfoService} from '../book-info.service';
+import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {BookService} from '../../book/service/book.service';
 import {BookMetadataBI} from '../../book/model/book-metadata-for-book-info.model';
 import {MessageService} from 'primeng/api';
 
 @Component({
-  selector: 'app-book-metadata-editor',
+  selector: 'app-metadata-editor',
   standalone: true,
-  templateUrl: './book-metadata-editor.component.html',
-  styleUrl: './book-metadata-editor.component.scss',
+  templateUrl: './metadata-editor.component.html',
+  styleUrl: './metadata-editor.component.scss',
   imports: [
     InputText,
     Textarea,
@@ -29,13 +29,13 @@ import {MessageService} from 'primeng/api';
     ReactiveFormsModule
   ]
 })
-export class BookMetadataEditorComponent implements OnInit {
+export class MetadataEditorComponent implements OnInit {
 
   bookMetadata$: Observable<BookMetadataBI | null>;
   bookMetadataForm: FormGroup;
   currentBookId!: number;
 
-  constructor(private bookInfoService: BookInfoService, private bookService: BookService, private messageService: MessageService) {
+  constructor(private bookInfoService: BookMetadataCenterService, private bookService: BookService, private messageService: MessageService) {
     this.bookMetadata$ = this.bookInfoService.bookMetadata$;
     this.bookMetadataForm = new FormGroup({
       title: new FormControl(''),

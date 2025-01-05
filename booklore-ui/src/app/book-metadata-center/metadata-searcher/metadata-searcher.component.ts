@@ -10,13 +10,13 @@ import {BookService} from '../../book/service/book.service';
 import {FetchMetadataRequest} from '../../book/model/fetch-metadata-request.model';
 import {FetchedMetadata} from '../../book/model/book.model';
 import {ProgressSpinner} from 'primeng/progressspinner';
-import {MetadataSearcherComponent} from '../metadata-searcher/metadata-searcher.component';
-import {BookInfoService} from '../book-info.service';
+import {MetadataPickerComponent} from '../metadata-picker/metadata-picker.component';
+import {BookMetadataCenterService} from '../book-metadata-center.service';
 
 @Component({
-  selector: 'app-book-match',
-  templateUrl: './book-match.component.html',
-  styleUrls: ['./book-match.component.scss'],
+  selector: 'app-metadata-searcher',
+  templateUrl: './metadata-searcher.component.html',
+  styleUrls: ['./metadata-searcher.component.scss'],
   imports: [
     Select,
     ReactiveFormsModule,
@@ -26,11 +26,11 @@ import {BookInfoService} from '../book-info.service';
     NgForOf,
     NgIf,
     ProgressSpinner,
-    MetadataSearcherComponent
+    MetadataPickerComponent
   ],
   standalone: true
 })
-export class BookMatchComponent implements OnInit {
+export class MetadataSearcherComponent implements OnInit {
 
   form: FormGroup;
   providers = Object.values(Provider);
@@ -39,7 +39,7 @@ export class BookMatchComponent implements OnInit {
   bookId!: number;
   loading: boolean = false;
 
-  constructor(private fb: FormBuilder, private bookService: BookService, private bookInfoService: BookInfoService) {
+  constructor(private fb: FormBuilder, private bookService: BookService, private bookInfoService: BookMetadataCenterService) {
     this.form = this.fb.group({
       provider: null,
       isbn: [''],

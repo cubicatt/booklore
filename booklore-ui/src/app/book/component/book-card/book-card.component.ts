@@ -119,8 +119,6 @@ export class BookCardComponent implements OnInit {
   }
 
   openBookInfo(book: Book): void {
-    setTimeout(() => {
-      this.router.navigate(['/library', book.libraryId, 'book', book.id, 'info']);
-    }, 10);
+    this.openBookDetailsDialog(book.id)
   }
 }

@@ -8,6 +8,8 @@ import {NgForOf, NgIf} from '@angular/common';
 import {Button} from 'primeng/button';
 import {Router} from '@angular/router';
 import {BookService} from '../../service/book.service';
+import {BookMetadataCenterComponent} from '../../../book-metadata-center/book-metadata-center.component';
+import {DialogService} from 'primeng/dynamicdialog';
 
 @Component({
   selector: 'app-search',
@@ -27,7 +29,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   #searchSubject = new Subject<string>();
   #subscription!: Subscription;
 
-  constructor(private bookService: BookService, private router: Router) {}
+  constructor(private bookService: BookService, private router: Router, private dialogService: DialogService) {}
 
   ngOnInit(): void {
     this.initializeSearch();
@@ -55,11 +57,29 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   onBookClick(book: Book): void {
     this.clearSearch();
-    this.openBook(book.id, book.libraryId);
+    this.openBook(book.id);
   }
 
-  openBook(bookId: number, libraryId: number): void {
-    this.router.navigate(['/library', libraryId, 'book', bookId, 'info']);
+  openBook(bookId: number): void {
+    this.bookService.getBookByIdFromAPI(bookId, true).subscribe(({
+      next: (book) => {
+        this.dialogService.open(BookMetadataCenterComponent, {
+          header: 'Open book details',
+          modal: true,
+          closable: true,
+          width: '1200px',
+          height: '835px',
+          showHeader: false,
+          closeOnEscape: true,
+          data: {
+            book: book
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error fetching book:', error);
+      }
+    }))
   }
 
   getBookCoverUrl(bookId: number): string {

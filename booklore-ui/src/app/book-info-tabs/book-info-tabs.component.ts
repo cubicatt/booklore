@@ -8,6 +8,7 @@ import {BookMatchComponent} from './book-match/book-match.component';
 import {BookInfoService} from './book-info.service';
 import {Book} from '../book/model/book.model';
 import {BookMetadataBI} from '../book/model/book-metadata-for-book-info.model';
+import {BookMetadataViewerComponent} from './book-metadata-viewer/book-metadata-viewer.component';
 
 @Component({
   selector: 'book-info-tabs',
@@ -22,6 +23,7 @@ import {BookMetadataBI} from '../book/model/book-metadata-for-book-info.model';
     BookDetailsComponent,
     TabPanel,
     BookMatchComponent,
+    BookMetadataViewerComponent,
   ],
 })
 export class BookInfoTabsComponent implements OnInit {

@@ -1,18 +1,18 @@
 <p-tabs value="0" style="height: 100%; overflow: hidden;">
   <p-tablist>
     <p-tab value="0">Book Details</p-tab>
-    <p-tab value="1">Match Book</p-tab>
-    <p-tab value="2">Manage File</p-tab>
+    <p-tab value="1">Edit Details</p-tab>
+    <p-tab value="2">Match Book</p-tab>
   </p-tablist>
   <p-tabpanels style="height: 100%; overflow: hidden; padding-bottom: 0">
     <p-tabpanel value="0" style="height: 100%; overflow: hidden;">
-      <app-book-details></app-book-details>
+      <app-book-metadata-viewer></app-book-metadata-viewer>
     </p-tabpanel>
     <p-tabpanel value="1" style="height: 100%; overflow: hidden;">
-      <app-book-match></app-book-match>
+      <app-book-details></app-book-details>
     </p-tabpanel>
     <p-tabpanel value="2" style="height: 100%; overflow: hidden;">
-      <p>I too work!!</p>
+      <app-book-match></app-book-match>
     </p-tabpanel>
   </p-tabpanels>
 </p-tabs>

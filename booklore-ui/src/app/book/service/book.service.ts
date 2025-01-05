@@ -115,10 +115,10 @@ export class BookService {
     );
   }
 
-  readBook(book: Book): void {
-    const url = `/pdf-viewer/book/${book.id}`;
+  readBook(bookId: number): void {
+    const url = `/pdf-viewer/book/${bookId}`;
     window.open(url, '_blank');
-    this.updateLastReadTime(book.id).subscribe({
+    this.updateLastReadTime(bookId).subscribe({
       error: err => console.error('Failed to update last read time', err),
     });
   }
@@ -202,6 +202,7 @@ export class BookService {
   }
 
   updateMetadata(bookId: number, bookMetadata: BookMetadataBI): Observable<BookMetadata> {
+    console.log(bookMetadata)
     return this.http.put<BookMetadata>(`${this.url}/${bookId}/metadata`, bookMetadata);
   }
 

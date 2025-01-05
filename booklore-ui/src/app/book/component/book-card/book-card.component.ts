@@ -50,7 +50,7 @@ export class BookCardComponent implements OnInit {
   }
 
   readBook(book: Book): void {
-    this.bookService.readBook(book);
+    this.bookService.readBook(book.id);
   }
 
   toggleSelection(selected: boolean): void {

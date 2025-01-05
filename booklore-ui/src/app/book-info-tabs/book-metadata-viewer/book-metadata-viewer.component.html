@@ -1,0 +1,60 @@
+<div class="container pt-2 flex flex-col h-full">
+  <div class="book-metadata-container flex-shrink-0" *ngIf="bookMetadata$ | async as bookMetadata">
+    <div class="flex flex-row w-full">
+
+      <img [src]="coverImageSrc(bookMetadata.bookId)" class="book-cover placeholder" alt="Cover of {{ bookMetadata.title }}" loading="lazy" width="200"/>
+
+      <div class="pl-4 flex flex-col w-full space-y-4">
+        <div class="flex flex-row items-center justify-between">
+          <div>
+            <p class="text-xl font-bold">{{ bookMetadata.title }}</p>
+            <div class="flex items-center gap-4 pt-1">
+              <p-rating [(ngModel)]="bookMetadata.rating" readonly stars="5"></p-rating>
+              <p class="font-semibold">({{ bookMetadata.reviewCount || 0 }} Reviews)</p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <p-button [rounded]="true" [raised]="true" [outlined]="true" severity="info" (onClick)="readBook(bookMetadata.bookId)" icon="pi pi-eye"></p-button>
+            <p-button [rounded]="true" [raised]="true" [outlined]="true" severity="info" icon="pi pi-download"></p-button>
+          </div>
+        </div>
+
+
+        <div class="flex items-center">
+          <p class="font-semibold text-lg">Authors:</p>
+          <div class="flex flex-wrap gap-2 ml-2">
+            <p class="text-lg" *ngFor="let author of bookMetadata.authors">
+              {{ author }}
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <p><span class="font-bold">Publisher:</span> {{ bookMetadata.publisher || 'N/A' }}</p>
+          <p><span class="font-bold">Published:</span> {{ bookMetadata.publishedDate || 'Unknown' }}</p>
+          <p><span class="font-bold">Language:</span> {{ bookMetadata.language || 'Unknown' }}</p>
+          <p><span class="font-bold">ISBN:</span> {{ bookMetadata.isbn10 || 'Unknown' }}</p>
+          <p><span class="font-bold">Page Count:</span> {{ bookMetadata.pageCount || 'Unknown' }}</p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <p-tag *ngFor="let category of bookMetadata.categories" value="{{category}}"></p-tag>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <p-divider></p-divider>
+
+  <div *ngIf="bookMetadata$ | async as bookMetadata" class="book-description space-y-4 overflow-y-auto flex-1">
+    <p class="pt-2 px-2" [innerHTML]="bookMetadata.description || 'No description available.'"></p>
+  </div>
+
+  <div class="flex flex-col gap-x-4 mt-auto">
+    <p-divider></p-divider>
+    <div class="flex gap-x-4 justify-end">
+      <p-button label="Close" icon="pi pi-times" severity="secondary" (onClick)="closeDialog()"></p-button>
+    </div>
+  </div>
+</div>

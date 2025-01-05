@@ -55,6 +55,8 @@ public class BookMetadataService {
         metadata.setIsbn13(newMetadata.getIsbn13());
         metadata.setDescription(newMetadata.getDescription());
         metadata.setPageCount(newMetadata.getPageCount());
+        metadata.setRating(newMetadata.getRating());
+        metadata.setReviewCount(newMetadata.getReviewCount());
         if (newMetadata.getAuthors() != null && !newMetadata.getAuthors().isEmpty()) {
             List<Author> authors = newMetadata.getAuthors().stream()
                     .map(authorName -> authorRepository.findByName(authorName)

@@ -1,4 +1,4 @@
-<div *ngIf="bookMetadata$ | async as bookMetadata" class="container pt-4 flex flex-col h-full">
+<div *ngIf="bookMetadata$ | async as bookMetadata" class="container pt-2 flex flex-col h-full">
   <form [formGroup]="bookMetadataForm" (ngSubmit)="onSave()" class="space-y-4 overflow-y-auto flex-1">
     <div class="flex w-full gap-x-4">
       <div class="flex flex-col gap-1 w-2/3">

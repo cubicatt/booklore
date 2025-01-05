@@ -27,6 +27,8 @@ public class BookMetadataTransformer {
                 .language(bookMetadata.getLanguage())
                 .pageCount(bookMetadata.getPageCount())
                 .publishedDate(bookMetadata.getPublishedDate())
+                .rating(bookMetadata.getRating())
+                .reviewCount(bookMetadata.getReviewCount())
                 .authors(bookMetadata.getAuthors() == null ? null : bookMetadata.getAuthors().stream().map(AuthorTransformer::toAuthorDTO).collect(Collectors.toList()))
                 .categories(bookMetadata.getCategories() == null ? null : bookMetadata.getCategories().stream().map(CategoryTransformer::categoryDTO).collect(Collectors.toList()))
                 .build();

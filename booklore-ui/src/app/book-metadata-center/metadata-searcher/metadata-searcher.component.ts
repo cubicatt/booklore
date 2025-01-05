@@ -112,7 +112,7 @@ export class MetadataSearcherComponent implements OnInit {
     this.selectedFetchedMetadata = fetchedMetadata;
   }
 
-  onGoBack($event: boolean) {
+  onGoBack() {
     this.selectedFetchedMetadata = null;
   }
 }

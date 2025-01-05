@@ -54,5 +54,5 @@
 </form>
 
 <div *ngIf="selectedFetchedMetadata" class="h-full flex-auto">
-  <app-metadata-picker [fetchedMetadata]="selectedFetchedMetadata" (goBack)="onGoBack($event)"></app-metadata-picker>
+  <app-metadata-picker [fetchedMetadata]="selectedFetchedMetadata" (goBack)="onGoBack()"></app-metadata-picker>
 </div>

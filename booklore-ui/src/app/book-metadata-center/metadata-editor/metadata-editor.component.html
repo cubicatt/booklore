@@ -7,7 +7,7 @@
       <p-image [src]="coverImageSrc(bookMetadata.bookId)" alt="Image" width="225"></p-image>
 
       <div class="flex flex-col flex-grow pl-2">
-        
+
         <div class="flex flex-row w-full gap-4 pb-1">
           <div class="flex flex-col gap-1 w-2/3">
             <label for="title">Title</label>
@@ -78,6 +78,7 @@
     <div class="flex flex-row w-full gap-4 mt-2 pb-1">
       <div class="flex flex-col gap-1 w-full">
         <label for="description">Description</label>
+        <!--<p-editor class="w-full" formControlName="description" id="description" [style]="{ height: '18rem' }" />-->
         <textarea rows="12" pTextarea id="description" formControlName="description" class="w-full"></textarea>
       </div>
     </div>

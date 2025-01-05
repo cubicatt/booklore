@@ -11,6 +11,7 @@ import {AsyncPipe, NgIf} from '@angular/common';
 import {BookService} from '../../book/service/book.service';
 import {BookMetadataBI} from '../../book/model/book-metadata-for-book-info.model';
 import {MessageService} from 'primeng/api';
+import {Editor} from 'primeng/editor';
 
 @Component({
   selector: 'app-metadata-editor',
@@ -26,7 +27,8 @@ import {MessageService} from 'primeng/api';
     FormsModule,
     AsyncPipe,
     NgIf,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    Editor
   ]
 })
 export class MetadataEditorComponent implements OnInit {

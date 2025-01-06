@@ -12,7 +12,6 @@ public enum ApiError {
     IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Image not found or not readable"),
     INVALID_FILE_FORMAT(HttpStatus.BAD_REQUEST, "Invalid file format, only pdf and epub are supported"),
     LIBRARY_NOT_FOUND(HttpStatus.NOT_FOUND, "Library not found with ID: %d"),
-    BAD_REQUEST(HttpStatus.BAD_REQUEST, "Bad request"),
     FILE_TOO_LARGE(HttpStatus.BAD_REQUEST, "File size exceeds the limit: 100 MB"),
     DIRECTORY_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create the directory: %s"),
     INVALID_LIBRARY_PATH(HttpStatus.BAD_REQUEST, "Invalid library path"),
@@ -21,6 +20,7 @@ public enum ApiError {
     SHELF_ALREADY_EXISTS(HttpStatus.CONFLICT, "Shelf already exists: %s"),
     SHELF_NOT_FOUND(HttpStatus.NOT_FOUND, "Shelf not found with ID: %d"),
     SCHEDULE_REFRESH_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to schedule metadata refresh job. Error: %s"),
+    ANOTHER_METADATA_JOB_RUNNING(HttpStatus.CONFLICT, "A metadata refresh job is currently running. Please wait for it to complete before initiating a new one."),
     METADATA_SOURCE_NOT_IMPLEMENT_OR_DOES_NOT_EXIST(HttpStatus.BAD_REQUEST, "Metadata source not implement or does not exist");
 
     private final HttpStatus status;

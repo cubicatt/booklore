@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Builder
 @Data
-public class BookWithNeighborsDTO {
-    private BookDTO currentBook;
+public class BookWithNeighbors {
+    private Book currentBook;
     private Long previousBookId;
     private Long nextBookId;
 }

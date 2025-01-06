@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CategoryDTO {
+public class Category {
     private Long id;
     private String name;
 }

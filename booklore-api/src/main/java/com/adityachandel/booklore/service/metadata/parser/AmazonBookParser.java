@@ -1,8 +1,7 @@
 package com.adityachandel.booklore.service.metadata.parser;
 
-import com.adityachandel.booklore.exception.ApiError;
-import com.adityachandel.booklore.model.entity.Book;
-import com.adityachandel.booklore.repository.BookRepository;
+import com.adityachandel.booklore.model.dto.Book;
+import com.adityachandel.booklore.model.dtonew.BookDTONew;
 import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
 import com.adityachandel.booklore.util.BookUtils;
@@ -29,10 +28,18 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class AmazonBookParser implements BookParser {
 
-    private BookRepository bookRepository;
+    @Override
+    public FetchedBookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
+        List<FetchedBookMetadata> fetchedBookMetadata = fetchTopNMetadata(book, fetchMetadataRequest, 1);
+        if(fetchedBookMetadata == null || fetchedBookMetadata.isEmpty()) {
+            return null;
+        } else {
+            return fetchedBookMetadata.getFirst();
+        }
+    }
 
-    public List<FetchedBookMetadata> fetchMetadata(Long bookId, FetchMetadataRequest fetchMetadataRequest) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+    @Override
+    public List<FetchedBookMetadata> fetchTopNMetadata(Book book, FetchMetadataRequest fetchMetadataRequest, int n) {
         if (fetchMetadataRequest == null || (fetchMetadataRequest.getTitle() == null && fetchMetadataRequest.getAuthor() == null && fetchMetadataRequest.getIsbn() == null)) {
             String title = book.getMetadata().getTitle();
             if (title == null || title.isEmpty()) {
@@ -42,20 +49,18 @@ public class AmazonBookParser implements BookParser {
                 fetchMetadataRequest = FetchMetadataRequest.builder().title(title).build();
             }
         }
-        List<String> amazonBookIds = getAmazonBookIds(fetchMetadataRequest);
+        List<String> amazonBookIds = getFirstNAmazonBookIds(fetchMetadataRequest, n);
         if (amazonBookIds == null || amazonBookIds.isEmpty()) {
             return null;
         }
         List<FetchedBookMetadata> fetchedBookMetadata = new ArrayList<>();
-        int limit = Math.min(amazonBookIds.size(), 5);
-        for (int i = 0; i < limit; i++) {
-            String amazonBookId = amazonBookIds.get(i);
+        for (String amazonBookId : amazonBookIds) {
             fetchedBookMetadata.add(getBookMetadata(amazonBookId));
         }
         return fetchedBookMetadata;
     }
 
-    private List<String> getAmazonBookIds(FetchMetadataRequest fetchMetadataRequest) {
+    private List<String> getFirstNAmazonBookIds(FetchMetadataRequest fetchMetadataRequest, int n) {
         String queryUrl = buildQueryUrl(fetchMetadataRequest);
         if (queryUrl == null) {
             log.error("Query URL is null, cannot proceed.");
@@ -69,39 +74,42 @@ public class AmazonBookParser implements BookParser {
                 log.error("No search results found for query: {}", queryUrl);
                 return null;
             }
-
             Elements items = searchResults.select("div[role=listitem][data-index]");
             if (items.isEmpty()) {
                 log.error("No items found in the search results.");
             } else {
+                int count = 0;
                 for (Element item : items) {
-                    String bookLink = null;
-                    for (String type : new String[]{"Paperback", "Hardcover"}) {
-                        Element link = item.select("a:containsOwn(" + type + ")").first();
-                        if (link != null) {
-                            bookLink = link.attr("href");
-                            log.info("{} link found: {}", type, bookLink);
-                            break; // Take the first found link, whether Paperback or Hardcover
-                        } else {
-                            log.info("No link containing '{}' found.", type);
-                        }
-                    }
-
-                    if (bookLink != null) {
-                        String asin = extractAsinFromUrl(bookLink);
-                        log.info("Book ASIN extracted: {}", asin);
-                        bookIds.add(asin);
-                    } else {
-                        String asin = item.attr("data-asin");
-                        log.info("No book link found, returning ASIN: {}", asin);
-                        bookIds.add(asin);
-                    }
+                    if (count >= n) break;
+                    bookIds.add(extractAmazonBookId(item));
+                    count++;
                 }
             }
         } catch (Exception e) {
             log.error("Failed to get asin: {}", e.getMessage(), e);
         }
         return bookIds;
+    }
+
+    private String extractAmazonBookId(Element item) {
+        String bookLink = null;
+        for (String type : new String[]{"Paperback", "Hardcover"}) {
+            Element link = item.select("a:containsOwn(" + type + ")").first();
+            if (link != null) {
+                bookLink = link.attr("href");
+                log.info("{} link found: {}", type, bookLink);
+                break; // Take the first found link, whether Paperback or Hardcover
+            } else {
+                log.info("No link containing '{}' found.", type);
+            }
+        }
+        if (bookLink != null) {
+            return extractAsinFromUrl(bookLink);
+        } else {
+            String asin = item.attr("data-asin");
+            log.info("No book link found, returning ASIN: {}", asin);
+            return asin;
+        }
     }
 
     private String extractAsinFromUrl(String url) {
@@ -120,7 +128,6 @@ public class AmazonBookParser implements BookParser {
         Document doc = fetchDoc("https://www.amazon.com/dp/" + amazonBookId);
 
         return FetchedBookMetadata.builder()
-                .amazonBookId(amazonBookId)
                 .title(getTitle(doc))
                 .subtitle(getSubtitle(doc))
                 .authors(getAuthors(doc).stream().toList())
@@ -175,7 +182,7 @@ public class AmazonBookParser implements BookParser {
         if (subtitleElement != null) {
             return subtitleElement.text();
         }
-        log.error("Error fetching subtitle: Element not found.");
+        log.warn("Error fetching subtitle: Element not found.");
         return null;
     }
 
@@ -217,9 +224,9 @@ public class AmazonBookParser implements BookParser {
             if (isbn10Element != null) {
                 return isbn10Element.text();
             }
-            log.error("Error fetching ISBN-10: Element not found.");
+            log.warn("Error fetching ISBN-10: Element not found.");
         } catch (Exception e) {
-            log.error("Error fetching ISBN-10: {}", e.getMessage());
+            log.warn("Error fetching ISBN-10: {}", e.getMessage());
         }
         return null;
     }
@@ -230,9 +237,9 @@ public class AmazonBookParser implements BookParser {
             if (isbn13Element != null) {
                 return isbn13Element.text();
             }
-            log.error("Error fetching ISBN-13: Element not found.");
+            log.warn("Error fetching ISBN-13: Element not found.");
         } catch (Exception e) {
-            log.error("Error fetching ISBN-13: {}", e.getMessage());
+            log.warn("Error fetching ISBN-13: {}", e.getMessage());
         }
         return null;
     }
@@ -243,9 +250,9 @@ public class AmazonBookParser implements BookParser {
             if (publisherElement != null) {
                 return publisherElement.text();
             }
-            log.error("Error fetching publisher: Element not found.");
+            log.warn("Error fetching publisher: Element not found.");
         } catch (Exception e) {
-            log.error("Error fetching publisher: {}", e.getMessage());
+            log.warn("Error fetching publisher: {}", e.getMessage());
         }
         return null;
     }
@@ -256,9 +263,9 @@ public class AmazonBookParser implements BookParser {
             if (publicationDateElement != null) {
                 return parseAmazonDate(publicationDateElement.text());
             }
-            log.error("Error fetching publication date: Element not found.");
+            log.warn("Error fetching publication date: Element not found.");
         } catch (Exception e) {
-            log.error("Error fetching publication date: {}", e.getMessage());
+            log.warn("Error fetching publication date: {}", e.getMessage());
         }
         return null;
     }
@@ -269,9 +276,9 @@ public class AmazonBookParser implements BookParser {
             if (languageElement != null) {
                 return languageElement.text();
             }
-            log.error("Error fetching language: Element not found.");
+            log.warn("Error fetching language: Element not found.");
         } catch (Exception e) {
-            log.error("Error fetching language: {}", e.getMessage());
+            log.warn("Error fetching language: {}", e.getMessage());
         }
         return null;
     }
@@ -287,9 +294,9 @@ public class AmazonBookParser implements BookParser {
                         .map(c -> c.replace("(Books)", "").trim())
                         .collect(Collectors.toSet());
             }
-            log.error("Error fetching best seller categories: Element not found.");
+            log.warn("Error fetching best seller categories: Element not found.");
         } catch (Exception e) {
-            log.error("Error fetching best seller categories: {}", e.getMessage());
+            log.warn("Error fetching best seller categories: {}", e.getMessage());
         }
         return Set.of();
     }
@@ -307,7 +314,7 @@ public class AmazonBookParser implements BookParser {
                 }
             }
         } catch (Exception e) {
-            log.error("Error fetching rating", e);
+            log.warn("Error fetching rating", e);
         }
         return null;
     }
@@ -326,7 +333,7 @@ public class AmazonBookParser implements BookParser {
                 }
             }
         } catch (Exception e) {
-            log.error("Error fetching review count", e);
+            log.warn("Error fetching review count", e);
         }
         return null;
     }
@@ -337,9 +344,9 @@ public class AmazonBookParser implements BookParser {
             if (imageElement != null) {
                 return imageElement.attr("src");
             }
-            log.error("Error fetching image URL: Image element not found.");
+            log.warn("Error fetching image URL: Image element not found.");
         } catch (Exception e) {
-            log.error("Error fetching image URL: {}", e.getMessage());
+            log.warn("Error fetching image URL: {}", e.getMessage());
         }
         return null;
     }
@@ -353,7 +360,7 @@ public class AmazonBookParser implements BookParser {
                     String cleanedPageCount = pageCountText.replaceAll("[^\\d]", "");
                     return Integer.parseInt(cleanedPageCount);
                 } catch (NumberFormatException e) {
-                    log.error("Error parsing page count: {}", pageCountText, e);
+                    log.warn("Error parsing page count: {}", pageCountText, e);
                 }
             }
         }

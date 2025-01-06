@@ -1,17 +1,16 @@
-package com.adityachandel.booklore.model.dto;
+package com.adityachandel.booklore.model.dtonew;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
-public class BookMetadataDTO {
-    private Long bookId;
-    private String googleBookId;
-    private String amazonBookId;
+@NoArgsConstructor
+@AllArgsConstructor
+public class BookMetadataDTONew {
     private String title;
     private String subtitle;
     private String publisher;
@@ -23,7 +22,6 @@ public class BookMetadataDTO {
     private String language;
     private Float rating;
     private Integer reviewCount;
-    private List<AuthorDTO> authors;
-    private List<CategoryDTO> categories;
-
+    private List<AuthorDTONew> authors;
+    private List<CategoryDTONew> categories;
 }

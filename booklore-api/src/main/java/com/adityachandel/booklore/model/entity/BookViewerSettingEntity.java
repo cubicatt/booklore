@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "book_viewer_setting")
-public class BookViewerSetting {
+public class BookViewerSettingEntity {
     @Id
     private Long bookId;
 
@@ -19,7 +19,7 @@ public class BookViewerSetting {
     @MapsId
     @JoinColumn(name = "book_id")
     @JsonIgnore
-    private Book book;
+    private BookEntity book;
 
     @Column(name = "page_number")
     private int pageNumber;

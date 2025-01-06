@@ -1,13 +1,13 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.model.LibraryFile;
-import com.adityachandel.booklore.model.entity.Author;
-import com.adityachandel.booklore.model.entity.Book;
-import com.adityachandel.booklore.model.entity.BookMetadata;
-import com.adityachandel.booklore.model.entity.BookViewerSetting;
+import com.adityachandel.booklore.model.entity.AuthorEntity;
+import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.model.entity.BookMetadataEntity;
+import com.adityachandel.booklore.model.entity.BookViewerSettingEntity;
 import com.adityachandel.booklore.repository.AuthorRepository;
 import com.adityachandel.booklore.repository.BookMetadataRepository;
-import com.adityachandel.booklore.repository.BookRepository;
+import com.adityachandel.booklore.repository.BookEntityRepository;
 import com.adityachandel.booklore.repository.BookViewerSettingRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,52 +22,52 @@ import java.util.Set;
 public class BookCreatorService {
 
     private AuthorRepository authorRepository;
-    private BookRepository bookRepository;
+    private BookEntityRepository bookEntityRepository;
     private BookMetadataRepository bookMetadataRepository;
     private BookViewerSettingRepository bookViewerSettingRepository;
 
-    public Book createShellBook(LibraryFile libraryFile) {
+    public BookEntity createShellBook(LibraryFile libraryFile) {
         File bookFile = new File(libraryFile.getFilePath());
-        Book book = Book.builder().library(libraryFile.getLibrary()).path(bookFile.getPath()).fileName(bookFile.getName()).build();
-        BookMetadata bookMetadata = BookMetadata.builder().build();
-        BookViewerSetting bookViewerSetting = BookViewerSetting.builder()
-                .book(book)
-                .bookId(book.getId())
+        BookEntity bookEntity = BookEntity.builder().library(libraryFile.getLibraryEntity()).path(bookFile.getPath()).fileName(bookFile.getName()).build();
+        BookMetadataEntity bookMetadataEntity = BookMetadataEntity.builder().build();
+        BookViewerSettingEntity bookViewerSetting = BookViewerSettingEntity.builder()
+                .book(bookEntity)
+                .bookId(bookEntity.getId())
                 .pageNumber(1)
                 .sidebar_visible(true)
                 .spread("odd")
                 .zoom("page-fit")
                 .build();
-        book.setMetadata(bookMetadata);
-        book.setViewerSetting(bookViewerSetting);
-        return book;
+        bookEntity.setMetadata(bookMetadataEntity);
+        bookEntity.setViewerSetting(bookViewerSetting);
+        return bookEntity;
     }
 
-    public void addAuthorsToBook(Set<String> authors, Book book) {
+    public void addAuthorsToBook(Set<String> authors, BookEntity bookEntity) {
         for (String authorStr : authors) {
-            Optional<Author> authorOptional = authorRepository.findByName(authorStr);
-            Author author;
+            Optional<AuthorEntity> authorOptional = authorRepository.findByName(authorStr);
+            AuthorEntity authorEntity;
             if (authorOptional.isPresent()) {
-                author = authorOptional.get();
+                authorEntity = authorOptional.get();
             } else {
-                author = Author.builder()
+                authorEntity = AuthorEntity.builder()
                         .name(authorStr)
                         .build();
-                author = authorRepository.save(author);
+                authorEntity = authorRepository.save(authorEntity);
             }
-            if (book.getMetadata().getAuthors() == null) {
-                book.getMetadata().setAuthors(new ArrayList<>());
+            if (bookEntity.getMetadata().getAuthors() == null) {
+                bookEntity.getMetadata().setAuthors(new ArrayList<>());
             }
-            book.getMetadata().getAuthors().add(author);
+            bookEntity.getMetadata().getAuthors().add(authorEntity);
         }
     }
 
-    public void saveConnections(Book book) {
-        if (book.getMetadata().getAuthors() != null && !book.getMetadata().getAuthors().isEmpty()) {
-            authorRepository.saveAll(book.getMetadata().getAuthors());
+    public void saveConnections(BookEntity bookEntity) {
+        if (bookEntity.getMetadata().getAuthors() != null && !bookEntity.getMetadata().getAuthors().isEmpty()) {
+            authorRepository.saveAll(bookEntity.getMetadata().getAuthors());
         }
-        bookRepository.save(book);
-        bookMetadataRepository.save(book.getMetadata());
-        bookViewerSettingRepository.save(book.getViewerSetting());
+        bookEntityRepository.save(bookEntity);
+        bookMetadataRepository.save(bookEntity.getMetadata());
+        bookViewerSettingRepository.save(bookEntity.getViewerSetting());
     }
 }

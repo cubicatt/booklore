@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.convertor;
 
-import com.adityachandel.booklore.model.entity.Sort;
+import com.adityachandel.booklore.model.dto.Sort;
 import com.adityachandel.booklore.model.enums.SortDirection;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

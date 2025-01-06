@@ -1,22 +1,18 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.exception.ApiError;
-import com.adityachandel.booklore.model.dto.BookDTO;
-import com.adityachandel.booklore.model.dto.BookMetadataDTO;
-import com.adityachandel.booklore.model.dto.BookViewerSettingDTO;
-import com.adityachandel.booklore.model.dto.BookWithNeighborsDTO;
-import com.adityachandel.booklore.model.dto.response.GoogleBooksMetadata;
-import com.adityachandel.booklore.model.entity.Author;
-import com.adityachandel.booklore.model.entity.Book;
-import com.adityachandel.booklore.model.entity.BookViewerSetting;
-import com.adityachandel.booklore.model.entity.Shelf;
-import com.adityachandel.booklore.repository.*;
-import com.adityachandel.booklore.service.metadata.BookMetadataService;
-import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
-import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
-import com.adityachandel.booklore.transformer.BookSettingTransformer;
-import com.adityachandel.booklore.transformer.BookTransformer;
-import com.adityachandel.booklore.util.BookUtils;
+import com.adityachandel.booklore.mapper.BookMapper;
+import com.adityachandel.booklore.mapper.BookViewerSettingMapper;
+import com.adityachandel.booklore.model.dto.Book;
+import com.adityachandel.booklore.model.dto.BookViewerSetting;
+import com.adityachandel.booklore.model.dto.BookWithNeighbors;
+import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.model.entity.BookViewerSettingEntity;
+import com.adityachandel.booklore.model.entity.ShelfEntity;
+import com.adityachandel.booklore.repository.BookEntityRepository;
+import com.adityachandel.booklore.repository.BookViewerSettingRepository;
+import com.adityachandel.booklore.repository.LibraryRepository;
+import com.adityachandel.booklore.repository.ShelfRepository;
 import com.adityachandel.booklore.util.FileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,37 +35,32 @@ import java.util.stream.Collectors;
 @Service
 public class BooksService {
 
-    private final BookRepository bookRepository;
+    private final BookEntityRepository bookEntityRepository;
     private final BookViewerSettingRepository bookViewerSettingRepository;
-    private final GoogleBookMetadataService googleBookMetadataService;
     private final LibraryRepository libraryRepository;
     private final ShelfRepository shelfRepository;
     private final FileService fileService;
-    private final BookMetadataService bookMetadataService;
+    private final BookMapper bookMapper;
+    private final BookViewerSettingMapper bookViewerSettingMapper;
 
 
-    public BookDTO getBook(long bookId, boolean withDescription) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        BookDTO bookDTO = BookTransformer.convertToBookDTO(book);
+    public Book getBook(long bookId, boolean withDescription) {
+        BookEntity bookEntity = bookEntityRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        Book book = bookMapper.toBook(bookEntity);
         if (!withDescription) {
-            bookDTO.getMetadata().setDescription(null);
+            book.getMetadata().setDescription(null);
         }
-        return bookDTO;
+        return book;
     }
 
-    public List<BookDTO> getBooks(boolean withDescription) {
-        return bookRepository.findAll().stream()
-                .map(BookTransformer::convertToBookDTO)
-                .peek(bookDTO -> {
-                    if (!withDescription) {
-                        bookDTO.getMetadata().setDescription(null);
-                    }
-                })
+    public List<Book> getBooks(boolean withDescription) {
+        return bookEntityRepository.findAll().stream()
+                .map(bookEntity -> bookMapper.toBookWithDescription(bookEntity, withDescription))
                 .collect(Collectors.toList());
     }
 
-    public void saveBookViewerSetting(long bookId, BookViewerSettingDTO bookViewerSettingDTO) {
-        BookViewerSetting bookViewerSetting = bookViewerSettingRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+    public void saveBookViewerSetting(long bookId, BookViewerSetting bookViewerSettingDTO) {
+        BookViewerSettingEntity bookViewerSetting = bookViewerSettingRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         bookViewerSetting.setPageNumber(bookViewerSettingDTO.getPageNumber());
         bookViewerSetting.setZoom(bookViewerSettingDTO.getZoom());
         bookViewerSetting.setSpread(bookViewerSettingDTO.getSpread());
@@ -78,98 +69,66 @@ public class BooksService {
     }
 
     public ResponseEntity<byte[]> getBookData(long bookId) throws IOException {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        byte[] pdfBytes = Files.readAllBytes(new File(book.getPath()).toPath());
+        BookEntity bookEntity = bookEntityRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        byte[] pdfBytes = Files.readAllBytes(new File(bookEntity.getPath()).toPath());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
                 .body(pdfBytes);
     }
 
-    public List<BookDTO> search(String title) {
-        List<Book> books = bookRepository.findByTitleContainingIgnoreCase(title);
-        return books.stream().map(BookTransformer::convertToBookDTO).toList();
+    public List<Book> search(String title) {
+        List<BookEntity> bookEntities = bookEntityRepository.findByTitleContainingIgnoreCase(title);
+        return bookEntities.stream().map(bookMapper::toBook).toList();
     }
 
-    public BookViewerSettingDTO getBookViewerSetting(long bookId) {
-        BookViewerSetting bookViewerSetting = bookViewerSettingRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        return BookSettingTransformer.convertToDTO(bookViewerSetting);
+    public BookViewerSetting getBookViewerSetting(long bookId) {
+        BookViewerSettingEntity bookViewerSetting = bookViewerSettingRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        return bookViewerSettingMapper.toBookViewerSetting(bookViewerSetting);
     }
 
-    public BookDTO updateLastReadTime(long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        book.setLastReadTime(Instant.now());
-        return BookTransformer.convertToBookDTO(bookRepository.save(book));
+    public Book updateLastReadTime(long bookId) {
+        BookEntity bookEntity = bookEntityRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        bookEntity.setLastReadTime(Instant.now());
+        return bookMapper.toBook(bookEntityRepository.save(bookEntity));
     }
 
-    public List<GoogleBooksMetadata> fetchProspectiveMetadataListByBookId(long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        StringBuilder searchString = new StringBuilder();
-        if (book.getMetadata().getTitle() != null && !book.getMetadata().getTitle().isEmpty()) {
-            searchString.append(book.getMetadata().getTitle());
-        }
-        if (searchString.isEmpty()) {
-            searchString.append(BookUtils.cleanFileName(book.getFileName()));
-        }
-        if (book.getMetadata().getAuthors() != null && !book.getMetadata().getAuthors().isEmpty()) {
-            if (!searchString.isEmpty()) {
-                searchString.append(" ");
-            }
-            searchString.append(book.getMetadata().getAuthors().stream()
-                    .map(Author::getName)
-                    .collect(Collectors.joining(", ")));
-        }
-        return googleBookMetadataService.queryByTerm(searchString.toString());
-    }
-
-    public List<GoogleBooksMetadata> fetchProspectiveMetadataListBySearchTerm(String searchTerm) {
-        return googleBookMetadataService.queryByTerm(searchTerm);
-    }
-
-
-    public BookWithNeighborsDTO getBookWithNeighbours(long libraryId, long bookId) {
+    public BookWithNeighbors getBookWithNeighbours(long libraryId, long bookId) {
         libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        Book previousBook = bookRepository.findFirstByLibraryIdAndIdLessThanOrderByIdDesc(libraryId, bookId).orElse(null);
-        Book nextBook = bookRepository.findFirstByLibraryIdAndIdGreaterThanOrderByIdAsc(libraryId, bookId).orElse(null);
-        return BookWithNeighborsDTO.builder()
-                .currentBook(BookTransformer.convertToBookDTO(book))
-                .previousBookId(previousBook != null ? previousBook.getId() : null)
-                .nextBookId(nextBook != null ? nextBook.getId() : null)
+        BookEntity bookEntity = bookEntityRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        BookEntity previousBookEntity = bookEntityRepository.findFirstByLibraryIdAndIdLessThanOrderByIdDesc(libraryId, bookId).orElse(null);
+        BookEntity nextBookEntity = bookEntityRepository.findFirstByLibraryIdAndIdGreaterThanOrderByIdAsc(libraryId, bookId).orElse(null);
+        return BookWithNeighbors.builder()
+                .currentBook(bookMapper.toBook(bookEntity))
+                .previousBookId(previousBookEntity != null ? previousBookEntity.getId() : null)
+                .nextBookId(nextBookEntity != null ? nextBookEntity.getId() : null)
                 .build();
     }
 
     @Transactional
-    public List<BookDTO> assignShelvesToBooks(Set<Long> bookIds, Set<Long> shelfIdsToAssign, Set<Long> shelfIdsToUnassign) {
-        List<Book> books = bookRepository.findAllById(bookIds);
-        List<Shelf> shelvesToAssign = shelfRepository.findAllById(shelfIdsToAssign);
-        List<Shelf> shelvesToUnassign = shelfRepository.findAllById(shelfIdsToUnassign);
-        for (Book book : books) {
-            book.getShelves().removeIf(shelf -> shelfIdsToUnassign.contains(shelf.getId()));
-            shelvesToUnassign.forEach(shelf -> shelf.getBooks().remove(book));
+    public List<Book> assignShelvesToBooks(Set<Long> bookIds, Set<Long> shelfIdsToAssign, Set<Long> shelfIdsToUnassign) {
+        List<BookEntity> bookEntities = bookEntityRepository.findAllById(bookIds);
+        List<ShelfEntity> shelvesToAssign = shelfRepository.findAllById(shelfIdsToAssign);
+        List<ShelfEntity> shelvesToUnassign = shelfRepository.findAllById(shelfIdsToUnassign);
+        for (BookEntity bookEntity : bookEntities) {
+            bookEntity.getShelves().removeIf(shelf -> shelfIdsToUnassign.contains(shelf.getId()));
+            shelvesToUnassign.forEach(shelf -> shelf.getBookEntities().remove(bookEntity));
             shelvesToAssign.forEach(shelf -> {
-                if (!book.getShelves().contains(shelf)) {
-                    book.getShelves().add(shelf);
+                if (!bookEntity.getShelves().contains(shelf)) {
+                    bookEntity.getShelves().add(shelf);
                 }
-                if (!shelf.getBooks().contains(book)) {
-                    shelf.getBooks().add(book);
+                // Do remove contains, it's necessary
+                if (!shelf.getBookEntities().contains(bookEntity)) {
+                    shelf.getBookEntities().add(bookEntity);
                 }
             });
-            bookRepository.save(book);
+            bookEntityRepository.save(bookEntity);
             shelfRepository.saveAll(shelvesToAssign);
         }
-        return books.stream().map(BookTransformer::convertToBookDTO).collect(Collectors.toList());
+        return bookEntities.stream().map(bookMapper::toBook).collect(Collectors.toList());
     }
 
     public Resource getBookCover(long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        return fileService.getBookCover(book.getMetadata().getThumbnail());
-    }
-
-    public BookMetadataDTO setBookMetadata(long bookId, MetadataProvider source, FetchedBookMetadata setMetadataRequest) {
-        return bookMetadataService.setBookMetadata(bookId, setMetadataRequest, source);
-    }
-
-    public BookMetadataDTO setBookMetadataV2(long bookId, FetchedBookMetadata setMetadataRequest) {
-        return bookMetadataService.setBookMetadata(bookId, setMetadataRequest, MetadataProvider.AMAZON);
+        BookEntity bookEntity = bookEntityRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        return fileService.getBookCover(bookEntity.getMetadata().getThumbnail());
     }
 }

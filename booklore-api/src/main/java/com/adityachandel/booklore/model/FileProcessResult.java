@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.model;
 
-import com.adityachandel.booklore.model.dto.BookDTO;
+import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.enums.ParsingStatus;
 import lombok.Builder;
 import lombok.Data;
@@ -10,5 +10,5 @@ import lombok.Data;
 public class FileProcessResult {
     private LibraryFile libraryFile;
     private ParsingStatus parsingStatus;
-    private BookDTO bookDTO;
+    private Book book;
 }

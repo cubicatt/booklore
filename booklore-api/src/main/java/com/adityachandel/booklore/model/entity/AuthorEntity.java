@@ -13,7 +13,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "author")
-public class Author {
+public class AuthorEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,15 +22,15 @@ public class Author {
     @Column(name = "name")
     private String name;
 
-    @ManyToMany(mappedBy = "authors")
-    private List<BookMetadata> bookMetadataList;
+    @ManyToMany(mappedBy = "authors", fetch = FetchType.LAZY)
+    private List<BookMetadataEntity> bookMetadataEntityList;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Author author = (Author) o;
-        return Objects.equals(name, author.name);
+        AuthorEntity authorEntity = (AuthorEntity) o;
+        return Objects.equals(name, authorEntity.name);
     }
 
     @Override

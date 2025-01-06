@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "book_metadata")
-public class BookMetadata {
+public class BookMetadataEntity {
 
     @Id
     @Column(name = "book_id")
@@ -60,14 +60,14 @@ public class BookMetadata {
     @MapsId
     @JoinColumn(name = "book_id")
     @JsonIgnore
-    private Book book;
+    private BookEntity book;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "book_metadata_author_mapping",
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "author_id"))
-    private List<Author> authors;
+    private List<AuthorEntity> authors;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -75,5 +75,5 @@ public class BookMetadata {
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private List<Category> categories;
+    private List<CategoryEntity> categories;
 }

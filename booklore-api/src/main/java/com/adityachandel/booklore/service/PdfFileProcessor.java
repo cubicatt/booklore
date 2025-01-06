@@ -1,15 +1,12 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.config.AppProperties;
+import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.model.LibraryFile;
-import com.adityachandel.booklore.model.dto.BookDTO;
-import com.adityachandel.booklore.model.entity.Book;
-import com.adityachandel.booklore.model.entity.BookMetadata;
-import com.adityachandel.booklore.repository.BookRepository;
-import com.adityachandel.booklore.transformer.BookTransformer;
-import com.adityachandel.booklore.util.FileService;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import com.adityachandel.booklore.model.dto.Book;
+import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.model.entity.BookMetadataEntity;
+import com.adityachandel.booklore.repository.BookEntityRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
@@ -36,51 +33,54 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PdfFileProcessor implements FileProcessor {
 
-    private BookRepository bookRepository;
+    private BookEntityRepository bookEntityRepository;
     private BookCreatorService bookCreatorService;
     private AppProperties appProperties;
+    private BookMapper bookMapper;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
-    public BookDTO processFile(LibraryFile libraryFile, boolean forceProcess) {
+    public Book processFile(LibraryFile libraryFile, boolean forceProcess) {
         File bookFile = new File(libraryFile.getFilePath());
         String fileName = bookFile.getName();
         if (!forceProcess) {
-            Optional<Book> bookOptional = bookRepository.findBookByFileNameAndLibraryId(fileName, libraryFile.getLibrary().getId());
-            return bookOptional.map(BookTransformer::convertToBookDTO).orElseGet(() -> processNewFile(libraryFile));
+            Optional<BookEntity> bookOptional = bookEntityRepository.findBookByFileNameAndLibraryId(fileName, libraryFile.getLibraryEntity().getId());
+            return bookOptional
+                    .map(bookMapper::toBook)
+                    .orElseGet(() -> processNewFile(libraryFile));
         } else {
             return processNewFile(libraryFile);
         }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    protected BookDTO processNewFile(LibraryFile libraryFile) {
+    protected Book processNewFile(LibraryFile libraryFile) {
         File bookFile = new File(libraryFile.getFilePath());
-        Book book = bookCreatorService.createShellBook(libraryFile);
-        BookMetadata bookMetadata = book.getMetadata();
+        BookEntity bookEntity = bookCreatorService.createShellBook(libraryFile);
+        BookMetadataEntity bookMetadataEntity = bookEntity.getMetadata();
         try (PDDocument document = Loader.loadPDF(bookFile)) {
             if (document.getDocumentInformation() == null) {
                 log.warn("No document information found");
             } else {
                 if (document.getDocumentInformation().getTitle() != null) {
-                    bookMetadata.setTitle(document.getDocumentInformation().getTitle());
+                    bookMetadataEntity.setTitle(document.getDocumentInformation().getTitle());
                 }
                 if (document.getDocumentInformation().getAuthor() != null) {
                     Set<String> authors = getAuthors(document);
-                    bookCreatorService.addAuthorsToBook(authors, book);
+                    bookCreatorService.addAuthorsToBook(authors, bookEntity);
                 }
             }
-            bookCreatorService.saveConnections(book);
-            Book saved = bookRepository.save(book);
+            bookCreatorService.saveConnections(bookEntity);
+            BookEntity saved = bookEntityRepository.save(bookEntity);
             boolean success = generateCoverImage(saved.getId(), new File(appProperties.getPathConfig() + "/thumbs"), document);
             if (success) {
-                bookMetadata.setThumbnail(appProperties.getPathConfig() + "/thumbs/" + book.getId() + "/f.jpg");
+                bookMetadataEntity.setThumbnail(appProperties.getPathConfig() + "/thumbs/" + bookEntity.getId() + "/f.jpg");
             }
-            bookRepository.flush();
+            bookEntityRepository.flush();
         } catch (Exception e) {
             log.error("Error while processing file {}, error: {}", libraryFile.getFilePath(), e.getMessage());
         }
-        return BookTransformer.convertToBookDTO(book);
+        return bookMapper.toBook(bookEntity);
     }
 
     private Set<String> getAuthors(PDDocument document) {

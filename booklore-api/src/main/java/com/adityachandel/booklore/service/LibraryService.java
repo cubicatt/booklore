@@ -1,16 +1,16 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.exception.ApiError;
-import com.adityachandel.booklore.model.dto.BookDTO;
-import com.adityachandel.booklore.model.dto.LibraryDTO;
+import com.adityachandel.booklore.mapper.BookMapper;
+import com.adityachandel.booklore.mapper.LibraryMapper;
+import com.adityachandel.booklore.model.dto.Book;
+import com.adityachandel.booklore.model.dto.Library;
+import com.adityachandel.booklore.model.dto.Sort;
 import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
-import com.adityachandel.booklore.model.entity.Book;
-import com.adityachandel.booklore.model.entity.Library;
-import com.adityachandel.booklore.model.entity.Sort;
-import com.adityachandel.booklore.repository.BookRepository;
+import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.model.entity.LibraryEntity;
+import com.adityachandel.booklore.repository.BookEntityRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
-import com.adityachandel.booklore.transformer.BookTransformer;
-import com.adityachandel.booklore.transformer.LibraryTransformer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -24,18 +24,20 @@ import java.util.List;
 @AllArgsConstructor
 public class LibraryService {
 
-    private LibraryRepository libraryRepository;
-    private BookRepository bookRepository;
+    private final LibraryRepository libraryRepository;
+    private final BookEntityRepository bookEntityRepository;
     private final LibraryProcessingService libraryProcessingService;
+    private final BookMapper bookMapper;
+    private final LibraryMapper libraryMapper;
 
-    public LibraryDTO createLibrary(CreateLibraryRequest request) {
-        Library library = Library.builder()
+    public Library createLibrary(CreateLibraryRequest request) {
+        LibraryEntity libraryEntity = LibraryEntity.builder()
                 .name(request.getName())
                 .paths(request.getPaths())
                 .icon(request.getIcon())
                 .build();
-        library = libraryRepository.save(library);
-        Long libraryId = library.getId();
+        libraryEntity = libraryRepository.save(libraryEntity);
+        Long libraryId = libraryEntity.getId();
         Thread.startVirtualThread(() -> {
             try {
                 libraryProcessingService.processLibrary(libraryId);
@@ -46,7 +48,7 @@ public class LibraryService {
             }
             log.info("Parsing task completed!");
         });
-        return LibraryTransformer.convertToLibraryDTO(library);
+        return libraryMapper.toLibrary(libraryEntity);
     }
 
     public void refreshLibrary(long libraryId) {
@@ -63,14 +65,14 @@ public class LibraryService {
         });
     }
 
-    public LibraryDTO getLibrary(long libraryId) {
-        Library library = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
-        return LibraryTransformer.convertToLibraryDTO(library);
+    public Library getLibrary(long libraryId) {
+        LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+        return libraryMapper.toLibrary(libraryEntity);
     }
 
-    public List<LibraryDTO> getLibraries() {
-        List<Library> libraries = libraryRepository.findAll();
-        return libraries.stream().map(LibraryTransformer::convertToLibraryDTO).toList();
+    public List<Library> getLibraries() {
+        List<LibraryEntity> libraries = libraryRepository.findAll();
+        return libraries.stream().map(libraryMapper::toLibrary).toList();
     }
 
     public void deleteLibrary(long id) {
@@ -78,21 +80,21 @@ public class LibraryService {
         libraryRepository.deleteById(id);
     }
 
-    public BookDTO getBook(long libraryId, long bookId) {
+    public Book getBook(long libraryId, long bookId) {
         libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
-        Book book = bookRepository.findBookByIdAndLibraryId(bookId, libraryId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        return BookTransformer.convertToBookDTO(book);
+        BookEntity bookEntity = bookEntityRepository.findBookByIdAndLibraryId(bookId, libraryId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        return bookMapper.toBook(bookEntity);
     }
 
-    public List<BookDTO> getBooks(long libraryId) {
+    public List<Book> getBooks(long libraryId) {
         libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
-        List<Book> books = bookRepository.findBooksByLibraryId(libraryId);
-        return books.stream().map(BookTransformer::convertToBookDTO).toList();
+        List<BookEntity> bookEntities = bookEntityRepository.findBooksByLibraryId(libraryId);
+        return bookEntities.stream().map(bookMapper::toBook).toList();
     }
 
-    public LibraryDTO updateSort(long libraryId, Sort sort) {
-        Library library = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
-        library.setSort(sort);
-        return LibraryTransformer.convertToLibraryDTO(libraryRepository.save(library));
+    public Library updateSort(long libraryId, Sort sort) {
+        LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+        libraryEntity.setSort(sort);
+        return libraryMapper.toLibrary(libraryRepository.save(libraryEntity));
     }
 }

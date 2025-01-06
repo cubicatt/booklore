@@ -1,16 +1,16 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.exception.ApiError;
-import com.adityachandel.booklore.model.dto.BookDTO;
-import com.adityachandel.booklore.model.dto.ShelfDTO;
+import com.adityachandel.booklore.mapper.BookMapper;
+import com.adityachandel.booklore.mapper.ShelfMapper;
+import com.adityachandel.booklore.model.dto.Book;
+import com.adityachandel.booklore.model.dto.Shelf;
 import com.adityachandel.booklore.model.dto.request.ShelfCreateRequest;
-import com.adityachandel.booklore.model.entity.Book;
-import com.adityachandel.booklore.model.entity.Shelf;
-import com.adityachandel.booklore.model.entity.Sort;
-import com.adityachandel.booklore.repository.BookRepository;
+import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.model.entity.ShelfEntity;
+import com.adityachandel.booklore.model.dto.Sort;
+import com.adityachandel.booklore.repository.BookEntityRepository;
 import com.adityachandel.booklore.repository.ShelfRepository;
-import com.adityachandel.booklore.transformer.BookTransformer;
-import com.adityachandel.booklore.transformer.ShelfTransformer;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,31 +21,35 @@ import java.util.List;
 public class ShelfService {
 
     private final ShelfRepository shelfRepository;
-    private final BookRepository bookRepository;
+    private final BookEntityRepository bookEntityRepository;
+    private final ShelfMapper shelfMapper;
+    private final BookMapper bookMapper;
 
-    public ShelfDTO createShelf(ShelfCreateRequest request) {
+    public Shelf createShelf(ShelfCreateRequest request) {
         boolean exists = shelfRepository.existsByName(request.getName());
         if (exists) {
             throw ApiError.SHELF_ALREADY_EXISTS.createException(request.getName());
         }
-        Shelf shelf = Shelf.builder().icon(request.getIcon()).name(request.getName()).build();
-        return ShelfTransformer.convertToShelfDTO(shelfRepository.save(shelf));
+        ShelfEntity shelfEntity = ShelfEntity.builder().icon(request.getIcon()).name(request.getName()).build();
+        return shelfMapper.toShelf((shelfRepository.save(shelfEntity)));
     }
 
-    public ShelfDTO updateShelf(Long id, ShelfCreateRequest request) {
-        Shelf shelf = shelfRepository.findById(id)
+    public Shelf updateShelf(Long id, ShelfCreateRequest request) {
+        ShelfEntity shelfEntity = shelfRepository.findById(id)
                 .orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(id));
-        shelf.setName(request.getName());
-        return ShelfTransformer.convertToShelfDTO(shelfRepository.save(shelf));
+        shelfEntity.setName(request.getName());
+        return shelfMapper.toShelf(shelfRepository.save(shelfEntity));
     }
 
-    public List<ShelfDTO> getShelves() {
-        return shelfRepository.findAll().stream().map(ShelfTransformer::convertToShelfDTO).toList();
+    public List<Shelf> getShelves() {
+        return shelfRepository.findAll().stream()
+                .map(shelfMapper::toShelf)
+                .toList();
     }
 
-    public ShelfDTO getShelf(Long shelfId) {
-        Shelf shelf = shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
-        return ShelfTransformer.convertToShelfDTO(shelf);
+    public Shelf getShelf(Long shelfId) {
+        ShelfEntity shelfEntity = shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
+        return shelfMapper.toShelf(shelfEntity);
     }
 
     public void deleteShelf(Long shelfId) {
@@ -53,15 +57,17 @@ public class ShelfService {
         shelfRepository.deleteById(shelfId);
     }
 
-    public List<BookDTO> getShelfBooks(Long shelfId) {
+    public List<Book> getShelfBooks(Long shelfId) {
         shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
-        List<Book> books = bookRepository.findByShelfId(shelfId);
-        return books.stream().map(BookTransformer::convertToBookDTO).toList();
+        List<BookEntity> bookEntities = bookEntityRepository.findByShelfId(shelfId);
+        return bookEntities.stream()
+                .map(bookMapper::toBook)
+                .toList();
     }
 
-    public ShelfDTO updateSort(long shelfId, Sort sort) {
-        Shelf shelf = shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
-        shelf.setSort(sort);
-        return ShelfTransformer.convertToShelfDTO(shelfRepository.save(shelf));
+    public Shelf updateSort(long shelfId, Sort sort) {
+        ShelfEntity shelfEntity = shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
+        shelfEntity.setSort(sort);
+        return shelfMapper.toShelf(shelfRepository.save(shelfEntity));
     }
 }

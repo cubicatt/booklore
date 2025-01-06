@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.model.stomp;
 
-import com.adityachandel.booklore.model.dto.BookDTO;
+import com.adityachandel.booklore.model.dto.Book;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,7 +11,7 @@ import java.util.Set;
 public class BookNotification {
 
     private Action action;
-    private BookDTO addedBook;
+    private Book addedBook;
     private Set<Long> removedBookIds;
 
     public enum Action {

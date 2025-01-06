@@ -8,13 +8,13 @@ import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BookDTO {
+public class Book {
     private Long id;
     private Long libraryId;
     private String fileName;
     private String title;
     private Instant lastReadTime;
     private Instant addedOn;
-    private BookMetadataDTO metadata;
-    private List<ShelfDTO> shelves;
+    private BookMetadata metadata;
+    private List<Shelf> shelves;
 }

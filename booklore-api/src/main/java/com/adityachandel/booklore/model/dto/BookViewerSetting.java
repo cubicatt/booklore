@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class BookViewerSettingDTO {
+public class BookViewerSetting {
     private int pageNumber;
     private String zoom;
     private boolean sidebar_visible;

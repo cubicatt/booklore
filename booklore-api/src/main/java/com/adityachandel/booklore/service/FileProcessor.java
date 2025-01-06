@@ -1,9 +1,8 @@
 package com.adityachandel.booklore.service;
 
-import com.adityachandel.booklore.model.FileProcessResult;
 import com.adityachandel.booklore.model.LibraryFile;
-import com.adityachandel.booklore.model.dto.BookDTO;
+import com.adityachandel.booklore.model.dto.Book;
 
 public interface FileProcessor {
-    BookDTO processFile(LibraryFile libraryFile, boolean forceProcess);
+    Book processFile(LibraryFile libraryFile, boolean forceProcess);
 }

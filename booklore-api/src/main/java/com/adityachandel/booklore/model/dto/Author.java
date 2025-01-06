@@ -9,8 +9,7 @@ import java.util.List;
 @Builder
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AuthorDTO {
+public class Author {
     private Long id;
     private String name;
-    private List<BookDTO> books;
 }

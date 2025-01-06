@@ -12,6 +12,7 @@ import {BookMetadataBI} from '../model/book-metadata-for-book-info.model';
 })
 export class BookService {
   private readonly url = 'http://localhost:8080/v1/book';
+  private readonly metadataUrl = 'http://localhost:8080/v1/metadata';
 
   private bookStateSubject = new BehaviorSubject<BookState>({
     books: null,
@@ -144,14 +145,6 @@ export class BookService {
     return `${this.url}/${bookId}/cover`;
   }
 
-  fetchBookMetadataByBookId(bookId: number): Observable<BookMetadata[]> {
-    return this.http.get<BookMetadata[]>(`${this.url}/${bookId}/fetch-metadata`);
-  }
-
-  fetchBookMetadataByTerm(term: string): Observable<BookMetadata[]> {
-    return this.http.get<BookMetadata[]>(`${this.url}/fetch-metadata?term=${term}`);
-  }
-
   setBookMetadata(googleBookId: string, bookId: number): Observable<Book> {
     const requestBody = {googleBookId};
     return this.http.put<Book>(`${this.url}/${bookId}/set-metadata`, requestBody).pipe(
@@ -198,11 +191,10 @@ export class BookService {
   }
 
   fetchMetadata(bookId: number, request: FetchMetadataRequest): Observable<FetchedMetadata[]> {
-    return this.http.post<FetchedMetadata[]>(`${this.url}/${bookId}/metadata`, request);
+    return this.http.post<FetchedMetadata[]>(`${this.metadataUrl}/${bookId}`, request);
   }
 
   updateMetadata(bookId: number, bookMetadata: BookMetadataBI): Observable<BookMetadata> {
-    return this.http.put<BookMetadata>(`${this.url}/${bookId}/metadata`, bookMetadata);
+    return this.http.put<BookMetadata>(`${this.metadataUrl}/${bookId}`, bookMetadata);
   }
-
 }

@@ -2,7 +2,7 @@ package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.model.LibraryFile;
-import com.adityachandel.booklore.model.entity.Library;
+import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import lombok.AllArgsConstructor;
@@ -24,8 +24,8 @@ public class FileUploadService {
     private final PdfFileProcessor fileProcessor;
 
     public void uploadFile(MultipartFile file, long libraryId, String filePath) {
-        Library library = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
-        if (!library.getPaths().contains(filePath)) {
+        LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+        if (!libraryEntity.getPaths().contains(filePath)) {
             throw ApiError.INVALID_LIBRARY_PATH.createException();
         }
         String fileType = file.getContentType();
@@ -43,7 +43,7 @@ public class FileUploadService {
             }
             file.transferTo(storageFile);
             LibraryFile libraryFile = LibraryFile.builder()
-                    .library(library)
+                    .libraryEntity(libraryEntity)
                     .bookFileType(getFileType(fileType))
                     .filePath(storageFile.getAbsolutePath())
                     .build();

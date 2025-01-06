@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.service.metadata.model;
+package com.adityachandel.booklore.model.dto;
 
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class FetchedBookMetadata {
+public class BookMetadata {
     private Long bookId;
     private String title;
     private String subtitle;
@@ -18,10 +18,9 @@ public class FetchedBookMetadata {
     private String isbn13;
     private String isbn10;
     private Integer pageCount;
-    private String thumbnailUrl;
     private String language;
     private Float rating;
     private Integer reviewCount;
-    private List<String> authors;
-    private List<String> categories;
+    private List<Author> authors;
+    private List<Category> categories;
 }

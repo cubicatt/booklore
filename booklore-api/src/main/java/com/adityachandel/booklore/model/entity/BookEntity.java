@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "book")
-public class Book {
+public class BookEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,14 +26,14 @@ public class Book {
     private String path;
 
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private BookMetadata metadata;
+    private BookMetadataEntity metadata;
 
     @ManyToOne
     @JoinColumn(name = "library_id", nullable = false)
-    private Library library;
+    private LibraryEntity library;
 
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private BookViewerSetting viewerSetting;
+    private BookViewerSettingEntity viewerSetting;
 
     @Column(name = "last_read_time")
     private Instant lastReadTime;
@@ -47,5 +47,5 @@ public class Book {
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "shelf_id")
     )
-    private List<Shelf> shelves;
+    private List<ShelfEntity> shelves;
 }

@@ -1,36 +1,34 @@
 package com.adityachandel.booklore.model.entity;
 
-import com.adityachandel.booklore.convertor.PathsConverter;
 import com.adityachandel.booklore.convertor.SortConverter;
+import com.adityachandel.booklore.model.dto.Sort;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-@Entity
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "library")
-public class Library {
+@NoArgsConstructor
+@Entity
+@Table(name = "shelf")
+public class ShelfEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     @Convert(converter = SortConverter.class)
     private Sort sort;
 
-    @Convert(converter = PathsConverter.class)
-    @Column(name = "paths")
-    private List<String> paths;
-
-    @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Book> books;
+    @ManyToMany(mappedBy = "shelves", fetch = FetchType.LAZY)
+    private Set<BookEntity> bookEntities = new HashSet<>();
 
     private String icon;
 }

@@ -1,20 +1,19 @@
 package com.adityachandel.booklore.model.entity;
 
-import com.adityachandel.booklore.convertor.SortConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "shelf")
-public class Shelf {
+@AllArgsConstructor
+@Table(name = "category")
+public class CategoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,11 +22,7 @@ public class Shelf {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @Convert(converter = SortConverter.class)
-    private Sort sort;
-
-    @ManyToMany(mappedBy = "shelves", fetch = FetchType.LAZY)
-    private Set<Book> books = new HashSet<>();
-
-    private String icon;
+    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
+    private Set<BookMetadataEntity> bookMetadataEntityList = new HashSet<>();
 }
+

@@ -1,10 +1,10 @@
 package com.adityachandel.booklore.controller;
 
-import com.adityachandel.booklore.model.dto.BookDTO;
-import com.adityachandel.booklore.model.dto.BookWithNeighborsDTO;
-import com.adityachandel.booklore.model.dto.LibraryDTO;
+import com.adityachandel.booklore.model.dto.Book;
+import com.adityachandel.booklore.model.dto.BookWithNeighbors;
+import com.adityachandel.booklore.model.dto.Library;
 import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
-import com.adityachandel.booklore.model.entity.Sort;
+import com.adityachandel.booklore.model.dto.Sort;
 import com.adityachandel.booklore.service.BooksService;
 import com.adityachandel.booklore.service.LibraryService;
 import com.adityachandel.booklore.service.metadata.parser.AmazonBookParser;
@@ -25,17 +25,17 @@ public class LibraryController {
     private AmazonBookParser amazonBookParser;
 
     @GetMapping("/{libraryId}")
-    public ResponseEntity<LibraryDTO> getLibrary(@PathVariable long libraryId) {
+    public ResponseEntity<Library> getLibrary(@PathVariable long libraryId) {
         return ResponseEntity.ok(libraryService.getLibrary(libraryId));
     }
 
     @GetMapping
-    public ResponseEntity<List<LibraryDTO>> getLibraries() {
+    public ResponseEntity<List<Library>> getLibraries() {
         return ResponseEntity.ok(libraryService.getLibraries());
     }
 
     @PostMapping
-    public ResponseEntity<LibraryDTO> createLibraryNew(@RequestBody CreateLibraryRequest request) {
+    public ResponseEntity<Library> createLibraryNew(@RequestBody CreateLibraryRequest request) {
         return ResponseEntity.ok(libraryService.createLibrary(request));
     }
 
@@ -46,23 +46,23 @@ public class LibraryController {
     }
 
     @GetMapping("/{libraryId}/book/{bookId}/withNeighbors")
-    public ResponseEntity<BookWithNeighborsDTO> getBookWithNeighbours(@PathVariable long libraryId, @PathVariable long bookId) {
+    public ResponseEntity<BookWithNeighbors> getBookWithNeighbours(@PathVariable long libraryId, @PathVariable long bookId) {
         return ResponseEntity.ok(booksService.getBookWithNeighbours(libraryId, bookId));
     }
 
     @GetMapping("/{libraryId}/book/{bookId}")
-    public ResponseEntity<BookDTO> getBook(@PathVariable long libraryId, @PathVariable long bookId) {
+    public ResponseEntity<Book> getBook(@PathVariable long libraryId, @PathVariable long bookId) {
         return ResponseEntity.ok(libraryService.getBook(libraryId, bookId));
     }
 
     @GetMapping("/{libraryId}/book")
-    public ResponseEntity<List<BookDTO>> getBooks(@PathVariable long libraryId) {
-        List<BookDTO> books = libraryService.getBooks(libraryId);
+    public ResponseEntity<List<Book>> getBooks(@PathVariable long libraryId) {
+        List<Book> books = libraryService.getBooks(libraryId);
         return ResponseEntity.ok(books);
     }
 
     @PutMapping("/{libraryId}/sort")
-    public ResponseEntity<LibraryDTO> updateLibrary(@PathVariable long libraryId, @RequestBody Sort sort) {
+    public ResponseEntity<Library> updateLibrary(@PathVariable long libraryId, @RequestBody Sort sort) {
         return ResponseEntity.ok(libraryService.updateSort(libraryId, sort));
     }
 

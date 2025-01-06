@@ -1,10 +1,9 @@
 package com.adityachandel.booklore.controller;
 
-import com.adityachandel.booklore.model.dto.BookDTO;
-import com.adityachandel.booklore.model.dto.LibraryDTO;
-import com.adityachandel.booklore.model.dto.ShelfDTO;
+import com.adityachandel.booklore.model.dto.Book;
+import com.adityachandel.booklore.model.dto.Shelf;
 import com.adityachandel.booklore.model.dto.request.ShelfCreateRequest;
-import com.adityachandel.booklore.model.entity.Sort;
+import com.adityachandel.booklore.model.dto.Sort;
 import com.adityachandel.booklore.service.ShelfService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -22,27 +21,27 @@ public class ShelfController {
     private final ShelfService shelfService;
 
     @GetMapping
-    public ResponseEntity<List<ShelfDTO>> findAll() {
+    public ResponseEntity<List<Shelf>> findAll() {
         return ResponseEntity.ok(shelfService.getShelves());
     }
 
     @GetMapping("/{shelfId}")
-    public ResponseEntity<ShelfDTO> findById(@PathVariable Long shelfId) {
+    public ResponseEntity<Shelf> findById(@PathVariable Long shelfId) {
         return ResponseEntity.ok(shelfService.getShelf(shelfId));
     }
 
     @GetMapping("/{shelfId}/books")
-    public ResponseEntity<List<BookDTO>> getShelfBooks(@PathVariable Long shelfId) {
+    public ResponseEntity<List<Book>> getShelfBooks(@PathVariable Long shelfId) {
         return ResponseEntity.ok(shelfService.getShelfBooks(shelfId));
     }
 
     @PostMapping
-    public ResponseEntity<ShelfDTO> createShelf(@Valid @RequestBody ShelfCreateRequest request) {
+    public ResponseEntity<Shelf> createShelf(@Valid @RequestBody ShelfCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(shelfService.createShelf(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ShelfDTO> updateShelf(@PathVariable Long id, @Valid @RequestBody ShelfCreateRequest request) {
+    public ResponseEntity<Shelf> updateShelf(@PathVariable Long id, @Valid @RequestBody ShelfCreateRequest request) {
         return ResponseEntity.ok(shelfService.updateShelf(id, request));
     }
 
@@ -53,7 +52,7 @@ public class ShelfController {
     }
 
     @PutMapping("/{shelfId}/sort")
-    public ResponseEntity<ShelfDTO> updateShelf(@PathVariable long shelfId, @RequestBody Sort sort) {
+    public ResponseEntity<Shelf> updateShelf(@PathVariable long shelfId, @RequestBody Sort sort) {
         return ResponseEntity.ok(shelfService.updateSort(shelfId, sort));
     }
 

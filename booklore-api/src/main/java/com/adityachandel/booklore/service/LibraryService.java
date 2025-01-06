@@ -9,7 +9,7 @@ import com.adityachandel.booklore.model.dto.Sort;
 import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
-import com.adityachandel.booklore.repository.BookEntityRepository;
+import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ import java.util.List;
 public class LibraryService {
 
     private final LibraryRepository libraryRepository;
-    private final BookEntityRepository bookEntityRepository;
+    private final BookRepository bookRepository;
     private final LibraryProcessingService libraryProcessingService;
     private final BookMapper bookMapper;
     private final LibraryMapper libraryMapper;
@@ -82,13 +82,13 @@ public class LibraryService {
 
     public Book getBook(long libraryId, long bookId) {
         libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
-        BookEntity bookEntity = bookEntityRepository.findBookByIdAndLibraryId(bookId, libraryId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        BookEntity bookEntity = bookRepository.findBookByIdAndLibraryId(bookId, libraryId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         return bookMapper.toBook(bookEntity);
     }
 
     public List<Book> getBooks(long libraryId) {
         libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
-        List<BookEntity> bookEntities = bookEntityRepository.findBooksByLibraryId(libraryId);
+        List<BookEntity> bookEntities = bookRepository.findBooksByLibraryId(libraryId);
         return bookEntities.stream().map(bookMapper::toBook).toList();
     }
 

@@ -6,7 +6,7 @@ import com.adityachandel.booklore.model.LibraryFile;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
-import com.adityachandel.booklore.repository.BookEntityRepository;
+import com.adityachandel.booklore.repository.BookRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PdfFileProcessor implements FileProcessor {
 
-    private BookEntityRepository bookEntityRepository;
+    private BookRepository bookRepository;
     private BookCreatorService bookCreatorService;
     private AppProperties appProperties;
     private BookMapper bookMapper;
@@ -44,7 +44,7 @@ public class PdfFileProcessor implements FileProcessor {
         File bookFile = new File(libraryFile.getFilePath());
         String fileName = bookFile.getName();
         if (!forceProcess) {
-            Optional<BookEntity> bookOptional = bookEntityRepository.findBookByFileNameAndLibraryId(fileName, libraryFile.getLibraryEntity().getId());
+            Optional<BookEntity> bookOptional = bookRepository.findBookByFileNameAndLibraryId(fileName, libraryFile.getLibraryEntity().getId());
             return bookOptional
                     .map(bookMapper::toBook)
                     .orElseGet(() -> processNewFile(libraryFile));
@@ -71,12 +71,12 @@ public class PdfFileProcessor implements FileProcessor {
                 }
             }
             bookCreatorService.saveConnections(bookEntity);
-            BookEntity saved = bookEntityRepository.save(bookEntity);
+            BookEntity saved = bookRepository.save(bookEntity);
             boolean success = generateCoverImage(saved.getId(), new File(appProperties.getPathConfig() + "/thumbs"), document);
             if (success) {
                 bookMetadataEntity.setThumbnail(appProperties.getPathConfig() + "/thumbs/" + bookEntity.getId() + "/f.jpg");
             }
-            bookEntityRepository.flush();
+            bookRepository.flush();
         } catch (Exception e) {
             log.error("Error while processing file {}, error: {}", libraryFile.getFilePath(), e.getMessage());
         }

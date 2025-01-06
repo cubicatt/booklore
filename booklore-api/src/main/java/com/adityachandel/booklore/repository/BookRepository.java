@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface BookEntityRepository extends JpaRepository<BookEntity, Long>, JpaSpecificationExecutor<BookEntity> {
+public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpecificationExecutor<BookEntity> {
 
     Optional<BookEntity> findByFileName(String fileName);
 

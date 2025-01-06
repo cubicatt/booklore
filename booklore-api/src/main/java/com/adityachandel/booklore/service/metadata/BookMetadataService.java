@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class BookMetadataService {
 
     private AmazonBookParser amazonBookParser;
-    private BookEntityRepository bookEntityRepository;
+    private BookRepository bookRepository;
     private LibraryRepository libraryRepository;
     private AuthorRepository authorRepository;
     private BookMetadataRepository bookMetadataRepository;
@@ -45,7 +45,7 @@ public class BookMetadataService {
 
 
     public List<FetchedBookMetadata> fetchMetadataList(long bookId, FetchMetadataRequest request) {
-        BookEntity bookEntity = bookEntityRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         Book book = bookMapper.toBook(bookEntity);
         if (request.getProvider() == MetadataProvider.AMAZON) {
             return amazonBookParser.fetchTopNMetadata(book, request, GET_METADATA_COUNT);
@@ -90,7 +90,7 @@ public class BookMetadataService {
 
 
     public BookMetadata setBookMetadata(long bookId, FetchedBookMetadata newMetadata, MetadataProvider source, boolean setThumbnail) {
-        BookEntity bookEntity = bookEntityRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         BookMetadataEntity metadata = bookEntity.getMetadata();
         metadata.setTitle(newMetadata.getTitle());
         metadata.setSubtitle(newMetadata.getSubtitle());

@@ -9,7 +9,7 @@ import com.adityachandel.booklore.model.dto.BookWithNeighbors;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookViewerSettingEntity;
 import com.adityachandel.booklore.model.entity.ShelfEntity;
-import com.adityachandel.booklore.repository.BookEntityRepository;
+import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.BookViewerSettingRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.repository.ShelfRepository;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Service
 public class BooksService {
 
-    private final BookEntityRepository bookEntityRepository;
+    private final BookRepository bookRepository;
     private final BookViewerSettingRepository bookViewerSettingRepository;
     private final LibraryRepository libraryRepository;
     private final ShelfRepository shelfRepository;
@@ -45,7 +45,7 @@ public class BooksService {
 
 
     public Book getBook(long bookId, boolean withDescription) {
-        BookEntity bookEntity = bookEntityRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         Book book = bookMapper.toBook(bookEntity);
         if (!withDescription) {
             book.getMetadata().setDescription(null);
@@ -54,7 +54,7 @@ public class BooksService {
     }
 
     public List<Book> getBooks(boolean withDescription) {
-        return bookEntityRepository.findAll().stream()
+        return bookRepository.findAll().stream()
                 .map(bookEntity -> bookMapper.toBookWithDescription(bookEntity, withDescription))
                 .collect(Collectors.toList());
     }
@@ -69,7 +69,7 @@ public class BooksService {
     }
 
     public ResponseEntity<byte[]> getBookData(long bookId) throws IOException {
-        BookEntity bookEntity = bookEntityRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         byte[] pdfBytes = Files.readAllBytes(new File(bookEntity.getPath()).toPath());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
@@ -77,7 +77,7 @@ public class BooksService {
     }
 
     public List<Book> search(String title) {
-        List<BookEntity> bookEntities = bookEntityRepository.findByTitleContainingIgnoreCase(title);
+        List<BookEntity> bookEntities = bookRepository.findByTitleContainingIgnoreCase(title);
         return bookEntities.stream().map(bookMapper::toBook).toList();
     }
 
@@ -87,16 +87,16 @@ public class BooksService {
     }
 
     public Book updateLastReadTime(long bookId) {
-        BookEntity bookEntity = bookEntityRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         bookEntity.setLastReadTime(Instant.now());
-        return bookMapper.toBook(bookEntityRepository.save(bookEntity));
+        return bookMapper.toBook(bookRepository.save(bookEntity));
     }
 
     public BookWithNeighbors getBookWithNeighbours(long libraryId, long bookId) {
         libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
-        BookEntity bookEntity = bookEntityRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        BookEntity previousBookEntity = bookEntityRepository.findFirstByLibraryIdAndIdLessThanOrderByIdDesc(libraryId, bookId).orElse(null);
-        BookEntity nextBookEntity = bookEntityRepository.findFirstByLibraryIdAndIdGreaterThanOrderByIdAsc(libraryId, bookId).orElse(null);
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        BookEntity previousBookEntity = bookRepository.findFirstByLibraryIdAndIdLessThanOrderByIdDesc(libraryId, bookId).orElse(null);
+        BookEntity nextBookEntity = bookRepository.findFirstByLibraryIdAndIdGreaterThanOrderByIdAsc(libraryId, bookId).orElse(null);
         return BookWithNeighbors.builder()
                 .currentBook(bookMapper.toBook(bookEntity))
                 .previousBookId(previousBookEntity != null ? previousBookEntity.getId() : null)
@@ -106,7 +106,7 @@ public class BooksService {
 
     @Transactional
     public List<Book> assignShelvesToBooks(Set<Long> bookIds, Set<Long> shelfIdsToAssign, Set<Long> shelfIdsToUnassign) {
-        List<BookEntity> bookEntities = bookEntityRepository.findAllById(bookIds);
+        List<BookEntity> bookEntities = bookRepository.findAllById(bookIds);
         List<ShelfEntity> shelvesToAssign = shelfRepository.findAllById(shelfIdsToAssign);
         List<ShelfEntity> shelvesToUnassign = shelfRepository.findAllById(shelfIdsToUnassign);
         for (BookEntity bookEntity : bookEntities) {
@@ -121,14 +121,14 @@ public class BooksService {
                     shelf.getBookEntities().add(bookEntity);
                 }
             });
-            bookEntityRepository.save(bookEntity);
+            bookRepository.save(bookEntity);
             shelfRepository.saveAll(shelvesToAssign);
         }
         return bookEntities.stream().map(bookMapper::toBook).collect(Collectors.toList());
     }
 
     public Resource getBookCover(long bookId) {
-        BookEntity bookEntity = bookEntityRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         return fileService.getBookCover(bookEntity.getMetadata().getThumbnail());
     }
 }

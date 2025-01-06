@@ -9,7 +9,7 @@ import com.adityachandel.booklore.model.dto.request.ShelfCreateRequest;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.ShelfEntity;
 import com.adityachandel.booklore.model.dto.Sort;
-import com.adityachandel.booklore.repository.BookEntityRepository;
+import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.ShelfRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.List;
 public class ShelfService {
 
     private final ShelfRepository shelfRepository;
-    private final BookEntityRepository bookEntityRepository;
+    private final BookRepository bookRepository;
     private final ShelfMapper shelfMapper;
     private final BookMapper bookMapper;
 
@@ -59,7 +59,7 @@ public class ShelfService {
 
     public List<Book> getShelfBooks(Long shelfId) {
         shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
-        List<BookEntity> bookEntities = bookEntityRepository.findByShelfId(shelfId);
+        List<BookEntity> bookEntities = bookRepository.findByShelfId(shelfId);
         return bookEntities.stream()
                 .map(bookMapper::toBook)
                 .toList();

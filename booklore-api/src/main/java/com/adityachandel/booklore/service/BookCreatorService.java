@@ -7,7 +7,7 @@ import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.entity.BookViewerSettingEntity;
 import com.adityachandel.booklore.repository.AuthorRepository;
 import com.adityachandel.booklore.repository.BookMetadataRepository;
-import com.adityachandel.booklore.repository.BookEntityRepository;
+import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.BookViewerSettingRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.Set;
 public class BookCreatorService {
 
     private AuthorRepository authorRepository;
-    private BookEntityRepository bookEntityRepository;
+    private BookRepository bookRepository;
     private BookMetadataRepository bookMetadataRepository;
     private BookViewerSettingRepository bookViewerSettingRepository;
 
@@ -66,7 +66,7 @@ public class BookCreatorService {
         if (bookEntity.getMetadata().getAuthors() != null && !bookEntity.getMetadata().getAuthors().isEmpty()) {
             authorRepository.saveAll(bookEntity.getMetadata().getAuthors());
         }
-        bookEntityRepository.save(bookEntity);
+        bookRepository.save(bookEntity);
         bookMetadataRepository.save(bookEntity.getMetadata());
         bookViewerSettingRepository.save(bookEntity.getViewerSetting());
     }

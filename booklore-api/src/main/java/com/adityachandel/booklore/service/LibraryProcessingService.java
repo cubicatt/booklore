@@ -8,7 +8,7 @@ import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.model.stomp.BookNotification;
 import com.adityachandel.booklore.model.stomp.Topic;
-import com.adityachandel.booklore.repository.BookEntityRepository;
+import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class LibraryProcessingService {
     private final LibraryRepository libraryRepository;
     private final NotificationService notificationService;
     private final PdfFileProcessor pdfFileProcessor;
-    private final BookEntityRepository bookEntityRepository;
+    private final BookRepository bookRepository;
 
 
     @Transactional
@@ -60,7 +60,7 @@ public class LibraryProcessingService {
     protected void deleteRemovedBooks(List<BookEntity> removedBookEntities) {
         if (!removedBookEntities.isEmpty()) {
             Set<Long> bookIds = removedBookEntities.stream().map(BookEntity::getId).collect(Collectors.toSet());
-            bookEntityRepository.deleteByIdIn(bookIds);
+            bookRepository.deleteByIdIn(bookIds);
             BookNotification notification = BookNotification.builder().action(BOOKS_REMOVED).removedBookIds(bookIds).build();
             notificationService.sendMessage(Topic.BOOK, notification);
             log.info("Books removed: {}", bookIds);

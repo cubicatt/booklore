@@ -5,7 +5,7 @@ import com.adityachandel.booklore.model.dto.Author;
 import com.adityachandel.booklore.model.entity.AuthorEntity;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.repository.AuthorRepository;
-import com.adityachandel.booklore.repository.BookEntityRepository;
+import com.adityachandel.booklore.repository.BookRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ import java.util.List;
 public class AuthorService {
 
     private final AuthorRepository authorRepository;
-    private final BookEntityRepository bookEntityRepository;
+    private final BookRepository bookRepository;
     private final AuthorMapper authorMapper;
 
     public Author getAuthorById(Long id) {
@@ -25,7 +25,7 @@ public class AuthorService {
     }
 
     public List<Author> getAuthorsByBookId(Long bookId) {
-        bookEntityRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         List<AuthorEntity> authorEntities = authorRepository.findAuthorsByBookId(bookId);
         return authorEntities.stream().map(authorMapper::toAuthor).toList();
     }

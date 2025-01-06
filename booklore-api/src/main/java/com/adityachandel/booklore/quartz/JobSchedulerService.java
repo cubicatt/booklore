@@ -30,6 +30,9 @@ public class JobSchedulerService {
 
             scheduler.scheduleJob(jobDetail, trigger);
         } catch (Exception e) {
+            if(e.getMessage().contains("already exists")) {
+                throw ApiError.ANOTHER_METADATA_JOB_RUNNING.createException();
+            }
             throw ApiError.SCHEDULE_REFRESH_ERROR.createException(e.getMessage());
         }
     }

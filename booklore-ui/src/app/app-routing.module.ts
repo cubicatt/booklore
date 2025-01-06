@@ -4,6 +4,7 @@ import {PdfViewerComponent} from './book/component/pdf-viewer/pdf-viewer.compone
 import {DashboardComponent} from './book/component/dashboard/dashboard.component';
 import {BookBrowserComponent} from './book/component/book-browser/book-browser.component';
 import {AppLayoutComponent} from './book/component/layout/app.layout.component';
+import {BookTableComponent} from './book/component/book-table/book-table.component';
 
 const routes: Routes = [
   {
@@ -13,7 +14,7 @@ const routes: Routes = [
         path: '', component: DashboardComponent,
       },
       {
-        path: 'all-books', component: BookBrowserComponent,
+        path: 'all-books', component: BookTableComponent,
       },
       {
         path: 'library/:libraryId/books', component: BookBrowserComponent,

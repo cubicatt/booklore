@@ -26,16 +26,21 @@ public class FileService {
     private final AppProperties appProperties;
 
     public Resource getBookCover(String thumbnailPath) {
-        Path filePath = Paths.get(thumbnailPath);
+        Path thumbPath;
+        if (thumbnailPath == null || thumbnailPath.isEmpty()) {
+            thumbPath = Paths.get(getMissingThumbnailPath());
+        } else {
+            thumbPath = Paths.get(thumbnailPath);
+        }
         try {
-            Resource resource = new UrlResource(filePath.toUri());
+            Resource resource = new UrlResource(thumbPath.toUri());
             if (resource.exists() && resource.isReadable()) {
                 return resource;
             } else {
-                throw ApiError.IMAGE_NOT_FOUND.createException(filePath);
+                throw ApiError.IMAGE_NOT_FOUND.createException(thumbPath);
             }
         } catch (IOException e) {
-            throw ApiError.IMAGE_NOT_FOUND.createException(filePath);
+            throw ApiError.IMAGE_NOT_FOUND.createException(thumbPath);
         }
     }
 
@@ -73,6 +78,10 @@ public class FileService {
 
     public String getThumbnailPath(long bookId) {
         return appProperties.getPathConfig() + "/thumbs/" + bookId + "/";
+    }
+
+    public String getMissingThumbnailPath() {
+        return appProperties.getPathConfig() + "/thumbs/missing/m.jpg";
     }
 
 }

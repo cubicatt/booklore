@@ -53,8 +53,7 @@ export class BookBrowserComponent implements OnInit {
     private shelfService: ShelfService,
     private dialogService: DialogService,
     private sortService: SortService,
-    private libraryShelfMenuService: LibraryShelfMenuService
-  ) {
+    private libraryShelfMenuService: LibraryShelfMenuService) {
   }
 
   ngOnInit(): void {

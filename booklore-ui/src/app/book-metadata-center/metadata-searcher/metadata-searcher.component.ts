@@ -12,6 +12,7 @@ import {FetchedMetadata} from '../../book/model/book.model';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {MetadataPickerComponent} from '../metadata-picker/metadata-picker.component';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
+import {MultiSelect} from 'primeng/multiselect';
 
 @Component({
   selector: 'app-metadata-searcher',
@@ -26,7 +27,8 @@ import {BookMetadataCenterService} from '../book-metadata-center.service';
     NgForOf,
     NgIf,
     ProgressSpinner,
-    MetadataPickerComponent
+    MetadataPickerComponent,
+    MultiSelect
   ],
   standalone: true
 })
@@ -70,16 +72,16 @@ export class MetadataSearcherComponent implements OnInit {
 
   onSubmit(): void {
     if (this.form.valid) {
-      const providerKey = Object.keys(Provider).find(
-        key => Provider[key as keyof typeof Provider] === this.form.get('provider')?.value
+      const providerKeys = Object.keys(Provider).filter(key =>
+        (this.form.get('provider')?.value as string[]).includes(Provider[key as keyof typeof Provider])
       );
-      if (!providerKey) {
+      if (!providerKeys) {
         console.error('Invalid provider selected.');
         return;
       }
       const fetchRequest: FetchMetadataRequest = {
         bookId: this.bookId,
-        provider: providerKey,
+        providers: providerKeys,
         title: this.form.get('title')?.value,
         isbn: this.form.get('isbn')?.value,
         author: this.form.get('author')?.value
@@ -103,6 +105,20 @@ export class MetadataSearcherComponent implements OnInit {
     }
   }
 
+  buildProviderLink(metadata: { provider: string; providerBookId: string }): string {
+    if (!metadata.provider || !metadata.providerBookId) {
+      throw new Error("Invalid metadata: 'provider' or 'providerBookId' is missing.");
+    }
+    switch (metadata.provider) {
+      case "AMAZON":
+        return `<a href="https://www.amazon.com/dp/${metadata.providerBookId}" target="_blank">Amazon</a>`;
+      case "GOOD_READS":
+        return `<a href="https://www.goodreads.com/book/show/${metadata.providerBookId}" target="_blank">Goodreads</a>`;
+      default:
+        throw new Error(`Unsupported provider: ${metadata.provider}`);
+    }
+  }
+
   truncateText(text: string | null, length: number): string {
     const safeText = text ?? '';
     return safeText.length > length ? safeText.substring(0, length) + '...' : safeText;
@@ -114,5 +130,12 @@ export class MetadataSearcherComponent implements OnInit {
 
   onGoBack() {
     this.selectedFetchedMetadata = null;
+  }
+
+  sanitizeHtml(htmlString: string | null | undefined): string {
+    if (!htmlString) {
+      return '';
+    }
+    return htmlString.replace(/<\/?[^>]+(>|$)/g, '').trim();
   }
 }

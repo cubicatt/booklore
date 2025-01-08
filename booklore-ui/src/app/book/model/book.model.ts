@@ -1,5 +1,5 @@
 import {Shelf} from './shelf.model';
-import {SafeUrl} from '@angular/platform-browser';
+import {Provider} from './provider.model';
 
 export interface Book {
   id: number;
@@ -30,8 +30,8 @@ export interface BookMetadata {
 
 export interface FetchedMetadata {
   bookId: number | null;
-  googleBookId: string | null;
-  amazonBookId: string | null;
+  provider: string,
+  providerBookId: string,
   title: string | null;
   subtitle?: string | null;
   publisher: string | null;
@@ -39,6 +39,7 @@ export interface FetchedMetadata {
   description: string | null;
   isbn13: string | null;
   isbn10: string | null;
+  asin: string | null;
   pageCount: number | null;
   thumbnailUrl: string | undefined;
   language: string | null;

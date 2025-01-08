@@ -1,9 +1,9 @@
 package com.adityachandel.booklore.service.metadata.parser;
 
 import com.adityachandel.booklore.model.dto.Book;
-import com.adityachandel.booklore.model.dtonew.BookDTONew;
 import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
+import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import com.adityachandel.booklore.util.BookUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +28,11 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class AmazonBookParser implements BookParser {
 
+    private static final int COUNT_DETAILED_METADATA_TO_GET = 3;
+
     @Override
     public FetchedBookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
-        List<FetchedBookMetadata> fetchedBookMetadata = fetchTopNMetadata(book, fetchMetadataRequest, 1);
+        List<FetchedBookMetadata> fetchedBookMetadata = fetchMetadata(book, fetchMetadataRequest);
         if(fetchedBookMetadata == null || fetchedBookMetadata.isEmpty()) {
             return null;
         } else {
@@ -39,7 +41,7 @@ public class AmazonBookParser implements BookParser {
     }
 
     @Override
-    public List<FetchedBookMetadata> fetchTopNMetadata(Book book, FetchMetadataRequest fetchMetadataRequest, int n) {
+    public List<FetchedBookMetadata> fetchMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
         if (fetchMetadataRequest == null || (fetchMetadataRequest.getTitle() == null && fetchMetadataRequest.getAuthor() == null && fetchMetadataRequest.getIsbn() == null)) {
             String title = book.getMetadata().getTitle();
             if (title == null || title.isEmpty()) {
@@ -49,7 +51,7 @@ public class AmazonBookParser implements BookParser {
                 fetchMetadataRequest = FetchMetadataRequest.builder().title(title).build();
             }
         }
-        List<String> amazonBookIds = getFirstNAmazonBookIds(fetchMetadataRequest, n);
+        List<String> amazonBookIds = getFirstNAmazonBookIds(fetchMetadataRequest, COUNT_DETAILED_METADATA_TO_GET);
         if (amazonBookIds == null || amazonBookIds.isEmpty()) {
             return null;
         }
@@ -60,7 +62,7 @@ public class AmazonBookParser implements BookParser {
         return fetchedBookMetadata;
     }
 
-    private List<String> getFirstNAmazonBookIds(FetchMetadataRequest fetchMetadataRequest, int n) {
+    private List<String> getFirstNAmazonBookIds(FetchMetadataRequest fetchMetadataRequest, int countBookIdsToGet) {
         String queryUrl = buildQueryUrl(fetchMetadataRequest);
         if (queryUrl == null) {
             log.error("Query URL is null, cannot proceed.");
@@ -80,7 +82,7 @@ public class AmazonBookParser implements BookParser {
             } else {
                 int count = 0;
                 for (Element item : items) {
-                    if (count >= n) break;
+                    if (count >= countBookIdsToGet) break;
                     bookIds.add(extractAmazonBookId(item));
                     count++;
                 }
@@ -128,6 +130,8 @@ public class AmazonBookParser implements BookParser {
         Document doc = fetchDoc("https://www.amazon.com/dp/" + amazonBookId);
 
         return FetchedBookMetadata.builder()
+                .providerBookId(amazonBookId)
+                .provider(MetadataProvider.AMAZON)
                 .title(getTitle(doc))
                 .subtitle(getSubtitle(doc))
                 .authors(getAuthors(doc).stream().toList())
@@ -301,7 +305,7 @@ public class AmazonBookParser implements BookParser {
         return Set.of();
     }
 
-    private Float getRating(Document doc) {
+    private Double getRating(Document doc) {
         try {
             Element reviewDiv = doc.select("div#averageCustomerReviews_feature_div").first();
             if (reviewDiv != null) {
@@ -309,7 +313,7 @@ public class AmazonBookParser implements BookParser {
                 if (!ratingElements.isEmpty()) {
                     String text = Objects.requireNonNull(ratingElements.first()).text();
                     if (!text.isEmpty()) {
-                        return Float.parseFloat(text);
+                        return Double.parseDouble(text);
                     }
                 }
             }

@@ -42,6 +42,7 @@ import {providePrimeNG} from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 import {IftaLabel} from 'primeng/iftalabel';
 import {LoadingOverlayComponent} from './loading-overlay/loading-overlay.component';
+import {MultiSelectModule} from 'primeng/multiselect';
 
 @NgModule({
     declarations: [
@@ -81,6 +82,7 @@ import {LoadingOverlayComponent} from './loading-overlay/loading-overlay.compone
         ProgressSpinnerModule,
         IftaLabel,
         LoadingOverlayComponent,
+        MultiSelectModule
     ],
     providers: [
         DialogService,

@@ -11,12 +11,15 @@ import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
 import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import com.adityachandel.booklore.service.metadata.parser.AmazonBookParser;
+import com.adityachandel.booklore.service.metadata.parser.GoodReadsParser;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -25,19 +28,46 @@ import java.util.stream.Collectors;
 public class BookMetadataService {
 
     private AmazonBookParser amazonBookParser;
+    private GoodReadsParser goodReadsParser;
     private BookRepository bookRepository;
     private LibraryRepository libraryRepository;
     private BookMapper bookMapper;
     private BookMetadataUpdater bookMetadataUpdater;
 
-    private final int GET_METADATA_COUNT = 5;
-
 
     public List<FetchedBookMetadata> fetchMetadataList(long bookId, FetchMetadataRequest request) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         Book book = bookMapper.toBook(bookEntity);
-        if (request.getProvider() == MetadataProvider.AMAZON) {
-            return amazonBookParser.fetchTopNMetadata(book, request, GET_METADATA_COUNT);
+
+        List<CompletableFuture<List<FetchedBookMetadata>>> futures = request.getProviders().stream()
+                .map(provider -> CompletableFuture.supplyAsync(() -> fetchMetadataFromProvider(provider, book, request))
+                        .exceptionally(e -> {
+                            log.error("Error fetching metadata from provider: {}", provider, e);
+                            return List.of();
+                        }))
+                .toList();
+
+        List<List<FetchedBookMetadata>> allMetadata = futures.stream().map(CompletableFuture::join).toList();
+
+        List<FetchedBookMetadata> interleavedMetadata = new ArrayList<>();
+        int maxSize = allMetadata.stream().mapToInt(List::size).max().orElse(0);
+
+        for (int i = 0; i < maxSize; i++) {
+            for (List<FetchedBookMetadata> metadataList : allMetadata) {
+                if (i < metadataList.size()) {
+                    interleavedMetadata.add(metadataList.get(i));
+                }
+            }
+        }
+
+        return interleavedMetadata;
+    }
+
+    private List<FetchedBookMetadata> fetchMetadataFromProvider(MetadataProvider provider, Book book, FetchMetadataRequest request) {
+        if (provider == MetadataProvider.AMAZON) {
+            return amazonBookParser.fetchMetadata(book, request);
+        } else if (provider == MetadataProvider.GOOD_READS) {
+            return goodReadsParser.fetchMetadata(book, request);
         } else {
             throw ApiError.METADATA_SOURCE_NOT_IMPLEMENT_OR_DOES_NOT_EXIST.createException();
         }

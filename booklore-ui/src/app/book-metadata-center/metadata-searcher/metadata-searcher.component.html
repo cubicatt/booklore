@@ -1,8 +1,8 @@
 <form *ngIf="!selectedFetchedMetadata" class="flex flex-col w-full h-full pt-2" [formGroup]="form" (ngSubmit)="onSubmit()">
   <div class="flex w-full gap-x-4 items-end">
     <div class="flex flex-col gap-1 w-1/6">
-      <label for="provider">Provider</label>
-      <p-select id="provider" class="w-full" [options]="providers" formControlName="provider" placeholder="Select Provider.."></p-select>
+      <label for="provider">Providers</label>
+      <p-multiselect id="provider" class="w-full" [filter]="false" showToggleAll="false" [options]="providers" formControlName="provider" placeholder="Select Providers"></p-multiselect>
     </div>
 
     <div class="flex flex-col gap-1 w-1/6">
@@ -30,21 +30,25 @@
   </div>
 
   <div *ngIf="!loading" class="mt-8 flex-1 overflow-y-auto">
-    <div *ngFor="let book of allFetchedMetadata" class="book-item flex flex-col w-full">
-      <div class="flex w-full flex-row book-item-content" (click)="onBookClick(book)">
-        <img [src]="book.thumbnailUrl" alt="Image" class="img-fixed-dimensions pr-2"/>
+    <div *ngFor="let metadata of allFetchedMetadata" class="book-item flex flex-col w-full">
+      <div class="flex w-full flex-row book-item-content" (click)="onBookClick(metadata)">
+        <img [src]="metadata.thumbnailUrl || 'assets/book-cover-metadata.png'" alt="Image" class="img-fixed-dimensions pr-2"/>
         <div class=" flex flex-col w-full m-2">
           <div class="flex flex-row gap-4 justify-between">
-            <p class="font-bold">{{ truncateText(book['title'], 90) }}</p>
-            <div class="flex gap-4">
-              <p>ISBN: {{ book['isbn10'] }}</p>
+            <p class="font-bold">{{ truncateText(metadata['title'], 90) }}</p>
+            <div class="flex gap-2">
+              <p>ISBN: {{ metadata['isbn10'] || metadata['asin'] }}</p>
               <p> | </p>
-              <p>Published: {{ book['publishedDate'] }}</p>
+              <p>Published: {{ metadata['publishedDate'] }}</p>
             </div>
           </div>
-          <p>by {{ truncateText(book['authors'].join(', '), 70) }}</p>
+          <div class="flex gap-2">
+            <p>by {{ truncateText(metadata['authors'].join(', '), 70) }}</p>
+            <p> | </p>
+            <p>Source: <span [innerHTML]="buildProviderLink(metadata)"></span></p>
+          </div>
           <p class="mt-4 truncate-text p-secondary">
-            {{ book['description'] }}
+            {{ sanitizeHtml(metadata['description']) }}
           </p>
         </div>
       </div>

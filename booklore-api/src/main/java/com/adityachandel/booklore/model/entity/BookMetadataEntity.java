@@ -51,7 +51,7 @@ public class BookMetadataEntity {
     private String language;
 
     @Column(name = "rating")
-    private Float rating;
+    private Double rating;
 
     @Column(name = "review_count")
     private Integer reviewCount;

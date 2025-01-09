@@ -19,7 +19,6 @@ import {MultiSelect} from 'primeng/multiselect';
   templateUrl: './metadata-searcher.component.html',
   styleUrls: ['./metadata-searcher.component.scss'],
   imports: [
-    Select,
     ReactiveFormsModule,
     Button,
     InputText,

@@ -4,10 +4,10 @@
 
       <img [src]="coverImageSrc(bookMetadata.bookId)" class="book-cover placeholder" alt="Cover of {{ bookMetadata.title }}" loading="lazy" width="225"/>
 
-      <div class="pl-4 flex flex-col w-full space-y-4">
+      <div class="pl-6 flex flex-col w-full space-y-4">
         <div class="flex flex-row items-center justify-between">
           <div>
-            <p class="text-xl font-bold">{{ bookMetadata.title }}</p>
+            <p class="text-lg font-bold">{{ bookMetadata.title }}</p>
             <div class="flex items-center gap-4 pt-1">
               <p-rating [(ngModel)]="bookMetadata.rating" readonly stars="5"></p-rating>
               <p class="font-semibold">({{ bookMetadata.reviewCount || 0 }} Reviews)</p>

@@ -1,41 +1,36 @@
-<div *ngIf="!(bookState$ | async)?.loaded && !(bookState$ | async)?.error">
-  <p-progressSpinner></p-progressSpinner>
-</div>
-
-<div *ngIf="(bookState$ | async)?.books as book">
-  <p-table [value]="book" [resizableColumns]="true" showGridlines stripedRows [scrollable]="true"
-           scrollHeight="900px" [virtualScroll]="true" [virtualScrollItemSize]="46">
-    <ng-template #header>
-      <tr>
-        <th class="max-w-16">Cover</th>
-        <th class="w-1/2 max-w-52 overflow-hidden truncate" pResizableColumn>Title</th>
-        <th class="w-1/6 max-w-48 overflow-hidden truncate">Publisher</th>
-        <th class="w-1/8 max-w-44 overflow-hidden truncate" pResizableColumn>Subtitle</th>
-        <th class="w-1/8 max-w-36 overflow-hidden truncate">ISBN</th>
-        <th class="w-1/8 max-w-32 overflow-hidden truncate">Language</th>
-        <th class="w-1/8 max-w-36 overflow-hidden truncate">Rating</th>
-        <th class="max-w-16">
-          <p-tableHeaderCheckbox/>
-        </th>
-      </tr>
-    </ng-template>
-    <ng-template #body let-book>
-      <tr style="height:46px">
-        <td (click)="openMetadataCenter(book.id)" class="w-6 h-6"><img [src]="getBookCoverUrl(book.id)" alt="Book Cover" class="size-7"/></td>
-        <td (click)="openMetadataCenter(book.id)" class="w-1/2 max-w-52 overflow-hidden truncate" [title]="book.metadata?.title">{{ book.metadata?.title }} </td>
-        <td class="w-1/6 max-w-48 overflow-hidden truncate">{{ book.metadata?.publisher }}</td>
-        <td class="w-1/8 max-w-44 overflow-hidden truncate">{{ book.metadata?.subtitle }}</td>
-        <td class="w-1/8 max-w-36 overflow-hidden truncate">{{ book.metadata?.isbn10 }}</td>
-        <td class="w-1/8 max-w-32 overflow-hidden truncate">{{ book.metadata?.language }}</td>
-        <td class="w-1/8 max-w-36 overflow-hidden truncate">
-          <ng-container *ngIf="book.metadata">
-            <p-rating [(ngModel)]="book.metadata.rating" readonly stars="5"></p-rating>
-          </ng-container>
-        </td>
-        <td class="max-w-16">
-          <p-tableCheckbox [value]="book"/>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
-</div>
+<p-table [value]="books" [resizableColumns]="true" showGridlines stripedRows [scrollable]="true" [scrollHeight]="'calc(100vh - 160px)'"
+         [virtualScroll]="true" [virtualScrollItemSize]="46" [(selection)]="selectedBooks" (onHeaderCheckboxToggle)="onHeaderCheckboxToggle($event)"
+         (onRowSelect)="onRowSelect($event)" (onRowUnselect)="onRowUnselect($event)">
+  <ng-template #header>
+    <tr>
+      <th class="max-w-16">Cover</th>
+      <th class="w-1/2 max-w-52 overflow-hidden truncate" pResizableColumn>Title</th>
+      <th class="w-1/6 max-w-48 overflow-hidden truncate">Publisher</th>
+      <th class="w-1/8 max-w-44 overflow-hidden truncate" pResizableColumn>Subtitle</th>
+      <th class="w-1/8 max-w-36 overflow-hidden truncate">ISBN</th>
+      <th class="w-1/8 max-w-32 overflow-hidden truncate">Language</th>
+      <th class="w-1/8 max-w-36 overflow-hidden truncate">Rating</th>
+      <th class="max-w-16">
+        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-book>
+    <tr style="height:46px">
+      <td (click)="openMetadataCenter(book.id)" class="w-6 h-6"><img [src]="getBookCoverUrl(book.id)" alt="Book Cover" class="size-7"/></td>
+      <td (click)="openMetadataCenter(book.id)" class="w-1/2 max-w-52 overflow-hidden truncate" [title]="book.metadata?.title">{{ book.metadata?.title }}</td>
+      <td class="w-1/6 max-w-48 overflow-hidden truncate">{{ book.metadata?.publisher }}</td>
+      <td class="w-1/8 max-w-44 overflow-hidden truncate">{{ book.metadata?.subtitle }}</td>
+      <td class="w-1/8 max-w-36 overflow-hidden truncate">{{ book.metadata?.isbn10 }}</td>
+      <td class="w-1/8 max-w-32 overflow-hidden truncate">{{ book.metadata?.language }}</td>
+      <td class="w-1/8 max-w-36 overflow-hidden truncate">
+        <ng-container *ngIf="book.metadata">
+          <p-rating [(ngModel)]="book.metadata.rating" readonly stars="5"></p-rating>
+        </ng-container>
+      </td>
+      <td class="max-w-16">
+        <p-tableCheckbox [value]="book"></p-tableCheckbox>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

@@ -7,15 +7,8 @@
       <p *ngIf="entityType === EntityType.ALL_BOOKS" class="entity-name text-2xl">
         All Books
       </p>
-
       <div *ngIf="entityType !== EntityType.ALL_BOOKS">
-        <p-button
-          icon="pi pi-ellipsis-v"
-          [rounded]="true"
-          [text]="true"
-          severity="info"
-          (click)="entitymenu.toggle($event)">
-        </p-button>
+        <p-button icon="pi pi-ellipsis-v" [rounded]="true" [text]="true" severity="info" (click)="entitymenu.toggle($event)"></p-button>
         <p-menu #entitymenu [model]="entityOptions" [popup]="true" appendTo="body"></p-menu>
       </div>
     </ng-container>
@@ -23,74 +16,69 @@
 
   <div class="header-right-items">
     <input type="text" pInputText placeholder="Search by title..." [(ngModel)]="bookTitle" (ngModelChange)="onBookTitleChange($event)"/>
-
-    <p-dropdown
-      [options]="sortOptions"
-      optionLabel="label"
-      placeholder="Select Sorting"
-      [(ngModel)]="selectedSort"
-      (onChange)="updateSortOption($event.value)">
-    </p-dropdown>
-
-    <div class="zoom-controls">
-      <p-button icon="pi pi-minus" [rounded]="true" [outlined]="true" severity="info"></p-button>
-      <p-button icon="pi pi-plus" [rounded]="true" [outlined]="true" severity="info"></p-button>
+    <p-dropdown [options]="sortOptions" optionLabel="label" placeholder="Select Sorting" [(ngModel)]="selectedSort" (onChange)="updateSortOption($event.value)"></p-dropdown>
+    <div class="state-options">
+      <p-radioButton *ngFor="let option of stateOptions" [value]="option.value" [(ngModel)]="value" (onClick)="viewChanged($event)"></p-radioButton>
     </div>
   </div>
 </div>
 
-<div *ngIf="!(bookState$ | async)?.loaded && !(bookState$ | async)?.error">
-  <p-progressSpinner></p-progressSpinner>
-</div>
-
-<div class="virtual-scroller-container">
-  <div class="no-books-container" *ngIf="(bookState$ | async)?.error">
-    <p class="no-books-text">
-      {{ entityType === EntityType.LIBRARY ? "Failed to load library's books!" : "Failed to load shelf's books!" }}
-    </p>
-  </div>
-  <div class="no-books-container" *ngIf="!(bookState$ | async)?.error && (bookState$ | async)?.loaded && (bookState$ | async)?.books?.length === 0">
-    <p class="no-books-text">
-      {{ entityType === EntityType.LIBRARY ? "This library has no books!" : "This shelf has no books!" }}
-    </p>
+<div *ngIf="bookState$ | async as bookState">
+  <div *ngIf="!bookState?.loaded && !bookState?.error">
+    <p-progressSpinner></p-progressSpinner>
   </div>
 
-  <div class="book-card-container" *ngIf="(bookState$ | async)?.books as books">
-    <virtual-scroller *ngIf="books.length > 0" class="virtual-scroller" #scroll [items]="books">
-      <div class="grid grid-cols-12 gap-4" #container>
-        <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
-          <app-book-card
-            [book]="book"
-            [isCheckboxEnabled]="true"
-            [onBookSelect]="handleBookSelect.bind(this)"
-            [isSelected]="selectedBooks.has(book.id)">
-          </app-book-card>
+  <div class="virtual-scroller-container">
+    <div class="no-books-container" *ngIf="bookState?.error">
+      <p class="no-books-text">
+        {{ entityType === EntityType.LIBRARY ? "Failed to load library's books!" : "Failed to load shelf's books!" }}
+      </p>
+    </div>
+    <div class="no-books-container" *ngIf="!bookState?.error && bookState?.loaded && bookState?.books?.length === 0">
+      <p class="no-books-text">
+        {{ entityType === EntityType.LIBRARY ? "This library has no books!" : "This shelf has no books!" }}
+      </p>
+    </div>
+
+    <div class="book-card-container" *ngIf="bookState?.books as books">
+      <app-book-table *ngIf="value === 'table'" [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)"></app-book-table>
+
+      <virtual-scroller *ngIf="value === 'grid'" class="virtual-scroller" #scroll [items]="books">
+        <div class="grid grid-cols-12 gap-4" #container>
+          <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
+            <app-book-card
+              [book]="book"
+              [isCheckboxEnabled]="true"
+              [onBookSelect]="handleBookSelect.bind(this)"
+              [isSelected]="selectedBooks.has(book.id)">
+            </app-book-card>
+          </div>
         </div>
-      </div>
-    </virtual-scroller>
-  </div>
+      </virtual-scroller>
+    </div>
 
-  <div class="book-browser-footer" *ngIf="selectedBooks.size > 0">
-    <div class="footer-items-container">
-      <ng-container *ngIf="entityType$ | async as entityType">
-        <p-button *ngIf="entityType === EntityType.LIBRARY || entityType === EntityType.ALL_BOOKS"
-                  icon="pi pi-book"
-                  label="Assign Shelf"
-                  severity="info"
-                  (onClick)="openShelfAssigner()">
-        </p-button>
-        <p-button *ngIf="entityType === EntityType.SHELF"
-                  icon="pi pi-minus-circle"
-                  label="Unshelf"
-                  severity="info"
-                  (click)="unshelfBooks()">
-        </p-button>
-        <p-button icon="pi pi-times"
-                  label="Deselect"
-                  severity="warn"
-                  (click)="deselectAllBooks()">
-        </p-button>
-      </ng-container>
+    <div class="book-browser-footer" *ngIf="selectedBooks.size > 0">
+      <div class="footer-items-container">
+        <ng-container *ngIf="entityType$ | async as entityType">
+          <p-button *ngIf="entityType === EntityType.LIBRARY || entityType === EntityType.ALL_BOOKS"
+                    icon="pi pi-book"
+                    label="Assign Shelf"
+                    severity="info"
+                    (onClick)="openShelfAssigner()">
+          </p-button>
+          <p-button *ngIf="entityType === EntityType.SHELF"
+                    icon="pi pi-minus-circle"
+                    label="Unshelf"
+                    severity="info"
+                    (click)="unshelfBooks()">
+          </p-button>
+          <p-button icon="pi pi-times"
+                    label="Deselect"
+                    severity="warn"
+                    (click)="deselectAllBooks()">
+          </p-button>
+        </ng-container>
+      </div>
     </div>
   </div>
 </div>

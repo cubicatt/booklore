@@ -1,14 +1,12 @@
-import { Component } from '@angular/core';
-import {Observable} from 'rxjs';
-import {BookState} from '../../model/state/book-state.model';
+import {ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {TableModule} from 'primeng/table';
-import {AsyncPipe, NgIf} from '@angular/common';
-import {ProgressSpinner} from 'primeng/progressspinner';
+import {NgIf} from '@angular/common';
 import {BookService} from '../../service/book.service';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {BookMetadataCenterComponent} from '../../../book-metadata-center/book-metadata-center.component';
 import {DialogService} from 'primeng/dynamicdialog';
+import {Book} from '../../model/book.model';
 
 @Component({
   selector: 'app-book-table',
@@ -16,31 +14,58 @@ import {DialogService} from 'primeng/dynamicdialog';
   templateUrl: './book-table.component.html',
   imports: [
     TableModule,
-    AsyncPipe,
     NgIf,
-    ProgressSpinner,
     Rating,
     FormsModule
   ],
   styleUrl: './book-table.component.scss'
 })
 export class BookTableComponent {
-  bookState$: Observable<BookState>;
+  selectedBooks: Book[] = [];
+  selectedBookIds: Set<number> = new Set();
 
-  constructor(private bookService: BookService, private dialogService: DialogService) {
-    this.bookState$ = this.bookService.bookState$;
+  @Output() selectedBooksChange = new EventEmitter<Set<number>>();
+  @Input() books: Book[] = [];
+
+  constructor(private bookService: BookService, private dialogService: DialogService, private zone: NgZone) {
+  }
+
+  clearSelectedBooks(): void {
+    this.selectedBookIds.clear();
+    this.selectedBooks = [];
+    this.selectedBooksChange.emit(this.selectedBookIds);
+  }
+
+  onRowSelect(event: any): void {
+    this.selectedBookIds.add(event.data.id);
+    this.selectedBooksChange.emit(this.selectedBookIds);
+  }
+
+  onRowUnselect(event: any): void {
+    this.selectedBookIds.delete(event.data.id);
+    this.selectedBooksChange.emit(this.selectedBookIds);
+  }
+
+  onHeaderCheckboxToggle(event: any): void {
+    if (event.checked) {
+      this.selectedBooks = [...this.books];
+      this.selectedBookIds = new Set(this.books.map(book => book.id));
+    } else {
+      this.clearSelectedBooks();
+    }
+    this.selectedBooksChange.emit(this.selectedBookIds);
   }
 
   getBookCoverUrl(bookId: number): string {
     return this.bookService.getBookCoverUrl(bookId);
   }
 
-  openMetadataCenter(id: number) {
+  openMetadataCenter(id: number): void {
     this.openBookDetailsDialog(id);
   }
 
   openBookDetailsDialog(bookId: number): void {
-    this.bookService.getBookByIdFromAPI(bookId, true).subscribe(({
+    this.bookService.getBookByIdFromAPI(bookId, true).subscribe({
       next: (book) => {
         this.dialogService.open(BookMetadataCenterComponent, {
           header: 'Open book details',
@@ -59,6 +84,6 @@ export class BookTableComponent {
       error: (error) => {
         console.error('Error fetching book:', error);
       }
-    }))
+    });
   }
 }

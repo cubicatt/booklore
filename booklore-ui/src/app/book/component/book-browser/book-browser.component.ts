@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {MenuItem, MessageService} from 'primeng/api';
 import {LibraryService} from '../../service/library.service';
@@ -16,6 +16,8 @@ import {SortOption} from '../../model/sort.model';
 import {BookState} from '../../model/state/book-state.model';
 import {Book} from '../../model/book.model';
 import {LibraryShelfMenuService} from '../../service/library-shelf-menu.service';
+import {SelectButtonChangeEvent} from 'primeng/selectbutton';
+import {BookTableComponent} from '../book-table/book-table.component';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -44,6 +46,12 @@ export class BookBrowserComponent implements OnInit {
   sortOptions: SortOption[] = [];
   isDrawerVisible: boolean = false;
   dynamicDialogRef: DynamicDialogRef | undefined;
+  EntityType = EntityType;
+
+  stateOptions: any[] = [{ label: 'Grid', value: 'grid' },{ label: 'Table', value: 'table' }];
+  value: string = 'table';
+
+  @ViewChild(BookTableComponent) bookTableComponent!: BookTableComponent;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -91,7 +99,6 @@ export class BookBrowserComponent implements OnInit {
       this.bookTitle$.next('');
       this.bookTitle = '';
     });
-
   }
 
   private getEntityInfoFromRoute(): Observable<{ entityId: number; entityType: EntityType }> {
@@ -214,7 +221,18 @@ export class BookBrowserComponent implements OnInit {
     this.isDrawerVisible = this.selectedBooks.size > 0;
   }
 
+  onSelectedBooksChange(selectedBookIds: Set<number>): void {
+    this.selectedBooks = new Set(selectedBookIds);
+    this.isDrawerVisible = this.selectedBooks.size > 0;
+  }
+
   deselectAllBooks(): void {
+    this.selectedBooks.clear();
+    this.isDrawerVisible = false;
+    this.bookTableComponent.clearSelectedBooks();
+  }
+
+  viewChanged(event : SelectButtonChangeEvent) {
     this.selectedBooks.clear();
     this.isDrawerVisible = false;
   }
@@ -285,6 +303,4 @@ export class BookBrowserComponent implements OnInit {
       this.selectedBooks.clear();
     });
   }
-
-  protected readonly EntityType = EntityType;
 }

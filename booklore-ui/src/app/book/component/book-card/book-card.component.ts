@@ -34,11 +34,7 @@ export class BookCardComponent implements OnInit {
   items: MenuItem[] | undefined;
   isHovered: boolean = false;
 
-  constructor(
-    private bookService: BookService,
-    private router: Router,
-    private dialogService: DialogService
-  ) {
+  constructor(private bookService: BookService, private dialogService: DialogService) {
   }
 
   ngOnInit(): void {

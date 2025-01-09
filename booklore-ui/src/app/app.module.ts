@@ -43,6 +43,9 @@ import Aura from '@primeng/themes/aura';
 import {IftaLabel} from 'primeng/iftalabel';
 import {LoadingOverlayComponent} from './loading-overlay/loading-overlay.component';
 import {MultiSelectModule} from 'primeng/multiselect';
+import {SelectButton} from "primeng/selectbutton";
+import {BookTableComponent} from './book/component/book-table/book-table.component';
+import {RadioButton} from 'primeng/radiobutton';
 
 @NgModule({
     declarations: [
@@ -52,38 +55,41 @@ import {MultiSelectModule} from 'primeng/multiselect';
         ShelfAssignerComponent,
         BookBrowserComponent
     ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        AppLayoutModule,
-        FormsModule,
-        InputTextModule,
-        TableModule,
-        Button,
-        StepperModule,
-        IconFieldModule,
-        InputIconModule,
-        ToggleButtonModule,
-        PasswordModule,
-        ToastModule,
-        InfiniteScrollDirective,
-        SearchComponent,
-        DropdownModule,
-        VirtualScrollerModule,
-        LazyLoadImageModule,
-        ConfirmDialogModule,
-        CheckboxModule,
-        DividerModule,
-        DialogModule,
-        BookCardComponent,
-        SpeedDialModule,
-        MenuModule,
-        IconPickerComponent,
-        ProgressSpinnerModule,
-        IftaLabel,
-        LoadingOverlayComponent,
-        MultiSelectModule
-    ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    AppLayoutModule,
+    FormsModule,
+    InputTextModule,
+    TableModule,
+    Button,
+    StepperModule,
+    IconFieldModule,
+    InputIconModule,
+    ToggleButtonModule,
+    PasswordModule,
+    ToastModule,
+    InfiniteScrollDirective,
+    SearchComponent,
+    DropdownModule,
+    VirtualScrollerModule,
+    LazyLoadImageModule,
+    ConfirmDialogModule,
+    CheckboxModule,
+    DividerModule,
+    DialogModule,
+    BookCardComponent,
+    SpeedDialModule,
+    MenuModule,
+    IconPickerComponent,
+    ProgressSpinnerModule,
+    IftaLabel,
+    LoadingOverlayComponent,
+    MultiSelectModule,
+    SelectButton,
+    BookTableComponent,
+    RadioButton
+  ],
     providers: [
         DialogService,
         MessageService,

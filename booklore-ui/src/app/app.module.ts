@@ -46,6 +46,7 @@ import {MultiSelectModule} from 'primeng/multiselect';
 import {SelectButton} from "primeng/selectbutton";
 import {BookTableComponent} from './book/component/book-table/book-table.component';
 import {RadioButton} from 'primeng/radiobutton';
+import {Select} from 'primeng/select';
 
 @NgModule({
     declarations: [
@@ -88,7 +89,8 @@ import {RadioButton} from 'primeng/radiobutton';
     MultiSelectModule,
     SelectButton,
     BookTableComponent,
-    RadioButton
+    RadioButton,
+    Select
   ],
     providers: [
         DialogService,

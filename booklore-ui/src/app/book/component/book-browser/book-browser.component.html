@@ -16,7 +16,7 @@
 
   <div class="header-right-items">
     <input type="text" pInputText placeholder="Search by title..." [(ngModel)]="bookTitle" (ngModelChange)="onBookTitleChange($event)"/>
-    <p-dropdown [options]="sortOptions" optionLabel="label" placeholder="Select Sorting" [(ngModel)]="selectedSort" (onChange)="updateSortOption($event.value)"></p-dropdown>
+    <p-select [options]="sortOptions" optionLabel="label" placeholder="Select Sorting" [(ngModel)]="selectedSort" (onChange)="updateSortOption($event.value)"></p-select>
     <div *ngFor="let option of stateOptions" class="field-checkbox">
       <p-radioButton [inputId]="option.key" [value]="option.value"  [(ngModel)]="value" (onClick)="viewChanged($event)"></p-radioButton>
       <label [for]="option.key" class="ml-2">{{ option.label }}</label>
@@ -76,7 +76,7 @@
                     (click)="unshelfBooks()">
           </p-button>
           <p-button icon="pi pi-times"
-                    label="Deselect"
+                    label="Deselect All"
                     severity="warn"
                     (click)="deselectAllBooks()">
           </p-button>

@@ -1,6 +1,6 @@
 import {AfterContentChecked, AfterViewChecked, AfterViewInit, Component, EventEmitter, Input, NgZone, OnChanges, Output} from '@angular/core';
 import {TableModule} from 'primeng/table';
-import {NgIf} from '@angular/common';
+import {NgClass, NgIf} from '@angular/common';
 import {BookService} from '../../service/book.service';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
@@ -17,7 +17,8 @@ import {SortDirection, SortOption} from '../../model/sort.model';
     TableModule,
     NgIf,
     Rating,
-    FormsModule
+    FormsModule,
+    NgClass
   ],
   styleUrl: './book-table.component.scss'
 })
@@ -98,9 +99,17 @@ export class BookTableComponent implements OnChanges {
   }
 
 
-  testzzz($event: any) {
-    console.log($event)
+  getStarColor(rating: number): string {
+    if (rating >= 4.5) {
+      return 'rgb(34, 197, 94)';
+    } else if (rating >= 4) {
+      return 'rgb(52, 211, 153)';
+    } else if (rating >= 3.5) {
+      return 'rgb(234, 179, 8)';
+    } else if (rating >= 2.5) {
+      return 'rgb(249, 115, 22)';
+    } else {
+      return 'rgb(239, 68, 68)';
+    }
   }
-
-  protected readonly SortDirection = SortDirection;
 }

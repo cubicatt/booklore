@@ -22,7 +22,9 @@
       <th>Rating</th>
       <th>Pages</th>
       <th>Reviews</th>
-      <th><p-tableHeaderCheckbox/></th>
+      <th>
+        <p-tableHeaderCheckbox/>
+      </th>
     </tr>
   </ng-template>
   <ng-template #body let-book>
@@ -35,7 +37,12 @@
       <td class="w-1/12 max-w-28 overflow-hidden truncate">{{ book.metadata?.language }}</td>
       <td class="w-1/12 max-w-30 overflow-hidden truncate">
         <ng-container *ngIf="book.metadata">
-          <p-rating [(ngModel)]="book.metadata.rating" readonly stars="5"></p-rating>
+          <p-rating
+            [(ngModel)]="book.metadata.rating"
+            readonly
+            stars="5"
+            [style.--p-rating-icon-active-color]="getStarColor(book.metadata.rating)">
+          </p-rating>
         </ng-container>
       </td>
       <td class="w-1/12 max-w-32 overflow-hidden truncate">{{ book.metadata?.pageCount }}</td>

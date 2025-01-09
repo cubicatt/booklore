@@ -1,5 +1,4 @@
 import {Shelf} from './shelf.model';
-import {Provider} from './provider.model';
 
 export interface Book {
   id: number;
@@ -13,25 +12,25 @@ export interface Book {
 export interface BookMetadata {
   title: string;
   subtitle?: string;
-  authors: Author[];
-  categories: Category[];
   publisher: string;
   publishedDate: string;
-  isbn10: string;
-  isbn13: string;
   description?: string;
+  isbn13: string;
+  isbn10: string;
+  asin?: string;
   pageCount: number;
+  language: string;
   rating: number;
   reviewCount: number;
-  language: string;
-  googleBookId: string;
+  authors: Author[];
+  categories: Category[];
   [key: string]: any;
 }
 
 export interface FetchedMetadata {
   bookId: number | null;
-  provider: string,
-  providerBookId: string,
+  provider: string;
+  providerBookId: string;
   title: string | null;
   subtitle?: string | null;
   publisher: string | null;

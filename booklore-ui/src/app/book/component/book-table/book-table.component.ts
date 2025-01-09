@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {AfterContentChecked, AfterViewChecked, AfterViewInit, Component, EventEmitter, Input, NgZone, OnChanges, Output} from '@angular/core';
 import {TableModule} from 'primeng/table';
 import {NgIf} from '@angular/common';
 import {BookService} from '../../service/book.service';
@@ -7,6 +7,7 @@ import {FormsModule} from '@angular/forms';
 import {BookMetadataCenterComponent} from '../../../book-metadata-center/book-metadata-center.component';
 import {DialogService} from 'primeng/dynamicdialog';
 import {Book} from '../../model/book.model';
+import {SortDirection, SortOption} from '../../model/sort.model';
 
 @Component({
   selector: 'app-book-table',
@@ -20,14 +21,23 @@ import {Book} from '../../model/book.model';
   ],
   styleUrl: './book-table.component.scss'
 })
-export class BookTableComponent {
+export class BookTableComponent implements OnChanges {
   selectedBooks: Book[] = [];
   selectedBookIds: Set<number> = new Set();
 
   @Output() selectedBooksChange = new EventEmitter<Set<number>>();
   @Input() books: Book[] = [];
+  @Input() sortOption: SortOption | null = null;
 
-  constructor(private bookService: BookService, private dialogService: DialogService, private zone: NgZone) {
+  constructor(private bookService: BookService, private dialogService: DialogService) {
+  }
+
+  // Hack to set virtual-scroller height
+  ngOnChanges() {
+    let wrapperElements: HTMLCollection = document.getElementsByClassName('p-virtualscroller');
+    Array.prototype.forEach.call(wrapperElements, function (wrapperElement) {
+      wrapperElement.style["height"] = 'calc(100vh - 160px)';
+    });
   }
 
   clearSelectedBooks(): void {
@@ -86,4 +96,11 @@ export class BookTableComponent {
       }
     });
   }
+
+
+  testzzz($event: any) {
+    console.log($event)
+  }
+
+  protected readonly SortDirection = SortDirection;
 }

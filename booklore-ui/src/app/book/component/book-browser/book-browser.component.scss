@@ -69,12 +69,36 @@
 .book-browser-footer {
   position: absolute;
   bottom: 0;
+  left: 37%;
+  right: 37%;
+  display: flex;
+  justify-content: center;
+  padding: 1.1rem;
+  box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  border-radius: 10px 10px 0 0;
+}
+
+.book-browser-footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
   left: 0;
   right: 0;
-  background-color: var(--card-background);
-  padding: 1rem;
-  box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
-  display: flex;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: -1;
+  border-radius: 10px 10px 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-width: 1px 1px 0px 1px;
+}
+
+.book-browser-footer > * {
+  pointer-events: auto;
+}
+
+.book-browser-footer:hover::before {
+  pointer-events: none;
 }
 
 .footer-items-container {

@@ -59,7 +59,6 @@ export class BookMetadataCenterComponent implements OnInit {
       reviewCount: metadata?.reviewCount || null,
       rating: metadata?.rating || null,
       language: metadata?.language || '',
-      googleBookId: metadata?.googleBookId || '',
     };
   }
 }

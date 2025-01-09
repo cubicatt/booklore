@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {FetchedMetadata} from '../../book/model/book.model';
+import {BookMetadata, FetchedMetadata} from '../../book/model/book.model';
 import {BookService} from '../../book/service/book.service';
 import {MessageService} from 'primeng/api';
 import {Button} from 'primeng/button';
@@ -116,7 +116,8 @@ export class MetadataPickerComponent implements OnInit {
     };
 
     this.bookService.updateMetadata(this.currentBookId, updatedBookMetadata).subscribe({
-      next: () => {
+      next: (bookMetadata) => {
+        console.log(bookMetadata)
         Object.keys(this.copiedFields).forEach((field) => {
           if (this.copiedFields[field]) {
             this.savedFields[field] = true;

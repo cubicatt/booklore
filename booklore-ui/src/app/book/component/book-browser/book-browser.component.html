@@ -17,8 +17,9 @@
   <div class="header-right-items">
     <input type="text" pInputText placeholder="Search by title..." [(ngModel)]="bookTitle" (ngModelChange)="onBookTitleChange($event)"/>
     <p-dropdown [options]="sortOptions" optionLabel="label" placeholder="Select Sorting" [(ngModel)]="selectedSort" (onChange)="updateSortOption($event.value)"></p-dropdown>
-    <div class="state-options">
-      <p-radioButton *ngFor="let option of stateOptions" [value]="option.value" [(ngModel)]="value" (onClick)="viewChanged($event)"></p-radioButton>
+    <div *ngFor="let option of stateOptions" class="field-checkbox">
+      <p-radioButton [inputId]="option.key" [value]="option.value"  [(ngModel)]="value" (onClick)="viewChanged($event)"></p-radioButton>
+      <label [for]="option.key" class="ml-2">{{ option.label }}</label>
     </div>
   </div>
 </div>
@@ -41,7 +42,9 @@
     </div>
 
     <div class="book-card-container" *ngIf="bookState?.books as books">
-      <app-book-table *ngIf="value === 'table'" [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)"></app-book-table>
+
+      <app-book-table *ngIf="value === 'table'&& books.length > 0" [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)"
+      [sortOption]="selectedSort"></app-book-table>
 
       <virtual-scroller *ngIf="value === 'grid'" class="virtual-scroller" #scroll [items]="books">
         <div class="grid grid-cols-12 gap-4" #container>
@@ -57,7 +60,7 @@
       </virtual-scroller>
     </div>
 
-    <div class="book-browser-footer" *ngIf="selectedBooks.size > 0">
+    <div class="book-browser-footer" *ngIf="selectedBooks.size > 0" [@slideInOut]>
       <div class="footer-items-container">
         <ng-container *ngIf="entityType$ | async as entityType">
           <p-button *ngIf="entityType === EntityType.LIBRARY || entityType === EntityType.ALL_BOOKS"

@@ -11,13 +11,13 @@ import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Library} from '../../model/library.model';
 import {Shelf} from '../../model/shelf.model';
 import {SortService} from '../../service/sort.service';
-import {SortOptionsHelper} from '../../service/sort-options.helper';
 import {SortOption} from '../../model/sort.model';
 import {BookState} from '../../model/state/book-state.model';
 import {Book} from '../../model/book.model';
 import {LibraryShelfMenuService} from '../../service/library-shelf-menu.service';
 import {SelectButtonChangeEvent} from 'primeng/selectbutton';
 import {BookTableComponent} from '../book-table/book-table.component';
+import {animate, state, style, transition, trigger} from '@angular/animations';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -29,7 +29,23 @@ export enum EntityType {
   selector: 'app-book-browser',
   standalone: false,
   templateUrl: './book-browser.component.html',
-  styleUrls: ['./book-browser.component.scss']
+  styleUrls: ['./book-browser.component.scss'],
+  animations: [
+    trigger('slideInOut', [
+      state('void', style({
+        transform: 'translateY(100%)'
+      })),
+      state('*', style({
+        transform: 'translateY(0)'
+      })),
+      transition(':enter', [
+        animate('0.1s ease-in')
+      ]),
+      transition(':leave', [
+        animate('0.1s ease-out')
+      ])
+    ])
+  ]
 })
 export class BookBrowserComponent implements OnInit {
   bookState$: Observable<BookState> | undefined;
@@ -48,7 +64,7 @@ export class BookBrowserComponent implements OnInit {
   dynamicDialogRef: DynamicDialogRef | undefined;
   EntityType = EntityType;
 
-  stateOptions: any[] = [{ label: 'Grid', value: 'grid' },{ label: 'Table', value: 'table' }];
+  stateOptions: any[] = [{label: 'Grid', value: 'grid'}, {label: 'Table', value: 'table'}];
   value: string = 'table';
 
   @ViewChild(BookTableComponent) bookTableComponent!: BookTableComponent;
@@ -65,7 +81,7 @@ export class BookBrowserComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.sortOptions = SortOptionsHelper.generateSortOptions();
+    this.sortOptions = SortService.generateSortOptions();
     const isAllBooksRoute = this.activatedRoute.snapshot.routeConfig?.path === 'all-books';
 
     if (isAllBooksRoute) {
@@ -85,7 +101,7 @@ export class BookBrowserComponent implements OnInit {
       );
 
       this.entityType$ = routeEntityInfo$.pipe(
-        map(({ entityType }) => entityType)
+        map(({entityType}) => entityType)
       );
 
       this.entity$.subscribe(entity => {
@@ -107,11 +123,11 @@ export class BookBrowserComponent implements OnInit {
         const libraryId = Number(params.get('libraryId') || NaN);
         const shelfId = Number(params.get('shelfId') || NaN);
         if (!isNaN(libraryId)) {
-          return { entityId: libraryId, entityType: EntityType.LIBRARY };
+          return {entityId: libraryId, entityType: EntityType.LIBRARY};
         } else if (!isNaN(shelfId)) {
-          return { entityId: shelfId, entityType: EntityType.SHELF };
+          return {entityId: shelfId, entityType: EntityType.SHELF};
         } else {
-          return { entityId: NaN, entityType: EntityType.ALL_BOOKS };
+          return {entityId: NaN, entityType: EntityType.ALL_BOOKS};
         }
       })
     );
@@ -160,7 +176,7 @@ export class BookBrowserComponent implements OnInit {
         if (bookState.loaded && !bookState.error) {
           const filteredBooks = bookState.books?.filter(bookFilter) || [];
           const sortedBooks = this.sortService.applySort(filteredBooks, this.selectedSort);
-          return { ...bookState, books: sortedBooks };
+          return {...bookState, books: sortedBooks};
         }
         return bookState;
       }),
@@ -171,7 +187,7 @@ export class BookBrowserComponent implements OnInit {
   private processBookState(bookState: BookState): BookState {
     if (bookState.loaded && !bookState.error) {
       const sortedBooks = this.sortService.applySort(bookState.books || [], this.selectedSort);
-      return { ...bookState, books: sortedBooks };
+      return {...bookState, books: sortedBooks};
     }
     return bookState;
   }
@@ -183,7 +199,7 @@ export class BookBrowserComponent implements OnInit {
           const filteredBooks = bookState.books?.filter(book =>
             book.metadata?.title?.toLowerCase().includes(title.toLowerCase())
           ) || null;
-          return { ...bookState, books: filteredBooks };
+          return {...bookState, books: filteredBooks};
         }
         return bookState;
       })
@@ -232,7 +248,7 @@ export class BookBrowserComponent implements OnInit {
     this.bookTableComponent.clearSelectedBooks();
   }
 
-  viewChanged(event : SelectButtonChangeEvent) {
+  viewChanged(event: SelectButtonChangeEvent) {
     this.selectedBooks.clear();
     this.isDrawerVisible = false;
   }

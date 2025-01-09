@@ -195,6 +195,14 @@ export class BookService {
   }
 
   updateMetadata(bookId: number, bookMetadata: BookMetadataBI): Observable<BookMetadata> {
-    return this.http.put<BookMetadata>(`${this.metadataUrl}/${bookId}`, bookMetadata);
+    return this.http.put<BookMetadata>(`${this.metadataUrl}/${bookId}`, bookMetadata).pipe(
+      tap(updatedMetadata => {
+        const currentState = this.bookStateSubject.value;
+        const updatedBooks = (currentState.books || []).map(book =>
+          book.id === bookId ? {...book, metadata: updatedMetadata} : book
+        );
+        this.bookStateSubject.next({...currentState, books: updatedBooks});
+      })
+    );
   }
 }

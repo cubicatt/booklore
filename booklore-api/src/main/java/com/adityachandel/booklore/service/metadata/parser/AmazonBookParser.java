@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,30 +26,26 @@ import java.util.stream.Collectors;
 public class AmazonBookParser implements BookParser {
 
     private static final int COUNT_DETAILED_METADATA_TO_GET = 3;
+    private static final String BASE_SEARCH_URL = "https://www.amazon.com/s/?search-alias=stripbooks&unfiltered=1&sort=relevanceexprank";
+    private static final String BASE_BOOK_URL = "https://www.amazon.com/dp/";
 
     @Override
     public FetchedBookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
-        List<FetchedBookMetadata> fetchedBookMetadata = fetchMetadata(book, fetchMetadataRequest);
-        if(fetchedBookMetadata == null || fetchedBookMetadata.isEmpty()) {
+        LinkedList<String> amazonBookIds = getAmazonBookIds(book, fetchMetadataRequest);
+        if (amazonBookIds == null || amazonBookIds.isEmpty()) {
             return null;
-        } else {
-            return fetchedBookMetadata.getFirst();
         }
+        return getBookMetadata(amazonBookIds.getFirst());
     }
 
     @Override
     public List<FetchedBookMetadata> fetchMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
-        if (fetchMetadataRequest == null || (fetchMetadataRequest.getTitle() == null && fetchMetadataRequest.getAuthor() == null && fetchMetadataRequest.getIsbn() == null)) {
-            String title = book.getMetadata().getTitle();
-            if (title == null || title.isEmpty()) {
-                String cleanFileName = BookUtils.cleanFileName(book.getFileName());
-                fetchMetadataRequest = FetchMetadataRequest.builder().title(cleanFileName).build();
-            } else {
-                fetchMetadataRequest = FetchMetadataRequest.builder().title(title).build();
-            }
-        }
-        List<String> amazonBookIds = getFirstNAmazonBookIds(fetchMetadataRequest, COUNT_DETAILED_METADATA_TO_GET);
-        if (amazonBookIds == null || amazonBookIds.isEmpty()) {
+        LinkedList<String> amazonBookIds = Optional.ofNullable(getAmazonBookIds(book, fetchMetadataRequest))
+                .map(list -> list.stream()
+                        .limit(COUNT_DETAILED_METADATA_TO_GET)
+                        .collect(Collectors.toCollection(LinkedList::new)))
+                .orElse(new LinkedList<>());
+        if (amazonBookIds.isEmpty()) {
             return null;
         }
         List<FetchedBookMetadata> fetchedBookMetadata = new ArrayList<>();
@@ -62,13 +55,13 @@ public class AmazonBookParser implements BookParser {
         return fetchedBookMetadata;
     }
 
-    private List<String> getFirstNAmazonBookIds(FetchMetadataRequest fetchMetadataRequest, int countBookIdsToGet) {
-        String queryUrl = buildQueryUrl(fetchMetadataRequest);
+    private LinkedList<String> getAmazonBookIds(Book book, FetchMetadataRequest fetchMetadataRequest) {
+        String queryUrl = buildQueryUrl(fetchMetadataRequest, book);
         if (queryUrl == null) {
             log.error("Query URL is null, cannot proceed.");
             return null;
         }
-        List<String> bookIds = new ArrayList<>();
+        LinkedList<String> bookIds = new LinkedList<>();
         try {
             Document doc = fetchDoc(queryUrl);
             Element searchResults = doc.select("span[data-component-type=s-search-results]").first();
@@ -80,11 +73,8 @@ public class AmazonBookParser implements BookParser {
             if (items.isEmpty()) {
                 log.error("No items found in the search results.");
             } else {
-                int count = 0;
                 for (Element item : items) {
-                    if (count >= countBookIdsToGet) break;
                     bookIds.add(extractAmazonBookId(item));
-                    count++;
                 }
             }
         } catch (Exception e) {
@@ -127,7 +117,7 @@ public class AmazonBookParser implements BookParser {
     private FetchedBookMetadata getBookMetadata(String amazonBookId) {
         log.info("Fetching book metadata for amazon book {}", amazonBookId);
 
-        Document doc = fetchDoc("https://www.amazon.com/dp/" + amazonBookId);
+        Document doc = fetchDoc(BASE_BOOK_URL + amazonBookId);
 
         return FetchedBookMetadata.builder()
                 .providerBookId(amazonBookId)
@@ -149,22 +139,35 @@ public class AmazonBookParser implements BookParser {
                 .build();
     }
 
-    private String buildQueryUrl(FetchMetadataRequest fetchMetadataRequest) {
-        StringBuilder queryBuilder = new StringBuilder("https://www.amazon.com/s/?search-alias=stripbooks&unfiltered=1&sort=relevanceexprank");
+    private String buildQueryUrl(FetchMetadataRequest fetchMetadataRequest, Book book) {
+        StringBuilder queryBuilder = new StringBuilder(BASE_SEARCH_URL);
 
+        // Always add ISBN if present
         if (fetchMetadataRequest.getIsbn() != null && !fetchMetadataRequest.getIsbn().isEmpty()) {
             queryBuilder.append("&field-isbn=").append(fetchMetadataRequest.getIsbn());
         }
 
-        if (fetchMetadataRequest.getTitle() != null && !fetchMetadataRequest.getTitle().isEmpty()) {
-            queryBuilder.append("&field-title=").append(fetchMetadataRequest.getTitle().replace(" ", "%20"));
+        // Add title if present, otherwise check filename if title is absent
+        String title = fetchMetadataRequest.getTitle();
+        if (title != null && !title.isEmpty()) {
+            queryBuilder.append("&field-title=").append(title.replace(" ", "%20"));
+        } else {
+            String filename = BookUtils.cleanFileName(book.getFileName());
+            if (filename != null && !filename.isEmpty()) {
+                queryBuilder.append("&field-title=").append(filename.replace(" ", "%20"));
+            }
         }
 
-        if (fetchMetadataRequest.getAuthor() != null && !fetchMetadataRequest.getAuthor().isEmpty()) {
-            queryBuilder.append("&field-author=").append(fetchMetadataRequest.getAuthor().replace(" ", "%20"));
+        // Add author only if title or filename is present
+        if ((title != null && !title.isEmpty()) || (fetchMetadataRequest.getIsbn() != null && !fetchMetadataRequest.getIsbn().isEmpty())) {
+            String author = fetchMetadataRequest.getAuthor();
+            if (author != null && !author.isEmpty()) {
+                queryBuilder.append("&field-author=").append(author.replace(" ", "%20"));
+            }
         }
 
-        if (fetchMetadataRequest.getIsbn() == null && fetchMetadataRequest.getTitle() == null && fetchMetadataRequest.getAuthor() != null) {
+        // If ISBN, Title, or Filename is missing, return null
+        if (fetchMetadataRequest.getIsbn() == null && (title == null || title.isEmpty()) && (book.getFileName() == null || book.getFileName().isEmpty())) {
             return null;
         }
 

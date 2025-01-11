@@ -11,7 +11,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +29,8 @@ import java.util.regex.Pattern;
 @Service
 public class GoodReadsParser implements BookParser {
 
-    private static final String SEARCH_BASE_URL = "https://www.goodreads.com/search?q=";
-    private static final String BOOK_BASE_URL = "https://www.goodreads.com/book/show/";
+    private static final String BASE_SEARCH_URL = "https://www.goodreads.com/search?q=";
+    private static final String BASE_BOOK_URL = "https://www.goodreads.com/book/show/";
     private static final int COUNT_DETAILED_METADATA_TO_GET = 3;
 
     @Override
@@ -40,7 +39,7 @@ public class GoodReadsParser implements BookParser {
         if (preview.isEmpty()) {
             return null;
         }
-        List<FetchedBookMetadata> fetchedMetadata = fetchMetadataForPreviews(List.of(preview.get()));
+        List<FetchedBookMetadata> fetchedMetadata = fetchMetadataUsingPreviews(List.of(preview.get()));
         return fetchedMetadata.isEmpty() ? null : fetchedMetadata.getFirst();
     }
 
@@ -49,15 +48,15 @@ public class GoodReadsParser implements BookParser {
         List<FetchedBookMetadata> previews = fetchMetadataPreviews(fetchMetadataRequest).stream()
                 .limit(COUNT_DETAILED_METADATA_TO_GET)
                 .toList();
-        return fetchMetadataForPreviews(previews);
+        return fetchMetadataUsingPreviews(previews);
     }
 
-    private List<FetchedBookMetadata> fetchMetadataForPreviews(List<FetchedBookMetadata> previews) {
+    private List<FetchedBookMetadata> fetchMetadataUsingPreviews(List<FetchedBookMetadata> previews) {
         List<FetchedBookMetadata> fetchedMetadata = new ArrayList<>();
         for (FetchedBookMetadata preview : previews) {
             log.info("Fetching metadata for: {}", preview.getTitle());
             try {
-                Document document = fetchDoc(BOOK_BASE_URL + preview.getProviderBookId());
+                Document document = fetchDoc(BASE_BOOK_URL + preview.getProviderBookId());
                 FetchedBookMetadata detailedMetadata = parseBookDetails(document, preview.getProviderBookId());
                 if (detailedMetadata != null) {
                     fetchedMetadata.add(detailedMetadata);
@@ -329,7 +328,7 @@ public class GoodReadsParser implements BookParser {
     public String generateSearchUrl(String searchTerm) {
         try {
             String encodedSearchTerm = URLEncoder.encode(searchTerm, "UTF-8");
-            return SEARCH_BASE_URL + encodedSearchTerm;
+            return BASE_SEARCH_URL + encodedSearchTerm;
         } catch (UnsupportedEncodingException e) {
             log.error("Error encoding search term: {}", searchTerm);
             return null;
@@ -340,22 +339,23 @@ public class GoodReadsParser implements BookParser {
         log.info("Fetching metadata previews for {}", request.getTitle());
         try {
             String searchUrl = generateSearchUrl(request.getTitle() + " " + request.getAuthor());
-            Elements books = fetchDoc(searchUrl).select("table.tableList").first().select("tr[itemtype=http://schema.org/Book]");
-            List<FetchedBookMetadata> fetchedBookMetadataList = new ArrayList<>();
-            for (Element book : books) {
-                Integer publishedYear = extractPublishedYearPreview(book);
-                FetchedBookMetadata metadata = FetchedBookMetadata.builder()
-                        .providerBookId(String.valueOf(extractGoodReadsIdPreview(book)))
-                        .title(extractTitlePreview(book))
+            Elements previewBooks = fetchDoc(searchUrl).select("table.tableList").first().select("tr[itemtype=http://schema.org/Book]");
+            List<FetchedBookMetadata> metadataPreviews = new ArrayList<>();
+            for (Element previewBook : previewBooks) {
+                Integer publishedYear = extractPublishedYearPreview(previewBook);
+                FetchedBookMetadata previewMetadata = FetchedBookMetadata.builder()
+                        .providerBookId(String.valueOf(extractGoodReadsIdPreview(previewBook)))
+                        .title(extractTitlePreview(previewBook))
                         .publishedDate(publishedYear != null ? LocalDate.of(publishedYear, 1, 1) : null)
-                        .rating(extractRatingPreview(book))
-                        .reviewCount(extractRatingsPreview(book))
-                        .authors(extractAuthorsPreview(book))
-                        .thumbnailUrl(extractCoverUrlPreview(book))
+                        .rating(extractRatingPreview(previewBook))
+                        .reviewCount(extractRatingsPreview(previewBook))
+                        .authors(extractAuthorsPreview(previewBook))
+                        .thumbnailUrl(extractCoverUrlPreview(previewBook))
                         .build();
-                fetchedBookMetadataList.add(metadata);
+                metadataPreviews.add(previewMetadata);
             }
-            return fetchedBookMetadataList;
+            Thread.sleep(Duration.ofSeconds(1));
+            return metadataPreviews;
         } catch (Exception e) {
             log.error("Error fetching metadata previews: {}", e.getMessage());
             return Collections.emptyList();

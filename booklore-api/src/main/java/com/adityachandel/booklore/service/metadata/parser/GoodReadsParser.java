@@ -267,21 +267,16 @@ public class GoodReadsParser implements BookParser {
     public List<FetchedBookMetadata> fetchMetadataPreviews(Book book, FetchMetadataRequest request) {
         String searchTerm = getSearchTerm(book, request);
         if (searchTerm != null) {
-            log.info("Fetching metadata previews for {}", searchTerm);
+            log.info("Fetching metadata previews for: {}", searchTerm);
             try {
                 String searchUrl = generateSearchUrl(searchTerm);
                 Elements previewBooks = fetchDoc(searchUrl).select("table.tableList").first().select("tr[itemtype=http://schema.org/Book]");
                 List<FetchedBookMetadata> metadataPreviews = new ArrayList<>();
                 for (Element previewBook : previewBooks) {
-                    Integer publishedYear = extractPublishedYearPreview(previewBook);
                     FetchedBookMetadata previewMetadata = FetchedBookMetadata.builder()
                             .providerBookId(String.valueOf(extractGoodReadsIdPreview(previewBook)))
                             .title(extractTitlePreview(previewBook))
-                            .publishedDate(publishedYear != null ? LocalDate.of(publishedYear, 1, 1) : null)
-                            .rating(extractRatingPreview(previewBook))
-                            .reviewCount(extractRatingsPreview(previewBook))
                             .authors(extractAuthorsPreview(previewBook))
-                            .thumbnailUrl(extractCoverUrlPreview(previewBook))
                             .build();
                     metadataPreviews.add(previewMetadata);
                 }
@@ -296,11 +291,27 @@ public class GoodReadsParser implements BookParser {
     }
 
     private String getSearchTerm(Book book, FetchMetadataRequest request) {
-        return (request.getTitle() != null && !request.getTitle().isEmpty())
+        String searchTerm = (request.getTitle() != null && !request.getTitle().isEmpty())
                 ? request.getTitle()
                 : (book.getFileName() != null && !book.getFileName().isEmpty()
                 ? BookUtils.cleanFileName(book.getFileName())
                 : null);
+
+        if (searchTerm != null) {
+            searchTerm = searchTerm.replaceAll("[.,\\-\\[\\]{}()!@#$%^&*_=+|~`<>?/\";:]", "").trim();
+            if (searchTerm.length() > 60) {
+                String[] words = searchTerm.split("\\s+");
+                StringBuilder truncated = new StringBuilder();
+                for (String word : words) {
+                    if (truncated.length() + word.length() + 1 > 60) break;
+                    if (!truncated.isEmpty()) truncated.append(" ");
+                    truncated.append(word);
+                }
+                searchTerm = truncated.toString();
+            }
+        }
+
+        return searchTerm;
     }
 
     private Integer extractGoodReadsIdPreview(Element book) {
@@ -338,65 +349,6 @@ public class GoodReadsParser implements BookParser {
             return link != null ? link.attr("title") : null;
         } catch (Exception e) {
             log.warn("Error extracting title: {}", e.getMessage());
-            return null;
-        }
-    }
-
-    private String extractCoverUrlPreview(Element book) {
-        try {
-            Element link = book.select("a[title]").first();
-            return link != null ? link.select("img").attr("src") : null;
-        } catch (Exception e) {
-            log.warn("Error extracting image URL: {}", e.getMessage());
-            return null;
-        }
-    }
-
-    private Double extractRatingPreview(Element book) {
-        try {
-            Element ratingElement = book.selectFirst("span.greyText.smallText.uitext");
-            if (ratingElement != null) {
-                String[] split = ratingElement.text().split(" — ");
-                String avgRating = split[0].split("avg rating")[0].trim();
-                if (avgRating.length() <= 4) {
-                    return Double.valueOf(avgRating);
-                }
-            }
-            return null;
-        } catch (Exception e) {
-            log.warn("Error extracting rating: {}", e.getMessage());
-            return null;
-        }
-    }
-
-    private Integer extractRatingsPreview(Element book) {
-        try {
-            Element ratingElement = book.selectFirst("span.greyText.smallText.uitext");
-            if (ratingElement != null) {
-                String[] split = ratingElement.text().split(" — ");
-                if (split.length > 1) {
-                    return Integer.parseInt(split[1].split("ratings")[0].replace(",", "").trim());
-                }
-            }
-            return null;
-        } catch (Exception e) {
-            log.warn("Error extracting number of ratings: {}", e.getMessage());
-            return null;
-        }
-    }
-
-    private Integer extractPublishedYearPreview(Element book) {
-        try {
-            Element ratingElement = book.selectFirst("span.greyText.smallText.uitext");
-            if (ratingElement != null) {
-                String[] split = ratingElement.text().split(" — ");
-                if (split.length == 4) {
-                    return Integer.parseInt(split[2].split("published")[1].trim());
-                }
-            }
-            return null;
-        } catch (Exception e) {
-            log.warn("Error extracting published year: {}", e.getMessage());
             return null;
         }
     }

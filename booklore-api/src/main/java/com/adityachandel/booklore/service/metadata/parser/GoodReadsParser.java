@@ -56,7 +56,7 @@ public class GoodReadsParser implements BookParser {
     private List<FetchedBookMetadata> fetchMetadataUsingPreviews(List<FetchedBookMetadata> previews) {
         List<FetchedBookMetadata> fetchedMetadata = new ArrayList<>();
         for (FetchedBookMetadata preview : previews) {
-            log.info("Fetching metadata for: {}", preview.getTitle());
+            log.info("GoodReads: Fetching metadata for: {}", preview.getTitle());
             try {
                 Document document = fetchDoc(BASE_BOOK_URL + preview.getProviderBookId());
                 FetchedBookMetadata detailedMetadata = parseBookDetails(document, preview.getProviderBookId());
@@ -267,7 +267,7 @@ public class GoodReadsParser implements BookParser {
     public List<FetchedBookMetadata> fetchMetadataPreviews(Book book, FetchMetadataRequest request) {
         String searchTerm = getSearchTerm(book, request);
         if (searchTerm != null) {
-            log.info("Fetching metadata previews for: {}", searchTerm);
+            log.info("GoodReads: Fetching metadata previews for: {}", searchTerm);
             try {
                 String searchUrl = generateSearchUrl(searchTerm);
                 Elements previewBooks = fetchDoc(searchUrl).select("table.tableList").first().select("tr[itemtype=http://schema.org/Book]");

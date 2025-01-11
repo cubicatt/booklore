@@ -1,13 +1,13 @@
-import {AfterContentChecked, AfterViewChecked, AfterViewInit, Component, EventEmitter, Input, NgZone, OnChanges, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
 import {TableModule} from 'primeng/table';
-import {NgClass, NgIf} from '@angular/common';
+import {NgIf} from '@angular/common';
 import {BookService} from '../../service/book.service';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {BookMetadataCenterComponent} from '../../../book-metadata-center/book-metadata-center.component';
 import {DialogService} from 'primeng/dynamicdialog';
 import {Book} from '../../model/book.model';
-import {SortDirection, SortOption} from '../../model/sort.model';
+import {SortOption} from '../../model/sort.model';
 
 @Component({
   selector: 'app-book-table',
@@ -17,8 +17,7 @@ import {SortDirection, SortOption} from '../../model/sort.model';
     TableModule,
     NgIf,
     Rating,
-    FormsModule,
-    NgClass
+    FormsModule
   ],
   styleUrl: './book-table.component.scss'
 })

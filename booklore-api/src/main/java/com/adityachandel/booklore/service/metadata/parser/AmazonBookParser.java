@@ -55,15 +55,16 @@ public class AmazonBookParser implements BookParser {
         return fetchedBookMetadata;
     }
 
-    private LinkedList<String> getAmazonBookIds(Book book, FetchMetadataRequest fetchMetadataRequest) {
-        String queryUrl = buildQueryUrl(fetchMetadataRequest, book);
+    private LinkedList<String> getAmazonBookIds(Book book, FetchMetadataRequest request) {
+        log.info("Amazon: Querying metadata for ISBN: {}, Title: {}, Author: {}, FileName: {}", request.getIsbn(), request.getTitle(), request.getAuthor(), book.getFileName());
+        String queryUrl = buildQueryUrl(request, book);
         if (queryUrl == null) {
             log.error("Query URL is null, cannot proceed.");
             return null;
         }
         LinkedList<String> bookIds = new LinkedList<>();
         try {
-            Document doc = fetchDoc(queryUrl);
+            Document doc = fetchDocument(queryUrl);
             Element searchResults = doc.select("span[data-component-type=s-search-results]").first();
             if (searchResults == null) {
                 log.error("No search results found for query: {}", queryUrl);
@@ -115,10 +116,8 @@ public class AmazonBookParser implements BookParser {
     }
 
     private FetchedBookMetadata getBookMetadata(String amazonBookId) {
-        log.info("Fetching book metadata for amazon book {}", amazonBookId);
-
-        Document doc = fetchDoc(BASE_BOOK_URL + amazonBookId);
-
+        log.info("Amazon: Fetching metadata for: {}", amazonBookId);
+        Document doc = fetchDocument(BASE_BOOK_URL + amazonBookId);
         return FetchedBookMetadata.builder()
                 .providerBookId(amazonBookId)
                 .provider(MetadataProvider.AMAZON)
@@ -126,7 +125,7 @@ public class AmazonBookParser implements BookParser {
                 .subtitle(getSubtitle(doc))
                 .authors(getAuthors(doc).stream().toList())
                 .categories(getBestSellerCategories(doc).stream().toList())
-                .description(getDescription(doc))
+                .description(cleanDescriptionHtml(getDescription(doc)))
                 .isbn13(getIsbn13(doc))
                 .isbn10(getIsbn10(doc))
                 .publisher(getPublisher(doc))
@@ -374,7 +373,7 @@ public class AmazonBookParser implements BookParser {
         return null;
     }
 
-    private Document fetchDoc(String url) {
+    private Document fetchDocument(String url) {
         try {
             Connection.Response response = Jsoup.connect(url)
                     .header("accept", "text/html, application/json")
@@ -412,5 +411,19 @@ public class AmazonBookParser implements BookParser {
     private LocalDate parseAmazonDate(String dateString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
         return LocalDate.parse(dateString, formatter);
+    }
+
+    private String cleanDescriptionHtml(String html) {
+        Document document = Jsoup.parse(html);
+        document.select("span.a-text-bold").tagName("b").removeAttr("class");
+        document.select("span.a-text-italic").tagName("i").removeAttr("class");
+        for (Element span : document.select("span.a-list-item")) {
+            span.unwrap();  // Removes the span and keeps its content
+        }
+        document.select("ol.a-ordered-list.a-vertical").tagName("ol").removeAttr("class");
+        for (Element span : document.select("span")) {
+            span.unwrap();
+        }
+        return document.body().html();
     }
 }

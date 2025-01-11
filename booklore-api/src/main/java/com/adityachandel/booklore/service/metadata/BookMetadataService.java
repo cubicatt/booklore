@@ -4,18 +4,20 @@ import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.model.dto.Author;
 import com.adityachandel.booklore.model.dto.Book;
-import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
-import com.adityachandel.booklore.model.entity.*;
-import com.adityachandel.booklore.model.stomp.BookNotification;
+import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.model.entity.BookMetadataEntity;
+import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.stomp.Topic;
-import com.adityachandel.booklore.repository.*;
+import com.adityachandel.booklore.repository.BookRepository;
+import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.service.NotificationService;
 import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
 import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import com.adityachandel.booklore.service.metadata.parser.AmazonBookParser;
 import com.adityachandel.booklore.service.metadata.parser.GoodReadsParser;
+import com.adityachandel.booklore.service.metadata.parser.GoogleParser;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,22 +31,21 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import static com.adityachandel.booklore.model.stomp.BookNotification.Action.BOOK_ADDED;
 import static com.adityachandel.booklore.model.stomp.LogNotification.createLogNotification;
-import static com.adityachandel.booklore.model.stomp.Topic.METADATA_UPDATE;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class BookMetadataService {
 
-    private AmazonBookParser amazonBookParser;
-    private GoodReadsParser goodReadsParser;
-    private BookRepository bookRepository;
-    private LibraryRepository libraryRepository;
-    private BookMapper bookMapper;
-    private BookMetadataUpdater bookMetadataUpdater;
-    private NotificationService notificationService;
+    private final GoogleParser googleParser;
+    private final AmazonBookParser amazonBookParser;
+    private final GoodReadsParser goodReadsParser;
+    private final BookRepository bookRepository;
+    private final LibraryRepository libraryRepository;
+    private final BookMapper bookMapper;
+    private final BookMetadataUpdater bookMetadataUpdater;
+    private final NotificationService notificationService;
 
     public List<FetchedBookMetadata> fetchMetadataList(long bookId, FetchMetadataRequest request) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
@@ -79,6 +80,8 @@ public class BookMetadataService {
             return amazonBookParser.fetchMetadata(book, request);
         } else if (provider == MetadataProvider.GOOD_READS) {
             return goodReadsParser.fetchMetadata(book, request);
+        } else if (provider == MetadataProvider.GOOGLE) {
+            return googleParser.fetchMetadata(book, request);
         } else {
             throw ApiError.METADATA_SOURCE_NOT_IMPLEMENT_OR_DOES_NOT_EXIST.createException();
         }
@@ -94,6 +97,8 @@ public class BookMetadataService {
         if (provider == MetadataProvider.AMAZON) {
             return amazonBookParser.fetchTopMetadata(book, fetchMetadataRequest);
         } else if (provider == MetadataProvider.GOOD_READS) {
+            return goodReadsParser.fetchTopMetadata(book, fetchMetadataRequest);
+        } else if (provider == MetadataProvider.GOOGLE) {
             return goodReadsParser.fetchTopMetadata(book, fetchMetadataRequest);
         } else {
             throw ApiError.METADATA_SOURCE_NOT_IMPLEMENT_OR_DOES_NOT_EXIST.createException();

@@ -11,7 +11,7 @@ import {AsyncPipe, NgIf} from '@angular/common';
 import {BookService} from '../../book/service/book.service';
 import {BookMetadataBI} from '../../book/model/book-metadata-for-book-info.model';
 import {MessageService} from 'primeng/api';
-import {Editor} from 'primeng/editor';
+import {MetadataService} from '../../book/service/metadata.service';
 
 @Component({
   selector: 'app-metadata-editor',
@@ -27,8 +27,7 @@ import {Editor} from 'primeng/editor';
     FormsModule,
     AsyncPipe,
     NgIf,
-    ReactiveFormsModule,
-    Editor
+    ReactiveFormsModule
   ]
 })
 export class MetadataEditorComponent implements OnInit {
@@ -37,7 +36,11 @@ export class MetadataEditorComponent implements OnInit {
   bookMetadataForm: FormGroup;
   currentBookId!: number;
 
-  constructor(private bookInfoService: BookMetadataCenterService, private bookService: BookService, private messageService: MessageService) {
+  constructor(private bookInfoService: BookMetadataCenterService,
+              private bookService: BookService,
+              private messageService: MessageService,
+              private metadataService: MetadataService) {
+
     this.bookMetadata$ = this.bookInfoService.bookMetadata$;
     this.bookMetadataForm = new FormGroup({
       title: new FormControl(''),
@@ -96,7 +99,7 @@ export class MetadataEditorComponent implements OnInit {
       reviewCount: this.bookMetadataForm.get('reviewCount')?.value,
       language: this.bookMetadataForm.get('language')?.value
     };
-    this.bookService.updateMetadata(updatedBookMetadata.bookId, updatedBookMetadata).subscribe({
+    this.metadataService.updateBookMetadata(updatedBookMetadata.bookId, updatedBookMetadata).subscribe({
       next: () => {
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
         this.bookInfoService.emit(updatedBookMetadata);

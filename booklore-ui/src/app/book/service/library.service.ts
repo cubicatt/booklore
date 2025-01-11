@@ -1,12 +1,11 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, tap } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { catchError, map } from 'rxjs/operators';
-import { Library } from '../model/library.model';
-import { BookService } from './book.service';
-import {BookMetadata, BookWithNeighborsDTO} from '../model/book.model';
-import { SortOption } from '../model/sort.model';
-import { LibraryState } from '../model/state/library-state.model';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable, of, tap} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {catchError, map} from 'rxjs/operators';
+import {Library} from '../model/library.model';
+import {BookService} from './book.service';
+import {SortOption} from '../model/sort.model';
+import {LibraryState} from '../model/state/library-state.model';
 
 @Injectable({
   providedIn: 'root',
@@ -104,14 +103,9 @@ export class LibraryService {
     );
   }
 
-  getBookWithNeighbours(libraryId: number, bookId: number): Observable<BookWithNeighborsDTO> {
-    return this.http.get<BookWithNeighborsDTO>(`${this.url}/${libraryId}/book/${bookId}/withNeighbors`);
-  }
-
   getBookCount(libraryId: number): Observable<number> {
     return this.bookService.bookState$.pipe(
       map(state => (state.books || []).filter(book => book.libraryId === libraryId).length)
     );
   }
-
 }

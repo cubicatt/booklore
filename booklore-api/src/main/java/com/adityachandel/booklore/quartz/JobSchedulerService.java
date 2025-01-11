@@ -1,7 +1,8 @@
 package com.adityachandel.booklore.quartz;
 
 import com.adityachandel.booklore.exception.ApiError;
-import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
+import com.adityachandel.booklore.model.dto.request.BooksMetadataRefreshRequest;
+import com.adityachandel.booklore.model.dto.request.LibraryMetadataRefreshRequest;
 import lombok.AllArgsConstructor;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
@@ -10,30 +11,42 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class JobSchedulerService {
 
-    private Scheduler scheduler;
+    private final Scheduler scheduler;
 
-    public void scheduleMetadataRefresh(MetadataRefreshRequest request) {
+    public void scheduleMetadataRefresh(LibraryMetadataRefreshRequest request) {
+        scheduleJob(request, RefreshLibraryMetadataJob.class, "libraryMetadataJob");
+    }
+
+    public void scheduleBookMetadataRefresh(BooksMetadataRefreshRequest request) {
+        scheduleJob(request, RefreshBooksMetadataJob.class, "booksMetadataJob");
+    }
+
+    private <T> void scheduleJob(T request, Class<? extends Job> jobClass, String name) {
         try {
             JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put("request", request);
 
-            JobDetail jobDetail = JobBuilder.newJob(RefreshMetadataJob.class)
-                    .withIdentity("refreshMetadataJob", "Metadata")
+            JobDetail jobDetail = JobBuilder.newJob(jobClass)
+                    .withIdentity(name, "Metadata")
                     .usingJobData(jobDataMap)
                     .build();
 
             Trigger trigger = TriggerBuilder.newTrigger()
                     .forJob(jobDetail)
-                    .withIdentity("refreshMetadataTrigger", "Metadata")
+                    .withIdentity(name, "Metadata")
                     .startNow()
                     .build();
 
             scheduler.scheduleJob(jobDetail, trigger);
-        } catch (Exception e) {
-            if(e.getMessage().contains("already exists")) {
-                throw ApiError.ANOTHER_METADATA_JOB_RUNNING.createException();
-            }
-            throw ApiError.SCHEDULE_REFRESH_ERROR.createException(e.getMessage());
+        } catch (SchedulerException e) {
+            handleSchedulerException(e);
         }
+    }
+
+    private void handleSchedulerException(Exception e) {
+        if (e.getMessage() != null && e.getMessage().contains("already exists")) {
+            throw ApiError.ANOTHER_METADATA_JOB_RUNNING.createException();
+        }
+        throw ApiError.SCHEDULE_REFRESH_ERROR.createException(e.getMessage());
     }
 }

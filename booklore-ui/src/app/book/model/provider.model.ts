@@ -1,5 +1,5 @@
-export enum Provider {
-  AMAZON = 'Amazon',
-  GOOGLE = 'Google Books',
-  GOOD_READS = 'Good Reads'
+export enum MetadataProvider {
+  AMAZON = 'AMAZON',
+  GOOGLE = 'GOOGLE',
+  GOOD_READS = 'GOOD_READS'
 }

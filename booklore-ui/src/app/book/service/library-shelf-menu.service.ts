@@ -1,10 +1,12 @@
-import { Injectable } from '@angular/core';
-import { MenuItem, ConfirmationService, MessageService } from 'primeng/api';
-import { Router } from '@angular/router';
+import {Injectable} from '@angular/core';
+import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
+import {Router} from '@angular/router';
 import {LibraryService} from './library.service';
 import {ShelfService} from './shelf.service';
 import {Library} from '../model/library.model';
 import {Shelf} from '../model/shelf.model';
+import {MetadataService} from './metadata.service';
+import {MetadataProvider} from '../model/provider.model';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +17,7 @@ export class LibraryShelfMenuService {
     private messageService: MessageService,
     private libraryService: LibraryService,
     private shelfService: ShelfService,
+    private metadataService: MetadataService,
     private router: Router
   ) {}
 
@@ -72,6 +75,48 @@ export class LibraryShelfMenuService {
                         summary: 'Failed',
                         detail: 'Failed to refresh library',
                       });
+                    }
+                  });
+                }
+              });
+            }
+          },
+          {
+            label: 'Refresh Books Metadata',
+            icon: 'pi pi-database',
+            command: () => {
+              this.confirmationService.confirm({
+                message: `Are you sure you want to refresh the metadata for all books in the library: "${entity?.name}"?`,
+                header: 'Confirm Library Metadata Refresh',
+                rejectButtonProps: {
+                  label: 'Cancel',
+                },
+                accept: () => {
+                  this.metadataService.autoRefreshLibraryBooksMetadata(entity?.id!, MetadataProvider.AMAZON, false).subscribe({
+                    next: () => {
+                      this.messageService.add({
+                        severity: 'success',
+                        life: 1500,
+                        summary: 'Library Metadata Refresh Scheduled',
+                        detail: 'The metadata refresh for all books in the library has been successfully scheduled.',
+                      });
+                    },
+                    error: (e) => {
+                      if (e.status === 409) {
+                        this.messageService.add({
+                          severity: 'error',
+                          summary: 'Task Already Running',
+                          life: 5000,
+                          detail: 'A metadata refresh task is already in progress. Please wait for it to complete before starting another one.',
+                        });
+                      } else {
+                        this.messageService.add({
+                          severity: 'error',
+                          summary: 'Library Metadata Refresh Failed',
+                          life: 5000,
+                          detail: 'An unexpected error occurred while scheduling the metadata refresh. Please try again later or contact support if the issue persists.',
+                        });
+                      }
                     }
                   });
                 }

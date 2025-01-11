@@ -17,7 +17,7 @@ import java.util.Optional;
 @Repository
 public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpecificationExecutor<BookEntity> {
 
-    Optional<BookEntity> findByFileName(String fileName);
+    List<BookEntity> findAllByIdIn(Collection<Long> ids);
 
     List<BookEntity> findBooksByLibraryId(Long libraryId);
 
@@ -27,10 +27,6 @@ public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpec
 
     @Query("SELECT b FROM BookEntity b JOIN b.metadata bm WHERE LOWER(bm.title) LIKE LOWER(CONCAT('%', :title, '%'))")
     List<BookEntity> findByTitleContainingIgnoreCase(@Param("title") String title);
-
-    Page<BookEntity> findByLastReadTimeIsNotNull(Pageable pageable);
-
-    Page<BookEntity> findByAddedOnIsNotNull(Pageable pageable);
 
     Optional<BookEntity> findFirstByLibraryIdAndIdLessThanOrderByIdDesc(Long libraryId, Long currentBookId);
 

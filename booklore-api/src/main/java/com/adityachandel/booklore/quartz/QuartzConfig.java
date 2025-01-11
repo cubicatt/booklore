@@ -23,7 +23,7 @@ public class QuartzConfig {
 
     @Bean
     public JobDetail refreshMetadataJobDetail() {
-        return JobBuilder.newJob(RefreshMetadataJob.class)
+        return JobBuilder.newJob(RefreshLibraryMetadataJob.class)
                 .withIdentity("refreshMetadataJob")
                 .storeDurably()
                 .build();

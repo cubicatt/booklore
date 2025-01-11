@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
     });
 
     this.rxStompService.watch('/topic/metadata-update').subscribe((message: Message) => {
-      this.bookService.handleUpdateMetadata(JSON.parse(message.body));
+      this.bookService.handleBookUpdate(JSON.parse(message.body));
     });
 
     this.rxStompService.watch('/topic/log').subscribe((message: Message) => {

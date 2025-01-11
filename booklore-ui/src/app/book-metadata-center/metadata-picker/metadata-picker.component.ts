@@ -11,6 +11,7 @@ import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Observable} from 'rxjs';
 import {BookMetadataBI} from '../../book/model/book-metadata-for-book-info.model';
 import {Tooltip} from 'primeng/tooltip';
+import {MetadataService} from '../../book/service/metadata.service';
 
 @Component({
   selector: 'app-metadata-picker',
@@ -42,7 +43,11 @@ export class MetadataPickerComponent implements OnInit {
   copiedFields: { [key: string]: boolean } = {};
   savedFields: { [key: string]: boolean } = {};
 
-  constructor(private bookService: BookService, private bookInfoService: BookMetadataCenterService, private messageService: MessageService) {
+  constructor(private bookService: BookService,
+              private bookInfoService: BookMetadataCenterService,
+              private messageService: MessageService,
+              private metadataService: MetadataService) {
+
     this.bookMetadata$ = this.bookInfoService.bookMetadata$;
     this.bookMetadataForm = new FormGroup({
       title: new FormControl(''),
@@ -115,7 +120,7 @@ export class MetadataPickerComponent implements OnInit {
       thumbnailUrl: this.updateThumbnailUrl ? this.fetchedMetadata.thumbnailUrl : '',
     };
 
-    this.bookService.updateMetadata(this.currentBookId, updatedBookMetadata).subscribe({
+    this.metadataService.updateBookMetadata(this.currentBookId, updatedBookMetadata).subscribe({
       next: (bookMetadata) => {
         Object.keys(this.copiedFields).forEach((field) => {
           if (this.copiedFields[field]) {

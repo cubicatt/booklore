@@ -2,17 +2,14 @@ import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {catchError, map, switchMap, tap} from 'rxjs/operators';
-import {Book, BookMetadata, BookSetting, FetchedMetadata} from '../model/book.model';
+import {Book, BookMetadata, BookSetting} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
-import {FetchMetadataRequest} from '../model/fetch-metadata-request.model';
-import {BookMetadataBI} from '../model/book-metadata-for-book-info.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BookService {
   private readonly url = 'http://localhost:8080/v1/book';
-  private readonly metadataUrl = 'http://localhost:8080/v1/metadata';
 
   private bookStateSubject = new BehaviorSubject<BookState>({
     books: null,
@@ -145,24 +142,16 @@ export class BookService {
     return `${this.url}/${bookId}/cover`;
   }
 
-  setBookMetadata(googleBookId: string, bookId: number): Observable<Book> {
-    const requestBody = {googleBookId};
-    return this.http.put<Book>(`${this.url}/${bookId}/set-metadata`, requestBody).pipe(
-      map(book => {
-        const currentState = this.bookStateSubject.value;
-        const updatedBooks = (currentState.books || []).map(existingBook =>
-          existingBook.id === book.id ? book : existingBook
-        );
-        this.bookStateSubject.next({...currentState, books: updatedBooks});
-        return book;
-      }),
-      catchError(error => {
-        const currentState = this.bookStateSubject.value;
-        this.bookStateSubject.next({...currentState, error: error.message});
-        throw error;
-      })
-    );
+  getBookByIdFromAPI(bookId: number, withDescription: boolean) {
+    return this.http.get<Book>(`${this.url}/${bookId}`, {
+      params: {
+        withDescription: withDescription.toString()
+      }
+    });
   }
+
+
+  /*------------------ All the websocket handlers go below ------------------*/
 
   handleNewlyCreatedBook(book: Book): void {
     const currentState = this.bookStateSubject.value;
@@ -182,34 +171,18 @@ export class BookService {
     this.bookStateSubject.next({...currentState, books: filteredBooks});
   }
 
-  getBookByIdFromAPI(bookId: number, withDescription: boolean) {
-    return this.http.get<Book>(`${this.url}/${bookId}`, {
-      params: {
-        withDescription: withDescription.toString()
-      }
-    });
-  }
-
-  fetchMetadata(bookId: number, request: FetchMetadataRequest): Observable<FetchedMetadata[]> {
-    return this.http.post<FetchedMetadata[]>(`${this.metadataUrl}/${bookId}`, request);
-  }
-
-  updateMetadata(bookId: number, bookMetadata: BookMetadataBI): Observable<BookMetadata> {
-    return this.http.put<BookMetadata>(`${this.metadataUrl}/${bookId}`, bookMetadata).pipe(
-      tap(updatedMetadata => {
-        const currentState = this.bookStateSubject.value;
-        const updatedBooks = (currentState.books || []).map(book =>
-          book.id === bookId ? {...book, metadata: updatedMetadata} : book
-        );
-        this.bookStateSubject.next({...currentState, books: updatedBooks});
-      })
-    );
-  }
-
-  handleUpdateMetadata(updatedBook: Book) {
+  handleBookUpdate(updatedBook: Book) {
     const currentState = this.bookStateSubject.value;
     const updatedBooks = (currentState.books || []).map(book => {
       return book.id == updatedBook.id ? {...book, metadata: updatedBook.metadata} : book
+    });
+    this.bookStateSubject.next({...currentState, books: updatedBooks})
+  }
+
+  handleBookMetadataUpdate(bookId: number, updatedMetadata: BookMetadata) {
+    const currentState = this.bookStateSubject.value;
+    const updatedBooks = (currentState.books || []).map(book => {
+      return book.id == bookId ? {...book, metadata: updatedMetadata} : book
     });
     this.bookStateSubject.next({...currentState, books: updatedBooks})
   }

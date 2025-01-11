@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.quartz;
 
-import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
+import com.adityachandel.booklore.model.dto.request.LibraryMetadataRefreshRequest;
 import com.adityachandel.booklore.service.metadata.BookMetadataService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,16 +14,16 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 @DisallowConcurrentExecution
-public class RefreshMetadataJob implements Job {
+public class RefreshLibraryMetadataJob implements Job {
 
     private BookMetadataService bookMetadataService;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try {
-            MetadataRefreshRequest request = (MetadataRefreshRequest) context.getMergedJobDataMap().get("request");
+            LibraryMetadataRefreshRequest request = (LibraryMetadataRefreshRequest) context.getMergedJobDataMap().get("request");
             log.info("Refreshing metadata for library ID: {}", request.getLibraryId());
-            bookMetadataService.refreshMetadata(request);
+            bookMetadataService.refreshLibraryMetadata(request);
         } catch (Exception e) {
             throw new JobExecutionException("Error occurred while executing metadata refresh job", e);
         }

@@ -18,7 +18,7 @@
     <input type="text" pInputText placeholder="Search by title..." [(ngModel)]="bookTitle" (ngModelChange)="onBookTitleChange($event)"/>
     <p-select [options]="sortOptions" optionLabel="label" placeholder="Select Sorting" [(ngModel)]="selectedSort" (onChange)="updateSortOption($event.value)"></p-select>
     <div *ngFor="let option of stateOptions" class="field-checkbox">
-      <p-radioButton [inputId]="option.key" [value]="option.value"  [(ngModel)]="value" (onClick)="viewChanged($event)"></p-radioButton>
+      <p-radioButton [inputId]="option.key" [value]="option.value" [(ngModel)]="value" (onClick)="viewChanged($event)"></p-radioButton>
       <label [for]="option.key" class="ml-2">{{ option.label }}</label>
     </div>
   </div>
@@ -44,7 +44,7 @@
     <div class="book-card-container" *ngIf="bookState?.books as books">
 
       <app-book-table *ngIf="value === 'table'&& books.length > 0" [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)"
-      [sortOption]="selectedSort"></app-book-table>
+                      [sortOption]="selectedSort"></app-book-table>
 
       <virtual-scroller *ngIf="value === 'grid'" class="virtual-scroller" #scroll [items]="books">
         <div class="grid grid-cols-12 gap-4" #container>
@@ -74,6 +74,12 @@
                     label="Unshelf"
                     severity="info"
                     (click)="unshelfBooks()">
+          </p-button>
+          <p-button
+                    icon="pi pi-database"
+                    label="Refresh Metadata"
+                    severity="info"
+                    (click)="updateMetadata()">
           </p-button>
           <p-button icon="pi pi-times"
                     label="Deselect All"

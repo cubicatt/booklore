@@ -4,14 +4,15 @@ import {Button} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
 import {Divider} from 'primeng/divider';
 import {NgForOf, NgIf} from '@angular/common';
-import {Provider} from '../../book/model/provider.model';
+import {MetadataProvider} from '../../book/model/provider.model';
 import {BookService} from '../../book/service/book.service';
-import {FetchMetadataRequest} from '../../book/model/fetch-metadata-request.model';
+import {FetchMetadataRequest} from '../../book/model/request/fetch-metadata-request.model';
 import {FetchedMetadata} from '../../book/model/book.model';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {MetadataPickerComponent} from '../metadata-picker/metadata-picker.component';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {MultiSelect} from 'primeng/multiselect';
+import {MetadataService} from '../../book/service/metadata.service';
 
 @Component({
   selector: 'app-metadata-searcher',
@@ -33,14 +34,17 @@ import {MultiSelect} from 'primeng/multiselect';
 export class MetadataSearcherComponent implements OnInit {
 
   form: FormGroup;
-  providers = Object.values(Provider);
+  providers = Object.values(MetadataProvider);
   allFetchedMetadata: FetchedMetadata[] = [];
   selectedFetchedMetadata!: FetchedMetadata | null;
   bookId!: number;
   loading: boolean = false;
 
-  constructor(private fb: FormBuilder, private bookService: BookService, private bookInfoService: BookMetadataCenterService) {
-    this.form = this.fb.group({
+  constructor(private formBuilder: FormBuilder,
+              private bookService: BookService,
+              private bookInfoService: BookMetadataCenterService,
+              private metadataService: MetadataService) {
+    this.form = this.formBuilder.group({
       provider: null,
       isbn: [''],
       title: [''],
@@ -70,8 +74,8 @@ export class MetadataSearcherComponent implements OnInit {
 
   onSubmit(): void {
     if (this.form.valid) {
-      const providerKeys = Object.keys(Provider).filter(key =>
-        (this.form.get('provider')?.value as string[]).includes(Provider[key as keyof typeof Provider])
+      const providerKeys = Object.keys(MetadataProvider).filter(key =>
+        (this.form.get('provider')?.value as string[]).includes(MetadataProvider[key as keyof typeof MetadataProvider])
       );
       if (!providerKeys) {
         console.error('Invalid provider selected.');
@@ -85,7 +89,7 @@ export class MetadataSearcherComponent implements OnInit {
         author: this.form.get('author')?.value
       };
       this.loading = true;
-      this.bookService.fetchMetadata(fetchRequest.bookId, fetchRequest)
+      this.metadataService.fetchBookMetadata(fetchRequest.bookId, fetchRequest)
         .subscribe({
           next: (fetchedMetadata) => {
             this.loading = false;
@@ -94,7 +98,7 @@ export class MetadataSearcherComponent implements OnInit {
               thumbnailUrl: book.thumbnailUrl
             }));
           },
-          error: (err) => {
+          error: (e) => {
             this.loading = false;
           }
         });

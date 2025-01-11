@@ -78,7 +78,15 @@
     <div class="flex flex-row w-full gap-4 mt-2 pb-1">
       <div class="flex flex-col gap-1 w-full">
         <label for="description">Description</label>
-        <!--<p-editor class="w-full" formControlName="description" id="description" [style]="{ height: '18rem' }" />-->
+        <!--<p-editor class="w-full" formControlName="description" id="description" [style]="{ height: '18rem' }">
+          <ng-template #header>
+            <span class="ql-formats">
+                <button type="button" class="ql-bold" aria-label="Bold"></button>
+                <button type="button" class="ql-italic" aria-label="Italic"></button>
+                <button type="button" class="ql-underline" aria-label="Underline"></button>
+            </span>
+          </ng-template>
+        </p-editor>-->
         <textarea rows="12" pTextarea id="description" formControlName="description" class="w-full"></textarea>
       </div>
     </div>

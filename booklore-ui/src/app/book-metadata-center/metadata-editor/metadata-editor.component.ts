@@ -27,7 +27,8 @@ import {Editor} from 'primeng/editor';
     FormsModule,
     AsyncPipe,
     NgIf,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    Editor
   ]
 })
 export class MetadataEditorComponent implements OnInit {

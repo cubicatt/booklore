@@ -1,18 +1,17 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Button} from 'primeng/button';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {Book} from '../../book/model/book.model';
-import {Observable, Subscription} from 'rxjs';
+import {Observable} from 'rxjs';
 import {BookService} from '../../book/service/book.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {LibraryService} from '../../book/service/library.service';
+import {Router} from '@angular/router';
 import {BookMetadataBI} from '../../book/model/book-metadata-for-book-info.model';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Divider} from 'primeng/divider';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
-import {Chip} from 'primeng/chip';
 import {Tag} from 'primeng/tag';
+import {Editor} from 'primeng/editor';
 
 @Component({
   selector: 'app-metadata-viewer',
@@ -27,7 +26,8 @@ import {Tag} from 'primeng/tag';
     Divider,
     Rating,
     FormsModule,
-    Tag
+    Tag,
+    Editor
   ]
 })
 export class MetadataViewerComponent implements OnInit {

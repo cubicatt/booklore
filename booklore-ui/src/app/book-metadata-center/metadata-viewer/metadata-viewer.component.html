@@ -44,14 +44,20 @@
     </div>
   </div>
 
-  <p-divider></p-divider>
+  <!--<p-divider></p-divider>-->
 
   <div *ngIf="bookMetadata$ | async as bookMetadata" class="book-description space-y-4 overflow-y-auto flex-1">
-    <p class="pt-2 px-2" [innerHTML]="bookMetadata.description || 'No description available.'"></p>
+    <!--<p class="pt-2 px-2" [innerHTML]="bookMetadata.description || 'No description available.'"></p>-->
+    <div class="pt-6">
+      <p-editor [(ngModel)]="bookMetadata.description" [style]="{ height: '350px' }" [readonly]="true">
+        <ng-template #header>
+        </ng-template>
+      </p-editor>
+    </div>
   </div>
 
   <div class="flex flex-col gap-x-4 mt-auto">
-    <p-divider></p-divider>
+    <!--<p-divider></p-divider>-->
     <div class="flex gap-x-4 justify-end">
       <p-button label="Close" icon="pi pi-times" severity="secondary" (onClick)="closeDialog()"></p-button>
     </div>

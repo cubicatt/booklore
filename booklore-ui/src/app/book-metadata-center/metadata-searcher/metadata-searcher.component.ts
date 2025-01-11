@@ -1,7 +1,6 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
-import {Select} from 'primeng/select';
 import {InputText} from 'primeng/inputtext';
 import {Divider} from 'primeng/divider';
 import {NgForOf, NgIf} from '@angular/common';

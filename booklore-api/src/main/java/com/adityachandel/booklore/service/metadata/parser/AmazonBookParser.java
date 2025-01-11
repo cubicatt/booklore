@@ -421,9 +421,26 @@ public class AmazonBookParser implements BookParser {
             span.unwrap();  // Removes the span and keeps its content
         }
         document.select("ol.a-ordered-list.a-vertical").tagName("ol").removeAttr("class");
+        document.select("ul.a-unordered-list.a-vertical").tagName("ul").removeAttr("class");
         for (Element span : document.select("span")) {
             span.unwrap();
         }
+        document.select("li").forEach(li -> {
+            // Remove <br> tags preceding the <li> (if any)
+            Element prev = li.previousElementSibling();
+            if (prev != null && "br".equals(prev.tagName())) {
+                prev.remove();
+            }
+
+            // Remove <br> tags following the <li> (if any)
+            Element next = li.nextElementSibling();
+            if (next != null && "br".equals(next.tagName())) {
+                next.remove();
+            }
+        });
+        document.select("p").stream()
+                .filter(p -> p.text().trim().isEmpty())
+                .forEach(Element::remove);
         return document.body().html();
     }
 }

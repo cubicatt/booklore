@@ -117,7 +117,6 @@ export class MetadataPickerComponent implements OnInit {
 
     this.bookService.updateMetadata(this.currentBookId, updatedBookMetadata).subscribe({
       next: (bookMetadata) => {
-        console.log(bookMetadata)
         Object.keys(this.copiedFields).forEach((field) => {
           if (this.copiedFields[field]) {
             this.savedFields[field] = true;
@@ -151,7 +150,6 @@ export class MetadataPickerComponent implements OnInit {
     }
     return Number(formValue);
   }
-
 
   private getPageCountOrCopied(): number | null {
     const formValue = this.bookMetadataForm.get('pageCount')?.value;

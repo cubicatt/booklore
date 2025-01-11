@@ -2,7 +2,6 @@ package com.adityachandel.booklore.service.metadata;
 
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMetadataMapper;
-import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.entity.AuthorEntity;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
@@ -32,11 +31,10 @@ public class BookMetadataUpdater {
     private BookMetadataRepository bookMetadataRepository;
     private CategoryRepository categoryRepository;
     private FileService fileService;
-    private BookMetadataMapper bookMetadataMapper;
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public BookMetadata setBookMetadata(long bookId, FetchedBookMetadata newMetadata, MetadataProvider source, boolean setThumbnail) {
+    public BookMetadataEntity setBookMetadata(long bookId, FetchedBookMetadata newMetadata, MetadataProvider source, boolean setThumbnail) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         BookMetadataEntity metadata = bookEntity.getMetadata();
         metadata.setTitle(newMetadata.getTitle());
@@ -73,7 +71,7 @@ public class BookMetadataUpdater {
                 try {
                     thumbnailPath = fileService.createThumbnail(bookId, newMetadata.getThumbnailUrl(), source.name());
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    log.error(e.getMessage());
                 }
                 metadata.setThumbnail(thumbnailPath);
             }
@@ -82,7 +80,7 @@ public class BookMetadataUpdater {
         authorRepository.saveAll(metadata.getAuthors());
         categoryRepository.saveAll(metadata.getCategories());
         bookMetadataRepository.save(metadata);
-        return bookMetadataMapper.toBookMetadata(metadata, false);
+        return metadata;
     }
 
 }

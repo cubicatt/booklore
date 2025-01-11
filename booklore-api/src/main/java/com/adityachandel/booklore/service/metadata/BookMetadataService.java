@@ -4,9 +4,13 @@ import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.model.dto.Author;
 import com.adityachandel.booklore.model.dto.Book;
+import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import com.adityachandel.booklore.model.entity.*;
+import com.adityachandel.booklore.model.stomp.BookNotification;
+import com.adityachandel.booklore.model.stomp.Topic;
 import com.adityachandel.booklore.repository.*;
+import com.adityachandel.booklore.service.NotificationService;
 import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
 import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
@@ -17,10 +21,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
+import static com.adityachandel.booklore.model.stomp.BookNotification.Action.BOOK_ADDED;
+import static com.adityachandel.booklore.model.stomp.LogNotification.createLogNotification;
+import static com.adityachandel.booklore.model.stomp.Topic.METADATA_UPDATE;
 
 @Slf4j
 @Service
@@ -33,7 +44,7 @@ public class BookMetadataService {
     private LibraryRepository libraryRepository;
     private BookMapper bookMapper;
     private BookMetadataUpdater bookMetadataUpdater;
-
+    private NotificationService notificationService;
 
     public List<FetchedBookMetadata> fetchMetadataList(long bookId, FetchMetadataRequest request) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
@@ -82,6 +93,8 @@ public class BookMetadataService {
                 .build();
         if (provider == MetadataProvider.AMAZON) {
             return amazonBookParser.fetchTopMetadata(book, fetchMetadataRequest);
+        } else if (provider == MetadataProvider.GOOD_READS) {
+            return goodReadsParser.fetchTopMetadata(book, fetchMetadataRequest);
         } else {
             throw ApiError.METADATA_SOURCE_NOT_IMPLEMENT_OR_DOES_NOT_EXIST.createException();
         }
@@ -90,12 +103,23 @@ public class BookMetadataService {
     @Transactional
     public void refreshMetadata(MetadataRefreshRequest request) {
         LibraryEntity libraryEntity = libraryRepository.findById(request.getLibraryId()).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(request.getLibraryId()));
-        List<Book> books = libraryEntity.getBookEntities().stream().map(bookMapper::toBook).toList();
+        List<BookEntity> books = libraryEntity.getBookEntities().stream()
+                .sorted(Comparator.comparing(BookEntity::getFileName, Comparator.nullsLast(String::compareTo)))
+                .toList();
         try {
-            for (Book book : books) {
-                FetchedBookMetadata metadata = fetchTopMetadata(request.getMetadataProvider(), book);
+            for (BookEntity bookEntity : books) {
+                FetchedBookMetadata metadata = fetchTopMetadata(request.getMetadataProvider(), bookMapper.toBook(bookEntity));
                 if (metadata != null) {
-                    bookMetadataUpdater.setBookMetadata(book.getId(), metadata, request.getMetadataProvider(), request.isReplaceCover());
+                    BookMetadataEntity bookMetadata = bookMetadataUpdater.setBookMetadata(bookEntity.getId(), metadata, request.getMetadataProvider(), request.isReplaceCover());
+                    bookEntity.setMetadata(bookMetadata);
+                    bookRepository.save(bookEntity);
+
+                    Book book = bookMapper.toBook(bookEntity);
+                    notificationService.sendMessage(Topic.METADATA_UPDATE, book);
+                    notificationService.sendMessage(Topic.LOG, createLogNotification("Book metadata updated: " + book.getMetadata().getTitle()));
+                    if (request.getMetadataProvider() == MetadataProvider.GOOD_READS) {
+                        Thread.sleep(Duration.ofSeconds(ThreadLocalRandom.current().nextInt(3, 10)).toMillis());
+                    }
                 }
             }
         } catch (Exception e) {

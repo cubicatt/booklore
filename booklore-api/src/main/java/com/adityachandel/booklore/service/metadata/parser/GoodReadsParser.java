@@ -22,10 +22,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,24 +34,37 @@ public class GoodReadsParser implements BookParser {
     private static final String BOOK_BASE_URL = "https://www.goodreads.com/book/show/";
     private static final int COUNT_DETAILED_METADATA_TO_GET = 3;
 
+    @Override
+    public FetchedBookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
+        Optional<FetchedBookMetadata> preview = fetchMetadataPreviews(fetchMetadataRequest).stream().findFirst();
+        if (preview.isEmpty()) {
+            return null;
+        }
+        List<FetchedBookMetadata> fetchedMetadata = fetchMetadataForPreviews(List.of(preview.get()));
+        return fetchedMetadata.isEmpty() ? null : fetchedMetadata.getFirst();
+    }
 
     @Override
     public List<FetchedBookMetadata> fetchMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
-        List<FetchedBookMetadata> fetchedMetadata = new ArrayList<>();
         List<FetchedBookMetadata> previews = fetchMetadataPreviews(fetchMetadataRequest).stream()
                 .limit(COUNT_DETAILED_METADATA_TO_GET)
                 .toList();
+        return fetchMetadataForPreviews(previews);
+    }
 
-        for (FetchedBookMetadata metadata : previews) {
+    private List<FetchedBookMetadata> fetchMetadataForPreviews(List<FetchedBookMetadata> previews) {
+        List<FetchedBookMetadata> fetchedMetadata = new ArrayList<>();
+        for (FetchedBookMetadata preview : previews) {
+            log.info("Fetching metadata for: {}", preview.getTitle());
             try {
-                Document document = fetchDoc(BOOK_BASE_URL + metadata.getProviderBookId());
-                FetchedBookMetadata detailedMetadata = parseBookDetails(document, metadata.getProviderBookId());
+                Document document = fetchDoc(BOOK_BASE_URL + preview.getProviderBookId());
+                FetchedBookMetadata detailedMetadata = parseBookDetails(document, preview.getProviderBookId());
                 if (detailedMetadata != null) {
                     fetchedMetadata.add(detailedMetadata);
                 }
                 Thread.sleep(Duration.ofSeconds(1));
             } catch (Exception e) {
-                log.error("Error fetching metadata for book: {}", metadata.getProviderBookId(), e);
+                log.error("Error fetching metadata for book: {}", preview.getProviderBookId(), e);
             }
         }
         return fetchedMetadata;
@@ -321,32 +331,35 @@ public class GoodReadsParser implements BookParser {
             String encodedSearchTerm = URLEncoder.encode(searchTerm, "UTF-8");
             return SEARCH_BASE_URL + encodedSearchTerm;
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Error encoding search term: " + searchTerm, e);
+            log.error("Error encoding search term: {}", searchTerm);
+            return null;
         }
     }
 
     public List<FetchedBookMetadata> fetchMetadataPreviews(FetchMetadataRequest request) {
-
-        String searchUrl = generateSearchUrl(request.getTitle() + " " + request.getAuthor());
-
-        Elements books = fetchDoc(searchUrl).select("table.tableList").first().select("tr[itemtype=http://schema.org/Book]");
-
-        List<FetchedBookMetadata> fetchedBookMetadataList = new ArrayList<>();
-
-        for (Element book : books) {
-            Integer publishedYear = extractPublishedYearPreview(book);
-            FetchedBookMetadata metadata = FetchedBookMetadata.builder()
-                    .providerBookId(String.valueOf(extractGoodReadsIdPreview(book)))
-                    .title(extractTitlePreview(book))
-                    .publishedDate(publishedYear != null ? LocalDate.of(publishedYear, 1, 1) : null)
-                    .rating(extractRatingPreview(book))
-                    .reviewCount(extractRatingsPreview(book))
-                    .authors(extractAuthorsPreview(book))
-                    .thumbnailUrl(extractCoverUrlPreview(book))
-                    .build();
-            fetchedBookMetadataList.add(metadata);
+        log.info("Fetching metadata previews for {}", request.getTitle());
+        try {
+            String searchUrl = generateSearchUrl(request.getTitle() + " " + request.getAuthor());
+            Elements books = fetchDoc(searchUrl).select("table.tableList").first().select("tr[itemtype=http://schema.org/Book]");
+            List<FetchedBookMetadata> fetchedBookMetadataList = new ArrayList<>();
+            for (Element book : books) {
+                Integer publishedYear = extractPublishedYearPreview(book);
+                FetchedBookMetadata metadata = FetchedBookMetadata.builder()
+                        .providerBookId(String.valueOf(extractGoodReadsIdPreview(book)))
+                        .title(extractTitlePreview(book))
+                        .publishedDate(publishedYear != null ? LocalDate.of(publishedYear, 1, 1) : null)
+                        .rating(extractRatingPreview(book))
+                        .reviewCount(extractRatingsPreview(book))
+                        .authors(extractAuthorsPreview(book))
+                        .thumbnailUrl(extractCoverUrlPreview(book))
+                        .build();
+                fetchedBookMetadataList.add(metadata);
+            }
+            return fetchedBookMetadataList;
+        } catch (Exception e) {
+            log.error("Error fetching metadata previews: {}", e.getMessage());
+            return Collections.emptyList();
         }
-        return fetchedBookMetadataList;
     }
 
     private Integer extractGoodReadsIdPreview(Element book) {
@@ -445,11 +458,6 @@ public class GoodReadsParser implements BookParser {
             log.warn("Error extracting published year: {}", e.getMessage());
             return null;
         }
-    }
-
-    @Override
-    public FetchedBookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
-        return null;
     }
 
     private Document fetchDoc(String url) {

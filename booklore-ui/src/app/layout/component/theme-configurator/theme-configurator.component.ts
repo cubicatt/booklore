@@ -31,15 +31,15 @@ const presets = {
 };
 
 @Component({
-  selector: 'app-configurator',
+  selector: 'app-theme-configurator',
   standalone: true,
-  templateUrl: './configurator.component.html',
+  templateUrl: './theme-configurator.component.html',
   host: {
     class: 'config-panel hidden'
   },
   imports: [CommonModule, FormsModule, InputSwitchModule, ButtonModule, RadioButtonModule, SelectButton, ToggleSwitchModule]
 })
-export class AppConfiguratorComponent {
+export class ThemeConfiguratorComponent {
 
   get ripple() {
     return this.config.ripple();

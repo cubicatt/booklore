@@ -13,9 +13,9 @@ import {NgClass, NgIf} from '@angular/common';
 import {EventService} from '../../../shared/websocket/event.service';
 import {LogNotification} from '../../../shared/websocket/model/log-notification.model';
 import {Button} from 'primeng/button';
-import {AppConfiguratorComponent} from '../../../shared/components/configurator/configurator.component';
 import {StyleClass} from 'primeng/styleclass';
 import {Divider} from 'primeng/divider';
+import {ThemeConfiguratorComponent} from '../theme-configurator/theme-configurator.component';
 
 @Component({
   selector: 'app-topbar',
@@ -29,7 +29,7 @@ import {Divider} from 'primeng/divider';
     BookSearcherComponent,
     NgIf,
     Button,
-    AppConfiguratorComponent,
+    ThemeConfiguratorComponent,
     StyleClass,
     NgClass,
     Divider

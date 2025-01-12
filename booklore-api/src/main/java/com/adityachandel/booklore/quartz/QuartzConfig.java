@@ -20,12 +20,4 @@ public class QuartzConfig {
         jobFactory.setApplicationContext(applicationContext);
         return jobFactory;
     }
-
-    @Bean
-    public JobDetail refreshMetadataJobDetail() {
-        return JobBuilder.newJob(RefreshLibraryMetadataJob.class)
-                .withIdentity("refreshMetadataJob")
-                .storeDurably()
-                .build();
-    }
 }

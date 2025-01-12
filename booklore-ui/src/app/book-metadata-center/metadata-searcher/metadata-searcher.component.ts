@@ -6,7 +6,7 @@ import {Divider} from 'primeng/divider';
 import {NgForOf, NgIf} from '@angular/common';
 import {MetadataProvider} from '../../book/model/provider.model';
 import {BookService} from '../../book/service/book.service';
-import {FetchMetadataRequest} from '../../book/model/request/fetch-metadata-request.model';
+import {FetchMetadataRequest} from '../../book/model/request/metadata/fetch-metadata-request.model';
 import {FetchedMetadata} from '../../book/model/book.model';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {MetadataPickerComponent} from '../metadata-picker/metadata-picker.component';

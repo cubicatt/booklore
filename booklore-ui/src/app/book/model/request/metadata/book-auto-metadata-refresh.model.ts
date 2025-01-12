@@ -1,4 +1,4 @@
-import {MetadataProvider} from '../provider.model';
+import {MetadataProvider} from '../../provider.model';
 
 export interface BookAutoMetadataRefresh {
   bookIds: number[],

@@ -1,8 +1,6 @@
 package com.adityachandel.booklore.quartz;
 
 import com.adityachandel.booklore.exception.ApiError;
-import com.adityachandel.booklore.model.dto.request.BooksMetadataRefreshRequest;
-import com.adityachandel.booklore.model.dto.request.LibraryMetadataRefreshRequest;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import lombok.AllArgsConstructor;
 import org.quartz.*;
@@ -14,31 +12,23 @@ public class JobSchedulerService {
 
     private final Scheduler scheduler;
 
-    public void scheduleMetadataRefresh(LibraryMetadataRefreshRequest request) {
-        scheduleJob(request, RefreshLibraryMetadataJob.class, "libraryMetadataJob");
-    }
-
     public void scheduleMetadataRefreshV2(MetadataRefreshRequest request) {
-        scheduleJob(request, RefreshMetadataJobV2.class, "libraryMetadataJobV2");
+        scheduleJob(request);
     }
 
-    public void scheduleBookMetadataRefresh(BooksMetadataRefreshRequest request) {
-        scheduleJob(request, RefreshBooksMetadataJob.class, "booksMetadataJob");
-    }
-
-    private <T> void scheduleJob(T request, Class<? extends Job> jobClass, String name) {
+    private <T> void scheduleJob(T request) {
         try {
             JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put("request", request);
 
-            JobDetail jobDetail = JobBuilder.newJob(jobClass)
-                    .withIdentity(name, "Metadata")
+            JobDetail jobDetail = JobBuilder.newJob(RefreshMetadataJob.class)
+                    .withIdentity("metadataRefreshJobV2", "metadataRefreshJobV2")
                     .usingJobData(jobDataMap)
                     .build();
 
             Trigger trigger = TriggerBuilder.newTrigger()
                     .forJob(jobDetail)
-                    .withIdentity(name, "Metadata")
+                    .withIdentity("metadataRefreshJobV2", "metadataRefreshJobV2")
                     .startNow()
                     .build();
 

@@ -9,6 +9,7 @@ import {MetadataService} from './metadata.service';
 import {MetadataProvider} from '../model/provider.model';
 import {DialogService} from 'primeng/dynamicdialog';
 import {MetadataFetchOptionsComponent} from '../../metadata-fetch-options/metadata-fetch-options.component';
+import {MetadataRefreshType} from '../model/request/metadata/metadata-refresh-type.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -94,7 +95,8 @@ export class LibraryShelfMenuService {
                 modal: true,
                 closable: true,
                 data: {
-                  libraryId: entity?.id
+                  libraryId: entity?.id,
+                  metadataRefreshType: MetadataRefreshType.LIBRARY
                 }
               })
               /*this.confirmationService.confirm({

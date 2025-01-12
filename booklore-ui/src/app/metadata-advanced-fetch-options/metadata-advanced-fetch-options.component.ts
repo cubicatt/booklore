@@ -5,28 +5,7 @@ import {NgForOf, TitleCasePipe} from '@angular/common';
 import {Checkbox} from 'primeng/checkbox';
 import {Button} from 'primeng/button';
 import {MessageService} from 'primeng/api';
-
-
-export interface MetadataRefreshOptions {
-  refreshType: string;
-  defaultProvider: string;
-  refreshCovers: boolean;
-  fieldOptions: FieldOptions;
-}
-
-export interface FieldProvider {
-  default: string | null;
-  p2: string | null;
-  p1: string | null;
-}
-
-export interface FieldOptions {
-  title: FieldProvider;
-  description: FieldProvider;
-  authors: FieldProvider;
-  categories: FieldProvider;
-  cover: FieldProvider;
-}
+import {FieldOptions, FieldProvider, MetadataRefreshOptions} from '../book/model/request/metadata/metadata-refresh-options.model';
 
 @Component({
   selector: 'app-metadata-advanced-fetch-options',
@@ -69,7 +48,6 @@ export class MetadataAdvancedFetchOptionsComponent {
     });
     if (allProvidersSelected) {
       const metadataRefreshOptions: MetadataRefreshOptions = {
-        refreshType: 'LIBRARY',
         defaultProvider: this.allDefault.value,
         refreshCovers: this.refreshCovers,
         fieldOptions: this.fieldOptions

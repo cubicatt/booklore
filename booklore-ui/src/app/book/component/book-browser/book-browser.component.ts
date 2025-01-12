@@ -18,8 +18,8 @@ import {LibraryShelfMenuService} from '../../service/library-shelf-menu.service'
 import {SelectButtonChangeEvent} from 'primeng/selectbutton';
 import {BookTableComponent} from '../book-table/book-table.component';
 import {animate, state, style, transition, trigger} from '@angular/animations';
-import {MetadataProvider} from '../../model/provider.model';
-import {MetadataService} from '../../service/metadata.service';
+import {MetadataFetchOptionsComponent} from '../../../metadata-fetch-options/metadata-fetch-options.component';
+import {MetadataRefreshType} from '../../model/request/metadata/metadata-refresh-type.enum';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -79,7 +79,6 @@ export class BookBrowserComponent implements OnInit {
     private shelfService: ShelfService,
     private dialogService: DialogService,
     private sortService: SortService,
-    private metadataService: MetadataService,
     private libraryShelfMenuService: LibraryShelfMenuService) {
   }
 
@@ -300,10 +299,6 @@ export class BookBrowserComponent implements OnInit {
     this.bookTitle$.next(newTitle);
   }
 
-  openMetadataOptionsDialog() {
-
-  }
-
   openShelfAssigner() {
     this.dynamicDialogRef = this.dialogService.open(ShelfAssignerComponent, {
       header: `Update Books Shelves`,
@@ -328,32 +323,15 @@ export class BookBrowserComponent implements OnInit {
   }
 
   updateMetadata() {
-    this.metadataService.autoRefreshBooksMetadata(this.selectedBooks, MetadataProvider.Amazon, false).subscribe({
-      next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Metadata Update Scheduled',
-          detail: 'The metadata update for the selected books has been successfully scheduled.'
-        });
-      },
-      error: (e) => {
-        if (e.status === 409) {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Task Already Running',
-            life: 5000,
-            detail: 'A metadata refresh task is already in progress. Please wait for it to complete before starting another one.'
-          });
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Metadata Update Failed',
-            life: 5000,
-            detail: 'An unexpected error occurred while scheduling the metadata update. Please try again later or contact support if the issue persists.'
-          });
-        }
+    this.dialogService.open(MetadataFetchOptionsComponent, {
+      header: 'Metadata Refresh Options',
+      modal: true,
+      closable: true,
+      data: {
+        bookIds: this.selectedBooks,
+        metadataRefreshType: MetadataRefreshType.BOOKS
       }
-    });
+    })
   }
 
 }

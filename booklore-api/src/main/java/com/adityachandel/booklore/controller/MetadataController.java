@@ -13,6 +13,7 @@ import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class MetadataController {
 
     @PostMapping("/{bookId}")
     public ResponseEntity<List<FetchedBookMetadata>> getBookMetadata(@RequestBody(required = false) FetchMetadataRequest fetchMetadataRequest, @PathVariable Long bookId) {
-        return ResponseEntity.ok(bookMetadataService.fetchMetadataList(bookId, fetchMetadataRequest));
+        return ResponseEntity.ok(bookMetadataService.fetchMetadataForRequest(bookId, fetchMetadataRequest));
     }
 
     @PutMapping("/{bookId}")
@@ -44,22 +45,9 @@ public class MetadataController {
         return ResponseEntity.ok(bookMetadata);
     }
 
-    @PutMapping(path = "/library/{libraryId}/refresh")
-    public ResponseEntity<String> scheduleRefresh(@PathVariable Long libraryId, @RequestBody LibraryMetadataRefreshRequest request) {
-        jobSchedulerService.scheduleMetadataRefresh(request);
-        return ResponseEntity.noContent().build();
-    }
-
     @PutMapping(path = "/refreshV2")
-    public ResponseEntity<String> scheduleRefreshV2(@RequestBody MetadataRefreshRequest request) {
+    public ResponseEntity<String> scheduleRefreshV2(@Validated @RequestBody MetadataRefreshRequest request) {
         jobSchedulerService.scheduleMetadataRefreshV2(request);
         return ResponseEntity.noContent().build();
     }
-
-    @PutMapping(path = "/books/refresh")
-    public ResponseEntity<String> scheduleBookMetadataRefresh(@RequestBody BooksMetadataRefreshRequest request) {
-        jobSchedulerService.scheduleBookMetadataRefresh(request);
-        return ResponseEntity.noContent().build();
-    }
-
 }

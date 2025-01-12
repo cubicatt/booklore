@@ -2,6 +2,7 @@ package com.adityachandel.booklore.model.dto.request;
 
 import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -12,8 +13,9 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MetadataRefreshOptions {
-
+    @NotNull(message = "Default Provider cannot be null")
     private MetadataProvider defaultProvider;
+
     private boolean refreshCovers;
     private FieldOptions fieldOptions;
 

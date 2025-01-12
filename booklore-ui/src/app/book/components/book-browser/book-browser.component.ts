@@ -353,7 +353,7 @@ export class BookBrowserComponent implements OnInit {
       modal: true,
       closable: true,
       data: {
-        bookIds: this.selectedBooks,
+        bookIds: Array.from(this.selectedBooks),
         metadataRefreshType: MetadataRefreshType.BOOKS
       }
     })

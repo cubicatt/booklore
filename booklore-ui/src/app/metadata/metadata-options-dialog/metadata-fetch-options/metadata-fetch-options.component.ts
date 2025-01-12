@@ -27,7 +27,7 @@ import {MetadataRefreshOptions} from '../../model/request/metadata-refresh-optio
 export class MetadataFetchOptionsComponent {
   isBasicMode: boolean = true;
   libraryId!: number;
-  bookIds!: Set<number>;
+  bookIds!: number[];
   metadataRefreshType!: MetadataRefreshType;
 
   constructor(private dynamicDialogConfig: DynamicDialogConfig,
@@ -47,8 +47,8 @@ export class MetadataFetchOptionsComponent {
     const metadataRefreshRequest: MetadataRefreshRequest = {
       refreshType: this.metadataRefreshType,
       refreshOptions: metadataRefreshOptions,
-      ...(this.metadataRefreshType === 'BOOKS' && this.bookIds != null && {bookIds: this.bookIds}),
-      ...(this.metadataRefreshType === 'LIBRARY' && this.libraryId != null && {libraryId: this.libraryId})
+      bookIds: this.bookIds,
+      libraryId: this.libraryId
     };
     this.metadataService.autoRefreshMetadata(metadataRefreshRequest).subscribe({
       next: () => {

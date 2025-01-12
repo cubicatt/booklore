@@ -1,0 +1,18 @@
+<div class="flex flex-col gap-6 min-w-full custom-table p-6">
+  <!-- Provider Select -->
+  <p-select
+    [options]="providers"
+    [(ngModel)]="selectedProvider"
+    placeholder="Select Provider"
+    class="w-full"
+  ></p-select>
+
+  <!-- Refresh Covers Section -->
+  <div class="flex flex-row items-center gap-4">
+    <p class="pl-2">Refresh covers: </p>
+    <p-checkbox [(ngModel)]="refreshCovers" [binary]="true"></p-checkbox>
+  </div>
+
+  <!-- Submit Button -->
+  <p-button class="pt-4 justify-end" label="Submit" icon="pi pi-check"></p-button>
+</div>

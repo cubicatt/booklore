@@ -7,6 +7,8 @@ import {Library} from '../model/library.model';
 import {Shelf} from '../model/shelf.model';
 import {MetadataService} from './metadata.service';
 import {MetadataProvider} from '../model/provider.model';
+import {DialogService} from 'primeng/dynamicdialog';
+import {MetadataFetchOptionsComponent} from '../../metadata-fetch-options/metadata-fetch-options.component';
 
 @Injectable({
   providedIn: 'root',
@@ -18,8 +20,10 @@ export class LibraryShelfMenuService {
     private libraryService: LibraryService,
     private shelfService: ShelfService,
     private metadataService: MetadataService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private dialogService: DialogService
+  ) {
+  }
 
   initializeLibraryMenuItems(entity: Library | Shelf | null): MenuItem[] {
     return [
@@ -85,7 +89,15 @@ export class LibraryShelfMenuService {
             label: 'Refresh Books Metadata',
             icon: 'pi pi-database',
             command: () => {
-              this.confirmationService.confirm({
+              this.dialogService.open(MetadataFetchOptionsComponent, {
+                header: 'Metadata Refresh Options',
+                modal: true,
+                closable: true,
+                data: {
+                  libraryId: entity?.id
+                }
+              })
+              /*this.confirmationService.confirm({
                 message: `Are you sure you want to refresh the metadata for all books in the library: "${entity?.name}"?`,
                 header: 'Confirm Library Metadata Refresh',
                 rejectButtonProps: {
@@ -120,7 +132,7 @@ export class LibraryShelfMenuService {
                     }
                   });
                 }
-              });
+              });*/
             }
           }
         ]

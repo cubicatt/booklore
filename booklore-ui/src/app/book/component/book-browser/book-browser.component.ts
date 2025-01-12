@@ -300,6 +300,10 @@ export class BookBrowserComponent implements OnInit {
     this.bookTitle$.next(newTitle);
   }
 
+  openMetadataOptionsDialog() {
+
+  }
+
   openShelfAssigner() {
     this.dynamicDialogRef = this.dialogService.open(ShelfAssignerComponent, {
       header: `Update Books Shelves`,

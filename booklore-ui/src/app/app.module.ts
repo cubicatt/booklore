@@ -50,11 +50,7 @@ import {Select} from 'primeng/select';
 
 @NgModule({
     declarations: [
-        AppComponent,
-        DirectoryPickerComponent,
-        LibraryCreatorComponent,
-        ShelfAssignerComponent,
-        BookBrowserComponent
+        AppComponent
     ],
   imports: [
     BrowserModule,

@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { Book } from '../../model/book.model';
-import { MessageService } from 'primeng/api';
+import {MessageService, PrimeTemplate} from 'primeng/api';
 import { ShelfService } from '../../service/shelf.service';
 import { Observable } from 'rxjs';
 import { BookService } from '../../service/book.service';
@@ -9,11 +9,31 @@ import { map, tap } from 'rxjs/operators';
 import { Shelf } from '../../model/shelf.model';
 import { IconPickerComponent } from '../../../utilities/component/icon-picker/icon-picker.component';
 import { ShelfState } from '../../model/state/shelf-state.model';
+import {Button} from 'primeng/button';
+import {Divider} from 'primeng/divider';
+import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {Checkbox} from 'primeng/checkbox';
+import {FormsModule} from '@angular/forms';
+import {Dialog} from 'primeng/dialog';
+import {InputText} from 'primeng/inputtext';
 
 @Component({
   selector: 'app-shelf-assigner',
-  standalone: false,
+  standalone: true,
   templateUrl: './shelf-assigner.component.html',
+  imports: [
+    Button,
+    Divider,
+    NgForOf,
+    Checkbox,
+    AsyncPipe,
+    FormsModule,
+    IconPickerComponent,
+    Dialog,
+    InputText,
+    NgIf,
+    PrimeTemplate
+  ],
   styleUrls: ['./shelf-assigner.component.scss']
 })
 export class ShelfAssignerComponent implements OnInit {

@@ -6,11 +6,30 @@ import {Router} from '@angular/router';
 import {LibraryService} from '../../service/library.service';
 import {IconPickerComponent} from '../../../utilities/component/icon-picker/icon-picker.component';
 import {take} from 'rxjs';
+import {Button} from 'primeng/button';
+import {TableModule} from 'primeng/table';
+import {Step, StepList, StepPanel, StepPanels, Stepper} from 'primeng/stepper';
+import {NgIf} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {InputText} from 'primeng/inputtext';
 
 @Component({
   selector: 'app-library-creator',
-  standalone: false,
+  standalone: true,
   templateUrl: './library-creator.component.html',
+  imports: [
+    Button,
+    TableModule,
+    StepPanel,
+    IconPickerComponent,
+    NgIf,
+    FormsModule,
+    InputText,
+    Stepper,
+    StepList,
+    Step,
+    StepPanels
+  ],
   styleUrl: './library-creator.component.scss'
 })
 export class LibraryCreatorComponent {

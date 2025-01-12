@@ -1,11 +1,22 @@
 import {Component, OnInit} from '@angular/core';
 import {DynamicDialogRef} from 'primeng/dynamicdialog';
 import {UtilityService} from './utility.service';
+import {Button} from 'primeng/button';
+import {TableModule} from 'primeng/table';
+import {NgIf, NgStyle} from '@angular/common';
+import {InputText} from 'primeng/inputtext';
 
 @Component({
   selector: 'app-directory-picker-v2',
-  standalone: false,
+  standalone: true,
   templateUrl: './directory-picker.component.html',
+  imports: [
+    Button,
+    TableModule,
+    NgStyle,
+    InputText,
+    NgIf
+  ],
   styleUrls: ['./directory-picker.component.scss']
 })
 export class DirectoryPickerComponent implements OnInit {

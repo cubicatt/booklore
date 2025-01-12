@@ -20,6 +20,16 @@ import {BookTableComponent} from './book-table/book-table.component';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MetadataFetchOptionsComponent} from '../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../../metadata/model/request/metadata-refresh-type.enum';
+import {Button} from 'primeng/button';
+import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
+import {BookCardComponent} from './book-card/book-card.component';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {Select} from 'primeng/select';
+import {RadioButton} from 'primeng/radiobutton';
+import {Menu} from 'primeng/menu';
+import {InputText} from 'primeng/inputtext';
+import {FormsModule} from '@angular/forms';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -29,9 +39,24 @@ export enum EntityType {
 
 @Component({
   selector: 'app-book-browser',
-  standalone: false,
+  standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
+  imports: [
+    Button,
+    NgIf,
+    VirtualScrollerModule,
+    BookCardComponent,
+    AsyncPipe,
+    ProgressSpinner,
+    Select,
+    RadioButton,
+    Menu,
+    NgForOf,
+    InputText,
+    FormsModule,
+    BookTableComponent
+  ],
   animations: [
     trigger('slideInOut', [
       state('void', style({

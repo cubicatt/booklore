@@ -1,0 +1,58 @@
+<div class="layout-topbar">
+
+  <a class="layout-topbar-logo" routerLink="">
+    <span class="flex">
+      <p>Book</p>
+      <p class="half-title text-3xl">lore</p>
+    </span>
+  </a>
+
+  <p-button
+    #menubutton
+    icon="pi pi-arrow-left"
+    [rounded]="true"
+    [outlined]="true"
+    (click)="toggleMenu()"
+    [ngClass]="{ 'rotate-right': !isMenuVisible, 'rotate-left': isMenuVisible }"
+  >
+  </p-button>
+
+  <div class="topbar-right-items">
+    <app-book-searcher></app-book-searcher>
+    <ul class="topbar-items">
+      <p-divider layout="vertical" />
+      <li>
+        <i class="pi pi-wave-pulse" style="font-size: 1.5rem"
+           (click)="toggleEventDisplay()"
+           (mouseenter)="onMouseEnter()"
+           (mouseleave)="onMouseLeave()"
+           [class.pulsating]="eventHighlight"
+           [class.highlight]="eventHighlight"></i>
+        <div *ngIf="showEvents" class="live-event-container" (mouseleave)="onMouseLeave()">
+          <p *ngIf="latestEvent.timestamp">{{ latestEvent.timestamp }}</p>
+          <p>{{ latestEvent.message }}</p>
+        </div>
+      </li>
+      <p-divider layout="vertical" />
+      <li>
+        <a class="topbar-item">
+          <i class="pi pi-plus-circle text-surface-700 dark:text-surface-100" (click)="openLibraryCreatorDialog()"
+             pTooltip="Create New Library" tooltipPosition="top"></i>
+        </a>
+      </li>
+      <li>
+        <a class="topbar-item">
+          <i class="pi pi-upload text-surface-700 dark:text-surface-100" (click)="openFileUploadDialog()"
+             pTooltip="Upload book" tooltipPosition="top"></i>
+        </a>
+      </li>
+      <li class="relative">
+        <button type="button" class="topbar-item config-item" enterActiveClass="animate-scalein" enterFromClass="hidden" leaveActiveClass="animate-fadeout" leaveToClass="hidden" pStyleClass="@next" [hideOnOutsideClick]="true">
+          <i class="pi pi-palette"></i>
+        </button>
+        <app-configurator></app-configurator>
+      </li>
+    </ul>
+  </div>
+
+</div>

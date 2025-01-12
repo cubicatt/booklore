@@ -1,12 +1,12 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from "rxjs";
-import {FetchMetadataRequest} from "../model/request/metadata/fetch-metadata-request.model";
+import {FetchMetadataRequest} from "../../metadata/model/request/fetch-metadata-request.model";
 import {BookMetadata, FetchedMetadata} from "../model/book.model";
 import {BookMetadataBI} from "../model/book-metadata-for-book-info.model";
 import {tap} from "rxjs/operators";
 import {BookService} from "./book.service";
-import {MetadataRefreshRequest} from '../model/request/metadata/metadata-refresh-request.model';
+import {MetadataRefreshRequest} from '../../metadata/model/request/metadata-refresh-request.model';
 
 @Injectable({
   providedIn: 'root'

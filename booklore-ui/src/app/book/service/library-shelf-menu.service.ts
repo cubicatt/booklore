@@ -8,8 +8,8 @@ import {Shelf} from '../model/shelf.model';
 import {MetadataService} from './metadata.service';
 import {MetadataProvider} from '../model/provider.model';
 import {DialogService} from 'primeng/dynamicdialog';
-import {MetadataFetchOptionsComponent} from '../../metadata-fetch-options/metadata-fetch-options.component';
-import {MetadataRefreshType} from '../model/request/metadata/metadata-refresh-type.enum';
+import {MetadataFetchOptionsComponent} from '../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
+import {MetadataRefreshType} from '../../metadata/model/request/metadata-refresh-type.enum';
 
 @Injectable({
   providedIn: 'root',

@@ -17,6 +17,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -90,6 +93,7 @@ public class GoogleParser implements BookParser {
                 .title(volumeInfo.getTitle())
                 .subtitle(volumeInfo.getSubtitle())
                 .publisher(volumeInfo.getPublisher())
+                .publishedDate(parseDate(volumeInfo.getPublishedDate()))
                 .description(volumeInfo.getDescription())
                 .authors(Optional.ofNullable(volumeInfo.getAuthors()).orElse(List.of()))
                 .categories(Optional.ofNullable(volumeInfo.getCategories()).orElse(List.of()))
@@ -146,5 +150,17 @@ public class GoogleParser implements BookParser {
         }
 
         return truncated.toString();
+    }
+
+    public LocalDate parseDate(String input) {
+        try {
+            if (input.matches("\\d{4}")) {
+                return LocalDate.of(Integer.parseInt(input), 1, 1);
+            }
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            return LocalDate.parse(input, formatter);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.model.stomp;
+package com.adityachandel.booklore.model.websocket;
 
 import lombok.Getter;
 

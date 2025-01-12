@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { BookService } from '../../service/book.service';
 import { map, tap } from 'rxjs/operators';
 import { Shelf } from '../../model/shelf.model';
-import { IconPickerComponent } from '../../../utilities/icon-picker/icon-picker.component';
+import { IconPickerComponent } from '../../../utilities/component/icon-picker/icon-picker.component';
 import { ShelfState } from '../../model/state/shelf-state.model';
 
 @Component({

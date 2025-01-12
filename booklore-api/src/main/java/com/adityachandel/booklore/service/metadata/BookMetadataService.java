@@ -9,7 +9,7 @@ import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
-import com.adityachandel.booklore.model.stomp.Topic;
+import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.service.NotificationService;
@@ -28,7 +28,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import static com.adityachandel.booklore.model.stomp.LogNotification.createLogNotification;
+import static com.adityachandel.booklore.model.websocket.LogNotification.createLogNotification;
 import static com.adityachandel.booklore.service.metadata.model.MetadataProvider.*;
 
 @Slf4j
@@ -105,7 +105,7 @@ public class BookMetadataService {
             bookEntity.setMetadata(bookMetadata);
             bookRepository.save(bookEntity);
             Book book = bookMapper.toBook(bookEntity);
-            notificationService.sendMessage(Topic.METADATA_UPDATE, book);
+            notificationService.sendMessage(Topic.BOOK_METADATA_UPDATE, book);
             notificationService.sendMessage(Topic.LOG, createLogNotification("Book metadata updated: " + book.getMetadata().getTitle()));
         }
     }

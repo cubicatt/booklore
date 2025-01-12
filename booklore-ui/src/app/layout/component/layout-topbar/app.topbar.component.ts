@@ -8,7 +8,7 @@ import {TooltipModule} from 'primeng/tooltip';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {BookSearcherComponent} from '../../../book/components/book-searcher/book-searcher.component';
-import {FileUploadComponent} from '../../../utilities/file-upload/file-upload.component';
+import {FileUploadComponent} from '../../../utilities/component/file-upload/file-upload.component';
 import {NgClass, NgIf} from '@angular/common';
 import {EventService} from '../../../shared/websocket/event.service';
 import {LogNotification} from '../../../shared/websocket/model/log-notification.model';

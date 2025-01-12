@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {RxStompService} from './shared/websocket/rx-stomp.service';
 import {Message} from '@stomp/stompjs';
 import {BookService} from './book/service/book.service';
-import {Action, parseBookNotification} from './shared/websocket/model/book-notification.model';
 import {EventService} from './shared/websocket/event.service';
 import {parseLogNotification} from './shared/websocket/model/log-notification.model';
 
@@ -18,16 +17,15 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.rxStompService.watch('/topic/book').subscribe((message: Message) => {
-      const notification = parseBookNotification(message.body);
-      if (notification.action === Action.BOOK_ADDED) {
-        this.bookService.handleNewlyCreatedBook(notification.addedBook!);
-      } else if (notification.action === Action.BOOKS_REMOVED) {
-        this.bookService.handleRemovedBookIds(notification.removedBookIds!);
-      }
+    this.rxStompService.watch('/topic/book-add').subscribe((message: Message) => {
+      this.bookService.handleNewlyCreatedBook(JSON.parse(message.body));
     });
 
-    this.rxStompService.watch('/topic/metadata-update').subscribe((message: Message) => {
+    this.rxStompService.watch('/topic/books-removed').subscribe((message: Message) => {
+      this.bookService.handleRemovedBookIds(JSON.parse(message.body));
+    });
+
+    this.rxStompService.watch('/topic/book-metadata-update').subscribe((message: Message) => {
       this.bookService.handleBookUpdate(JSON.parse(message.body));
     });
 

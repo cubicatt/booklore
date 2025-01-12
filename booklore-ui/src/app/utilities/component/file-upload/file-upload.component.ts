@@ -1,15 +1,15 @@
 import {Component} from '@angular/core';
-import {Library} from '../../book/model/library.model';
+import {Library} from '../../../book/model/library.model';
 import {FileUploadService} from './file-upload.service';
 import {Button} from 'primeng/button';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
-import {ToastService} from '../../core/service/toast.service';
+import {ToastService} from '../../../core/service/toast.service';
 import {DynamicDialogRef} from 'primeng/dynamicdialog';
-import {LibraryService} from '../../book/service/library.service';
+import {LibraryService} from '../../../book/service/library.service';
 import {Observable} from 'rxjs';
-import {LibraryState} from '../../book/model/state/library-state.model';
+import {LibraryState} from '../../../book/model/state/library-state.model';
 
 @Component({
   selector: 'app-file-upload-v2',

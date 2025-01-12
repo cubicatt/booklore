@@ -1,10 +1,10 @@
 import {Component, ViewChild} from '@angular/core';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
-import {DirectoryPickerComponent} from '../../../utilities/directory-picker/directory-picker.component';
+import {DirectoryPickerComponent} from '../../../utilities/component/directory-picker/directory-picker.component';
 import {MessageService} from 'primeng/api';
 import {Router} from '@angular/router';
 import {LibraryService} from '../../service/library.service';
-import {IconPickerComponent} from '../../../utilities/icon-picker/icon-picker.component';
+import {IconPickerComponent} from '../../../utilities/component/icon-picker/icon-picker.component';
 import {take} from 'rxjs';
 
 @Component({

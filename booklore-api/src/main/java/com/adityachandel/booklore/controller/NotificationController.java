@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.controller;
 
-import com.adityachandel.booklore.model.stomp.Topic;
+import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;

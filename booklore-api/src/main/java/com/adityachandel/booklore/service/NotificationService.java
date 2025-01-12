@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.service;
 
-import com.adityachandel.booklore.model.stomp.Topic;
+import com.adityachandel.booklore.model.websocket.Topic;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 

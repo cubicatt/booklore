@@ -6,8 +6,7 @@ import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
-import com.adityachandel.booklore.model.stomp.BookNotification;
-import com.adityachandel.booklore.model.stomp.Topic;
+import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import lombok.AllArgsConstructor;
@@ -23,9 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.adityachandel.booklore.model.stomp.BookNotification.Action.BOOKS_REMOVED;
-import static com.adityachandel.booklore.model.stomp.BookNotification.Action.BOOK_ADDED;
-import static com.adityachandel.booklore.model.stomp.LogNotification.createLogNotification;
+import static com.adityachandel.booklore.model.websocket.LogNotification.createLogNotification;
 
 @Service
 @AllArgsConstructor
@@ -61,8 +58,7 @@ public class LibraryProcessingService {
         if (!removedBookEntities.isEmpty()) {
             Set<Long> bookIds = removedBookEntities.stream().map(BookEntity::getId).collect(Collectors.toSet());
             bookRepository.deleteByIdIn(bookIds);
-            BookNotification notification = BookNotification.builder().action(BOOKS_REMOVED).removedBookIds(bookIds).build();
-            notificationService.sendMessage(Topic.BOOK, notification);
+            notificationService.sendMessage(Topic.BOOKS_REMOVE, bookIds);
             log.info("Books removed: {}", bookIds);
         }
     }
@@ -73,8 +69,7 @@ public class LibraryProcessingService {
             log.info("Processing file: {}", libraryFile.getFilePath());
             Book book = processLibraryFile(libraryFile);
             if (book != null) {
-                BookNotification notification = BookNotification.builder().action(BOOK_ADDED).addedBook(book).build();
-                notificationService.sendMessage(Topic.BOOK, notification);
+                notificationService.sendMessage(Topic.BOOK_ADD, book);
                 notificationService.sendMessage(Topic.LOG, createLogNotification("Book added: " + book.getFileName()));
                 log.info("Processed file: {}", libraryFile.getFilePath());
             }

@@ -1,9 +1,9 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {PdfViewerComponent} from './book/pdf-viewer/pdf-viewer.component';
-import {MainDashboardComponent} from './dashboard/main-dashboard/main-dashboard.component';
-import {BookBrowserComponent} from './book/book-browser/book-browser.component';
-import {AppLayoutComponent} from './layout/app.layout.component';
+import {PdfViewerComponent} from './book/components/pdf-viewer/pdf-viewer.component';
+import {MainDashboardComponent} from './dashboard/components/main-dashboard/main-dashboard.component';
+import {BookBrowserComponent} from './book/components/book-browser/book-browser.component';
+import {AppLayoutComponent} from './layout/component/layout-main/app.layout.component';
 
 const routes: Routes = [
   {

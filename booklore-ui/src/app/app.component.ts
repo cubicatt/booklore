@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {RxStompService} from './book/service/rx-stomp.service';
+import {RxStompService} from './shared/websocket/rx-stomp.service';
 import {Message} from '@stomp/stompjs';
 import {BookService} from './book/service/book.service';
-import {Action, parseBookNotification} from './book/model/book-notification.model';
-import {EventService} from './book/service/event.service';
-import {parseLogNotification} from './book/model/log-notification.model';
+import {Action, parseBookNotification} from './shared/websocket/model/book-notification.model';
+import {EventService} from './shared/websocket/event.service';
+import {parseLogNotification} from './shared/websocket/model/log-notification.model';
 
 @Component({
   selector: 'app-root',

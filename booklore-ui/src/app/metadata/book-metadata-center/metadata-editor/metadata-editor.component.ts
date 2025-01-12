@@ -9,9 +9,9 @@ import {Observable} from 'rxjs';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {BookService} from '../../../book/service/book.service';
-import {BookMetadataBI} from '../../../book/model/book-metadata-for-book-info.model';
+import {BookMetadataBI} from '../../model/book-metadata-for-book-info.model';
 import {MessageService} from 'primeng/api';
-import {MetadataService} from '../../../book/service/metadata.service';
+import {MetadataService} from '../../metadata.service';
 
 @Component({
   selector: 'app-metadata-editor',

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
-import {BookMetadataBI} from '../../book/model/book-metadata-for-book-info.model';
+import {BookMetadataBI} from '../model/book-metadata-for-book-info.model';
 
 @Injectable({
   providedIn: 'root'

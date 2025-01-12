@@ -5,7 +5,7 @@ import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {MetadataSearcherComponent} from './metadata-searcher/metadata-searcher.component';
 import {BookMetadataCenterService} from './book-metadata-center.service';
 import {Book} from '../../book/model/book.model';
-import {BookMetadataBI} from '../../book/model/book-metadata-for-book-info.model';
+import {BookMetadataBI} from '../model/book-metadata-for-book-info.model';
 import {MetadataViewerComponent} from './metadata-viewer/metadata-viewer.component';
 
 @Component({

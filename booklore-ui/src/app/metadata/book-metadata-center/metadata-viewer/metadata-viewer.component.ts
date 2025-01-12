@@ -5,7 +5,7 @@ import {Book} from '../../../book/model/book.model';
 import {Observable} from 'rxjs';
 import {BookService} from '../../../book/service/book.service';
 import {Router} from '@angular/router';
-import {BookMetadataBI} from '../../../book/model/book-metadata-for-book-info.model';
+import {BookMetadataBI} from '../../model/book-metadata-for-book-info.model';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';

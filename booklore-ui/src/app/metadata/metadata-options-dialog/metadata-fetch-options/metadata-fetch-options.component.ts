@@ -5,7 +5,7 @@ import {Divider} from 'primeng/divider';
 import {Button} from 'primeng/button';
 import {MetadataBasicFetchOptionsComponent} from '../metadata-basic-fetch-options/metadata-basic-fetch-options.component';
 import {NgIf} from '@angular/common';
-import {MetadataService} from '../../../book/service/metadata.service';
+import {MetadataService} from '../../metadata.service';
 import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
 import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
 import {MessageService} from 'primeng/api';

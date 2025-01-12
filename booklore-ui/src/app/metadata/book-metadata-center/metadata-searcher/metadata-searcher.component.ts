@@ -4,7 +4,7 @@ import {Button} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
 import {Divider} from 'primeng/divider';
 import {NgForOf, NgIf} from '@angular/common';
-import {MetadataProvider} from '../../../book/model/provider.model';
+import {MetadataProvider} from '../../model/provider.model';
 import {BookService} from '../../../book/service/book.service';
 import {FetchMetadataRequest} from '../../model/request/fetch-metadata-request.model';
 import {FetchedMetadata} from '../../../book/model/book.model';
@@ -12,7 +12,7 @@ import {ProgressSpinner} from 'primeng/progressspinner';
 import {MetadataPickerComponent} from '../metadata-picker/metadata-picker.component';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {MultiSelect} from 'primeng/multiselect';
-import {MetadataService} from '../../../book/service/metadata.service';
+import {MetadataService} from '../../metadata.service';
 
 @Component({
   selector: 'app-metadata-searcher',

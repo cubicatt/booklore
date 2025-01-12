@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {DynamicDialogRef} from 'primeng/dynamicdialog';
-import {UtilityService} from '../../book/service/utility.service';
+import {UtilityService} from './utility.service';
 
 @Component({
   selector: 'app-directory-picker-v2',

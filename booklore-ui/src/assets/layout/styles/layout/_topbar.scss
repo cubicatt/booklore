@@ -205,7 +205,7 @@
 
   .config-panel {
     position: absolute;
-    top: calc(100% + 2px);
+    top: calc(100% + 4px);
     inset-inline-end: 0;
     width: 18rem;
     padding: .75rem;
@@ -214,6 +214,14 @@
     border: 1px solid var(--border-color);
     transform-origin: top;
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+
+    &.notification-box {
+      width: 30rem;
+      background-color: var(--card-background);
+      border: 0.25px solid var(--primary-color);
+      border-radius: 4px;
+      min-height: 5rem;
+    }
 
     .config-panel-content {
       display: flex;
@@ -262,61 +270,6 @@
     }
   }
 
-  .version-item {
-    width: auto;
-    padding: 0.5rem;
-
-    .version-text {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .version-icon {
-      margin-left: .25rem;
-      color: var(--text-secondary-color);
-    }
-  }
-
-  .versions-panel {
-    padding: .25rem;
-    background-color: var(--overlay-background);
-    position: absolute;
-    right: 0;
-    top: calc(100% + 2px);
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    transform-origin: top;
-
-    ul {
-      padding: 0;
-      margin: 0;
-      list-style-type: none;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-
-      li {
-        margin: 2px;
-
-      }
-
-      a {
-        display: inline-flex;
-        padding: 0.5rem .75rem;
-        border-radius: 6px;
-        width: 100%;
-        overflow: hidden;
-        color: var(--text-color);
-        white-space: nowrap;
-
-        &:hover {
-          background-color: var(--hover-background);
-        }
-      }
-    }
-  }
 }
 
 .topbar-right-items {

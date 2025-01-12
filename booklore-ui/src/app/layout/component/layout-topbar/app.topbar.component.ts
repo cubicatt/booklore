@@ -9,13 +9,14 @@ import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {BookSearcherComponent} from '../../../book/components/book-searcher/book-searcher.component';
 import {FileUploadComponent} from '../../../utilities/component/file-upload/file-upload.component';
-import {NgClass, NgIf} from '@angular/common';
+import {NgClass} from '@angular/common';
 import {EventService} from '../../../shared/websocket/event.service';
 import {LogNotification} from '../../../shared/websocket/model/log-notification.model';
 import {Button} from 'primeng/button';
 import {StyleClass} from 'primeng/styleclass';
 import {Divider} from 'primeng/divider';
 import {ThemeConfiguratorComponent} from '../theme-configurator/theme-configurator.component';
+import {LiveNotificationBoxComponent} from '../../../live-notification-box/live-notification-box.component';
 
 @Component({
   selector: 'app-topbar',
@@ -27,19 +28,18 @@ import {ThemeConfiguratorComponent} from '../theme-configurator/theme-configurat
     FormsModule,
     InputTextModule,
     BookSearcherComponent,
-    NgIf,
     Button,
     ThemeConfiguratorComponent,
     StyleClass,
     NgClass,
-    Divider
+    Divider,
+    LiveNotificationBoxComponent
   ],
 })
 export class AppTopBarComponent implements OnDestroy {
   items!: MenuItem[];
   ref: DynamicDialogRef | undefined;
 
-  latestEvent: LogNotification = {message: 'No recent notifications...'};
   eventHighlight: boolean = false;
   showEvents: boolean = false;
   eventTimeout: any;
@@ -49,9 +49,6 @@ export class AppTopBarComponent implements OnDestroy {
   @ViewChild('topbarmenu') menu!: ElementRef;
 
   constructor(public layoutService: LayoutService, public dialogService: PrimeDialogService, private eventService: EventService) {
-    this.eventService.latestEvent$.subscribe(event => {
-      this.latestEvent = event;
-    });
     this.eventService.eventHighlight$.subscribe(highlight => {
       this.eventHighlight = highlight;
     });

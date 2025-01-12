@@ -20,32 +20,31 @@
   <div class="topbar-right-items">
     <app-book-searcher></app-book-searcher>
     <ul class="topbar-items">
+      <div class="flex gap-6">
+        <li>
+          <a class="topbar-item">
+            <i class="pi pi-plus-circle text-surface-700 dark:text-surface-100" (click)="openLibraryCreatorDialog()"
+               pTooltip="Create New Library" tooltipPosition="top"></i>
+          </a>
+        </li>
+        <li>
+          <a class="topbar-item">
+            <i class="pi pi-upload text-surface-700 dark:text-surface-100" (click)="openFileUploadDialog()"
+               pTooltip="Upload book" tooltipPosition="top"></i>
+          </a>
+        </li>
+      </div>
+
       <p-divider layout="vertical" />
-      <li>
-        <i class="pi pi-wave-pulse" style="font-size: 1.5rem"
-           (click)="toggleEventDisplay()"
-           (mouseenter)="onMouseEnter()"
-           (mouseleave)="onMouseLeave()"
-           [class.pulsating]="eventHighlight"
-           [class.highlight]="eventHighlight"></i>
-        <div *ngIf="showEvents" class="live-event-container" (mouseleave)="onMouseLeave()">
-          <p *ngIf="latestEvent.timestamp">{{ latestEvent.timestamp }}</p>
-          <p>{{ latestEvent.message }}</p>
-        </div>
+      <li class="relative">
+        <button type="button" class="topbar-item" enterActiveClass="animate-scalein" enterFromClass="hidden" leaveActiveClass="animate-fadeout" leaveToClass="hidden" pStyleClass="@next" [hideOnOutsideClick]="true">
+           <i class="pi pi-wave-pulse" style="font-size: 1.5rem"
+             [class.pulsating]="eventHighlight"
+             [class.highlight]="eventHighlight"></i>
+        </button>
+        <app-live-notification-box class="config-panel notification-box"></app-live-notification-box>
       </li>
       <p-divider layout="vertical" />
-      <li>
-        <a class="topbar-item">
-          <i class="pi pi-plus-circle text-surface-700 dark:text-surface-100" (click)="openLibraryCreatorDialog()"
-             pTooltip="Create New Library" tooltipPosition="top"></i>
-        </a>
-      </li>
-      <li>
-        <a class="topbar-item">
-          <i class="pi pi-upload text-surface-700 dark:text-surface-100" (click)="openFileUploadDialog()"
-             pTooltip="Upload book" tooltipPosition="top"></i>
-        </a>
-      </li>
       <li class="relative">
         <button type="button" class="topbar-item config-item" enterActiveClass="animate-scalein" enterFromClass="hidden" leaveActiveClass="animate-fadeout" leaveToClass="hidden" pStyleClass="@next" [hideOnOutsideClick]="true">
           <i class="pi pi-palette"></i>

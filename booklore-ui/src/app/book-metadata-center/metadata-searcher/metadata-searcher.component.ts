@@ -115,6 +115,8 @@ export class MetadataSearcherComponent implements OnInit {
         return `<a href="https://www.amazon.com/dp/${metadata.providerBookId}" target="_blank">Amazon</a>`;
       case "GoodReads":
         return `<a href="https://www.goodreads.com/book/show/${metadata.providerBookId}" target="_blank">Goodreads</a>`;
+      case "Google":
+        return `<a href="https://books.google.com/books?id=${metadata.providerBookId}" target="_blank">Google</a>`;
       default:
         throw new Error(`Unsupported provider: ${metadata.provider}`);
     }

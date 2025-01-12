@@ -41,7 +41,6 @@ export class MetadataSearcherComponent implements OnInit {
   loading: boolean = false;
 
   constructor(private formBuilder: FormBuilder,
-              private bookService: BookService,
               private bookInfoService: BookMetadataCenterService,
               private metadataService: MetadataService) {
     this.form = this.formBuilder.group({
@@ -112,9 +111,9 @@ export class MetadataSearcherComponent implements OnInit {
       throw new Error("Invalid metadata: 'provider' or 'providerBookId' is missing.");
     }
     switch (metadata.provider) {
-      case "AMAZON":
+      case "Amazon":
         return `<a href="https://www.amazon.com/dp/${metadata.providerBookId}" target="_blank">Amazon</a>`;
-      case "GOOD_READS":
+      case "GoodReads":
         return `<a href="https://www.goodreads.com/book/show/${metadata.providerBookId}" target="_blank">Goodreads</a>`;
       default:
         throw new Error(`Unsupported provider: ${metadata.provider}`);

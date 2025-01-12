@@ -1,5 +1,5 @@
 export enum MetadataProvider {
-  AMAZON = 'AMAZON',
-  GOOGLE = 'GOOGLE',
-  GOOD_READS = 'GOOD_READS'
+  Amazon = "Amazon",
+  Google = "Google",
+  GoodReads = "GoodReads"
 }

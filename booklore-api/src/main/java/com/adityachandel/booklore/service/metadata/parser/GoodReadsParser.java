@@ -16,7 +16,6 @@ import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -73,7 +72,7 @@ public class GoodReadsParser implements BookParser {
 
     private FetchedBookMetadata parseBookDetails(Document document, String providerBookId) {
         FetchedBookMetadata.FetchedBookMetadataBuilder builder = FetchedBookMetadata.builder().providerBookId(providerBookId);
-        builder.provider(MetadataProvider.GOOD_READS);
+        builder.provider(MetadataProvider.GoodReads);
         try {
             JSONObject apolloStateJson = getJson(document)
                     .getJSONObject("props")

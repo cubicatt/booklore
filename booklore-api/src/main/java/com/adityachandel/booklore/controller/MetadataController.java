@@ -4,6 +4,7 @@ import com.adityachandel.booklore.mapper.BookMetadataMapper;
 import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.request.BooksMetadataRefreshRequest;
 import com.adityachandel.booklore.model.dto.request.LibraryMetadataRefreshRequest;
+import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import com.adityachandel.booklore.quartz.JobSchedulerService;
 import com.adityachandel.booklore.service.metadata.BookMetadataService;
 import com.adityachandel.booklore.service.metadata.BookMetadataUpdater;
@@ -33,19 +34,25 @@ public class MetadataController {
 
     @PutMapping("/{bookId}")
     public ResponseEntity<BookMetadata> setBookMetadata(@RequestBody FetchedBookMetadata setMetadataRequest, @PathVariable long bookId) {
-        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, MetadataProvider.AMAZON, true), false);
+        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true), false);
         return ResponseEntity.ok(bookMetadata);
     }
 
     @PutMapping("/{bookId}/source/{source}")
     public ResponseEntity<BookMetadata> setBookMetadata(@RequestBody FetchedBookMetadata setMetadataRequest, @PathVariable long bookId, @PathVariable MetadataProvider source) {
-        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, MetadataProvider.AMAZON, true), false);
+        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true), false);
         return ResponseEntity.ok(bookMetadata);
     }
 
     @PutMapping(path = "/library/{libraryId}/refresh")
     public ResponseEntity<String> scheduleRefresh(@PathVariable Long libraryId, @RequestBody LibraryMetadataRefreshRequest request) {
         jobSchedulerService.scheduleMetadataRefresh(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(path = "/refreshV2")
+    public ResponseEntity<String> scheduleRefreshV2(@RequestBody MetadataRefreshRequest request) {
+        jobSchedulerService.scheduleMetadataRefreshV2(request);
         return ResponseEntity.noContent().build();
     }
 

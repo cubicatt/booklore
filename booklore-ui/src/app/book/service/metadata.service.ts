@@ -9,44 +9,50 @@ import {BookMetadata, FetchedMetadata} from "../model/book.model";
 import {BookMetadataBI} from "../model/book-metadata-for-book-info.model";
 import {tap} from "rxjs/operators";
 import {BookService} from "./book.service";
+import {MetadataRefreshOptions} from '../../metadata-advanced-fetch-options/metadata-advanced-fetch-options.component';
+import {MetadataRefreshRequest} from '../../metadata-fetch-options/metadata-fetch-options.component';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class MetadataService {
 
-    private readonly url = 'http://localhost:8080/v1/metadata';
+  private readonly url = 'http://localhost:8080/v1/metadata';
 
-    constructor(private http: HttpClient, private bookService: BookService) {
-    }
+  constructor(private http: HttpClient, private bookService: BookService) {
+  }
 
-    fetchBookMetadata(bookId: number, request: FetchMetadataRequest): Observable<FetchedMetadata[]> {
-        return this.http.post<FetchedMetadata[]>(`${this.url}/${bookId}`, request);
-    }
+  fetchBookMetadata(bookId: number, request: FetchMetadataRequest): Observable<FetchedMetadata[]> {
+    return this.http.post<FetchedMetadata[]>(`${this.url}/${bookId}`, request);
+  }
 
-    updateBookMetadata(bookId: number, bookMetadata: BookMetadataBI): Observable<BookMetadata> {
-        return this.http.put<BookMetadata>(`${this.url}/${bookId}`, bookMetadata).pipe(
-            tap(updatedMetadata => {
-                this.bookService.handleBookMetadataUpdate(bookId, updatedMetadata);
-            })
-        );
-    }
+  updateBookMetadata(bookId: number, bookMetadata: BookMetadataBI): Observable<BookMetadata> {
+    return this.http.put<BookMetadata>(`${this.url}/${bookId}`, bookMetadata).pipe(
+      tap(updatedMetadata => {
+        this.bookService.handleBookMetadataUpdate(bookId, updatedMetadata);
+      })
+    );
+  }
 
-    autoRefreshLibraryBooksMetadata(libraryId: number, metadataProvider: MetadataProvider, replaceCover: boolean): Observable<void> {
-        const requestPayload: LibraryAutoMetadataRefreshRequest = {
-            libraryId: libraryId,
-            metadataProvider: metadataProvider,
-            replaceCover: replaceCover
-        }
-        return this.http.put<void>(`${this.url}/library/${libraryId}/refresh`, requestPayload);
-    }
+  autoRefreshLibraryBooksMetadataV2(metadataRefreshRequest: MetadataRefreshRequest) {
+    return this.http.put<void>(`${this.url}/refreshV2`, metadataRefreshRequest);
+  }
 
-    autoRefreshBooksMetadata(selectedBooks: Set<number>, metadataProvider: MetadataProvider, replaceCover: boolean): Observable<void> {
-        const requestPayload: BookAutoMetadataRefresh = {
-            bookIds: Array.from(selectedBooks),
-            metadataProvider: metadataProvider,
-            replaceCover
-        };
-        return this.http.put<void>(`${this.url}/books/refresh`, requestPayload);
+  autoRefreshLibraryBooksMetadata(libraryId: number, metadataProvider: MetadataProvider, replaceCover: boolean): Observable<void> {
+    const requestPayload: LibraryAutoMetadataRefreshRequest = {
+      libraryId: libraryId,
+      metadataProvider: metadataProvider,
+      replaceCover: replaceCover
     }
+    return this.http.put<void>(`${this.url}/library/${libraryId}/refresh`, requestPayload);
+  }
+
+  autoRefreshBooksMetadata(selectedBooks: Set<number>, metadataProvider: MetadataProvider, replaceCover: boolean): Observable<void> {
+    const requestPayload: BookAutoMetadataRefresh = {
+      bookIds: Array.from(selectedBooks),
+      metadataProvider: metadataProvider,
+      replaceCover
+    };
+    return this.http.put<void>(`${this.url}/books/refresh`, requestPayload);
+  }
 }

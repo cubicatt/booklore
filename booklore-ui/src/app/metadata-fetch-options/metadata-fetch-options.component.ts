@@ -1,10 +1,23 @@
 import {Component} from '@angular/core';
 import {DynamicDialogConfig} from 'primeng/dynamicdialog';
-import {MetadataAdvancedFetchOptionsComponent} from '../metadata-advanced-fetch-options/metadata-advanced-fetch-options.component';
+import {MetadataAdvancedFetchOptionsComponent, MetadataRefreshOptions} from '../metadata-advanced-fetch-options/metadata-advanced-fetch-options.component';
 import {Divider} from 'primeng/divider';
 import {Button} from 'primeng/button';
 import {MetadataBasicFetchOptionsComponent} from '../metadata-basic-fetch-options/metadata-basic-fetch-options.component';
 import {NgIf} from '@angular/common';
+import {MetadataService} from '../book/service/metadata.service';
+
+export interface MetadataRefreshRequest {
+  refreshType: RefreshType;
+  libraryId?: number;
+  bookIds?: Set<number>;
+  refreshOptions: MetadataRefreshOptions;
+}
+
+enum RefreshType {
+  BOOKS = 'BOOKS',
+  LIBRARY = 'LIBRARY'
+}
 
 @Component({
   selector: 'app-metadata-fetch-options',
@@ -21,10 +34,9 @@ import {NgIf} from '@angular/common';
 })
 export class MetadataFetchOptionsComponent {
   isBasicMode: boolean = false;
-  isDialogVisible: boolean = false;
   libraryId!: number;
 
-  constructor(private dynamicDialogConfig: DynamicDialogConfig) {
+  constructor(private dynamicDialogConfig: DynamicDialogConfig, private metadataService: MetadataService) {
     this.libraryId = dynamicDialogConfig.data.libraryId;
   }
 
@@ -32,13 +44,19 @@ export class MetadataFetchOptionsComponent {
     this.isBasicMode = !this.isBasicMode;
   }
 
-  openDialog() {
-    this.isDialogVisible = true;
+  onAdvancedMetadataOptionSubmit(metadataRefreshOptions: MetadataRefreshOptions) {
+    const metadataRefreshRequest: MetadataRefreshRequest = {
+      refreshType: RefreshType.LIBRARY,
+      libraryId: this.libraryId,
+      refreshOptions: metadataRefreshOptions
+    };
+    this.metadataService.autoRefreshLibraryBooksMetadataV2(metadataRefreshRequest).subscribe({
+      next: () => {
+        // Handle success
+      },
+      error: (error) => {
+        // Handle error
+      }
+    });
   }
-
-  // Close the dialog (if needed)
-  closeDialog() {
-    this.isDialogVisible = false;
-  }
-
 }

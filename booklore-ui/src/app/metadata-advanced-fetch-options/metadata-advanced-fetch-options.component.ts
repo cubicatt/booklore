@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, Output, EventEmitter} from '@angular/core';
 import {Select, SelectChangeEvent} from 'primeng/select';
 import {FormsModule} from '@angular/forms';
 import {NgForOf, TitleCasePipe} from '@angular/common';
@@ -6,10 +6,26 @@ import {Checkbox} from 'primeng/checkbox';
 import {Button} from 'primeng/button';
 import {MessageService} from 'primeng/api';
 
-interface FieldProvider {
-  defaultProvider: string | null;
-  higherPriorityProvider: string | null;
-  highestPriorityProvider: string | null;
+
+export interface MetadataRefreshOptions {
+  refreshType: string;
+  defaultProvider: string;
+  refreshCovers: boolean;
+  fieldOptions: FieldOptions;
+}
+
+export interface FieldProvider {
+  default: string | null;
+  p2: string | null;
+  p1: string | null;
+}
+
+export interface FieldOptions {
+  title: FieldProvider;
+  description: FieldProvider;
+  authors: FieldProvider;
+  categories: FieldProvider;
+  cover: FieldProvider;
 }
 
 @Component({
@@ -21,63 +37,65 @@ interface FieldProvider {
 })
 export class MetadataAdvancedFetchOptionsComponent {
 
+  @Output() metadataOptionsSubmitted: EventEmitter<MetadataRefreshOptions> = new EventEmitter<MetadataRefreshOptions>();
+  fields: (keyof FieldOptions)[] = ['title', 'description', 'authors', 'categories', 'cover'];
   providers: string[] = ['Amazon', 'Google', 'GoodReads'];
   refreshCovers: boolean = false;
 
-  defaultProvider = {
-    placeholder: 'Select All',
-    value: ''
-  };
-  higherPriorityProvider = {
-    placeholder: 'Select All',
-    value: ''
-  };
-  highestPriorityProvider = {
-    placeholder: 'Select All',
-    value: ''
-  };
+  allDefault = {placeholder: 'Set All', value: ''};
+  allP2 = {placeholder: 'Set All', value: ''};
+  allP1 = {placeholder: 'Set All', value: ''};
 
-  fields: string[] = ['title', 'description', 'authors', 'categories', 'cover'];
-
-  tableState: Record<string, FieldProvider> = this.fields.reduce<Record<string, FieldProvider>>((acc, field) => {
-    acc[field] = {
-      defaultProvider: null,
-      higherPriorityProvider: null,
-      highestPriorityProvider: null
-    };
-    return acc;
-  }, {});
+  fieldOptions: FieldOptions = {
+    title: {default: null, p2: null, p1: null},
+    description: {default: null, p2: null, p1: null},
+    authors: {default: null, p2: null, p1: null},
+    categories: {default: null, p2: null, p1: null},
+    cover: {default: null, p2: null, p1: null}
+  };
 
   constructor(private messageService: MessageService) {
   }
 
-
   syncProvider(event: SelectChangeEvent, providerType: keyof FieldProvider) {
-    for (const field of Object.keys(this.tableState)) {
-      this.tableState[field][providerType] = event.value;
+    for (const field of Object.keys(this.fieldOptions)) {
+      this.fieldOptions[field as keyof FieldOptions][providerType] = event.value;
     }
   }
 
-  individualProviderChanged(providerType: keyof FieldProvider) {
-    const providerMap: Record<keyof FieldProvider, { value: string; placeholder: string }> = {
-      defaultProvider: this.defaultProvider,
-      higherPriorityProvider: this.higherPriorityProvider,
-      highestPriorityProvider: this.highestPriorityProvider
-    };
-    const provider = providerMap[providerType];
-    provider.value = '';
-    provider.placeholder = 'Overridden';
+  submit() {
+    const allProvidersSelected = Object.keys(this.fieldOptions).every(field => {
+      return this.fieldOptions[field as keyof FieldOptions].default !== null;
+    });
+    if (allProvidersSelected) {
+      const metadataRefreshOptions: MetadataRefreshOptions = {
+        refreshType: 'LIBRARY',
+        defaultProvider: this.allDefault.value,
+        refreshCovers: this.refreshCovers,
+        fieldOptions: this.fieldOptions
+      };
+
+      this.metadataOptionsSubmitted.emit(metadataRefreshOptions);
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        life: 5000,
+        detail: 'Base provider must be selected for all the book fields.'
+      });
+    }
   }
 
-  submit() {
-    const allProvidersSelected = Object.keys(this.tableState).every(field => {
-      return this.tableState[field].defaultProvider !== null;
-    });
-    console.log(this.tableState)
-    if (allProvidersSelected) {
-
-    } else {
-      this.messageService.add({severity: 'error', summary: 'Error', life: 5000, detail: 'Base provider must be selected for all the book fields.'});
+  reset() {
+    this.allDefault.value = '';
+    this.allP2.value = '';
+    this.allP1.value = '';
+    for (const field of Object.keys(this.fieldOptions)) {
+      this.fieldOptions[field as keyof FieldOptions] = {
+        default: null,
+        p2: null,
+        p1: null
+      };
     }
   }
 }

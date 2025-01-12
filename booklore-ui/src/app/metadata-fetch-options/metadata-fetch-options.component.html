@@ -1,10 +1,10 @@
 <div class="flex flex-col items-center space-y-6">
   <ng-container *ngIf="isBasicMode; else advancedOptions">
-    <app-metadata-basic-fetch-options></app-metadata-basic-fetch-options>
+    <app-metadata-basic-fetch-options ></app-metadata-basic-fetch-options>
   </ng-container>
 
   <ng-template #advancedOptions>
-    <app-metadata-advanced-fetch-options></app-metadata-advanced-fetch-options>
+    <app-metadata-advanced-fetch-options (metadataOptionsSubmitted)="onAdvancedMetadataOptionSubmit($event)"></app-metadata-advanced-fetch-options>
   </ng-template>
 
   <p-divider></p-divider>

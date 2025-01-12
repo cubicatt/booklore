@@ -44,8 +44,8 @@ public class FileService {
         }
     }
 
-    public String createThumbnail(long bookId, String thumbnailUrl, String suffix) throws IOException {
-        String newFilename = suffix + ".jpg";
+    public String createThumbnail(long bookId, String thumbnailUrl) throws IOException {
+        String newFilename = "c.jpg";
         resizeAndSaveImage(thumbnailUrl, new File(getThumbnailPath(bookId)), newFilename);
         return getThumbnailPath(bookId) + newFilename;
     }

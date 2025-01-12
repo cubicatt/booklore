@@ -13,23 +13,23 @@
     <tr>
       <td class="px-4 py-2 text-gray-300"></td>
       <td class="px-4 py-2">
-        <p-select [options]="providers" [(ngModel)]="defaultProvider.value"
-                  (onChange)="syncProvider($event, 'defaultProvider')"
-                  [placeholder]="defaultProvider.placeholder"
+        <p-select [options]="providers" [(ngModel)]="allDefault.value"
+                  (onChange)="syncProvider($event, 'default')"
+                  placeholder="Select All"
                   class="w-full">
         </p-select>
       </td>
       <td class="px-4 py-2">
-        <p-select [options]="providers" [(ngModel)]="higherPriorityProvider.value"
-                  (onChange)="syncProvider($event, 'higherPriorityProvider')"
-                  [placeholder]="higherPriorityProvider.placeholder"
+        <p-select [options]="providers" [(ngModel)]="allP2.value"
+                  (onChange)="syncProvider($event, 'p2')"
+                  placeholder="Select All"
                   class="w-full">
         </p-select>
       </td>
       <td class="px-4 py-2">
-        <p-select [options]="providers" [(ngModel)]="highestPriorityProvider.value"
-                  (onChange)="syncProvider($event, 'highestPriorityProvider')"
-                  [placeholder]="highestPriorityProvider.placeholder"
+        <p-select [options]="providers" [(ngModel)]="allP1.value"
+                  (onChange)="syncProvider($event, 'p1')"
+                  placeholder="Select All"
                   class="w-full">
         </p-select>
       </td>
@@ -38,22 +38,19 @@
     <tr *ngFor="let field of fields" [hidden]="field === 'cover' && !refreshCovers">
       <td class="px-4 py-2 text-gray-300">{{ field | titlecase }}</td>
       <td class="px-4 py-2">
-        <p-select [options]="providers" [(ngModel)]="tableState[field].defaultProvider"
-                  (onChange)="individualProviderChanged('defaultProvider')"
+        <p-select [options]="providers" [(ngModel)]="fieldOptions[field].default"
                   placeholder="Unset"
                   class="w-full">
         </p-select>
       </td>
       <td class="px-4 py-2">
-        <p-select [options]="providers" [(ngModel)]="tableState[field].higherPriorityProvider"
-                  (onChange)="individualProviderChanged('higherPriorityProvider')"
+        <p-select [options]="providers" [(ngModel)]="fieldOptions[field].p2"
                   placeholder="Unset"
                   class="w-full">
         </p-select>
       </td>
       <td class="px-4 py-2">
-        <p-select [options]="providers" [(ngModel)]="tableState[field].highestPriorityProvider"
-                  (onChange)="individualProviderChanged('highestPriorityProvider')"
+        <p-select [options]="providers" [(ngModel)]="fieldOptions[field].p1"
                   placeholder="Unset"
                   class="w-full">
         </p-select>
@@ -68,7 +65,7 @@
       <p-checkbox [(ngModel)]="refreshCovers" [binary]="true"></p-checkbox>
     </div>
     <div class="flex flex-row gap-6">
-      <p-button severity="warn" label="Reset"></p-button>
+      <p-button severity="warn" label="Reset" (onClick)="reset()"></p-button>
       <p-button label="Submit" (onClick)="submit()"></p-button>
     </div>
 

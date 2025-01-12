@@ -120,7 +120,7 @@ public class AmazonBookParser implements BookParser {
         Document doc = fetchDocument(BASE_BOOK_URL + amazonBookId);
         return FetchedBookMetadata.builder()
                 .providerBookId(amazonBookId)
-                .provider(MetadataProvider.AMAZON)
+                .provider(MetadataProvider.Amazon)
                 .title(getTitle(doc))
                 .subtitle(getSubtitle(doc))
                 .authors(getAuthors(doc).stream().toList())
@@ -414,33 +414,38 @@ public class AmazonBookParser implements BookParser {
     }
 
     private String cleanDescriptionHtml(String html) {
-        Document document = Jsoup.parse(html);
-        document.select("span.a-text-bold").tagName("b").removeAttr("class");
-        document.select("span.a-text-italic").tagName("i").removeAttr("class");
-        for (Element span : document.select("span.a-list-item")) {
-            span.unwrap();  // Removes the span and keeps its content
-        }
-        document.select("ol.a-ordered-list.a-vertical").tagName("ol").removeAttr("class");
-        document.select("ul.a-unordered-list.a-vertical").tagName("ul").removeAttr("class");
-        for (Element span : document.select("span")) {
-            span.unwrap();
-        }
-        document.select("li").forEach(li -> {
-            // Remove <br> tags preceding the <li> (if any)
-            Element prev = li.previousElementSibling();
-            if (prev != null && "br".equals(prev.tagName())) {
-                prev.remove();
+        try {
+            Document document = Jsoup.parse(html);
+            document.select("span.a-text-bold").tagName("b").removeAttr("class");
+            document.select("span.a-text-italic").tagName("i").removeAttr("class");
+            for (Element span : document.select("span.a-list-item")) {
+                span.unwrap();  // Removes the span and keeps its content
             }
+            document.select("ol.a-ordered-list.a-vertical").tagName("ol").removeAttr("class");
+            document.select("ul.a-unordered-list.a-vertical").tagName("ul").removeAttr("class");
+            for (Element span : document.select("span")) {
+                span.unwrap();
+            }
+            document.select("li").forEach(li -> {
+                // Remove <br> tags preceding the <li> (if any)
+                Element prev = li.previousElementSibling();
+                if (prev != null && "br".equals(prev.tagName())) {
+                    prev.remove();
+                }
 
-            // Remove <br> tags following the <li> (if any)
-            Element next = li.nextElementSibling();
-            if (next != null && "br".equals(next.tagName())) {
-                next.remove();
-            }
-        });
-        document.select("p").stream()
-                .filter(p -> p.text().trim().isEmpty())
-                .forEach(Element::remove);
-        return document.body().html();
+                // Remove <br> tags following the <li> (if any)
+                Element next = li.nextElementSibling();
+                if (next != null && "br".equals(next.tagName())) {
+                    next.remove();
+                }
+            });
+            document.select("p").stream()
+                    .filter(p -> p.text().trim().isEmpty())
+                    .forEach(Element::remove);
+            return document.body().html();
+        } catch (Exception e) {
+            log.warn("Error cleaning html description", e);
+        }
+        return html;
     }
 }

@@ -3,6 +3,7 @@ package com.adityachandel.booklore.quartz;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.model.dto.request.BooksMetadataRefreshRequest;
 import com.adityachandel.booklore.model.dto.request.LibraryMetadataRefreshRequest;
+import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import lombok.AllArgsConstructor;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,10 @@ public class JobSchedulerService {
 
     public void scheduleMetadataRefresh(LibraryMetadataRefreshRequest request) {
         scheduleJob(request, RefreshLibraryMetadataJob.class, "libraryMetadataJob");
+    }
+
+    public void scheduleMetadataRefreshV2(MetadataRefreshRequest request) {
+        scheduleJob(request, RefreshMetadataJobV2.class, "libraryMetadataJobV2");
     }
 
     public void scheduleBookMetadataRefresh(BooksMetadataRefreshRequest request) {
@@ -49,4 +54,5 @@ public class JobSchedulerService {
         }
         throw ApiError.SCHEDULE_REFRESH_ERROR.createException(e.getMessage());
     }
+
 }

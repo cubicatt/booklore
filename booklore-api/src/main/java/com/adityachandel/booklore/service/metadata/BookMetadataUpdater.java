@@ -34,51 +34,53 @@ public class BookMetadataUpdater {
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public BookMetadataEntity setBookMetadata(long bookId, FetchedBookMetadata newMetadata, MetadataProvider source, boolean setThumbnail) {
+    public BookMetadataEntity setBookMetadata(long bookId, FetchedBookMetadata newMetadata, boolean setThumbnail) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         BookMetadataEntity metadata = bookEntity.getMetadata();
-        metadata.setTitle(newMetadata.getTitle());
-        metadata.setSubtitle(newMetadata.getSubtitle());
-        metadata.setPublisher(newMetadata.getPublisher());
-        metadata.setPublishedDate(newMetadata.getPublishedDate());
-        metadata.setLanguage(newMetadata.getLanguage());
-        metadata.setIsbn10(newMetadata.getIsbn10());
-        metadata.setIsbn13(newMetadata.getIsbn13());
-        metadata.setDescription(newMetadata.getDescription());
-        metadata.setPageCount(newMetadata.getPageCount());
-        metadata.setRating(newMetadata.getRating());
-        metadata.setReviewCount(newMetadata.getReviewCount());
-        if (newMetadata.getAuthors() != null && !newMetadata.getAuthors().isEmpty()) {
-            List<AuthorEntity> authorEntities = newMetadata.getAuthors().stream()
-                    .map(authorName -> authorRepository.findByName(authorName)
-                            .orElseGet(() -> authorRepository.save(AuthorEntity.builder().name(authorName).build())))
-                    .collect(Collectors.toList());
-            metadata.setAuthors(authorEntities);
-        }
-        if (newMetadata.getCategories() != null && !newMetadata.getCategories().isEmpty()) {
-            List<CategoryEntity> categories = new HashSet<>(newMetadata
-                    .getCategories())
-                    .stream()
-                    .map(categoryName -> categoryRepository.findByName(categoryName)
-                            .orElseGet(() -> categoryRepository.save(CategoryEntity.builder().name(categoryName).build())))
-                    .collect(Collectors.toList());
-            metadata.setCategories(categories);
-        }
 
-        if (setThumbnail) {
-            if (newMetadata.getThumbnailUrl() != null && !newMetadata.getThumbnailUrl().isEmpty()) {
-                String thumbnailPath = null;
-                try {
-                    thumbnailPath = fileService.createThumbnail(bookId, newMetadata.getThumbnailUrl(), source.name());
-                } catch (IOException e) {
-                    log.error(e.getMessage());
-                }
-                metadata.setThumbnail(thumbnailPath);
+        metadata.setTitle(newMetadata.getTitle() != null && !newMetadata.getTitle().isBlank() ? newMetadata.getTitle() : metadata.getTitle());
+        metadata.setSubtitle(newMetadata.getSubtitle() != null && !newMetadata.getSubtitle().isBlank() ? newMetadata.getSubtitle() : metadata.getSubtitle());
+        metadata.setPublisher(newMetadata.getPublisher() != null && !newMetadata.getPublisher().isBlank() ? newMetadata.getPublisher() : metadata.getPublisher());
+        metadata.setPublishedDate(newMetadata.getPublishedDate() != null ? newMetadata.getPublishedDate() : metadata.getPublishedDate());
+        metadata.setLanguage(newMetadata.getLanguage() != null && !newMetadata.getLanguage().isBlank() ? newMetadata.getLanguage() : metadata.getLanguage());
+        metadata.setIsbn10(newMetadata.getIsbn10() != null && !newMetadata.getIsbn10().isBlank() ? newMetadata.getIsbn10() : metadata.getIsbn10());
+        metadata.setIsbn13(newMetadata.getIsbn13() != null && !newMetadata.getIsbn13().isBlank() ? newMetadata.getIsbn13() : metadata.getIsbn13());
+        metadata.setDescription(newMetadata.getDescription() != null && !newMetadata.getDescription().isBlank() ? newMetadata.getDescription() : metadata.getDescription());
+        metadata.setPageCount(newMetadata.getPageCount() != null ? newMetadata.getPageCount() : metadata.getPageCount());
+        metadata.setRating(newMetadata.getRating() != null ? newMetadata.getRating() : metadata.getRating());
+        metadata.setReviewCount(newMetadata.getReviewCount() != null ? newMetadata.getReviewCount() : metadata.getReviewCount());
+
+        metadata.setAuthors(newMetadata.getAuthors() != null && !newMetadata.getAuthors().isEmpty() ?
+                newMetadata.getAuthors().stream()
+                        .map(authorName -> authorRepository.findByName(authorName)
+                                .orElseGet(() -> authorRepository.save(AuthorEntity.builder().name(authorName).build())))
+                        .collect(Collectors.toList())
+                : metadata.getAuthors());
+
+        metadata.setCategories(newMetadata.getCategories() != null && !newMetadata.getCategories().isEmpty() ?
+                new HashSet<>(newMetadata.getCategories()).stream()
+                        .map(categoryName -> categoryRepository.findByName(categoryName)
+                                .orElseGet(() -> categoryRepository.save(CategoryEntity.builder().name(categoryName).build())))
+                        .collect(Collectors.toList())
+                : metadata.getCategories());
+
+        if (setThumbnail && newMetadata.getThumbnailUrl() != null && !newMetadata.getThumbnailUrl().isEmpty()) {
+            String thumbnailPath = null;
+            try {
+                thumbnailPath = fileService.createThumbnail(bookId, newMetadata.getThumbnailUrl());
+            } catch (IOException e) {
+                log.error(e.getMessage());
             }
+            metadata.setThumbnail(thumbnailPath);
         }
 
-        authorRepository.saveAll(metadata.getAuthors());
-        categoryRepository.saveAll(metadata.getCategories());
+        if (!metadata.getAuthors().isEmpty()) {
+            authorRepository.saveAll(metadata.getAuthors());
+        }
+        if (!metadata.getCategories().isEmpty()) {
+            categoryRepository.saveAll(metadata.getCategories());
+        }
+
         bookMetadataRepository.save(metadata);
         return metadata;
     }

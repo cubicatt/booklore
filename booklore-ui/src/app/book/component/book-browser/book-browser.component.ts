@@ -328,7 +328,7 @@ export class BookBrowserComponent implements OnInit {
   }
 
   updateMetadata() {
-    this.metadataService.autoRefreshBooksMetadata(this.selectedBooks, MetadataProvider.AMAZON, false).subscribe({
+    this.metadataService.autoRefreshBooksMetadata(this.selectedBooks, MetadataProvider.Amazon, false).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',

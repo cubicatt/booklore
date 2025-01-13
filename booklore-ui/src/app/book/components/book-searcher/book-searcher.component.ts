@@ -58,10 +58,10 @@ export class BookSearcherComponent implements OnInit, OnDestroy {
 
   onBookClick(book: Book): void {
     this.clearSearch();
-    this.openBook(book.id);
+    this.openBookDetailsDialog(book.id);
   }
 
-  openBook(bookId: number): void {
+  openBookDetailsDialog(bookId: number): void {
     this.bookService.getBookByIdFromAPI(bookId, true).subscribe(({
       next: (book) => {
         this.dialogService.open(BookMetadataCenterComponent, {
@@ -72,6 +72,7 @@ export class BookSearcherComponent implements OnInit, OnDestroy {
           height: '835px',
           showHeader: false,
           closeOnEscape: true,
+          dismissableMask: true,
           data: {
             book: book
           }

@@ -85,6 +85,7 @@ export class BookCardComponent implements OnInit {
           height: '835px',
           showHeader: false,
           closeOnEscape: true,
+          dismissableMask: true,
           data: {
             book: book
           }

@@ -8,18 +8,14 @@ import {ShelfAssignerComponent} from '../../shelf-assigner/shelf-assigner.compon
 import {BookService} from '../../../service/book.service';
 import {CheckboxModule} from 'primeng/checkbox';
 import {FormsModule} from '@angular/forms';
-import {BookMetadataCenterComponent} from '../../../../metadata/book-metadata-center/book-metadata-center.component';
+import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
+
 
 @Component({
   selector: 'app-book-card',
   templateUrl: './book-card.component.html',
   styleUrls: ['./book-card.component.scss'],
-  imports: [
-    Button,
-    MenuModule,
-    CheckboxModule,
-    FormsModule
-  ],
+  imports: [Button, MenuModule, CheckboxModule, FormsModule],
 })
 export class BookCardComponent implements OnInit {
   @Input() book!: Book;
@@ -30,7 +26,8 @@ export class BookCardComponent implements OnInit {
   items: MenuItem[] | undefined;
   isHovered: boolean = false;
 
-  constructor(private bookService: BookService, private dialogService: DialogService) {
+  constructor(private bookService: BookService, private dialogService: DialogService,
+              private metadataDialogService: MetadataDialogService) {
   }
 
   ngOnInit(): void {
@@ -67,34 +64,11 @@ export class BookCardComponent implements OnInit {
           {
             label: 'View metadata',
             icon: 'pi pi-info-circle',
-            command: () => this.openBookDetailsDialog(this.book.id),
+            command: () => this.metadataDialogService.openBookDetailsDialog(this.book.id),
           },
         ],
       },
     ];
-  }
-
-  openBookDetailsDialog(bookId: number): void {
-    this.bookService.getBookByIdFromAPI(bookId, true).subscribe(({
-      next: (book) => {
-        this.dialogService.open(BookMetadataCenterComponent, {
-          header: 'Open book details',
-          modal: true,
-          closable: true,
-          width: '1200px',
-          height: '835px',
-          showHeader: false,
-          closeOnEscape: true,
-          dismissableMask: true,
-          data: {
-            book: book
-          }
-        });
-      },
-      error: (error) => {
-        console.error('Error fetching book:', error);
-      }
-    }))
   }
 
   private openShelfDialog(book: Book): void {
@@ -112,6 +86,6 @@ export class BookCardComponent implements OnInit {
   }
 
   openBookInfo(book: Book): void {
-    this.openBookDetailsDialog(book.id)
+    this.metadataDialogService.openBookDetailsDialog(book.id);
   }
 }

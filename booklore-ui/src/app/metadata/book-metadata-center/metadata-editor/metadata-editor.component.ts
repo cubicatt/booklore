@@ -11,7 +11,7 @@ import {AsyncPipe, NgIf} from '@angular/common';
 import {BookService} from '../../../book/service/book.service';
 import {BookMetadataBI} from '../../model/book-metadata-for-book-info.model';
 import {MessageService} from 'primeng/api';
-import {MetadataService} from '../../metadata.service';
+import {MetadataService} from '../../service/metadata.service';
 
 @Component({
   selector: 'app-metadata-editor',

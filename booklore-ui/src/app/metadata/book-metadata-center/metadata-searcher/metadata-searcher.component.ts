@@ -11,7 +11,7 @@ import {ProgressSpinner} from 'primeng/progressspinner';
 import {MetadataPickerComponent} from '../metadata-picker/metadata-picker.component';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {MultiSelect} from 'primeng/multiselect';
-import {MetadataService} from '../../metadata.service';
+import {MetadataService} from '../../service/metadata.service';
 
 @Component({
   selector: 'app-metadata-searcher',

@@ -11,7 +11,7 @@ import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Observable} from 'rxjs';
 import {BookMetadataBI} from '../../model/book-metadata-for-book-info.model';
 import {Tooltip} from 'primeng/tooltip';
-import {MetadataService} from '../../metadata.service';
+import {MetadataService} from '../../service/metadata.service';
 
 @Component({
   selector: 'app-metadata-picker',

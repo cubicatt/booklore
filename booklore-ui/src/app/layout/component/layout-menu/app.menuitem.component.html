@@ -30,13 +30,16 @@
     </a>
     <span *ngIf="(item.routerLink && !item.items) && item.visible !== false" class="book-count">
       <p-button
-        (mouseover)="hovered = true" (mouseleave)="hovered = false"
+        (mouseover)="hovered = true"
+        (mouseleave)="hovered = false"
         [text]="true"
         [outlined]="false"
         [rounded]="true"
         [label]="hovered ? '' : (item.bookCount$ | async)?.toString() || ''"
         [icon]="hovered ? 'pi pi-ellipsis-v' : ''"
-        class="font-bold">
+        [style.width]="'30px'"
+        [style.height]="'30px'"
+        [style.display]="'flex'">
       </p-button>
     </span>
   </div>

@@ -10,6 +10,7 @@ import {BookMetadataCenterComponent} from '../../../metadata/book-metadata-cente
 import {DialogService} from 'primeng/dynamicdialog';
 import {Button} from 'primeng/button';
 import {NgForOf, NgIf} from '@angular/common';
+import {MetadataDialogService} from '../../../metadata/service/metadata-dialog.service';
 
 @Component({
   selector: 'app-book-searcher',
@@ -30,7 +31,8 @@ export class BookSearcherComponent implements OnInit, OnDestroy {
   #searchSubject = new Subject<string>();
   #subscription!: Subscription;
 
-  constructor(private bookService: BookService, private router: Router, private dialogService: DialogService) {}
+  constructor(private bookService: BookService, private metadataDialogService: MetadataDialogService) {
+  }
 
   ngOnInit(): void {
     this.initializeSearch();
@@ -58,30 +60,7 @@ export class BookSearcherComponent implements OnInit, OnDestroy {
 
   onBookClick(book: Book): void {
     this.clearSearch();
-    this.openBookDetailsDialog(book.id);
-  }
-
-  openBookDetailsDialog(bookId: number): void {
-    this.bookService.getBookByIdFromAPI(bookId, true).subscribe(({
-      next: (book) => {
-        this.dialogService.open(BookMetadataCenterComponent, {
-          header: 'Open book details',
-          modal: true,
-          closable: true,
-          width: '1200px',
-          height: '835px',
-          showHeader: false,
-          closeOnEscape: true,
-          dismissableMask: true,
-          data: {
-            book: book
-          }
-        });
-      },
-      error: (error) => {
-        console.error('Error fetching book:', error);
-      }
-    }))
+    this.metadataDialogService.openBookDetailsDialog(book.id);
   }
 
   getBookCoverUrl(bookId: number): string {

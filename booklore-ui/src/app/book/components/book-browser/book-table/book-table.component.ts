@@ -8,6 +8,7 @@ import {BookMetadataCenterComponent} from '../../../../metadata/book-metadata-ce
 import {DialogService} from 'primeng/dynamicdialog';
 import {Book} from '../../../model/book.model';
 import {SortOption} from '../../../model/sort.model';
+import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
 
 @Component({
   selector: 'app-book-table',
@@ -29,7 +30,7 @@ export class BookTableComponent implements OnChanges {
   @Input() books: Book[] = [];
   @Input() sortOption: SortOption | null = null;
 
-  constructor(private bookService: BookService, private dialogService: DialogService) {
+  constructor(private bookService: BookService, private metadataDialogService: MetadataDialogService) {
   }
 
   // Hack to set virtual-scroller height
@@ -71,32 +72,8 @@ export class BookTableComponent implements OnChanges {
   }
 
   openMetadataCenter(id: number): void {
-    this.openBookDetailsDialog(id);
+    this.metadataDialogService.openBookDetailsDialog(id);
   }
-
-  openBookDetailsDialog(bookId: number): void {
-    this.bookService.getBookByIdFromAPI(bookId, true).subscribe({
-      next: (book) => {
-        this.dialogService.open(BookMetadataCenterComponent, {
-          header: 'Open book details',
-          modal: true,
-          closable: true,
-          width: '1200px',
-          height: '835px',
-          showHeader: false,
-          closeOnEscape: true,
-          dismissableMask: true,
-          data: {
-            book: book
-          }
-        });
-      },
-      error: (error) => {
-        console.error('Error fetching book:', error);
-      }
-    });
-  }
-
 
   getStarColor(rating: number): string {
     if (rating >= 4.5) {

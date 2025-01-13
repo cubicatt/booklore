@@ -43,8 +43,7 @@
 
     <div class="book-card-container" *ngIf="bookState?.books as books">
 
-      <app-book-table *ngIf="value === 'table'&& books.length > 0" [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)"
-                      [sortOption]="selectedSort"></app-book-table>
+      <app-book-table *ngIf="value === 'table'&& books.length > 0" [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)" [sortOption]="selectedSort"></app-book-table>
 
       <virtual-scroller *ngIf="value === 'grid'" class="virtual-scroller" #scroll [items]="books">
         <div class="grid grid-cols-12 gap-4" #container>

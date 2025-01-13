@@ -36,7 +36,7 @@ export class FileUploadComponent {
     private fileUploadService: FileUploadService,
     private toastService: ToastService,
     private dynamicDialogRef: DynamicDialogRef) {
-      this.libraryState$ = this.libraryService.libraryState$;
+    this.libraryState$ = this.libraryService.libraryState$;
   }
 
   triggerFileInput(fileInput: HTMLInputElement): void {
@@ -70,19 +70,18 @@ export class FileUploadComponent {
     const libraryId = this.selectedLibrary?.id ? this.selectedLibrary.id.toString() : '';
     const path = this.selectedPath || '';
     this.isUploading = true;
-    this.fileUploadService.uploadFile(file, libraryId, path)
-      .subscribe(
-        () => {
-          console.log('File uploaded successfully');
-          this.toastService.showSuccess("File uploaded", file.name);
-          this.isUploading = false;
-          this.dynamicDialogRef.close();
-        },
-        (error) => {
-          this.isUploading = false;
-          this.toastService.showError("Upload failed", error.error.message);
-          this.errorMessage = "Upload failed. " + error.error.message + ".";
-        }
-      );
+    this.fileUploadService.uploadFile(file, libraryId, path).subscribe({
+      next: () => {
+        console.log('File uploaded successfully');
+        this.toastService.showSuccess("File uploaded", file.name);
+        this.isUploading = false;
+        this.dynamicDialogRef.close();
+      },
+      error: (e) => {
+        this.isUploading = false;
+        this.toastService.showError("Upload failed", e.error.message);
+        this.errorMessage = "Upload failed. " + e.error.message + ".";
+      }
+    });
   }
 }

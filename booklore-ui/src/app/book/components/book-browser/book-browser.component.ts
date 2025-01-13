@@ -269,12 +269,14 @@ export class BookBrowserComponent implements OnInit {
   unshelfBooks() {
     if (this.entity) {
       this.bookService.updateBookShelves(this.selectedBooks, new Set(), new Set([this.entity.id])).subscribe(
-        () => {
-          this.messageService.add({severity: 'info', summary: 'Success', detail: 'Books shelves updated'});
-          this.selectedBooks = new Set<number>();
-        },
-        () => {
-          this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update books shelves'});
+        {
+          next: () => {
+            this.messageService.add({severity: 'info', summary: 'Success', detail: 'Books shelves updated'});
+            this.selectedBooks = new Set<number>();
+          },
+          error: () => {
+            this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update books shelves'});
+          }
         }
       );
     }

@@ -1,14 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { Book } from '../../model/book.model';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
+import {Book} from '../../model/book.model';
 import {MessageService, PrimeTemplate} from 'primeng/api';
-import { ShelfService } from '../../service/shelf.service';
-import { Observable } from 'rxjs';
-import { BookService } from '../../service/book.service';
-import { map, tap } from 'rxjs/operators';
-import { Shelf } from '../../model/shelf.model';
-import { IconPickerComponent } from '../../../utilities/component/icon-picker/icon-picker.component';
-import { ShelfState } from '../../model/state/shelf-state.model';
+import {ShelfService} from '../../service/shelf.service';
+import {Observable} from 'rxjs';
+import {BookService} from '../../service/book.service';
+import {map, tap} from 'rxjs/operators';
+import {Shelf} from '../../model/shelf.model';
+import {IconPickerComponent} from '../../../utilities/component/icon-picker/icon-picker.component';
+import {ShelfState} from '../../model/state/shelf-state.model';
 import {Button} from 'primeng/button';
 import {Divider} from 'primeng/divider';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
@@ -79,16 +79,16 @@ export class ShelfAssignerComponent implements OnInit {
       name: this.shelfName,
       icon: this.selectedIcon ? this.selectedIcon.replace('pi pi-', '') : 'heart'
     };
-    this.shelfService.createShelf(newShelf as Shelf).subscribe(
-      () => {
-        this.messageService.add({ severity: 'info', summary: 'Success', detail: `Shelf created: ${this.shelfName}` });
+    this.shelfService.createShelf(newShelf as Shelf).subscribe({
+      next: () => {
+        this.messageService.add({severity: 'info', summary: 'Success', detail: `Shelf created: ${this.shelfName}`});
         this.displayShelfDialog = false;
       },
-      error => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to create shelf' });
-        console.error('Error creating shelf:', error);
+      error: (e) => {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to create shelf'});
+        console.error('Error creating shelf:', e);
       }
-    );
+    });
   }
 
   updateBooksShelves(): void {
@@ -101,11 +101,11 @@ export class ShelfAssignerComponent implements OnInit {
   private updateBookShelves(bookIds: Set<number>, idsToAssign: Set<number | undefined>, idsToUnassign: Set<number>): void {
     this.bookService.updateBookShelves(bookIds, idsToAssign, idsToUnassign).subscribe({
       next: () => {
-        this.messageService.add({ severity: 'info', summary: 'Success', detail: 'Book shelves updated' });
+        this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book shelves updated'});
         this.dynamicDialogRef.close();
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to update book shelves' });
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book shelves'});
         this.dynamicDialogRef.close();
       }
     });

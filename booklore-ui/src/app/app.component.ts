@@ -4,12 +4,15 @@ import {Message} from '@stomp/stompjs';
 import {BookService} from './book/service/book.service';
 import {EventService} from './shared/websocket/event.service';
 import {parseLogNotification} from './shared/websocket/model/log-notification.model';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { Toast } from 'primeng/toast';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  standalone: false,
-  styleUrl: './app.component.scss'
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss',
+    imports: [ConfirmDialog, Toast, RouterOutlet]
 })
 export class AppComponent implements OnInit {
 

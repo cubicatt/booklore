@@ -18,7 +18,7 @@
     <input type="text" pInputText placeholder="Search by title..." [(ngModel)]="bookTitle" (ngModelChange)="onBookTitleChange($event)"/>
     <p-select [options]="sortOptions" optionLabel="label" placeholder="Select Sorting" [(ngModel)]="selectedSort" (onChange)="updateSortOption($event.value)"></p-select>
     <div *ngFor="let option of stateOptions" class="field-checkbox">
-      <p-radioButton [inputId]="option.key" [value]="option.value" [(ngModel)]="value" (onClick)="viewChanged($event)"></p-radioButton>
+      <p-radioButton [inputId]="option.key" [value]="option.value" [(ngModel)]="value" (onClick)="viewChanged()"></p-radioButton>
       <label [for]="option.key" class="ml-2">{{ option.label }}</label>
     </div>
   </div>

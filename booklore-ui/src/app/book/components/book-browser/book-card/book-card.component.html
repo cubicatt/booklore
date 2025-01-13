@@ -11,7 +11,7 @@
     <p-checkbox
       [(ngModel)]="isSelected"
       binary="true"
-      id="select-checkbox-{{book?.id}}"
+      id="select-checkbox-{{book.id}}"
       class="select-checkbox"
       (ngModelChange)="toggleSelection(isSelected || false)"></p-checkbox>
     <p-button [rounded]="true" icon="pi pi-info" class="read-btn" (click)="openBookInfo(book)"></p-button>

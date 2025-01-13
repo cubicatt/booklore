@@ -41,21 +41,7 @@ export enum EntityType {
   standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
-  imports: [
-    Button,
-    NgIf,
-    VirtualScrollerModule,
-    BookCardComponent,
-    AsyncPipe,
-    ProgressSpinner,
-    Select,
-    RadioButton,
-    Menu,
-    NgForOf,
-    InputText,
-    FormsModule,
-    BookTableComponent
-  ],
+  imports: [Button, NgIf, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Select, RadioButton, Menu, NgForOf, InputText, FormsModule, BookTableComponent],
   animations: [
     trigger('slideInOut', [
       state('void', style({
@@ -140,6 +126,7 @@ export class BookBrowserComponent implements OnInit {
     this.activatedRoute.paramMap.subscribe(() => {
       this.bookTitle$.next('');
       this.bookTitle = '';
+      this.deselectAllBooks();
     });
   }
 

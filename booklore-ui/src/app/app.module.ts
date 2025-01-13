@@ -2,7 +2,7 @@ import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {AppLayoutModule} from './layout/component/layout-main/app.layout.module';
+
 import {FormsModule} from '@angular/forms';
 import {DialogService} from 'primeng/dynamicdialog';
 import {InputTextModule} from 'primeng/inputtext';
@@ -38,43 +38,44 @@ import {MultiSelectModule} from 'primeng/multiselect';
 import {SelectButton} from "primeng/selectbutton";
 import {RadioButton} from 'primeng/radiobutton';
 import {Select} from 'primeng/select';
+import {provideHttpClient} from "@angular/common/http";
 
 @NgModule({
     declarations: [
         AppComponent
     ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    AppLayoutModule,
-    FormsModule,
-    InputTextModule,
-    TableModule,
-    Button,
-    StepperModule,
-    IconFieldModule,
-    InputIconModule,
-    ToggleButtonModule,
-    PasswordModule,
-    ToastModule,
-    InfiniteScrollDirective,
-    DropdownModule,
-    VirtualScrollerModule,
-    LazyLoadImageModule,
-    ConfirmDialogModule,
-    CheckboxModule,
-    DividerModule,
-    DialogModule,
-    SpeedDialModule,
-    MenuModule,
-    ProgressSpinnerModule,
-    IftaLabel,
-    MultiSelectModule,
-    SelectButton,
-    RadioButton,
-    Select
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        InputTextModule,
+        TableModule,
+        Button,
+        StepperModule,
+        IconFieldModule,
+        InputIconModule,
+        ToggleButtonModule,
+        PasswordModule,
+        ToastModule,
+        InfiniteScrollDirective,
+        DropdownModule,
+        VirtualScrollerModule,
+        LazyLoadImageModule,
+        ConfirmDialogModule,
+        CheckboxModule,
+        DividerModule,
+        DialogModule,
+        SpeedDialModule,
+        MenuModule,
+        ProgressSpinnerModule,
+        IftaLabel,
+        MultiSelectModule,
+        SelectButton,
+        RadioButton,
+        Select
+    ],
     providers: [
+        provideHttpClient(),
         DialogService,
         MessageService,
         ConfirmationService,

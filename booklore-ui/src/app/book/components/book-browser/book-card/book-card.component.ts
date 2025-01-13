@@ -1,7 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Book} from '../../../model/book.model';
 import {Button} from 'primeng/button';
-import {Router} from '@angular/router';
 import {MenuModule} from 'primeng/menu';
 import {MenuItem} from 'primeng/api';
 import {DialogService} from 'primeng/dynamicdialog';
@@ -9,8 +8,6 @@ import {ShelfAssignerComponent} from '../../shelf-assigner/shelf-assigner.compon
 import {BookService} from '../../../service/book.service';
 import {CheckboxModule} from 'primeng/checkbox';
 import {FormsModule} from '@angular/forms';
-import {NgIf} from '@angular/common';
-import {Observable} from 'rxjs';
 import {BookMetadataCenterComponent} from '../../../../metadata/book-metadata-center/book-metadata-center.component';
 
 @Component({
@@ -21,8 +18,7 @@ import {BookMetadataCenterComponent} from '../../../../metadata/book-metadata-ce
     Button,
     MenuModule,
     CheckboxModule,
-    FormsModule,
-    NgIf,
+    FormsModule
   ],
 })
 export class BookCardComponent implements OnInit {

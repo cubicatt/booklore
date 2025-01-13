@@ -33,7 +33,7 @@ export class AppComponent implements OnInit {
     });
 
     this.rxStompService.watch('/topic/log').subscribe((message: Message) => {
-      let logNotification = parseLogNotification(message.body);
+      const logNotification = parseLogNotification(message.body);
       this.eventService.handleIncomingLog(logNotification);
     });
   }

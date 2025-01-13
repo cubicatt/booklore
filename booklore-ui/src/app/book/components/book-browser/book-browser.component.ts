@@ -84,7 +84,7 @@ export class BookBrowserComponent implements OnInit {
   entityType: EntityType | undefined;
   bookTitle: string = '';
   entityOptions: MenuItem[] | undefined;
-  selectedBooks: Set<number> = new Set();
+  selectedBooks = new Set<number>();
   selectedSort: SortOption | null = null;
   sortOptions: SortOption[] = [];
   isDrawerVisible: boolean = false;

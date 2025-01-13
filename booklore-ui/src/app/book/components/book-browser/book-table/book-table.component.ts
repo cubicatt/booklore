@@ -23,7 +23,7 @@ import {SortOption} from '../../../model/sort.model';
 })
 export class BookTableComponent implements OnChanges {
   selectedBooks: Book[] = [];
-  selectedBookIds: Set<number> = new Set();
+  selectedBookIds = new Set<number>();
 
   @Output() selectedBooksChange = new EventEmitter<Set<number>>();
   @Input() books: Book[] = [];
@@ -34,7 +34,7 @@ export class BookTableComponent implements OnChanges {
 
   // Hack to set virtual-scroller height
   ngOnChanges() {
-    let wrapperElements: HTMLCollection = document.getElementsByClassName('p-virtualscroller');
+    const wrapperElements: HTMLCollection = document.getElementsByClassName('p-virtualscroller');
     Array.prototype.forEach.call(wrapperElements, function (wrapperElement) {
       wrapperElement.style["height"] = 'calc(100vh - 160px)';
     });

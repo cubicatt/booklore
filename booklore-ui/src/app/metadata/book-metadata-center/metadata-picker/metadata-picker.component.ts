@@ -40,8 +40,8 @@ export class MetadataPickerComponent implements OnInit {
   currentBookId!: number;
   updateThumbnailUrl: boolean = false;
   thumbnailSaved: boolean = false;
-  copiedFields: { [key: string]: boolean } = {};
-  savedFields: { [key: string]: boolean } = {};
+  copiedFields: Record<string, boolean> = {};
+  savedFields: Record<string, boolean> = {};
 
   constructor(private bookService: BookService,
               private bookInfoService: BookMetadataCenterService,

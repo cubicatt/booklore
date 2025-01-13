@@ -42,7 +42,7 @@ export class ShelfAssignerComponent implements OnInit {
   selectedShelves: Shelf[] = [];
   displayShelfDialog: boolean = false;
   shelfName: string = '';
-  bookIds: Set<number> = new Set();
+  bookIds = new Set<number>();
   isMultiBooks: boolean = false;
   selectedIcon: string | null = null;
 
@@ -92,7 +92,7 @@ export class ShelfAssignerComponent implements OnInit {
   }
 
   updateBooksShelves(): void {
-    const idsToAssign: Set<number | undefined> = new Set(this.selectedShelves.map(shelf => shelf.id));
+    const idsToAssign = new Set<number | undefined>(this.selectedShelves.map(shelf => shelf.id));
     const idsToUnassign: Set<number> = this.isMultiBooks ? new Set() : this.getIdsToUnAssign(this.book, idsToAssign);
     const bookIds = this.isMultiBooks ? this.bookIds : new Set([this.book.id]);
     this.updateBookShelves(bookIds, idsToAssign, idsToUnassign);

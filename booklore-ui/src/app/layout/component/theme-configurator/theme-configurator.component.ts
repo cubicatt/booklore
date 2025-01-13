@@ -1,5 +1,5 @@
 import {CommonModule, isPlatformBrowser} from '@angular/common';
-import {Component, computed, inject, PLATFORM_ID} from '@angular/core';
+import {Component, computed, inject, PLATFORM_ID, OnInit} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {$t, updatePreset, updateSurfacePalette} from '@primeng/themes';
 import Aura from '@primeng/themes/aura';
@@ -14,9 +14,7 @@ import {SelectButton} from 'primeng/selectbutton';
 import {ToggleSwitchModule} from 'primeng/toggleswitch';
 import {AppConfigService} from '../../../core/service/app-config.service';
 
-interface ColorPalette {
-  [key: string]: string;
-}
+type ColorPalette = Record<string, string>;
 
 interface Palette {
   name: string;
@@ -39,7 +37,7 @@ const presets = {
   },
   imports: [CommonModule, FormsModule, InputSwitchModule, ButtonModule, RadioButtonModule, SelectButton, ToggleSwitchModule]
 })
-export class ThemeConfiguratorComponent {
+export class ThemeConfiguratorComponent implements OnInit {
 
   get ripple() {
     return this.config.ripple();

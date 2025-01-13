@@ -2,8 +2,8 @@ export interface BookMetadataBI {
   bookId: number;
   title: string;
   subtitle?: string;
-  authors: Array<string>;
-  categories: Array<string>;
+  authors: string[];
+  categories: string[];
   publisher: string;
   publishedDate: string;
   isbn10: string;

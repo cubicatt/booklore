@@ -121,7 +121,7 @@ export class MetadataPickerComponent implements OnInit {
     };
 
     this.metadataService.updateBookMetadata(this.currentBookId, updatedBookMetadata).subscribe({
-      next: (bookMetadata) => {
+      next: () => {
         Object.keys(this.copiedFields).forEach((field) => {
           if (this.copiedFields[field]) {
             this.savedFields[field] = true;
@@ -133,7 +133,7 @@ export class MetadataPickerComponent implements OnInit {
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
         this.bookInfoService.emit(updatedBookMetadata);
       },
-      error: (error) => {
+      error: () => {
         this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book metadata'});
       }
     });

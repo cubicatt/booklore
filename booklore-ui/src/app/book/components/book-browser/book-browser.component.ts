@@ -15,7 +15,6 @@ import {SortOption} from '../../model/sort.model';
 import {BookState} from '../../model/state/book-state.model';
 import {Book} from '../../model/book.model';
 import {LibraryShelfMenuService} from '../../service/library-shelf-menu.service';
-import {SelectButtonChangeEvent} from 'primeng/selectbutton';
 import {BookTableComponent} from './book-table/book-table.component';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MetadataFetchOptionsComponent} from '../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
@@ -275,7 +274,7 @@ export class BookBrowserComponent implements OnInit {
     this.bookTableComponent.clearSelectedBooks();
   }
 
-  viewChanged(event: SelectButtonChangeEvent) {
+  viewChanged() {
     this.selectedBooks.clear();
     this.isDrawerVisible = false;
   }
@@ -287,7 +286,7 @@ export class BookBrowserComponent implements OnInit {
           this.messageService.add({severity: 'info', summary: 'Success', detail: 'Books shelves updated'});
           this.selectedBooks = new Set<number>();
         },
-        (error) => {
+        () => {
           this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update books shelves'});
         }
       );

@@ -40,7 +40,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   }
 
   private loadBook(bookId: number): void {
-    this.bookService.getBookById(bookId).subscribe((book) => {
+    this.bookService.getBookById(bookId).subscribe(() => {
       this.zone.run(() => {
         this.bookService.getBookSetting(bookId).subscribe((bookSetting) => {
           const { pageNumber, zoom, sidebar_visible, spread } = bookSetting;

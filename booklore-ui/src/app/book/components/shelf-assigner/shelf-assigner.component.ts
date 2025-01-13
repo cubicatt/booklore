@@ -99,16 +99,16 @@ export class ShelfAssignerComponent implements OnInit {
   }
 
   private updateBookShelves(bookIds: Set<number>, idsToAssign: Set<number | undefined>, idsToUnassign: Set<number>): void {
-    this.bookService.updateBookShelves(bookIds, idsToAssign, idsToUnassign).subscribe(
-      () => {
+    this.bookService.updateBookShelves(bookIds, idsToAssign, idsToUnassign).subscribe({
+      next: () => {
         this.messageService.add({ severity: 'info', summary: 'Success', detail: 'Book shelves updated' });
         this.dynamicDialogRef.close();
       },
-      error => {
+      error: () => {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to update book shelves' });
         this.dynamicDialogRef.close();
       }
-    );
+    });
   }
 
   private getIdsToUnAssign(book: Book, idsToAssign: Set<number | undefined>): Set<number> {

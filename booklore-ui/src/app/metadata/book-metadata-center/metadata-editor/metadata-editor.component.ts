@@ -104,7 +104,7 @@ export class MetadataEditorComponent implements OnInit {
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
         this.bookInfoService.emit(updatedBookMetadata);
       },
-      error: (error) => {
+      error: () => {
         this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book metadata'});
       }
     })

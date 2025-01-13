@@ -14,9 +14,6 @@ export class EventService {
 
   private eventTimeout: any;
 
-  constructor() {
-  }
-
   handleIncomingLog(logNotification: LogNotification): void {
     this.latestEventSubject.next(logNotification);
     this.eventHighlightSubject.next(true);

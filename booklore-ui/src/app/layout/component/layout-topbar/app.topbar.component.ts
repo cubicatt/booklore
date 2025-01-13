@@ -11,7 +11,6 @@ import {BookSearcherComponent} from '../../../book/components/book-searcher/book
 import {FileUploadComponent} from '../../../utilities/component/file-upload/file-upload.component';
 import {NgClass} from '@angular/common';
 import {EventService} from '../../../shared/websocket/event.service';
-import {LogNotification} from '../../../shared/websocket/model/log-notification.model';
 import {Button} from 'primeng/button';
 import {StyleClass} from 'primeng/styleclass';
 import {Divider} from 'primeng/divider';

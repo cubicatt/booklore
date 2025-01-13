@@ -1,10 +1,9 @@
-import {ChangeDetectorRef, Component, Host, HostBinding, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, HostBinding, Input, OnDestroy, OnInit} from '@angular/core';
 import {NavigationEnd, Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {Subscription} from 'rxjs';
 import {filter} from 'rxjs/operators';
 import {MenuService} from './service/app.menu.service';
-import {LayoutService} from '../layout-main/service/app.layout.service';
 import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {Ripple} from 'primeng/ripple';
 
@@ -101,7 +100,7 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
     });
 
     this.router.events.pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(params => {
+      .subscribe(() => {
         if (this.item.routerLink) {
           this.updateActiveStateFromRoute();
         }

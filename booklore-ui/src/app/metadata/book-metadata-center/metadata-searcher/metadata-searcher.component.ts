@@ -5,7 +5,6 @@ import {InputText} from 'primeng/inputtext';
 import {Divider} from 'primeng/divider';
 import {NgForOf, NgIf} from '@angular/common';
 import {MetadataProvider} from '../../model/provider.model';
-import {BookService} from '../../../book/service/book.service';
 import {FetchMetadataRequest} from '../../model/request/fetch-metadata-request.model';
 import {FetchedMetadata} from '../../../book/model/book.model';
 import {ProgressSpinner} from 'primeng/progressspinner';
@@ -97,7 +96,7 @@ export class MetadataSearcherComponent implements OnInit {
               thumbnailUrl: book.thumbnailUrl
             }));
           },
-          error: (e) => {
+          error: () => {
             this.loading = false;
           }
         });

@@ -72,7 +72,7 @@ export class FileUploadComponent {
     this.isUploading = true;
     this.fileUploadService.uploadFile(file, libraryId, path)
       .subscribe(
-        (response) => {
+        () => {
           console.log('File uploaded successfully');
           this.toastService.showSuccess("File uploaded", file.name);
           this.isUploading = false;

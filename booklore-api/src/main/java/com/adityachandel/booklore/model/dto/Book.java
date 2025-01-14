@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.model.dto;
 
+import com.adityachandel.booklore.model.enums.BookFileType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Book {
     private Long id;
+    private BookFileType bookType;
     private Long libraryId;
     private String fileName;
     private String title;

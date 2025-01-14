@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {catchError, map, switchMap, tap} from 'rxjs/operators';
-import {Book, BookMetadata, BookSetting} from '../model/book.model';
+import {Book, BookMetadata, BookSetting, BookType} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 
 @Injectable({
@@ -113,12 +113,21 @@ export class BookService {
     );
   }
 
-  readBook(bookId: number): void {
-    const url = `/pdf-viewer/book/${bookId}`;
-    window.open(url, '_blank');
-    this.updateLastReadTime(bookId).subscribe({
-      error: err => console.error('Failed to update last read time', err),
-    });
+  readBook(book: Book): void {
+    if (book.bookType === "PDF") {
+      const url = `/pdf-viewer/book/${book.id}`;
+      window.open(url, '_blank');
+      this.updateLastReadTime(book.id).subscribe({
+        next: () => console.log('Last read time updated successfully'),
+        error: err => console.error('Failed to update last read time', err),
+      });
+    } else if (book.bookType === "EPUB") {
+      const url = `/epub-viewer/book/${book.id}`;
+      window.open(url, '_blank');
+    } else {
+      console.error('Unsupported book type:', book.bookType);
+      return;
+    }
   }
 
   searchBooks(query: string): Observable<Book[]> {

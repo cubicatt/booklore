@@ -1,5 +1,7 @@
 import {Shelf} from './shelf.model';
 
+export type BookType = "PDF" | "EPUB";
+
 export interface Book {
   id: number;
   libraryId: number;
@@ -7,6 +9,7 @@ export interface Book {
   shelves?: Shelf[];
   lastReadTime?: string;
   addedOn?: string;
+  bookType: BookType;
 }
 
 export interface BookMetadata {

@@ -66,7 +66,7 @@ export class MetadataViewerComponent implements OnInit {
   }
 
   readBook(bookId: number) {
-    this.bookService.readBook(bookId);
+    /*this.bookService.readBook(bookId);*/
   }
 
   closeDialog() {

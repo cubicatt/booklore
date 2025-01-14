@@ -5,6 +5,7 @@ import com.adityachandel.booklore.model.entity.AuthorEntity;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.entity.BookViewerSettingEntity;
+import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.AuthorRepository;
 import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
@@ -26,9 +27,14 @@ public class BookCreatorService {
     private BookMetadataRepository bookMetadataRepository;
     private BookViewerSettingRepository bookViewerSettingRepository;
 
-    public BookEntity createShellBook(LibraryFile libraryFile) {
+    public BookEntity createShellBook(LibraryFile libraryFile, BookFileType bookFileType) {
         File bookFile = new File(libraryFile.getFilePath());
-        BookEntity bookEntity = BookEntity.builder().library(libraryFile.getLibraryEntity()).path(bookFile.getPath()).fileName(bookFile.getName()).build();
+        BookEntity bookEntity = BookEntity.builder()
+                .library(libraryFile.getLibraryEntity())
+                .path(bookFile.getPath())
+                .fileName(bookFile.getName())
+                .bookType(bookFileType)
+                .build();
         BookMetadataEntity bookMetadataEntity = BookMetadataEntity.builder().build();
         BookViewerSettingEntity bookViewerSetting = BookViewerSettingEntity.builder()
                 .book(bookEntity)
@@ -40,6 +46,7 @@ public class BookCreatorService {
                 .build();
         bookEntity.setMetadata(bookMetadataEntity);
         bookEntity.setViewerSetting(bookViewerSetting);
+        bookEntity = bookRepository.saveAndFlush(bookEntity);
         return bookEntity;
     }
 

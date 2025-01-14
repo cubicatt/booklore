@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.model.entity;
 
+import com.adityachandel.booklore.model.enums.BookFileType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +25,9 @@ public class BookEntity {
 
     @Column(name = "path")
     private String path;
+
+    @Column(name = "book_type")
+    private BookFileType bookType;
 
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private BookMetadataEntity metadata;

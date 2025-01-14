@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS book
     path           VARCHAR(1000) NOT NULL,
     last_read_time TIMESTAMP     NULL,
     added_on       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    book_type      VARCHAR(6)    NOT NULL,
     CONSTRAINT fk_library FOREIGN KEY (library_id) REFERENCES library (id) ON DELETE CASCADE,
     CONSTRAINT unique_file_library UNIQUE (file_name, library_id),
     INDEX idx_library_id (library_id),

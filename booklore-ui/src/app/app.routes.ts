@@ -3,6 +3,7 @@ import {PdfViewerComponent} from './book/components/pdf-viewer/pdf-viewer.compon
 import {BookBrowserComponent} from './book/components/book-browser/book-browser.component';
 import {MainDashboardComponent} from './dashboard/components/main-dashboard/main-dashboard.component';
 import {AppLayoutComponent} from './layout/component/layout-main/app.layout.component';
+import {EpubViewerComponent} from './epub-viewer/component/epub-viewer.component';
 
 export const routes: Routes = [
   {
@@ -25,5 +26,9 @@ export const routes: Routes = [
   {
     path: 'pdf-viewer/book/:bookId',
     component: PdfViewerComponent
+  },
+  {
+    path: 'epub-viewer/book/:bookId',
+    component: EpubViewerComponent
   }
 ];

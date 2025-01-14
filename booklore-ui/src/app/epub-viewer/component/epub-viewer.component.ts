@@ -7,6 +7,7 @@ import {NgForOf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Divider} from 'primeng/divider';
 import {DropdownModule} from 'primeng/dropdown';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-epub-viewer',
@@ -24,14 +25,12 @@ import {DropdownModule} from 'primeng/dropdown';
 export class EpubViewerComponent implements OnInit, OnDestroy {
 
   @ViewChild('epubContainer', {static: true}) epubContainer!: ElementRef;
-  bookId = 1;
   chapters: { label: string; href: string }[] = [];
   isDrawerVisible = false;
   isSettingsDrawerVisible: boolean = false;
   private book: any;
   private rendition: any;
-  private keyListener: (e: KeyboardEvent) => void = () => {
-  };
+  private keyListener: (e: KeyboardEvent) => void = () => {};
   fontSize: number = 100;
 
   fontTypes: any[] = [
@@ -43,15 +42,17 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   ];
   selectedFontType: string = 'serif';
 
-  constructor(private epubService: EpubService) {
+  constructor(private epubService: EpubService, private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
-    this.loadEpub();
+    this.route.paramMap.subscribe((params) => {
+      this.loadEpub(+params.get('bookId')!);
+    });
   }
 
-  loadEpub(): void {
-    this.epubService.downloadEpub(this.bookId).subscribe(
+  loadEpub(bookId: number): void {
+    this.epubService.downloadEpub(bookId).subscribe(
       (data: Blob) => {
         const fileReader = new FileReader();
         fileReader.onload = () => {

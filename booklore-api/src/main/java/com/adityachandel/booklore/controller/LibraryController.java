@@ -22,7 +22,6 @@ public class LibraryController {
 
     private LibraryService libraryService;
     private BooksService booksService;
-    private AmazonBookParser amazonBookParser;
 
     @GetMapping("/{libraryId}")
     public ResponseEntity<Library> getLibrary(@PathVariable long libraryId) {
@@ -43,11 +42,6 @@ public class LibraryController {
     public ResponseEntity<?> deleteLibrary(@PathVariable long libraryId) {
         libraryService.deleteLibrary(libraryId);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/{libraryId}/book/{bookId}/withNeighbors")
-    public ResponseEntity<BookWithNeighbors> getBookWithNeighbours(@PathVariable long libraryId, @PathVariable long bookId) {
-        return ResponseEntity.ok(booksService.getBookWithNeighbours(libraryId, bookId));
     }
 
     @GetMapping("/{libraryId}/book/{bookId}")
@@ -71,5 +65,4 @@ public class LibraryController {
         libraryService.refreshLibrary(libraryId);
         return ResponseEntity.noContent().build();
     }
-
 }

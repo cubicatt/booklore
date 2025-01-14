@@ -59,12 +59,6 @@ export interface Category {
   name: string;
 }
 
-export interface BookWithNeighborsDTO {
-  currentBook: Book;
-  previousBookId: number | null;
-  nextBookId: number | null;
-}
-
 export interface BookSetting {
   pageNumber: number;
   zoom: number | string;

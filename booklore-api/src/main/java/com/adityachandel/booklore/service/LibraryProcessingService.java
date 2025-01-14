@@ -32,6 +32,7 @@ public class LibraryProcessingService {
     private final LibraryRepository libraryRepository;
     private final NotificationService notificationService;
     private final PdfFileProcessor pdfFileProcessor;
+    private final EpubFileProcessor epubFileProcessor;
     private final BookRepository bookRepository;
 
 
@@ -80,6 +81,8 @@ public class LibraryProcessingService {
     protected Book processLibraryFile(LibraryFile libraryFile) {
         if (libraryFile.getBookFileType() == BookFileType.PDF) {
             return pdfFileProcessor.processFile(libraryFile, false);
+        } else if(libraryFile.getBookFileType() == BookFileType.EPUB) {
+            return epubFileProcessor.processFile(libraryFile, false);
         }
         return null;
     }

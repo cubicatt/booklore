@@ -1,7 +1,6 @@
 <div class="epub-viewer-container">
 
-  <p-button class="menu-toggle-button" (click)="toggleDrawer()" icon="pi pi-bars"></p-button>
-
+  <p-button class="menu-toggle-button" (click)="toggleDrawer()" icon="pi pi-bars" severity="secondary"></p-button>
   <p-drawer [(visible)]="isDrawerVisible" [modal]="false" [position]="'left'" header="Chapters">
     <ul class="chapter-list">
       <li *ngFor="let chapter of chapters" (click)="navigateToChapter(chapter); $event.stopPropagation()" class="chapter-item">
@@ -10,14 +9,14 @@
     </ul>
   </p-drawer>
 
-  <p-button class="settings-toggle-button" (click)="toggleSettingsDrawer()" icon="pi pi-cog"></p-button>
+  <p-button class="settings-toggle-button" (click)="toggleSettingsDrawer()" icon="pi pi-cog" severity="secondary"></p-button>
   <p-drawer [(visible)]="isSettingsDrawerVisible" [modal]="false" [position]="'right'" header="Settings">
     <div class="flex flex-col">
       <div class="settings-content">
         <p>Font Size: {{ fontSize }}%</p>
         <div class="flex flex-row gap-4">
-          <p-button icon="pi pi-minus" (click)="decreaseFontSize()"></p-button>
-          <p-button icon="pi pi-plus" (click)="increaseFontSize()"></p-button>
+          <p-button icon="pi pi-minus" (click)="decreaseFontSize()" severity="info"></p-button>
+          <p-button icon="pi pi-plus" (click)="increaseFontSize()" severity="info"></p-button>
         </div>
         <p-divider></p-divider>
         <label for="font-type">Font Type:</label>
@@ -29,6 +28,6 @@
 
   <div id="epubContainer" #epubContainer></div>
 
-  <button class="epub-controls-left" (click)="prevPage()">←</button>
+  <button class="epub-controls-left" (click)="prevPage()" >←</button>
   <button class="epub-controls-right" (click)="nextPage()">→</button>
 </div>

@@ -9,6 +9,8 @@ export interface Book {
   shelves?: Shelf[];
   lastReadTime?: string;
   addedOn?: string;
+  epubProgress?: string;
+  pdfProgress?: number;
   bookType: BookType;
 }
 

@@ -18,5 +18,7 @@ public class Book {
     private Instant lastReadTime;
     private Instant addedOn;
     private BookMetadata metadata;
+    private Integer pdfProgress;
+    private String epubProgress;
     private List<Shelf> shelves;
 }

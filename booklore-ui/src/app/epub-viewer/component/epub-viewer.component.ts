@@ -8,19 +8,14 @@ import {FormsModule} from '@angular/forms';
 import {Divider} from 'primeng/divider';
 import {DropdownModule} from 'primeng/dropdown';
 import {ActivatedRoute} from '@angular/router';
+import {Book} from '../../book/model/book.model';
+import {BookService} from '../../book/service/book.service';
 
 @Component({
   selector: 'app-epub-viewer',
   templateUrl: './epub-viewer.component.html',
   styleUrls: ['./epub-viewer.component.scss'],
-  imports: [
-    Drawer,
-    Button,
-    NgForOf,
-    FormsModule,
-    Divider,
-    DropdownModule
-  ]
+  imports: [Drawer, Button, NgForOf, FormsModule, Divider, DropdownModule]
 })
 export class EpubViewerComponent implements OnInit, OnDestroy {
 
@@ -30,8 +25,10 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   isSettingsDrawerVisible: boolean = false;
   private book: any;
   private rendition: any;
-  private keyListener: (e: KeyboardEvent) => void = () => {};
+  private keyListener: (e: KeyboardEvent) => void = () => {
+  };
   fontSize: number = 120;
+  bookLoreBook: Book | undefined
 
   fontTypes: any[] = [
     {label: 'Serif', value: 'serif'},
@@ -42,12 +39,19 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   ];
   selectedFontType: string = 'serif';
 
-  constructor(private epubService: EpubService, private route: ActivatedRoute) {
+  constructor(private epubService: EpubService, private route: ActivatedRoute, private bookService: BookService) {
   }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
+      this.loadBook(+params.get('bookId')!)
       this.loadEpub(+params.get('bookId')!);
+    });
+  }
+
+  private loadBook(bookId: number): void {
+    this.bookService.getBookById(bookId).subscribe((book) => {
+      this.bookLoreBook = book;
     });
   }
 
@@ -72,9 +76,16 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
             height: '100%',
             allowScriptedContent: true,
           });
-          this.rendition.display();
+
+          if(this.bookLoreBook?.epubProgress) {
+            this.rendition.display(this.bookLoreBook?.epubProgress);
+          } else {
+            this.rendition.display();
+          }
+
           this.setupKeyListener();
           this.updateFontSize();
+          this.trackProgress();
         };
         fileReader.readAsArrayBuffer(data);
       },
@@ -89,6 +100,16 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
       this.rendition.off('keyup', this.keyListener);
     }
     document.removeEventListener('keyup', this.keyListener);
+  }
+
+  private trackProgress(): void {
+    if (this.rendition) {
+      this.rendition.on('relocated', (location: any) => {
+        const percentage = location.start.percentage.toFixed(2);
+        console.log(`Reading progress: ${percentage * 100}%`);
+        console.log('Current location:', location);
+      });
+    }
   }
 
   updateFontSize(): void {

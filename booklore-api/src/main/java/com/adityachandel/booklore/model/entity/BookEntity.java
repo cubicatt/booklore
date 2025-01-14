@@ -45,6 +45,12 @@ public class BookEntity {
     @Column(name = "added_on")
     private Instant addedOn;
 
+    @Column(name = "epub_progress")
+    private String epubProgress;
+
+    @Column(name = "pdf_progress")
+    private Integer pdfProgress;
+
     @ManyToMany
     @JoinTable(
             name = "book_shelf_mapping",

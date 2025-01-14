@@ -13,16 +13,7 @@ import {MetadataViewerComponent} from './metadata-viewer/metadata-viewer.compone
   standalone: true,
   templateUrl: './book-metadata-center.component.html',
   styleUrl: './book-metadata-center.component.scss',
-  imports: [
-    Tabs,
-    TabList,
-    Tab,
-    TabPanels,
-    MetadataEditorComponent,
-    TabPanel,
-    MetadataSearcherComponent,
-    MetadataViewerComponent,
-  ],
+  imports: [Tabs, TabList, Tab, TabPanels, MetadataEditorComponent, TabPanel, MetadataSearcherComponent, MetadataViewerComponent],
 })
 export class BookMetadataCenterComponent implements OnInit {
 

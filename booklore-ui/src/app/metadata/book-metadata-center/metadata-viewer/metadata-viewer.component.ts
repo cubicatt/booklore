@@ -17,23 +17,14 @@ import {Editor} from 'primeng/editor';
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [
-    Button,
-    NgForOf,
-    NgIf,
-    AsyncPipe,
-    Rating,
-    FormsModule,
-    Tag,
-    Editor
-  ]
+  imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Editor]
 })
 export class MetadataViewerComponent implements OnInit {
 
   bookMetadata$: Observable<BookMetadataBI | null>;
   currentBookId!: number;
 
-  constructor(private bookService: BookService, private router: Router, private bookInfoService: BookMetadataCenterService) {
+  constructor(private bookService: BookService, private bookInfoService: BookMetadataCenterService) {
     this.bookMetadata$ = this.bookInfoService.bookMetadata$;
   }
 
@@ -43,19 +34,6 @@ export class MetadataViewerComponent implements OnInit {
         this.currentBookId = bookMetadata?.bookId;
       }
     })
-  }
-
-  navigateToBook(bookId: number | null, libraryId: number | null): void {
-    if (bookId && libraryId) {
-      this.router.navigate(['/library', libraryId, 'book', bookId, 'info']);
-    }
-  }
-
-  getAuthorNames(book: Book | null): string {
-    if (book && book.metadata && book.metadata.authors) {
-      return book.metadata.authors.map((author) => author.name).join(', ');
-    }
-    return 'No authors available';
   }
 
   coverImageSrc(bookId: number | undefined): string {

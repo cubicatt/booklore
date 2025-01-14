@@ -31,7 +31,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   private book: any;
   private rendition: any;
   private keyListener: (e: KeyboardEvent) => void = () => {};
-  fontSize: number = 100;
+  fontSize: number = 120;
 
   fontTypes: any[] = [
     {label: 'Serif', value: 'serif'},

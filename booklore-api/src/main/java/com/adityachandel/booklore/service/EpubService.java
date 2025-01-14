@@ -1,25 +1,24 @@
 package com.adityachandel.booklore.service;
 
+import com.adityachandel.booklore.exception.ApiError;
+import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.repository.BookRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+@AllArgsConstructor
 @Service
 public class EpubService {
 
-    // Method to retrieve the EPUB file as a ByteArrayResource
-    public ByteArrayResource getEpubFile(Long bookId) throws IOException {
-        String bookPath = "/Users/aditya.chandel/Downloads/Harry1.epub"; // Example path
-        File file = new File(bookPath);
-        if (!file.exists()) {
-            throw new IOException("EPUB file not found for book id: " + bookId);
-        }
+    private final BookRepository bookRepository;
 
-        // Convert the EPUB file to a byte array
-        try (FileInputStream inputStream = new FileInputStream(file)) {
+    public ByteArrayResource getEpubFile(Long bookId) throws IOException {
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        try (FileInputStream inputStream = new FileInputStream(bookEntity.getPath())) {
             byte[] fileContent = inputStream.readAllBytes();
             return new ByteArrayResource(fileContent);
         }

@@ -1,15 +1,14 @@
 import {Routes} from '@angular/router';
 import {PdfViewerComponent} from './book/components/pdf-viewer/pdf-viewer.component';
-import {MainDashboardComponent} from './dashboard/components/main-dashboard/main-dashboard.component';
 import {BookBrowserComponent} from './book/components/book-browser/book-browser.component';
-import {AppLayoutComponent} from './layout/component/layout-main/app.layout.component';
+import {EpubViewerComponent} from './epub-viewer/component/epub-viewer.component';
 
 export const routes: Routes = [
   {
-    path: '', component: AppLayoutComponent,
+    path: '', component: EpubViewerComponent,
     children: [
       {
-        path: '', component: MainDashboardComponent,
+        path: '', component: EpubViewerComponent,
       },
       {
         path: 'all-books', component: BookBrowserComponent,

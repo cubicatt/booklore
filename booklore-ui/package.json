@@ -23,6 +23,7 @@
     "@primeng/themes": "19.0.2",
     "@stomp/rx-stomp": "^2.0.0",
     "@stomp/stompjs": "^7.0.0",
+    "epubjs": "^0.3.93",
     "ng-lazyload-image": "^9.1.3",
     "ngx-extended-pdf-viewer": "^22.0.0",
     "ngx-infinite-scroll": "^19.0.0",

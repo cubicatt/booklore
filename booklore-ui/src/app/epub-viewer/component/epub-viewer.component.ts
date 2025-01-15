@@ -88,7 +88,6 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
             this.rendition.themes.register(name, theme);
           });
 
-
           this.setupKeyListener();
           this.updateFontSize();
           this.trackProgress();
@@ -142,7 +141,9 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
 
   changeThemes($event: DropdownChangeEvent) {
     if (this.rendition) {
-      this.rendition.themes.select(this.selectedTheme)
+      this.rendition.themes.select(this.selectedTheme);
+      this.rendition.clear();
+      this.rendition.start();
     }
   }
 
@@ -251,6 +252,4 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     }
     ]
   ]);
-
-
 }

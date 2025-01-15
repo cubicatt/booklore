@@ -10,6 +10,7 @@ import {DropdownModule} from 'primeng/dropdown';
 import {ActivatedRoute} from '@angular/router';
 import {Book} from '../../book/model/book.model';
 import {BookService} from '../../book/service/book.service';
+import {forkJoin} from 'rxjs';
 
 @Component({
   selector: 'app-epub-viewer',
@@ -28,7 +29,8 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   private keyListener: (e: KeyboardEvent) => void = () => {
   };
   fontSize: number = 120;
-  bookLoreBook: Book | undefined
+
+  epub!: Book;
 
   fontTypes: any[] = [
     {label: 'Serif', value: 'serif'},
@@ -44,20 +46,11 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
-      this.loadBook(+params.get('bookId')!)
-      this.loadEpub(+params.get('bookId')!);
-    });
-  }
+      let book$ = this.bookService.getBookByIdFromAPI(+params.get('bookId')!, false);
+      let epub$ = this.epubService.downloadEpub(+params.get('bookId')!);
+      forkJoin([book$, epub$]).subscribe(results => {
+        this.epub = results[0];
 
-  private loadBook(bookId: number): void {
-    this.bookService.getBookById(bookId).subscribe((book) => {
-      this.bookLoreBook = book;
-    });
-  }
-
-  loadEpub(bookId: number): void {
-    this.epubService.downloadEpub(bookId).subscribe(
-      (data: Blob) => {
         const fileReader = new FileReader();
         fileReader.onload = () => {
           const epubData = fileReader.result as ArrayBuffer;
@@ -77,8 +70,8 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
             allowScriptedContent: true,
           });
 
-          if(this.bookLoreBook?.epubProgress) {
-            this.rendition.display(this.bookLoreBook?.epubProgress);
+          if (this.epub?.epubProgress) {
+            this.rendition.display(this.epub.epubProgress);
           } else {
             this.rendition.display();
           }
@@ -87,12 +80,10 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
           this.updateFontSize();
           this.trackProgress();
         };
-        fileReader.readAsArrayBuffer(data);
-      },
-      (error) => {
-        console.error('Failed to load the EPUB:', error);
-      }
-    );
+        fileReader.readAsArrayBuffer(results[1]);
+      })
+
+    });
   }
 
   ngOnDestroy(): void {
@@ -105,9 +96,12 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   private trackProgress(): void {
     if (this.rendition) {
       this.rendition.on('relocated', (location: any) => {
-        const percentage = location.start.percentage.toFixed(2);
-        console.log(`Reading progress: ${percentage * 100}%`);
-        console.log('Current location:', location);
+        this.bookService.saveEpubProgress(this.epub.id, location.start.cfi).subscribe({
+          next: () => {
+          },
+          error: () => {
+          }
+        })
       });
     }
   }

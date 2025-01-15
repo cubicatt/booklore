@@ -2,9 +2,9 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookViewerSetting;
+import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.dto.request.ShelvesAssignmentRequest;
 import com.adityachandel.booklore.service.BooksService;
-import com.adityachandel.booklore.service.metadata.BookMetadataService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -20,7 +20,6 @@ import java.util.List;
 public class BookController {
 
     private BooksService booksService;
-    private BookMetadataService bookMetadataService;
 
     @GetMapping("/{bookId}")
     public ResponseEntity<Book> getBook(@PathVariable long bookId, @RequestParam(required = false, defaultValue = "false") boolean withDescription) {
@@ -67,5 +66,11 @@ public class BookController {
     @PostMapping("/assign-shelves")
     public ResponseEntity<List<Book>> addBookToShelf(@RequestBody @Valid ShelvesAssignmentRequest request) {
         return ResponseEntity.ok(booksService.assignShelvesToBooks(request.getBookIds(), request.getShelvesToAssign(), request.getShelvesToUnassign()));
+    }
+
+    @PostMapping("/progress")
+    public ResponseEntity<Void> addBookToProgress(@RequestBody @Valid ReadProgressRequest request) {
+        booksService.updateReadProgress(request);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -159,6 +159,9 @@ export class BookService {
     });
   }
 
+  saveEpubProgress(bookId: number, progress: string): Observable<void> {
+    return this.http.post<void>(`${this.url}/progress`, { bookId: bookId, epubProgress: progress });
+  }
 
   /*------------------ All the websocket handlers go below ------------------*/
 

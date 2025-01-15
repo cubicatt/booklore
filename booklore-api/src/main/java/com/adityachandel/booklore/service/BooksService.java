@@ -6,14 +6,17 @@ import com.adityachandel.booklore.mapper.BookViewerSettingMapper;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookViewerSetting;
 import com.adityachandel.booklore.model.dto.BookWithNeighbors;
+import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookViewerSettingEntity;
 import com.adityachandel.booklore.model.entity.ShelfEntity;
+import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.BookViewerSettingRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.repository.ShelfRepository;
 import com.adityachandel.booklore.util.FileService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -130,5 +133,16 @@ public class BooksService {
     public Resource getBookCover(long bookId) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         return fileService.getBookCover(bookEntity.getMetadata().getThumbnail());
+    }
+
+    public void updateReadProgress(ReadProgressRequest request) {
+        BookEntity book = bookRepository.findById(request.getBookId()).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(request.getBookId()));
+        book.setLastReadTime(Instant.now());
+        if (book.getBookType() == BookFileType.EPUB) {
+            book.setEpubProgress(request.getEpubProgress());
+        } else if (book.getBookType() == BookFileType.PDF) {
+            book.setPdfProgress(request.getPdfProgress());
+        }
+        bookRepository.save(book);
     }
 }

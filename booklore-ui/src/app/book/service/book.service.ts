@@ -122,6 +122,7 @@ export class BookService {
           const url = `/pdf-viewer/book/${book.id}`;
           window.open(url, '_blank');
           this.updateLastReadTime(book.id).subscribe({
+            next: () => {},
             error: err => console.error('Failed to update last read time', err),
           });
         } else if (book.bookType === "EPUB") {

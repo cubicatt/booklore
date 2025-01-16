@@ -220,7 +220,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   themesMap = new Map<string, any>([
     [
       'black', {
-      "body": {"background-color": "#000000", "color": "#f9f9f9", "font-family": "Arial, sans-serif"},
+      "body": {"background-color": "#000000", "color": "#f9f9f9"},
       "p": {"color": "#f9f9f9"},
       "h1, h2, h3, h4, h5, h6": {"color": "#f9f9f9"},
       "a": {"color": "#f9f9f9"},
@@ -233,7 +233,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     ],
     [
       'sepia', {
-      "body": {"background-color": "#f4ecd8", "color": "#6e4b3a", "font-family": "Georgia, serif"},
+      "body": {"background-color": "#f4ecd8", "color": "#6e4b3a"},
       "p": {"color": "#6e4b3a"},
       "h1, h2, h3, h4, h5, h6": {"color": "#6e4b3a"},
       "a": {"color": "#8b4513"},
@@ -246,10 +246,10 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     ],
     [
       'white', {
-      "body": {"background-color": "white", "color": "black", "font-family": "Arial, sans-serif"},
-      "p": {"color": "black"},
-      "h1, h2, h3, h4, h5, h6": {"color": "black"},
-      "a": {"color": "#1e90ff"},
+      "body": {"background-color": "#ffffff", "color": "#000000"},
+      "p": {"color": "#000000"},
+      "h1, h2, h3, h4, h5, h6": {"color": "#000000"},
+      "a": {"color": "#000000"},
       "img": {
         "-webkit-filter": "none",
         "filter": "none"
@@ -259,7 +259,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     ],
     [
       'grey', {
-      "body": {"background-color": "#404040", "color": "#d3d3d3", "font-family": "Arial, sans-serif"},
+      "body": {"background-color": "#404040", "color": "#d3d3d3"},
       "p": {"color": "#d3d3d3"},
       "h1, h2, h3, h4, h5, h6": {"color": "#d3d3d3"},
       "a": {"color": "#1e90ff"},

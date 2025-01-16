@@ -6,17 +6,18 @@ import {Button} from 'primeng/button';
 import {NgForOf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Divider} from 'primeng/divider';
-import {DropdownChangeEvent, DropdownModule} from 'primeng/dropdown';
 import {ActivatedRoute} from '@angular/router';
 import {Book} from '../../book/model/book.model';
 import {BookService} from '../../book/service/book.service';
 import {forkJoin} from 'rxjs';
+import {AppSettingsService} from '../../core/service/app-settings.service';
+import {Select} from 'primeng/select';
 
 @Component({
   selector: 'app-epub-viewer',
   templateUrl: './epub-viewer.component.html',
   styleUrls: ['./epub-viewer.component.scss'],
-  imports: [Drawer, Button, NgForOf, FormsModule, Divider, DropdownModule]
+  imports: [Drawer, Button, NgForOf, FormsModule, Divider, Select]
 })
 export class EpubViewerComponent implements OnInit, OnDestroy {
 
@@ -49,7 +50,8 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     {label: 'Sepia', value: 'sepia'}
   ];
 
-  constructor(private epubService: EpubService, private route: ActivatedRoute, private bookService: BookService) {
+  constructor(private epubService: EpubService, private route: ActivatedRoute,
+              private bookService: BookService, private appSettingsService: AppSettingsService) {
   }
 
   ngOnInit(): void {
@@ -89,12 +91,27 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
           });
 
           this.setupKeyListener();
-          this.updateFontSize();
           this.trackProgress();
+          this.subscribeToSettings();
         };
         fileReader.readAsArrayBuffer(results[1]);
       })
 
+    });
+  }
+
+  private subscribeToSettings(): void {
+    this.appSettingsService.appSettings$.subscribe((settings) => {
+      if (settings) {
+        if (settings.epub) {
+          this.selectedTheme = settings.epub.theme || 'white';
+          this.selectedFontType = settings.epub.font || 'serif';
+          this.fontSize = parseInt(settings.epub.fontSize, 10) || 120;
+          this.changeFontType();
+          this.updateFontSize();
+          this.changeThemes();
+        }
+      }
     });
   }
 
@@ -133,13 +150,13 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     this.updateFontSize();
   }
 
-  changeFontType(event: DropdownChangeEvent): void {
+  changeFontType(): void {
     if (this.rendition) {
       this.rendition.themes.font(this.selectedFontType);
     }
   }
 
-  changeThemes($event: DropdownChangeEvent) {
+  changeThemes() {
     if (this.rendition) {
       this.rendition.themes.select(this.selectedTheme);
       this.rendition.clear();

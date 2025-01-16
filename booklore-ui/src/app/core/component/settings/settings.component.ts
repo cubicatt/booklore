@@ -31,10 +31,10 @@ export class SettingsComponent implements OnInit {
     {name: 'No Spread', key: 'off'}
   ];
   zooms = [
-    {name: 'Auto Zoom', key: 'auto_zoom'},
-    {name: 'Page Fit', key: 'page_fit'},
-    {name: 'Page Width', key: 'page_width'},
-    {name: 'Actual Size', key: 'actual_size'}
+    {name: 'Auto Zoom', key: 'auto'},
+    {name: 'Page Fit', key: 'page-fit'},
+    {name: 'Page Width', key: 'page-width'},
+    {name: 'Actual Size', key: 'page-actual'}
   ];
   themes = [
     {name: 'White', key: 'white'},

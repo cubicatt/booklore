@@ -71,7 +71,6 @@ export class FileUploadComponent {
     this.isUploading = true;
     this.fileUploadService.uploadFile(file, libraryId, path).subscribe({
       next: () => {
-        console.log('File uploaded successfully');
         this.toastService.showSuccess("File uploaded", file.name);
         this.isUploading = false;
         this.dynamicDialogRef.close();

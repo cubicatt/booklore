@@ -72,9 +72,6 @@ export class SettingsComponent implements OnInit {
   populateSettings(settings: AppSettings): void {
     if (settings.pdf) {
       const pdfSettings = settings.pdf;
-      console.log(pdfSettings)
-
-
       this.selectedSpread = this.spreads.find(s => s.key === pdfSettings.spread)?.key;
       this.selectedZoom = this.zooms.find(z => z.key === pdfSettings.zoom)?.key;
       this.showSidebar = pdfSettings.sidebar;
@@ -83,8 +80,6 @@ export class SettingsComponent implements OnInit {
     if (settings.epub) {
       const epubSettings = settings.epub;
       this.selectedTheme = this.themes.find(t => t.key === epubSettings.theme)?.key;
-
-      console.log(epubSettings.fontSize)
       this.fontSize = parseInt(epubSettings.fontSize, 10);
       this.selectedFont = this.fonts.find(f => f.key === epubSettings.font)?.key;
     }

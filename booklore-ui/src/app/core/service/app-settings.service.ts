@@ -36,7 +36,7 @@ export class AppSettingsService {
 
     this.http.put(this.apiUrl, null, { params }).subscribe({
       next: () => {
-        console.log('Setting saved successfully');
+
       },
       error: (error) => {
         console.error('Error saving setting:', error);

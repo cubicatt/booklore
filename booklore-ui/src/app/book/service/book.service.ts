@@ -122,7 +122,6 @@ export class BookService {
           const url = `/pdf-viewer/book/${book.id}`;
           window.open(url, '_blank');
           this.updateLastReadTime(book.id).subscribe({
-            next: () => console.log('Last read time updated successfully'),
             error: err => console.error('Failed to update last read time', err),
           });
         } else if (book.bookType === "EPUB") {
@@ -151,7 +150,6 @@ export class BookService {
   }
 
   getBookData(bookId: number): Observable<Blob> {
-    console.log('Fetching book data...');
     return this.http.get<Blob>(`${this.url}/${bookId}/data`, {responseType: 'blob' as 'json'});
   }
 

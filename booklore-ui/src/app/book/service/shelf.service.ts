@@ -22,6 +22,10 @@ export class ShelfService {
   private http = inject(HttpClient);
   private bookService = inject(BookService);
 
+  constructor() {
+    this.loadShelves();
+  }
+
   private loadShelves(): void {
     this.http.get<Shelf[]>(this.url).pipe(
       catchError(error => {

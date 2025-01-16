@@ -23,6 +23,7 @@
       <h4 class="book-title">{{ book.metadata?.title }}</h4>
       <p-menu #menu [model]="items" [popup]="true" appendTo="body"></p-menu>
       <p-button
+        size="small"
         [text]="true"
         (click)="menu.toggle($event)"
         icon="pi pi-ellipsis-v">

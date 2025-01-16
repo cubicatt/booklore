@@ -54,7 +54,10 @@ public class BookMetadataService {
                             return List.of();
                         }))
                 .toList()
-                .stream().map(CompletableFuture::join).toList();
+                .stream()
+                .map(CompletableFuture::join)
+                .filter(Objects::nonNull)
+                .toList();
 
         List<FetchedBookMetadata> interleavedMetadata = new ArrayList<>();
         int maxSize = allMetadata.stream().mapToInt(List::size).max().orElse(0);

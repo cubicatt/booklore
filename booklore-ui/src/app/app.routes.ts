@@ -4,6 +4,7 @@ import {BookBrowserComponent} from './book/components/book-browser/book-browser.
 import {MainDashboardComponent} from './dashboard/components/main-dashboard/main-dashboard.component';
 import {AppLayoutComponent} from './layout/component/layout-main/app.layout.component';
 import {EpubViewerComponent} from './epub-viewer/component/epub-viewer.component';
+import {SettingsComponent} from './core/component/settings/settings.component';
 
 export const routes: Routes = [
   {
@@ -14,6 +15,9 @@ export const routes: Routes = [
       },
       {
         path: 'all-books', component: BookBrowserComponent,
+      },
+      {
+        path: 'settings', component: SettingsComponent,
       },
       {
         path: 'library/:libraryId/books', component: BookBrowserComponent,

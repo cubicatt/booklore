@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {LogNotification} from '../shared/websocket/model/log-notification.model';
-import {EventService} from '../shared/websocket/event.service';
+import {LogNotification} from '../../../shared/websocket/model/log-notification.model';
+import {EventService} from '../../../shared/websocket/event.service';
 
 @Component({
   selector: 'app-live-notification-box',

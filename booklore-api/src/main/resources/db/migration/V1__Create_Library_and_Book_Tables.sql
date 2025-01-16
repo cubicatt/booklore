@@ -103,3 +103,12 @@ CREATE TABLE IF NOT EXISTS book_shelf_mapping
     CONSTRAINT fk_book_shelf_mapping_book FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE,
     CONSTRAINT fk_book_shelf_mapping_shelf FOREIGN KEY (shelf_id) REFERENCES shelf (id) ON DELETE CASCADE
 );
+
+CREATE TABLE app_settings
+(
+    id       BIGINT AUTO_INCREMENT PRIMARY KEY,
+    category VARCHAR(255) NOT NULL,
+    key1 VARCHAR (255) NOT NULL,
+    value    TEXT         NOT NULL,
+    UNIQUE (category, key1)
+);

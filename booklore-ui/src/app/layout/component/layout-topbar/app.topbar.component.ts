@@ -1,7 +1,7 @@
 import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
 import {MenuItem} from 'primeng/api';
 import {LayoutService} from '../layout-main/service/app.layout.service';
-import {RouterLink} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {DialogService as PrimeDialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {LibraryCreatorComponent} from '../../../book/components/library-creator/library-creator.component';
 import {TooltipModule} from 'primeng/tooltip';
@@ -15,7 +15,7 @@ import {Button} from 'primeng/button';
 import {StyleClass} from 'primeng/styleclass';
 import {Divider} from 'primeng/divider';
 import {ThemeConfiguratorComponent} from '../theme-configurator/theme-configurator.component';
-import {LiveNotificationBoxComponent} from '../../../live-notification-box/live-notification-box.component';
+import {LiveNotificationBoxComponent} from '../../../core/component/live-notification-box/live-notification-box.component';
 
 @Component({
   selector: 'app-topbar',
@@ -47,7 +47,8 @@ export class AppTopBarComponent implements OnDestroy {
   @ViewChild('topbarmenubutton') topbarMenuButton!: ElementRef;
   @ViewChild('topbarmenu') menu!: ElementRef;
 
-  constructor(public layoutService: LayoutService, public dialogService: PrimeDialogService, private eventService: EventService) {
+  constructor(public layoutService: LayoutService, public dialogService: PrimeDialogService,
+              private eventService: EventService, private router: Router) {
     this.eventService.eventHighlight$.subscribe(highlight => {
       this.eventHighlight = highlight;
     });
@@ -105,5 +106,9 @@ export class AppTopBarComponent implements OnDestroy {
       this.ref.close();
     }
     clearTimeout(this.eventTimeout);
+  }
+
+  navigateToSettings() {
+    this.router.navigate(['/settings']);
   }
 }

@@ -1,0 +1,83 @@
+<p class="text-3xl font-semibold">Preferences</p>
+<p-divider></p-divider>
+
+<p class="text-xl font-medium pb-4 pt-6">PDF Reader Settings</p>
+
+<div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
+
+  <p class="text-lg font-medium py-1">Page Spread:</p>
+  <div class="flex gap-4 justify-start">
+    <div *ngFor="let spread of spreads" class="flex items-center gap-2">
+      <p-radiobutton
+        [inputId]="spread.key"
+        name="spread"
+        [value]="spread.key"
+        [(ngModel)]="selectedSpread"
+        (ngModelChange)="onSpreadChange()">
+      </p-radiobutton>
+      <label [for]="spread.key">{{ spread.name }}</label>
+    </div>
+  </div>
+
+  <p class="text-lg font-medium py-1">Page Zoom:</p>
+  <div class="flex gap-4 justify-start">
+    <div *ngFor="let zoom of zooms" class="flex items-center gap-2">
+      <p-radiobutton
+        [inputId]="zoom.key"
+        name="zoom"
+        [value]="zoom.key"
+        [(ngModel)]="selectedZoom"
+        (ngModelChange)="onZoomChange()">
+      </p-radiobutton>
+      <label [for]="zoom.key">{{ zoom.name }}</label>
+    </div>
+  </div>
+
+  <p class="text-lg font-medium py-1">Show Sidebar:</p>
+  <div class="flex justify-start">
+    <p-toggleswitch
+      [(ngModel)]="showSidebar"
+      (ngModelChange)="onSidebarChange()">
+    </p-toggleswitch>
+  </div>
+</div>
+
+<p-divider></p-divider>
+
+<p class="text-xl font-medium pb-4 pt-4">ePUB Reader Settings</p>
+
+<div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
+
+  <p class="text-lg font-medium">Theme:</p>
+  <div class="flex gap-4 justify-start">
+    <p-select
+      [options]="themes"
+      [(ngModel)]="selectedTheme"
+      optionLabel="name"
+      optionValue="key"
+      placeholder="Select a Theme"
+      class="w-full md:w-56"
+      (ngModelChange)="onThemeChange()">
+    </p-select>
+  </div>
+
+  <p class="text-lg font-medium">Font:</p>
+  <div class="flex gap-4 justify-start">
+    <p-select
+      [options]="fonts"
+      [(ngModel)]="selectedFont"
+      optionLabel="name"
+      optionValue="key"
+      placeholder="Select a Font"
+      class="w-full md:w-56"
+      (ngModelChange)="onFontChange()">
+    </p-select>
+  </div>
+
+  <p class="text-lg font-medium py-1">Font Size:</p>
+  <div class="flex gap-4 justify-start items-center">
+    <p-button icon="pi pi-minus" rounded="true" (click)="decreaseFontSize()"></p-button>
+    <p>{{ fontSize }}%</p>
+    <p-button icon="pi pi-plus" rounded="true" (click)="increaseFontSize()"></p-button>
+  </div>
+</div>

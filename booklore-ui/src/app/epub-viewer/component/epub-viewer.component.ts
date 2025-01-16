@@ -119,8 +119,8 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
 
   increaseFontSize(): void {
     this.fontSize += 10;
-    if (this.fontSize > 200) {
-      this.fontSize = 200;
+    if (this.fontSize > 300) {
+      this.fontSize = 300;
     }
     this.updateFontSize();
   }
@@ -205,7 +205,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
       "body": {"background-color": "#000000", "color": "#f9f9f9", "font-family": "Arial, sans-serif"},
       "p": {"color": "#f9f9f9"},
       "h1, h2, h3, h4, h5, h6": {"color": "#f9f9f9"},
-      "a": {"color": "#f9f9f9", "text-decoration": "underline"},
+      "a": {"color": "#f9f9f9"},
       "img": {
         "-webkit-filter": "invert(1) hue-rotate(180deg)",
         "filter": "invert(1) hue-rotate(180deg)"
@@ -218,7 +218,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
       "body": {"background-color": "#f4ecd8", "color": "#6e4b3a", "font-family": "Georgia, serif"},
       "p": {"color": "#6e4b3a"},
       "h1, h2, h3, h4, h5, h6": {"color": "#6e4b3a"},
-      "a": {"color": "#8b4513", "text-decoration": "underline"},
+      "a": {"color": "#8b4513"},
       "img": {
         "-webkit-filter": "sepia(1) contrast(1.5)",
         "filter": "sepia(1) contrast(1.5)"
@@ -231,7 +231,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
       "body": {"background-color": "white", "color": "black", "font-family": "Arial, sans-serif"},
       "p": {"color": "black"},
       "h1, h2, h3, h4, h5, h6": {"color": "black"},
-      "a": {"color": "#1e90ff", "text-decoration": "underline"},
+      "a": {"color": "#1e90ff"},
       "img": {
         "-webkit-filter": "none",
         "filter": "none"
@@ -244,7 +244,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
       "body": {"background-color": "#404040", "color": "#d3d3d3", "font-family": "Arial, sans-serif"},
       "p": {"color": "#d3d3d3"},
       "h1, h2, h3, h4, h5, h6": {"color": "#d3d3d3"},
-      "a": {"color": "#1e90ff", "text-decoration": "underline"},
+      "a": {"color": "#1e90ff"},
       "img": {
         "filter": "none"
       },

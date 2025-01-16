@@ -28,7 +28,7 @@ public class BookViewerSettingEntity {
     private String zoom;
 
     @Column(name = "sidebar_visible")
-    private boolean sidebar_visible;
+    private Boolean sidebar_visible;
 
     @Column(name = "spread")
     private String spread;

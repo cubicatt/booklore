@@ -59,10 +59,10 @@ CREATE TABLE IF NOT EXISTS category
 CREATE TABLE IF NOT EXISTS book_viewer_setting
 (
     book_id         BIGINT PRIMARY KEY,
-    page_number     INT         DEFAULT 1,
-    zoom            VARCHAR(16) DEFAULT 'page-fit',
-    sidebar_visible BOOLEAN     DEFAULT false,
-    spread          VARCHAR(16) DEFAULT 'odd',
+    page_number     INT         NULL,
+    zoom            VARCHAR(16) NULL,
+    sidebar_visible BOOLEAN     NULL,
+    spread          VARCHAR(16) NULL,
     CONSTRAINT fk_book_viewer_setting FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE
 );
 
@@ -108,7 +108,7 @@ CREATE TABLE app_settings
 (
     id       BIGINT AUTO_INCREMENT PRIMARY KEY,
     category VARCHAR(255) NOT NULL,
-    key1 VARCHAR (255) NOT NULL,
+    key1     VARCHAR(255) NOT NULL,
     value    TEXT         NOT NULL,
     UNIQUE (category, key1)
 );

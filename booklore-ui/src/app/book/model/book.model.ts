@@ -67,6 +67,6 @@ export interface Category {
 export interface BookSetting {
   pageNumber: number;
   zoom: number | string;
-  sidebar_visible: boolean;
+  sidebar_visible: boolean | null;
   spread: 'off' | 'even' | 'odd';
 }

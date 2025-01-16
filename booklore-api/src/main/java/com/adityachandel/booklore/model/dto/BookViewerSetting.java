@@ -8,6 +8,6 @@ import lombok.Data;
 public class BookViewerSetting {
     private int pageNumber;
     private String zoom;
-    private boolean sidebar_visible;
+    private Boolean sidebar_visible;
     private String spread;
 }

@@ -67,7 +67,7 @@ public class BooksService {
         bookViewerSetting.setPageNumber(bookViewerSettingDTO.getPageNumber());
         bookViewerSetting.setZoom(bookViewerSettingDTO.getZoom());
         bookViewerSetting.setSpread(bookViewerSettingDTO.getSpread());
-        bookViewerSetting.setSidebar_visible(bookViewerSettingDTO.isSidebar_visible());
+        bookViewerSetting.setSidebar_visible(bookViewerSettingDTO.getSidebar_visible());
         bookViewerSettingRepository.save(bookViewerSetting);
     }
 

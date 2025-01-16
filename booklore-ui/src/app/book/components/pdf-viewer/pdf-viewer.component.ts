@@ -1,12 +1,9 @@
-import {Component, inject, NgZone, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {NgxExtendedPdfViewerModule, ScrollModeType} from 'ngx-extended-pdf-viewer';
 import {BookService} from '../../service/book.service';
 import {AppSettingsService} from '../../../core/service/app-settings.service';
-import {forkJoin, Observable, of, Subscription} from 'rxjs';
-import {BookState} from '../../model/state/book-state.model';
-import {AppSettings} from '../../../core/model/app-settings.model';
-import {catchError, switchMap} from 'rxjs/operators';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -15,16 +12,18 @@ import {catchError, switchMap} from 'rxjs/operators';
   templateUrl: './pdf-viewer.component.html',
 })
 export class PdfViewerComponent implements OnInit, OnDestroy {
-  bookId!: number;
   handTool = true;
-  page = 1;
   rotation: 0 | 90 | 180 | 270 = 0;
   scrollMode: ScrollModeType = ScrollModeType.page;
+
   sidebarVisible!: boolean;
+  page!: number;
   spread!: 'off' | 'even' | 'odd';
   zoom!: number | string;
+
   private isInitialLoad = true;
   bookData!: string | Blob;
+  bookId!: number;
   private appSettingsSubscription!: Subscription;
 
   private bookService = inject(BookService);
@@ -47,7 +46,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
             const {pageNumber, zoom, sidebar_visible, spread} = bookSetting;
             this.page = pageNumber || 1;
             this.zoom = zoom || appSettings.pdf?.zoom || 'page-fit';
-            this.sidebarVisible = sidebar_visible ?? appSettings.pdf?.sidebar ?? false;
+            this.sidebarVisible = sidebar_visible ?? appSettings.pdf?.sidebar ?? true;
             this.spread = spread || appSettings.pdf?.spread || 'odd';
             this.isInitialLoad = false;
             this.bookService.getBookData(bookId).subscribe({

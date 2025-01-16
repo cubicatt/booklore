@@ -8,5 +8,5 @@ VALUES ('epub', 'theme', 'white'),
 
 INSERT INTO app_settings (category, key1, value)
 VALUES ('pdf', 'spread', 'odd'),
-       ('pdf', 'zoom', 'page_fit'),
+       ('pdf', 'zoom', 'page-fit'),
        ('pdf', 'sidebar', 'true');

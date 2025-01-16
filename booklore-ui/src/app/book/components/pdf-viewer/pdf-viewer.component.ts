@@ -1,11 +1,12 @@
-import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {NgxExtendedPdfViewerModule, ScrollModeType} from 'ngx-extended-pdf-viewer';
 import {BookService} from '../../service/book.service';
 import {AppSettingsService} from '../../../core/service/app-settings.service';
-import {forkJoin, Observable, Subscription} from 'rxjs';
+import {forkJoin, Observable, of, Subscription} from 'rxjs';
 import {BookState} from '../../model/state/book-state.model';
 import {AppSettings} from '../../../core/model/app-settings.model';
+import {catchError, switchMap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -23,13 +24,12 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   spread!: 'off' | 'even' | 'odd';
   zoom!: number | string;
   private isInitialLoad = true;
-
   bookData!: string | Blob;
-
   private appSettingsSubscription!: Subscription;
 
-  constructor(private bookService: BookService, private route: ActivatedRoute) {
-  }
+  private bookService = inject(BookService);
+  private appSettingsService = inject(AppSettingsService);
+  private route = inject(ActivatedRoute);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
@@ -40,20 +40,29 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   }
 
   private loadBook(bookId: number): void {
-    forkJoin({
-      bookSetting: this.bookService.getBookSetting(bookId),
-      bookData: this.bookService.getBookData(bookId),
-    }).subscribe({
-      next: ({bookSetting, bookData}) => {
-        const {pageNumber, zoom, sidebar_visible, spread} = bookSetting;
-        this.page = pageNumber || 1;
-        this.zoom = zoom || 'page-fit';
-        this.sidebarVisible = sidebar_visible ?? false;
-        this.spread = spread || 'odd';
-        this.isInitialLoad = false;
-        this.bookData = bookData;
-      }, error: (e) => {
-        console.log('Error loading book!', e)
+    this.appSettingsSubscription = this.appSettingsService.appSettings$.subscribe((appSettings) => {
+      if (appSettings) {
+        this.bookService.getBookSetting(bookId).subscribe({
+          next: (bookSetting) => {
+            const {pageNumber, zoom, sidebar_visible, spread} = bookSetting;
+            this.page = pageNumber || 1;
+            this.zoom = zoom || appSettings.pdf?.zoom || 'page-fit';
+            this.sidebarVisible = sidebar_visible ?? appSettings.pdf?.sidebar ?? false;
+            this.spread = spread || appSettings.pdf?.spread || 'odd';
+            this.isInitialLoad = false;
+            this.bookService.getBookData(bookId).subscribe({
+              next: (bookData) => {
+                this.bookData = bookData;
+              },
+              error: (e) => {
+                console.error('Error loading book data:', e);
+              },
+            });
+          },
+          error: (e) => {
+            console.error('Error loading book settings:', e);
+          },
+        });
       }
     });
   }

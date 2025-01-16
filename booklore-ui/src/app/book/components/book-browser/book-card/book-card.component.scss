@@ -28,7 +28,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
-  padding: 0 6px;
+  padding-left: 6px;
 }
 
 .book-cover {
@@ -78,4 +78,8 @@
 
 .book-card.selected .select-checkbox {
   display: block;
+}
+
+::ng-deep .p-button-icon-only {
+  --p-button-icon-only-width: 20px !important;
 }

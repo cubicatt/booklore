@@ -63,7 +63,7 @@ export class BookBrowserComponent implements OnInit {
   bookState$: Observable<BookState> | undefined;
   entity$: Observable<Library | Shelf | null> | undefined;
   entityType$: Observable<EntityType> | undefined;
-  bookTitle$ = new BehaviorSubject<string>('');
+  bookOrAuthor$ = new BehaviorSubject<string>('');
 
   entity: Library | Shelf | null = null;
   entityType: EntityType | undefined;
@@ -124,7 +124,7 @@ export class BookBrowserComponent implements OnInit {
     }
 
     this.activatedRoute.paramMap.subscribe(() => {
-      this.bookTitle$.next('');
+      this.bookOrAuthor$.next('');
       this.bookTitle = '';
       this.deselectAllBooks();
     });
@@ -179,7 +179,7 @@ export class BookBrowserComponent implements OnInit {
   private fetchAllBooks(): Observable<BookState> {
     return this.bookService.bookState$.pipe(
       map(bookState => this.processBookState(bookState)),
-      switchMap(bookState => this.filterBooksByTitle(bookState))
+      switchMap(bookState => this.filterBooks(bookState))
     );
   }
 
@@ -193,7 +193,7 @@ export class BookBrowserComponent implements OnInit {
         }
         return bookState;
       }),
-      switchMap(bookState => this.filterBooksByTitle(bookState))
+      switchMap(bookState => this.filterBooks(bookState))
     );
   }
 
@@ -205,13 +205,17 @@ export class BookBrowserComponent implements OnInit {
     return bookState;
   }
 
-  private filterBooksByTitle(bookState: BookState): Observable<BookState> {
-    return this.bookTitle$.pipe(
+  private filterBooks(bookState: BookState): Observable<BookState> {
+    return this.bookOrAuthor$.pipe(
       map(title => {
         if (title && title.trim() !== '') {
-          const filteredBooks = bookState.books?.filter(book =>
-            book.metadata?.title?.toLowerCase().includes(title.toLowerCase())
-          ) || null;
+          const filteredBooks = bookState.books?.filter(book => {
+            const matchesTitle = book.metadata?.title?.toLowerCase().includes(title.toLowerCase());
+            const matchesAuthor = book.metadata?.authors.some(author =>
+              author.name.toLowerCase().includes(title.toLowerCase())
+            );
+            return matchesTitle || matchesAuthor;
+          }) || null;
           return {...bookState, books: filteredBooks};
         }
         return bookState;
@@ -309,7 +313,7 @@ export class BookBrowserComponent implements OnInit {
   }
 
   onBookTitleChange(newTitle: string): void {
-    this.bookTitle$.next(newTitle);
+    this.bookOrAuthor$.next(newTitle);
   }
 
   openShelfAssigner() {

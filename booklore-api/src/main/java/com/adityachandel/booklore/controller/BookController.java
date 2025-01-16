@@ -73,4 +73,9 @@ public class BookController {
         booksService.updateReadProgress(request);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{bookId}/download")
+    public ResponseEntity<Resource> downloadFile(@PathVariable("bookId") Long bookId) {
+        return booksService.prepareFileForDownload(bookId);
+    }
 }

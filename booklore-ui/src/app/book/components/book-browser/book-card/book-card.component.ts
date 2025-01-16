@@ -9,6 +9,7 @@ import {BookService} from '../../../service/book.service';
 import {CheckboxModule} from 'primeng/checkbox';
 import {FormsModule} from '@angular/forms';
 import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
+import {FileService} from '../../../service/file.service';
 
 
 @Component({
@@ -26,6 +27,7 @@ export class BookCardComponent implements OnInit {
   items: MenuItem[] | undefined;
   isHovered: boolean = false;
 
+  private fileService = inject(FileService);
   private bookService = inject(BookService);
   private dialogService = inject(DialogService);
   private metadataDialogService = inject(MetadataDialogService);
@@ -65,6 +67,13 @@ export class BookCardComponent implements OnInit {
             label: 'View metadata',
             icon: 'pi pi-info-circle',
             command: () => this.metadataDialogService.openBookDetailsDialog(this.book.id),
+          },
+          {
+            label: 'Download',
+            icon: 'pi pi-download',
+            command: () => {
+              this.fileService.downloadFile(this.book.id)
+            },
           },
         ],
       },

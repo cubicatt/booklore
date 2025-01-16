@@ -9,6 +9,7 @@ import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
 import {Editor} from 'primeng/editor';
 import {Author, Book} from '../../../book/model/book.model';
+import {FileService} from '../../../book/service/file.service';
 
 @Component({
   selector: 'app-metadata-viewer',
@@ -20,6 +21,7 @@ import {Author, Book} from '../../../book/model/book.model';
 export class MetadataViewerComponent {
 
   private bookService = inject(BookService);
+  private fileService = inject(FileService);
   private metadataCenterService = inject(BookMetadataCenterService);
 
   metadata$: Observable<Book['metadata'] | null> = this.metadataCenterService.bookMetadata$;
@@ -38,5 +40,9 @@ export class MetadataViewerComponent {
 
   getAuthorNames(authors: Author[]): string {
     return authors.map(author => author.name).join(', ');
+  }
+
+  download(bookId: number) {
+    this.fileService.downloadFile(bookId);
   }
 }

@@ -20,14 +20,19 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
@@ -144,5 +149,24 @@ public class BooksService {
             book.setPdfProgress(request.getPdfProgress());
         }
         bookRepository.save(book);
+    }
+
+    public ResponseEntity<Resource> prepareFileForDownload(Long bookId) {
+        try {
+            BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+            String filePath = bookEntity.getPath();
+            Path file = Paths.get(filePath).toAbsolutePath().normalize();
+            Resource resource = new UrlResource(file.toUri());
+            String contentType = Files.probeContentType(file);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFileName() + "\"")
+                    .body(resource);
+        } catch (Exception e) {
+            throw ApiError.FAILED_TO_DOWNLOAD_FILE.createException(bookId);
+        }
     }
 }

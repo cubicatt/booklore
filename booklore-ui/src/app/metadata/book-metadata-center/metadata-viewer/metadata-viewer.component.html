@@ -15,7 +15,7 @@
           </div>
           <div class="flex gap-4 pr-4">
             <p-button [rounded]="true" [raised]="true" severity="info" (onClick)="readBook(metadata.bookId)" icon="pi pi-eye"></p-button>
-            <p-button [rounded]="true" [raised]="true" severity="info" icon="pi pi-download"></p-button>
+            <p-button [rounded]="true" [raised]="true" severity="info" icon="pi pi-download" (onClick)="download(metadata.bookId)"></p-button>
           </div>
         </div>
 

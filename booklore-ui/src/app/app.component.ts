@@ -4,15 +4,16 @@ import {Message} from '@stomp/stompjs';
 import {BookService} from './book/service/book.service';
 import {EventService} from './shared/websocket/event.service';
 import {parseLogNotification} from './shared/websocket/model/log-notification.model';
-import { ConfirmDialog } from 'primeng/confirmdialog';
-import { Toast } from 'primeng/toast';
-import { RouterOutlet } from '@angular/router';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Toast} from 'primeng/toast';
+import {RouterOutlet} from '@angular/router';
+import {AppSettingsService} from './core/service/app-settings.service';
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrl: './app.component.scss',
-    imports: [ConfirmDialog, Toast, RouterOutlet]
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss',
+  imports: [ConfirmDialog, Toast, RouterOutlet]
 })
 export class AppComponent implements OnInit {
 
@@ -20,6 +21,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
     this.rxStompService.watch('/topic/book-add').subscribe((message: Message) => {
       this.bookService.handleNewlyCreatedBook(JSON.parse(message.body));
     });

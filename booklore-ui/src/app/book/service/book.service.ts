@@ -143,8 +143,9 @@ export class BookService {
     );
   }
 
-  getBookDataUrl(bookId: number): string {
-    return `${this.url}/${bookId}/data`;
+  getBookData(bookId: number): Observable<Blob> {
+    console.log('Fetching book data...');
+    return this.http.get<Blob>(`${this.url}/${bookId}/data`, { responseType: 'blob' as 'json' });
   }
 
   getBookCoverUrl(bookId: number): string {

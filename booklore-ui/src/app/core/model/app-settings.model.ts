@@ -5,7 +5,7 @@ export interface EpubSettings {
 }
 
 export interface PdfSettings {
-  spread: string;
+  spread: 'off' | 'even' | 'odd';
   zoom: string;
   sidebar: boolean;
 }

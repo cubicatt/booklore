@@ -26,9 +26,9 @@ import {Button} from 'primeng/button';
 })
 export class SettingsComponent implements OnInit {
   spreads = [
-    {name: 'Even Spread', key: 'even_spread'},
-    {name: 'Odd Spread', key: 'odd_spread'},
-    {name: 'No Spread', key: 'no_spread'}
+    {name: 'Even Spread', key: 'even'},
+    {name: 'Odd Spread', key: 'odd'},
+    {name: 'No Spread', key: 'off'}
   ];
   zooms = [
     {name: 'Auto Zoom', key: 'auto_zoom'},

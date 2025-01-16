@@ -39,10 +39,6 @@ public class BookCreatorService {
         BookViewerSettingEntity bookViewerSetting = BookViewerSettingEntity.builder()
                 .book(bookEntity)
                 .bookId(bookEntity.getId())
-                .pageNumber(1)
-                .sidebar_visible(true)
-                .spread("odd")
-                .zoom("page-fit")
                 .build();
         bookEntity.setMetadata(bookMetadataEntity);
         bookEntity.setViewerSetting(bookViewerSetting);

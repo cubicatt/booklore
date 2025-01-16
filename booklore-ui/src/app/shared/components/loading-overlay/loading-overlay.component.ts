@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {Component, OnInit, OnDestroy, inject} from '@angular/core';
 import { Subscription } from 'rxjs';
 import {LoadingService} from '../../../core/service/loading.service';
 import {ProgressSpinner} from 'primeng/progressspinner';
@@ -17,7 +17,7 @@ export class LoadingOverlayComponent implements OnInit, OnDestroy {
   loading: boolean = false;
   private loadingSubscription: Subscription | undefined;
 
-  constructor(private loadingService: LoadingService) {}
+  private loadingService = inject(LoadingService);
 
   ngOnInit(): void {
     this.loadingSubscription = this.loadingService.loading$.subscribe(

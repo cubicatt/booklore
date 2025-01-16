@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
@@ -19,9 +19,8 @@ export class ShelfService {
   });
   shelfState$ = this.shelfStateSubject.asObservable();
 
-  constructor(private http: HttpClient, private bookService: BookService) {
-    this.loadShelves();
-  }
+  private http = inject(HttpClient);
+  private bookService = inject(BookService);
 
   private loadShelves(): void {
     this.http.get<Shelf[]>(this.url).pipe(

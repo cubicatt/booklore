@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {MetadataAdvancedFetchOptionsComponent} from '../metadata-advanced-fetch-options/metadata-advanced-fetch-options.component';
 import {Divider} from 'primeng/divider';
@@ -30,13 +30,16 @@ export class MetadataFetchOptionsComponent {
   bookIds!: number[];
   metadataRefreshType!: MetadataRefreshType;
 
-  constructor(private dynamicDialogConfig: DynamicDialogConfig,
-              private dynamicDialogRef: DynamicDialogRef,
-              private metadataService: MetadataService,
-              private messageService: MessageService) {
-    this.libraryId = dynamicDialogConfig.data.libraryId;
-    this.bookIds = dynamicDialogConfig.data.bookIds;
-    this.metadataRefreshType = dynamicDialogConfig.data.metadataRefreshType;
+  private dynamicDialogConfig = inject(DynamicDialogConfig);
+  private dynamicDialogRef = inject(DynamicDialogRef);
+  private metadataService = inject(MetadataService);
+  private messageService = inject(MessageService);
+
+
+  constructor() {
+    this.libraryId = this.dynamicDialogConfig.data.libraryId;
+    this.bookIds = this.dynamicDialogConfig.data.bookIds;
+    this.metadataRefreshType = this.dynamicDialogConfig.data.metadataRefreshType;
   }
 
   toggleMode() {

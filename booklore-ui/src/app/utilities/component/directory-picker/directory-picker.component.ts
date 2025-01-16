@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {DynamicDialogRef} from 'primeng/dynamicdialog';
 import {UtilityService} from './utility.service';
 import {Button} from 'primeng/button';
@@ -24,8 +24,8 @@ export class DirectoryPickerComponent implements OnInit {
   paths: string[] = ['...'];
   selectedProductName: string = '';
 
-  constructor(private utilityService: UtilityService, private dynamicDialogRef: DynamicDialogRef) {
-  }
+  private utilityService = inject(UtilityService);
+  private dynamicDialogRef = inject(DynamicDialogRef);
 
   ngOnInit() {
     const initialPath = '/';

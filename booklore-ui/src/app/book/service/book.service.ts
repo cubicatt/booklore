@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {catchError, map, switchMap, tap} from 'rxjs/operators';
@@ -18,7 +18,9 @@ export class BookService {
   });
   bookState$ = this.bookStateSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  private http = inject(HttpClient);
+
+  constructor() {
     this.loadBooks();
   }
 
@@ -113,21 +115,26 @@ export class BookService {
     );
   }
 
-  readBook(book: Book): void {
-    if (book.bookType === "PDF") {
-      const url = `/pdf-viewer/book/${book.id}`;
-      window.open(url, '_blank');
-      this.updateLastReadTime(book.id).subscribe({
-        next: () => console.log('Last read time updated successfully'),
-        error: err => console.error('Failed to update last read time', err),
-      });
-    } else if (book.bookType === "EPUB") {
-      const url = `/epub-viewer/book/${book.id}`;
-      window.open(url, '_blank');
-    } else {
-      console.error('Unsupported book type:', book.bookType);
-      return;
-    }
+  readBook(bookId: number): void {
+    this.getBookById(bookId).subscribe((book) => {
+      if (book) {
+        if (book.bookType === "PDF") {
+          const url = `/pdf-viewer/book/${book.id}`;
+          window.open(url, '_blank');
+          this.updateLastReadTime(book.id).subscribe({
+            next: () => console.log('Last read time updated successfully'),
+            error: err => console.error('Failed to update last read time', err),
+          });
+        } else if (book.bookType === "EPUB") {
+          const url = `/epub-viewer/book/${book.id}`;
+          window.open(url, '_blank');
+        } else {
+          console.error('Unsupported book type:', book.bookType);
+        }
+      } else {
+        console.error('Book not found');
+      }
+    });
   }
 
   searchBooks(query: string): Observable<Book[]> {
@@ -145,7 +152,7 @@ export class BookService {
 
   getBookData(bookId: number): Observable<Blob> {
     console.log('Fetching book data...');
-    return this.http.get<Blob>(`${this.url}/${bookId}/data`, { responseType: 'blob' as 'json' });
+    return this.http.get<Blob>(`${this.url}/${bookId}/data`, {responseType: 'blob' as 'json'});
   }
 
   getBookCoverUrl(bookId: number): string {
@@ -161,7 +168,7 @@ export class BookService {
   }
 
   saveEpubProgress(bookId: number, progress: string): Observable<void> {
-    return this.http.post<void>(`${this.url}/progress`, { bookId: bookId, epubProgress: progress });
+    return this.http.post<void>(`${this.url}/progress`, {bookId: bookId, epubProgress: progress});
   }
 
   /*------------------ All the websocket handlers go below ------------------*/

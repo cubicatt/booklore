@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
 import {Router} from '@angular/router';
 import {LibraryService} from './library.service';
@@ -13,15 +13,14 @@ import {MetadataRefreshType} from '../../metadata/model/request/metadata-refresh
   providedIn: 'root',
 })
 export class LibraryShelfMenuService {
-  constructor(
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService,
-    private libraryService: LibraryService,
-    private shelfService: ShelfService,
-    private router: Router,
-    private dialogService: DialogService
-  ) {
-  }
+
+  private confirmationService = inject(ConfirmationService);
+  private messageService = inject(MessageService);
+  private libraryService = inject(LibraryService);
+  private shelfService = inject(ShelfService);
+  private router = inject(Router);
+  private dialogService = inject(DialogService);
+
 
   initializeLibraryMenuItems(entity: Library | Shelf | null): MenuItem[] {
     return [

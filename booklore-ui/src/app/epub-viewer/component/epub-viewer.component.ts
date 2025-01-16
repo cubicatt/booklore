@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import ePub from 'epubjs';
 import {EpubService} from '../service/epub.service';
 import {Drawer} from 'primeng/drawer';
@@ -50,9 +50,10 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     {label: 'Sepia', value: 'sepia'}
   ];
 
-  constructor(private epubService: EpubService, private route: ActivatedRoute,
-              private bookService: BookService, private appSettingsService: AppSettingsService) {
-  }
+  private epubService = inject(EpubService);
+  private route = inject(ActivatedRoute);
+  private bookService = inject(BookService);
+  private appSettingsService = inject(AppSettingsService);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {

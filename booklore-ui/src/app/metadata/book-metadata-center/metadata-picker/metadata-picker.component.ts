@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {BookMetadata, FetchedMetadata} from '../../../book/model/book.model';
+import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
+import {Book, BookMetadata, FetchedMetadata} from '../../../book/model/book.model';
 import {BookService} from '../../../book/service/book.service';
 import {MessageService} from 'primeng/api';
 import {Button} from 'primeng/button';
@@ -9,7 +9,6 @@ import {NgClass, NgIf, NgStyle} from '@angular/common';
 import {Divider} from 'primeng/divider';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Observable} from 'rxjs';
-import {BookMetadataBI} from '../../model/book-metadata-for-book-info.model';
 import {Tooltip} from 'primeng/tooltip';
 import {MetadataService} from '../../service/metadata.service';
 
@@ -36,19 +35,20 @@ export class MetadataPickerComponent implements OnInit {
   @Output() goBack = new EventEmitter<boolean>();
 
   bookMetadataForm: FormGroup;
-  bookMetadata$: Observable<BookMetadataBI | null>;
   currentBookId!: number;
   updateThumbnailUrl: boolean = false;
   thumbnailSaved: boolean = false;
   copiedFields: Record<string, boolean> = {};
   savedFields: Record<string, boolean> = {};
 
-  constructor(private bookService: BookService,
-              private bookInfoService: BookMetadataCenterService,
-              private messageService: MessageService,
-              private metadataService: MetadataService) {
+  private bookService = inject(BookService);
+  private metadataCenterService = inject(BookMetadataCenterService);
+  private messageService = inject(MessageService);
+  private metadataService = inject(MetadataService);
 
-    this.bookMetadata$ = this.bookInfoService.bookMetadata$;
+  metadata$: Observable<BookMetadata | null> = this.metadataCenterService.bookMetadata$;
+
+  constructor() {
     this.bookMetadataForm = new FormGroup({
       title: new FormControl(''),
       subtitle: new FormControl(''),
@@ -67,23 +67,23 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.bookMetadata$.subscribe((bookMetadata) => {
-      if (bookMetadata) {
-        this.currentBookId = bookMetadata.bookId;
+    this.metadata$.subscribe((metadata) => {
+      if (metadata) {
+        this.currentBookId = metadata.bookId;
         this.bookMetadataForm.setValue({
-          title: bookMetadata.title,
-          subtitle: bookMetadata.subtitle,
-          authors: bookMetadata.authors.join(', '),
-          categories: bookMetadata.categories.join(', '),
-          publisher: bookMetadata.publisher,
-          publishedDate: bookMetadata.publishedDate,
-          isbn10: bookMetadata.isbn10,
-          isbn13: bookMetadata.isbn13,
-          description: bookMetadata.description,
-          pageCount: bookMetadata.pageCount == 0 ? null : bookMetadata.pageCount,
-          language: bookMetadata.language,
-          rating: bookMetadata.rating,
-          reviewCount: bookMetadata.reviewCount
+          title: metadata.title,
+          subtitle: metadata.subtitle,
+          authors: metadata.authors.map((author) => author.name).join(', '),
+          categories: metadata.categories.map((category) => category.name).join(', '),
+          publisher: metadata.publisher,
+          publishedDate: metadata.publishedDate,
+          isbn10: metadata.isbn10,
+          isbn13: metadata.isbn13,
+          description: metadata.description,
+          pageCount: metadata.pageCount == 0 ? null : metadata.pageCount,
+          language: metadata.language,
+          rating: metadata.rating,
+          reviewCount: metadata.reviewCount
         });
       }
     });
@@ -102,7 +102,7 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   onSave(): void {
-    const updatedBookMetadata: BookMetadataBI = {
+    const updatedBookMetadata: BookMetadata = {
       bookId: this.currentBookId,
       title: this.bookMetadataForm.get('title')?.value || this.copiedFields['title'] ? this.getValueOrCopied('title') : '',
       subtitle: this.bookMetadataForm.get('subtitle')?.value || this.copiedFields['subtitle'] ? this.getValueOrCopied('subtitle') : '',
@@ -131,7 +131,7 @@ export class MetadataPickerComponent implements OnInit {
           this.thumbnailSaved = true;
         }
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
-        this.bookInfoService.emit(updatedBookMetadata);
+        this.metadataCenterService.emit(updatedBookMetadata);
       },
       error: () => {
         this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book metadata'});
@@ -215,7 +215,7 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   closeDialog() {
-    this.bookInfoService.closeDialog(true);
+    this.metadataCenterService.closeDialog(true);
   }
 
 }

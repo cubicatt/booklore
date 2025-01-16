@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {AppSettingsService} from '../../service/app-settings.service';
 import {Observable} from 'rxjs';
 import {AppSettings} from '../../model/app-settings.model';
@@ -57,13 +57,11 @@ export class SettingsComponent implements OnInit {
   fontSize: number = 100;
   selectedFont: any;
 
-  appSettings$!: Observable<AppSettings | null>;
+  private appSettingsService = inject(AppSettingsService);
+  appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
 
-  constructor(private appSettingsService: AppSettingsService) {
-  }
 
   ngOnInit(): void {
-    this.appSettings$ = this.appSettingsService.appSettings$;
     this.appSettings$.subscribe(settings => {
       if (settings) {
         this.populateSettings(settings);

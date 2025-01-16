@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnChanges, Output} from '@angular/core';
 import {TableModule} from 'primeng/table';
 import {NgIf} from '@angular/common';
 import {BookService} from '../../../service/book.service';
@@ -30,8 +30,9 @@ export class BookTableComponent implements OnChanges {
   @Input() books: Book[] = [];
   @Input() sortOption: SortOption | null = null;
 
-  constructor(private bookService: BookService, private metadataDialogService: MetadataDialogService) {
-  }
+  private bookService = inject(BookService);
+  private metadataDialogService = inject(MetadataDialogService);
+
 
   // Hack to set virtual-scroller height
   ngOnChanges() {

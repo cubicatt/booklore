@@ -1,4 +1,4 @@
-import {Component, Output, EventEmitter} from '@angular/core';
+import {Component, Output, EventEmitter, inject} from '@angular/core';
 import {Select, SelectChangeEvent} from 'primeng/select';
 import {FormsModule} from '@angular/forms';
 import {NgForOf, TitleCasePipe} from '@angular/common';
@@ -33,8 +33,7 @@ export class MetadataAdvancedFetchOptionsComponent {
     cover: {default: null, p2: null, p1: null}
   };
 
-  constructor(private messageService: MessageService) {
-  }
+  private messageService = inject(MessageService);
 
   syncProvider(event: SelectChangeEvent, providerType: keyof FieldProvider) {
     for (const field of Object.keys(this.fieldOptions)) {

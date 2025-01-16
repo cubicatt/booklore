@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {InputText} from 'primeng/inputtext';
@@ -12,6 +12,7 @@ import {MetadataPickerComponent} from '../metadata-picker/metadata-picker.compon
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {MultiSelect} from 'primeng/multiselect';
 import {MetadataService} from '../../service/metadata.service';
+import {info} from 'autoprefixer';
 
 @Component({
   selector: 'app-metadata-searcher',
@@ -39,9 +40,11 @@ export class MetadataSearcherComponent implements OnInit {
   bookId!: number;
   loading: boolean = false;
 
-  constructor(private formBuilder: FormBuilder,
-              private bookInfoService: BookMetadataCenterService,
-              private metadataService: MetadataService) {
+  private formBuilder = inject(FormBuilder);
+  private metadataCenterService = inject(BookMetadataCenterService);
+  private metadataService = inject(MetadataService);
+
+  constructor() {
     this.form = this.formBuilder.group({
       provider: null,
       isbn: [''],
@@ -51,14 +54,14 @@ export class MetadataSearcherComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.bookInfoService.bookMetadata$.subscribe((bookMetadata => {
-      if (bookMetadata) {
-        this.bookId = bookMetadata.bookId;
+    this.metadataCenterService.bookMetadata$.subscribe((metadata => {
+      if (metadata) {
+        this.bookId = metadata.bookId;
         this.form.setValue(({
           provider: null,
-          isbn: bookMetadata.isbn10,
-          title: bookMetadata.title,
-          author: bookMetadata.authors.length > 0 ? bookMetadata.authors[0] : ''
+          isbn: metadata.isbn10,
+          title: metadata.title,
+          author: metadata.authors?.length! > 0 ? metadata.authors[0].name : ''
         }))
       }
     }))

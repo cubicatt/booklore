@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, inject, Input, OnInit} from '@angular/core';
 import {Book} from '../../../model/book.model';
 import {Button} from 'primeng/button';
 import {MenuModule} from 'primeng/menu';
@@ -26,9 +26,9 @@ export class BookCardComponent implements OnInit {
   items: MenuItem[] | undefined;
   isHovered: boolean = false;
 
-  constructor(private bookService: BookService, private dialogService: DialogService,
-              private metadataDialogService: MetadataDialogService) {
-  }
+  private bookService = inject(BookService);
+  private dialogService = inject(DialogService);
+  private metadataDialogService = inject(MetadataDialogService);
 
   ngOnInit(): void {
     this.initMenu();
@@ -39,7 +39,7 @@ export class BookCardComponent implements OnInit {
   }
 
   readBook(book: Book): void {
-    this.bookService.readBook(book);
+    this.bookService.readBook(book.id);
   }
 
   toggleSelection(selected: boolean): void {

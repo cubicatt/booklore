@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, inject, ViewChild} from '@angular/core';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {DirectoryPickerComponent} from '../../../utilities/component/directory-picker/directory-picker.component';
 import {MessageService} from 'primeng/api';
@@ -12,6 +12,7 @@ import {Step, StepList, StepPanel, StepPanels, Stepper} from 'primeng/stepper';
 import {NgIf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
+import {BookService} from '../../service/book.service';
 
 @Component({
   selector: 'app-library-creator',
@@ -41,13 +42,12 @@ export class LibraryCreatorComponent {
   ref: DynamicDialogRef | undefined;
   selectedIcon: string | null = null;
 
-  constructor(
-    private dialogService: DialogService,
-    private dynamicDialogRef: DynamicDialogRef,
-    private libraryService: LibraryService,
-    private messageService: MessageService,
-    private router: Router) {
-  }
+  private dialogService = inject(DialogService);
+  private dynamicDialogRef = inject(DynamicDialogRef);
+  private libraryService = inject(LibraryService);
+  private messageService = inject(MessageService);
+  private router = inject(Router);
+
 
   show() {
     this.ref = this.dialogService.open(DirectoryPickerComponent, {

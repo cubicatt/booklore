@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {DialogService} from 'primeng/dynamicdialog';
 import {BookService} from '../../book/service/book.service';
 import {BookMetadataCenterComponent} from '../book-metadata-center/book-metadata-center.component';
@@ -8,7 +8,9 @@ import {BookMetadataCenterComponent} from '../book-metadata-center/book-metadata
 })
 export class MetadataDialogService {
 
-  constructor(private dialogService: DialogService, private bookService: BookService) {}
+  private dialogService = inject(DialogService);
+  private bookService = inject(BookService);
+
 
   public openBookDetailsDialog(bookId: number): void {
     this.bookService.getBookByIdFromAPI(bookId, true).subscribe({

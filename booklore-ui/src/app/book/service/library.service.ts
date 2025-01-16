@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of, tap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {catchError, map} from 'rxjs/operators';
@@ -20,7 +20,10 @@ export class LibraryService {
   });
   libraryState$ = this.libraryStateSubject.asObservable();
 
-  constructor(private http: HttpClient, private bookService: BookService) {
+  private http = inject(HttpClient);
+  private bookService = inject(BookService);
+
+  constructor() {
     this.loadLibraries();
   }
 
@@ -48,12 +51,12 @@ export class LibraryService {
       map(createdLibrary => {
         const currentState = this.libraryStateSubject.value;
         const updatedLibraries = currentState.libraries ? [...currentState.libraries, createdLibrary] : [createdLibrary];
-        this.libraryStateSubject.next({ ...currentState, libraries: updatedLibraries });
+        this.libraryStateSubject.next({...currentState, libraries: updatedLibraries});
         return createdLibrary;
       }),
       catchError(error => {
         const currentState = this.libraryStateSubject.value;
-        this.libraryStateSubject.next({ ...currentState, error: error.message });
+        this.libraryStateSubject.next({...currentState, error: error.message});
         throw error;
       })
     );
@@ -65,11 +68,11 @@ export class LibraryService {
         this.bookService.removeBooksByLibraryId(libraryId);
         const currentState = this.libraryStateSubject.value;
         const updatedLibraries = currentState.libraries?.filter(library => library.id !== libraryId) || [];
-        this.libraryStateSubject.next({ ...currentState, libraries: updatedLibraries });
+        this.libraryStateSubject.next({...currentState, libraries: updatedLibraries});
       }),
       catchError(error => {
         const currentState = this.libraryStateSubject.value;
-        this.libraryStateSubject.next({ ...currentState, error: error.message });
+        this.libraryStateSubject.next({...currentState, error: error.message});
         return of();
       })
     );
@@ -79,7 +82,7 @@ export class LibraryService {
     return this.http.put<void>(`${this.url}/${libraryId}/refresh`, {}).pipe(
       catchError(error => {
         const currentState = this.libraryStateSubject.value;
-        this.libraryStateSubject.next({ ...currentState, error: error.message });
+        this.libraryStateSubject.next({...currentState, error: error.message});
         throw error;
       })
     );
@@ -92,12 +95,12 @@ export class LibraryService {
         const updatedLibraries = currentState.libraries?.map(library =>
           library.id === libraryId ? updatedLibrary : library
         ) || [];
-        this.libraryStateSubject.next({ ...currentState, libraries: updatedLibraries });
+        this.libraryStateSubject.next({...currentState, libraries: updatedLibraries});
         return updatedLibrary;
       }),
       catchError(error => {
         const currentState = this.libraryStateSubject.value;
-        this.libraryStateSubject.next({ ...currentState, error: error.message });
+        this.libraryStateSubject.next({...currentState, error: error.message});
         throw error;
       })
     );

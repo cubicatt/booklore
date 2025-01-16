@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, inject, Input} from '@angular/core';
 import {LogNotification} from '../../../shared/websocket/model/log-notification.model';
 import {EventService} from '../../../shared/websocket/event.service';
 
@@ -15,11 +15,11 @@ export class LiveNotificationBoxComponent {
 
   latestEvent: LogNotification = {message: 'No recent notifications...'};
 
-  constructor(private eventService: EventService) {
+  private eventService = inject(EventService);
 
+  constructor() {
     this.eventService.latestEvent$.subscribe(event => {
       this.latestEvent = event;
     });
   }
-
 }

@@ -4,6 +4,7 @@ export type BookType = "PDF" | "EPUB";
 
 export interface Book {
   id: number;
+  bookType: BookType;
   libraryId: number;
   metadata?: BookMetadata;
   shelves?: Shelf[];
@@ -11,24 +12,25 @@ export interface Book {
   addedOn?: string;
   epubProgress?: string;
   pdfProgress?: number;
-  bookType: BookType;
 }
 
 export interface BookMetadata {
+  bookId: number;
   title: string;
   subtitle?: string;
-  publisher: string;
-  publishedDate: string;
+  publisher?: string;
+  publishedDate?: string;
   description?: string;
-  isbn13: string;
-  isbn10: string;
+  isbn13?: string;
+  isbn10?: string;
   asin?: string;
-  pageCount: number;
-  language: string;
-  rating: number;
-  reviewCount: number;
+  pageCount?: number | null;
+  language?: string;
+  rating?: number | null;
+  reviewCount?: number | null;
   authors: Author[];
   categories: Category[];
+
   [key: string]: any;
 }
 
@@ -51,6 +53,7 @@ export interface FetchedMetadata {
   reviewCount: number | null;
   authors: string[];
   categories: string[];
+
   [key: string]: any;
 }
 

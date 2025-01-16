@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {RxStompService} from './shared/websocket/rx-stomp.service';
 import {Message} from '@stomp/stompjs';
 import {BookService} from './book/service/book.service';
@@ -17,8 +17,10 @@ import {AppSettingsService} from './core/service/app-settings.service';
 })
 export class AppComponent implements OnInit {
 
-  constructor(private bookService: BookService, private rxStompService: RxStompService, private eventService: EventService) {
-  }
+  private bookService = inject(BookService);
+  private rxStompService = inject(RxStompService);
+  private eventService = inject(EventService);
+
 
   ngOnInit(): void {
 

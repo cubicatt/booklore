@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {Subject, Subscription} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
 import {Book} from '../../model/book.model';
@@ -11,6 +11,7 @@ import {DialogService} from 'primeng/dynamicdialog';
 import {Button} from 'primeng/button';
 import {NgForOf, NgIf} from '@angular/common';
 import {MetadataDialogService} from '../../../metadata/service/metadata-dialog.service';
+import {LibraryShelfMenuService} from '../../service/library-shelf-menu.service';
 
 @Component({
   selector: 'app-book-searcher',
@@ -31,8 +32,9 @@ export class BookSearcherComponent implements OnInit, OnDestroy {
   #searchSubject = new Subject<string>();
   #subscription!: Subscription;
 
-  constructor(private bookService: BookService, private metadataDialogService: MetadataDialogService) {
-  }
+  private bookService = inject(BookService);
+  private metadataDialogService = inject(MetadataDialogService);
+
 
   ngOnInit(): void {
     this.initializeSearch();

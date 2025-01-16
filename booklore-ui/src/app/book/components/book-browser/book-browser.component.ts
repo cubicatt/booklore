@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, inject, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {MenuItem, MessageService} from 'primeng/api';
 import {LibraryService} from '../../service/library.service';
@@ -81,16 +81,14 @@ export class BookBrowserComponent implements OnInit {
 
   @ViewChild(BookTableComponent) bookTableComponent!: BookTableComponent;
 
-  constructor(
-    private activatedRoute: ActivatedRoute,
-    private messageService: MessageService,
-    private libraryService: LibraryService,
-    private bookService: BookService,
-    private shelfService: ShelfService,
-    private dialogService: DialogService,
-    private sortService: SortService,
-    private libraryShelfMenuService: LibraryShelfMenuService) {
-  }
+  private activatedRoute = inject(ActivatedRoute);
+  private messageService = inject(MessageService);
+  private libraryService = inject(LibraryService);
+  private bookService = inject(BookService);
+  private shelfService = inject(ShelfService);
+  private dialogService = inject(DialogService);
+  private sortService = inject(SortService);
+  private libraryShelfMenuService = inject(LibraryShelfMenuService);
 
   ngOnInit(): void {
     this.sortOptions = SortService.generateSortOptions();
@@ -262,7 +260,9 @@ export class BookBrowserComponent implements OnInit {
   deselectAllBooks(): void {
     this.selectedBooks.clear();
     this.isDrawerVisible = false;
-    this.bookTableComponent.clearSelectedBooks();
+    if(this.bookTableComponent) {
+      this.bookTableComponent.clearSelectedBooks();
+    }
   }
 
   viewChanged() {

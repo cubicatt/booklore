@@ -1,20 +1,20 @@
 <div class="container pt-2 flex flex-col h-full">
-  <div class="book-metadata-container flex-shrink-0" *ngIf="bookMetadata$ | async as bookMetadata">
+  <div class="book-metadata-container flex-shrink-0" *ngIf="metadata$ | async as metadata">
     <div class="flex flex-row w-full">
 
-      <img [src]="coverImageSrc(bookMetadata.bookId)" class="book-cover placeholder" alt="Cover of {{ bookMetadata.title }}" loading="lazy" width="225"/>
+      <img [src]="coverImageSrc(metadata.bookId)" class="book-cover placeholder" alt="Cover of {{ metadata.title }}" loading="lazy" width="225"/>
 
       <div class="pl-6 flex flex-col w-full space-y-4">
         <div class="flex flex-row items-center justify-between">
           <div>
-            <p class="text-lg font-bold">{{ bookMetadata.title }}</p>
+            <p class="text-lg font-bold">{{ metadata.title }}</p>
             <div class="flex items-center gap-4 pt-1">
-              <p-rating [(ngModel)]="bookMetadata.rating" readonly stars="5"></p-rating>
-              <p class="font-semibold">({{ bookMetadata.reviewCount || 0 }} Reviews)</p>
+              <p-rating [(ngModel)]="metadata.rating" readonly stars="5"></p-rating>
+              <p class="font-semibold">({{ metadata.reviewCount || 0 }} Reviews)</p>
             </div>
           </div>
           <div class="flex gap-4 pr-4">
-            <p-button [rounded]="true" [raised]="true" severity="info" (onClick)="readBook(bookMetadata.bookId)" icon="pi pi-eye"></p-button>
+            <p-button [rounded]="true" [raised]="true" severity="info" (onClick)="readBook(metadata.bookId)" icon="pi pi-eye"></p-button>
             <p-button [rounded]="true" [raised]="true" severity="info" icon="pi pi-download"></p-button>
           </div>
         </div>
@@ -22,22 +22,22 @@
         <div class="flex items-center">
           <p class="font-semibold text-lg">Authors:</p>
           <div class="flex flex-wrap gap-2 ml-2">
-            <p class="text-lg" *ngFor="let author of bookMetadata.authors">
-              {{ author }}
+            <p class="text-lg">
+              {{ getAuthorNames(metadata?.authors || []) }}
             </p>
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
-          <p><span class="font-bold">Publisher:</span> {{ bookMetadata.publisher || 'N/A' }}</p>
-          <p><span class="font-bold">Published:</span> {{ bookMetadata.publishedDate || 'Unknown' }}</p>
-          <p><span class="font-bold">Language:</span> {{ bookMetadata.language || 'Unknown' }}</p>
-          <p><span class="font-bold">ISBN:</span> {{ bookMetadata.isbn10 || 'Unknown' }}</p>
-          <p><span class="font-bold">Page Count:</span> {{ bookMetadata.pageCount || 'Unknown' }}</p>
+          <p><span class="font-bold">Publisher:</span> {{ metadata.publisher || 'N/A' }}</p>
+          <p><span class="font-bold">Published:</span> {{ metadata.publishedDate || 'Unknown' }}</p>
+          <p><span class="font-bold">Language:</span> {{ metadata.language || 'Unknown' }}</p>
+          <p><span class="font-bold">ISBN:</span> {{ metadata.isbn10 || 'Unknown' }}</p>
+          <p><span class="font-bold">Page Count:</span> {{ metadata.pageCount || 'Unknown' }}</p>
         </div>
 
         <div class="flex flex-wrap gap-2">
-          <p-tag *ngFor="let category of bookMetadata.categories" value="{{category}}"></p-tag>
+          <p-tag *ngFor="let category of metadata.categories" value="{{category}}"></p-tag>
         </div>
 
       </div>
@@ -46,10 +46,10 @@
 
   <!--<p-divider></p-divider>-->
 
-  <div *ngIf="bookMetadata$ | async as bookMetadata" class="book-description space-y-4 overflow-y-auto flex-1">
+  <div *ngIf="metadata$ | async as metadata" class="book-description space-y-4 overflow-y-auto flex-1">
     <!--<p class="pt-2 px-2" [innerHTML]="bookMetadata.description || 'No description available.'"></p>-->
     <div class="pt-6">
-      <p-editor [(ngModel)]="bookMetadata.description" [style]="{ height: '350px' }" [readonly]="true">
+      <p-editor [(ngModel)]="metadata.description" [style]="{ height: '350px' }" [readonly]="true">
         <ng-template #header>
         </ng-template>
       </p-editor>

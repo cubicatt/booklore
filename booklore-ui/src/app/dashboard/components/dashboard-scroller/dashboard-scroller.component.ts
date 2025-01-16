@@ -1,11 +1,11 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { BookService } from '../../../book/service/book.service';
-import { BookState } from '../../../book/model/state/book-state.model';
-import { BookCardComponent } from '../../../book/components/book-browser/book-card/book-card.component';
-import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
-import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
+import {Component, ElementRef, inject, Input, OnInit, ViewChild} from '@angular/core';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {BookService} from '../../../book/service/book.service';
+import {BookState} from '../../../book/model/state/book-state.model';
+import {BookCardComponent} from '../../../book/components/book-browser/book-card/book-card.component';
+import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
+import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {ProgressSpinnerModule} from 'primeng/progressspinner';
 
 @Component({
@@ -29,7 +29,7 @@ export class DashboardScrollerComponent implements OnInit {
 
   bookState$: Observable<BookState> | undefined;
 
-  constructor(private bookService: BookService) {}
+  private bookService = inject(BookService);
 
   ngOnInit(): void {
     if (this.bookListType === 'lastRead') {

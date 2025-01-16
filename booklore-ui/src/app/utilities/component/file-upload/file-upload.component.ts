@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {Library} from '../../../book/model/library.model';
 import {FileUploadService} from './file-upload.service';
 import {Button} from 'primeng/button';
@@ -24,20 +24,19 @@ import {LibraryState} from '../../../book/model/state/library-state.model';
   ],
 })
 export class FileUploadComponent {
-  libraryState$: Observable<LibraryState>;
+
   selectedLibrary: Library | null = null;
   selectedPath: string = '';
   selectedFileName: string = '';
   isUploading: boolean = false;
   errorMessage: string | null = null;
 
-  constructor(
-    private libraryService: LibraryService,
-    private fileUploadService: FileUploadService,
-    private toastService: ToastService,
-    private dynamicDialogRef: DynamicDialogRef) {
-    this.libraryState$ = this.libraryService.libraryState$;
-  }
+  private libraryService = inject(LibraryService);
+  private fileUploadService = inject(FileUploadService);
+  private toastService = inject(ToastService);
+  private dynamicDialogRef = inject(DynamicDialogRef);
+
+  libraryState$: Observable<LibraryState> = this.libraryService.libraryState$;
 
   triggerFileInput(fileInput: HTMLInputElement): void {
     fileInput.click();

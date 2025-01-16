@@ -1,19 +1,19 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
-import {BookMetadataBI} from '../model/book-metadata-for-book-info.model';
+import {Book, BookMetadata} from '../../book/model/book.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookMetadataCenterService {
 
-  private bookMetadataSubject = new BehaviorSubject<BookMetadataBI | null>(null);
+  private bookMetadataSubject = new BehaviorSubject<BookMetadata | null>(null);
   bookMetadata$ = this.bookMetadataSubject.asObservable();
 
   private dialogCloseSubject = new BehaviorSubject<boolean | null>(null);
   dialogClose$ = this.dialogCloseSubject.asObservable();
 
-  emit(bookMetadata: BookMetadataBI) {
+  emit(bookMetadata: BookMetadata) {
     this.bookMetadataSubject.next(bookMetadata);
   }
 

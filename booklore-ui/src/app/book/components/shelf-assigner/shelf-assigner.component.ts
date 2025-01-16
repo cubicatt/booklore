@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, inject, OnInit, ViewChild} from '@angular/core';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Book} from '../../model/book.model';
 import {MessageService, PrimeTemplate} from 'primeng/api';
@@ -16,6 +16,7 @@ import {Checkbox} from 'primeng/checkbox';
 import {FormsModule} from '@angular/forms';
 import {Dialog} from 'primeng/dialog';
 import {InputText} from 'primeng/inputtext';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-shelf-assigner',
@@ -37,29 +38,23 @@ import {InputText} from 'primeng/inputtext';
   styleUrls: ['./shelf-assigner.component.scss']
 })
 export class ShelfAssignerComponent implements OnInit {
-  shelfState$: Observable<ShelfState>;
-  book: Book;
+
+  private shelfService = inject(ShelfService);
+  private dynamicDialogConfig = inject(DynamicDialogConfig);
+  private dynamicDialogRef = inject(DynamicDialogRef);
+  private messageService = inject(MessageService);
+  private bookService = inject(BookService);
+
+  shelfState$: Observable<ShelfState> = this.shelfService.shelfState$;
+  book: Book = this.dynamicDialogConfig.data.book;
   selectedShelves: Shelf[] = [];
   displayShelfDialog: boolean = false;
   shelfName: string = '';
-  bookIds = new Set<number>();
-  isMultiBooks: boolean = false;
+  bookIds: Set<number> = this.dynamicDialogConfig.data.bookIds;
+  isMultiBooks: boolean = this.dynamicDialogConfig.data.isMultiBooks;
   selectedIcon: string | null = null;
 
   @ViewChild(IconPickerComponent) iconPicker: IconPickerComponent | undefined;
-
-  constructor(
-    private shelfService: ShelfService,
-    private dynamicDialogConfig: DynamicDialogConfig,
-    private dynamicDialogRef: DynamicDialogRef,
-    private messageService: MessageService,
-    private bookService: BookService
-  ) {
-    this.shelfState$ = this.shelfService.shelfState$;
-    this.book = this.dynamicDialogConfig.data.book;
-    this.bookIds = this.dynamicDialogConfig.data.bookIds;
-    this.isMultiBooks = this.dynamicDialogConfig.data.isMultiBooks;
-  }
 
   ngOnInit(): void {
     if (!this.isMultiBooks && this.book.shelves) {

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {LibraryCreatorComponent} from '../../../book/components/library-creator/library-creator.component';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {LibraryService} from '../../../book/service/library.service';
@@ -21,17 +21,15 @@ import {DashboardScrollerComponent} from '../dashboard-scroller/dashboard-scroll
   providers: [DialogService],
 })
 export class MainDashboardComponent {
-  isLibrariesEmpty$: Observable<boolean>;
+
   ref: DynamicDialogRef | undefined;
 
-  constructor(private libraryService: LibraryService, public dialogService: DialogService) {
-    this.isLibrariesEmpty$ = this.libraryService.libraryState$.pipe(
-      map(state => !state.libraries || state.libraries.length === 0)
-    );
-  }
+  isLibrariesEmpty$: Observable<boolean> = inject(LibraryService).libraryState$.pipe(
+    map(state => !state.libraries || state.libraries.length === 0)
+  );
 
   createNewLibrary() {
-    this.ref = this.dialogService.open(LibraryCreatorComponent, {
+    this.ref = inject(DialogService).open(LibraryCreatorComponent, {
       header: 'Create New Library',
       modal: true,
       closable: true,

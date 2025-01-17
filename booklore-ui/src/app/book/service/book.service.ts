@@ -88,12 +88,6 @@ export class BookService {
     this.bookStateSubject.next({...currentState, books: updatedBooks});
   }
 
-  getBookById(bookId: number): Observable<Book | undefined> {
-    return this.bookState$.pipe(
-      map(state => state.books?.find(book => book.id === bookId))
-    );
-  }
-
   getBookSetting(bookId: number): Observable<BookSetting> {
     return this.http.get<BookSetting>(`${this.url}/${bookId}/viewer-setting`);
   }
@@ -116,25 +110,26 @@ export class BookService {
   }
 
   readBook(bookId: number): void {
-    this.getBookById(bookId).subscribe((book) => {
-      if (book) {
-        if (book.bookType === "PDF") {
-          const url = `/pdf-viewer/book/${book.id}`;
-          window.open(url, '_blank');
-          this.updateLastReadTime(book.id).subscribe({
-            next: () => {},
-            error: err => console.error('Failed to update last read time', err),
-          });
-        } else if (book.bookType === "EPUB") {
-          const url = `/epub-viewer/book/${book.id}`;
-          window.open(url, '_blank');
-        } else {
-          console.error('Unsupported book type:', book.bookType);
-        }
+    const currentBooks = this.bookStateSubject.value.books;
+    const book = currentBooks?.find(book => book.id === bookId);
+    if (book) {
+      if (book.bookType === "PDF") {
+        const url = `/pdf-viewer/book/${book.id}`;
+        window.open(url, '_blank');
+        this.updateLastReadTime(book.id).subscribe({
+          next: () => {
+          },
+          error: err => console.error('Failed to update last read time', err),
+        });
+      } else if (book.bookType === "EPUB") {
+        const url = `/epub-viewer/book/${book.id}`;
+        window.open(url, '_blank');
       } else {
-        console.error('Book not found');
+        console.error('Unsupported book type:', book.bookType);
       }
-    });
+    } else {
+      console.error('Book not found');
+    }
   }
 
   searchBooks(query: string): Observable<Book[]> {

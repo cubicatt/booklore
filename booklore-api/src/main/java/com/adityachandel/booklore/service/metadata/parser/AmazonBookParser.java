@@ -141,10 +141,10 @@ public class AmazonBookParser implements BookParser {
     private String buildQueryUrl(FetchMetadataRequest fetchMetadataRequest, Book book) {
         StringBuilder queryBuilder = new StringBuilder(BASE_SEARCH_URL);
 
-        // Always add ISBN if present
+        /*// Always add ISBN if present
         if (fetchMetadataRequest.getIsbn() != null && !fetchMetadataRequest.getIsbn().isEmpty()) {
             queryBuilder.append("&field-isbn=").append(fetchMetadataRequest.getIsbn());
-        }
+        }*/
 
         // Add title if present, otherwise check filename if title is absent
         String title = fetchMetadataRequest.getTitle();

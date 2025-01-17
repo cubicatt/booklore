@@ -2,20 +2,20 @@
   *ngIf="(libraryState$ | async)?.libraries as libraries"
   class="flex flex-col gap-10 p-4 items-center justify-center min-w-[400px] max-w-[600px] w-full">
 
-  <p-dropdown
+  <p-select
     [options]="libraries"
     optionLabel="name"
     placeholder="Select Library"
     [(ngModel)]="selectedLibrary"
-    class="w-full"></p-dropdown>
+    class="w-full"></p-select>
 
-  <p-dropdown
+  <p-select
     [options]="selectedLibrary?.paths"
     optionLabel="path"
     placeholder="Select Upload Location"
     [(ngModel)]="selectedPath"
     [disabled]="!selectedLibrary"
-    class="w-full"></p-dropdown>
+    class="w-full"></p-select>
 
   <p-fileupload
     #fu

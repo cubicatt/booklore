@@ -8,7 +8,7 @@ import {TooltipModule} from 'primeng/tooltip';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {BookSearcherComponent} from '../../../book/components/book-searcher/book-searcher.component';
-import {NgClass} from '@angular/common';
+import {NgClass, NgIf} from '@angular/common';
 import {EventService} from '../../../shared/websocket/event.service';
 import {Button} from 'primeng/button';
 import {StyleClass} from 'primeng/styleclass';
@@ -32,7 +32,8 @@ import {BookUploaderComponent} from '../../../utilities/component/book-uploader/
     StyleClass,
     NgClass,
     Divider,
-    LiveNotificationBoxComponent
+    LiveNotificationBoxComponent,
+    NgIf
   ],
 })
 export class AppTopBarComponent implements OnDestroy {
@@ -55,6 +56,11 @@ export class AppTopBarComponent implements OnDestroy {
   }
 
   isMenuVisible: boolean = true;
+  isHovered: boolean = false;
+
+  onHover(hovered: boolean): void {
+    this.isHovered = hovered;
+  }
 
   toggleMenu() {
     this.isMenuVisible = !this.isMenuVisible;

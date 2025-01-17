@@ -1,15 +1,15 @@
-import { Component, inject } from '@angular/core';
-import { FileProgressEvent, FileSendEvent, FileUpload, FileUploadErrorEvent, FileUploadEvent } from 'primeng/fileupload';
-import { Button } from 'primeng/button';
-import { LibraryService } from '../../../book/service/library.service';
-import { Observable } from 'rxjs';
-import { LibraryState } from '../../../book/model/state/library-state.model';
-import { AsyncPipe, NgIf } from '@angular/common';
-import { DropdownModule } from 'primeng/dropdown';
-import { FormsModule } from '@angular/forms';
-import { Library, LibraryPath } from '../../../book/model/library.model';
-import { MessageService } from 'primeng/api';
-import { DynamicDialogRef } from 'primeng/dynamicdialog';
+import {Component, inject} from '@angular/core';
+import {FileProgressEvent, FileSendEvent, FileUpload, FileUploadErrorEvent, FileUploadEvent} from 'primeng/fileupload';
+import {Button} from 'primeng/button';
+import {LibraryService} from '../../../book/service/library.service';
+import {Observable} from 'rxjs';
+import {LibraryState} from '../../../book/model/state/library-state.model';
+import {AsyncPipe, NgIf} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {Library, LibraryPath} from '../../../book/model/library.model';
+import {MessageService} from 'primeng/api';
+import {DynamicDialogRef} from 'primeng/dynamicdialog';
+import {Select} from 'primeng/select';
 
 @Component({
   selector: 'app-book-uploader',
@@ -17,9 +17,9 @@ import { DynamicDialogRef } from 'primeng/dynamicdialog';
     FileUpload,
     Button,
     AsyncPipe,
-    DropdownModule,
     FormsModule,
-    NgIf
+    NgIf,
+    Select
   ],
   templateUrl: './book-uploader.component.html',
   styleUrl: './book-uploader.component.scss'

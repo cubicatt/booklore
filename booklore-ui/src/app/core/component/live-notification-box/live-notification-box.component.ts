@@ -8,7 +8,7 @@ import {EventService} from '../../../shared/websocket/event.service';
   templateUrl: './live-notification-box.component.html',
   styleUrl: './live-notification-box.component.scss',
   host: {
-    class: 'config-panel hidden'
+    class: 'config-panel'
   },
 })
 export class LiveNotificationBoxComponent {

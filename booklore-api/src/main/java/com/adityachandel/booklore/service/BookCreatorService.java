@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
@@ -42,6 +43,7 @@ public class BookCreatorService {
                 .build();
         bookEntity.setMetadata(bookMetadataEntity);
         bookEntity.setViewerSetting(bookViewerSetting);
+        bookEntity.setAddedOn(Instant.now());
         bookEntity = bookRepository.saveAndFlush(bookEntity);
         return bookEntity;
     }

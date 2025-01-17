@@ -10,13 +10,11 @@ import {Shelf} from '../../model/shelf.model';
 import {IconPickerComponent} from '../../../utilities/component/icon-picker/icon-picker.component';
 import {ShelfState} from '../../model/state/shelf-state.model';
 import {Button} from 'primeng/button';
-import {Divider} from 'primeng/divider';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {Checkbox} from 'primeng/checkbox';
 import {FormsModule} from '@angular/forms';
 import {Dialog} from 'primeng/dialog';
 import {InputText} from 'primeng/inputtext';
-import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-shelf-assigner',
@@ -24,7 +22,6 @@ import {Router} from '@angular/router';
   templateUrl: './shelf-assigner.component.html',
   imports: [
     Button,
-    Divider,
     NgForOf,
     Checkbox,
     AsyncPipe,

@@ -1,15 +1,9 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.model.LibraryFile;
-import com.adityachandel.booklore.model.entity.AuthorEntity;
-import com.adityachandel.booklore.model.entity.BookEntity;
-import com.adityachandel.booklore.model.entity.BookMetadataEntity;
-import com.adityachandel.booklore.model.entity.BookViewerSettingEntity;
+import com.adityachandel.booklore.model.entity.*;
 import com.adityachandel.booklore.model.enums.BookFileType;
-import com.adityachandel.booklore.repository.AuthorRepository;
-import com.adityachandel.booklore.repository.BookMetadataRepository;
-import com.adityachandel.booklore.repository.BookRepository;
-import com.adityachandel.booklore.repository.BookViewerSettingRepository;
+import com.adityachandel.booklore.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +20,8 @@ public class BookCreatorService {
     private AuthorRepository authorRepository;
     private BookRepository bookRepository;
     private BookMetadataRepository bookMetadataRepository;
-    private BookViewerSettingRepository bookViewerSettingRepository;
+    private PdfViewerPreferencesRepository pdfViewerPreferencesRepository;
+    private EpubViewerPreferencesRepository epubViewerPreferencesRepository;
 
     public BookEntity createShellBook(LibraryFile libraryFile, BookFileType bookFileType) {
         File bookFile = new File(libraryFile.getFilePath());
@@ -35,16 +30,25 @@ public class BookCreatorService {
                 .path(bookFile.getPath())
                 .fileName(bookFile.getName())
                 .bookType(bookFileType)
+                .addedOn(Instant.now())
                 .build();
         BookMetadataEntity bookMetadataEntity = BookMetadataEntity.builder().build();
-        BookViewerSettingEntity bookViewerSetting = BookViewerSettingEntity.builder()
-                .book(bookEntity)
-                .bookId(bookEntity.getId())
-                .build();
+        if (bookFileType == BookFileType.PDF) {
+            PdfViewerPreferencesEntity pdfViewerPreferencesEntity = PdfViewerPreferencesEntity.builder()
+                    .book(bookEntity)
+                    .bookId(bookEntity.getId())
+                    .build();
+            bookEntity.setPdfViewerPrefs(pdfViewerPreferencesEntity);
+        } else if (bookFileType == BookFileType.EPUB) {
+            EpubViewerPreferencesEntity epubViewerPreferencesEntity = EpubViewerPreferencesEntity.builder()
+                    .book(bookEntity)
+                    .bookId(bookEntity.getId())
+                    .build();
+            bookEntity.setEpubViewerPrefs(epubViewerPreferencesEntity);
+        }
         bookEntity.setMetadata(bookMetadataEntity);
-        bookEntity.setViewerSetting(bookViewerSetting);
-        bookEntity.setAddedOn(Instant.now());
         bookEntity = bookRepository.saveAndFlush(bookEntity);
+
         return bookEntity;
     }
 
@@ -73,6 +77,10 @@ public class BookCreatorService {
         }
         bookRepository.save(bookEntity);
         bookMetadataRepository.save(bookEntity.getMetadata());
-        bookViewerSettingRepository.save(bookEntity.getViewerSetting());
+        if (bookEntity.getBookType() == BookFileType.EPUB) {
+            epubViewerPreferencesRepository.save(bookEntity.getEpubViewerPrefs());
+        } else if (bookEntity.getBookType() == BookFileType.PDF) {
+            pdfViewerPreferencesRepository.save(bookEntity.getPdfViewerPrefs());
+        }
     }
 }

@@ -67,9 +67,20 @@ export interface Category {
   name: string;
 }
 
-export interface BookSetting {
-  pageNumber: number;
-  zoom: number | string;
-  sidebar_visible: boolean | null;
+export interface PdfViewerSetting {
+  zoom: string | number;
+  sidebarVisible: boolean;
   spread: 'off' | 'even' | 'odd';
+}
+
+export interface EpubViewerSetting {
+  theme: string;
+  font: string;
+  fontSize: number;
+}
+
+export interface BookSetting {
+  pdfSettings?: PdfViewerSetting;
+  epubSettings?: EpubViewerSetting;
+  [key: string]: any;
 }

@@ -2,7 +2,7 @@ import {inject, Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {catchError, map, switchMap, tap} from 'rxjs/operators';
-import {Book, BookMetadata, BookSetting, BookType} from '../model/book.model';
+import {Book, BookMetadata, BookSetting, BookType, EpubViewerSetting, PdfViewerSetting} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 
 @Injectable({
@@ -89,11 +89,11 @@ export class BookService {
   }
 
   getBookSetting(bookId: number): Observable<BookSetting> {
-    return this.http.get<BookSetting>(`${this.url}/${bookId}/viewer-setting`);
+    return this.http.get<BookSetting>(`${this.url}/${bookId}/book-viewer-setting`);
   }
 
-  updateViewerSetting(viewerSetting: any, bookId: number): Observable<void> {
-    return this.http.put<void>(`${this.url}/${bookId}/viewer-setting`, viewerSetting);
+  updateViewerSetting(bookSetting: BookSetting, bookId: number): Observable<void> {
+    return this.http.put<void>(`${this.url}/${bookId}/book-viewer-setting`, bookSetting);
   }
 
   updateLastReadTime(bookId: number): Observable<Book> {
@@ -145,7 +145,7 @@ export class BookService {
     );
   }
 
-  getBookData(bookId: number): Observable<Blob> {
+  getPdfData(bookId: number): Observable<Blob> {
     return this.http.get<Blob>(`${this.url}/${bookId}/data`, {responseType: 'blob' as 'json'});
   }
 

@@ -2,21 +2,20 @@ package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
-import com.adityachandel.booklore.mapper.BookViewerSettingMapper;
-import com.adityachandel.booklore.model.dto.Book;
-import com.adityachandel.booklore.model.dto.BookViewerSetting;
-import com.adityachandel.booklore.model.dto.BookWithNeighbors;
+import com.adityachandel.booklore.mapper.EpubViewerPreferencesMapper;
+import com.adityachandel.booklore.mapper.PdfViewerPreferencesMapper;
+import com.adityachandel.booklore.model.dto.*;
 import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.entity.BookEntity;
-import com.adityachandel.booklore.model.entity.BookViewerSettingEntity;
+import com.adityachandel.booklore.model.entity.EpubViewerPreferencesEntity;
+import com.adityachandel.booklore.model.entity.PdfViewerPreferencesEntity;
 import com.adityachandel.booklore.model.entity.ShelfEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.BookRepository;
-import com.adityachandel.booklore.repository.BookViewerSettingRepository;
-import com.adityachandel.booklore.repository.LibraryRepository;
+import com.adityachandel.booklore.repository.EpubViewerPreferencesRepository;
+import com.adityachandel.booklore.repository.PdfViewerPreferencesRepository;
 import com.adityachandel.booklore.repository.ShelfRepository;
 import com.adityachandel.booklore.util.FileService;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -29,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,13 +42,45 @@ import java.util.stream.Collectors;
 public class BooksService {
 
     private final BookRepository bookRepository;
-    private final BookViewerSettingRepository bookViewerSettingRepository;
-    private final LibraryRepository libraryRepository;
+    private final PdfViewerPreferencesRepository pdfViewerPreferencesRepository;
+    private final EpubViewerPreferencesRepository epubViewerPreferencesRepository;
     private final ShelfRepository shelfRepository;
     private final FileService fileService;
     private final BookMapper bookMapper;
-    private final BookViewerSettingMapper bookViewerSettingMapper;
+    private final PdfViewerPreferencesMapper pdfViewerPreferencesMapper;
+    private final EpubViewerPreferencesMapper epubViewerPreferencesMapper;
 
+    public BookViewerSettings getBookViewerSetting(long bookId) {
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        if (bookEntity.getBookType() == BookFileType.PDF) {
+            return BookViewerSettings.builder().pdfSettings(pdfViewerPreferencesMapper.toModel(bookEntity.getPdfViewerPrefs())).build();
+        } else if (bookEntity.getBookType() == BookFileType.EPUB) {
+            return BookViewerSettings.builder().epubSettings(epubViewerPreferencesMapper.toModel(bookEntity.getEpubViewerPrefs())).build();
+        } else {
+            throw ApiError.UNSUPPORTED_BOOK_TYPE.createException();
+        }
+    }
+
+    public void updateBookViewerSetting(long bookId, BookViewerSettings bookViewerSettings) {
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        if (bookEntity.getBookType() == BookFileType.PDF) {
+            PdfViewerPreferences pdfSettings = bookViewerSettings.getPdfSettings();
+            PdfViewerPreferencesEntity viewerPrefs = bookEntity.getPdfViewerPrefs();
+            viewerPrefs.setZoom(pdfSettings.getZoom());
+            viewerPrefs.setSpread(pdfSettings.getSpread());
+            viewerPrefs.setSidebarVisible(pdfSettings.getSidebarVisible());
+            pdfViewerPreferencesRepository.save(viewerPrefs);
+        } else if (bookEntity.getBookType() == BookFileType.EPUB) {
+            EpubViewerPreferences epubSettings = bookViewerSettings.getEpubSettings();
+            EpubViewerPreferencesEntity viewerPrefs = bookEntity.getEpubViewerPrefs();
+            viewerPrefs.setFont(epubSettings.getFont());
+            viewerPrefs.setFontSize(epubSettings.getFontSize());
+            viewerPrefs.setTheme(epubSettings.getTheme());
+            epubViewerPreferencesRepository.save(viewerPrefs);
+        } else {
+            throw ApiError.UNSUPPORTED_BOOK_TYPE.createException();
+        }
+    }
 
     public Book getBook(long bookId, boolean withDescription) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
@@ -67,15 +97,6 @@ public class BooksService {
                 .collect(Collectors.toList());
     }
 
-    public void saveBookViewerSetting(long bookId, BookViewerSetting bookViewerSettingDTO) {
-        BookViewerSettingEntity bookViewerSetting = bookViewerSettingRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        bookViewerSetting.setPageNumber(bookViewerSettingDTO.getPageNumber());
-        bookViewerSetting.setZoom(bookViewerSettingDTO.getZoom());
-        bookViewerSetting.setSpread(bookViewerSettingDTO.getSpread());
-        bookViewerSetting.setSidebar_visible(bookViewerSettingDTO.getSidebar_visible());
-        bookViewerSettingRepository.save(bookViewerSetting);
-    }
-
     public ResponseEntity<byte[]> getBookData(long bookId) throws IOException {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         byte[] pdfBytes = Files.readAllBytes(new File(bookEntity.getPath()).toPath());
@@ -89,27 +110,10 @@ public class BooksService {
         return bookEntities.stream().map(bookMapper::toBook).toList();
     }
 
-    public BookViewerSetting getBookViewerSetting(long bookId) {
-        BookViewerSettingEntity bookViewerSetting = bookViewerSettingRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        return bookViewerSettingMapper.toBookViewerSetting(bookViewerSetting);
-    }
-
     public Book updateLastReadTime(long bookId) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         bookEntity.setLastReadTime(Instant.now());
         return bookMapper.toBook(bookRepository.save(bookEntity));
-    }
-
-    public BookWithNeighbors getBookWithNeighbours(long libraryId, long bookId) {
-        libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
-        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        BookEntity previousBookEntity = bookRepository.findFirstByLibraryIdAndIdLessThanOrderByIdDesc(libraryId, bookId).orElse(null);
-        BookEntity nextBookEntity = bookRepository.findFirstByLibraryIdAndIdGreaterThanOrderByIdAsc(libraryId, bookId).orElse(null);
-        return BookWithNeighbors.builder()
-                .currentBook(bookMapper.toBook(bookEntity))
-                .previousBookId(previousBookEntity != null ? previousBookEntity.getId() : null)
-                .nextBookId(nextBookEntity != null ? nextBookEntity.getId() : null)
-                .build();
     }
 
     @Transactional

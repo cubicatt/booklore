@@ -3,7 +3,8 @@ import {ActivatedRoute} from '@angular/router';
 import {NgxExtendedPdfViewerModule, ScrollModeType} from 'ngx-extended-pdf-viewer';
 import {BookService} from '../../service/book.service';
 import {AppSettingsService} from '../../../core/service/app-settings.service';
-import {Subscription} from 'rxjs';
+import {filter, forkJoin, Subscription, take} from 'rxjs';
+import {PdfViewerSetting} from '../../model/book.model';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -33,36 +34,34 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
       this.bookId = +params.get('bookId')!;
-      this.loadBook(this.bookId);
-      this.updateLastReadTime();
-    });
-  }
+      this.appSettingsService.appSettings$
+        .pipe(
+          filter((appSettings) => appSettings !== null),
+          take(1))
+        .subscribe((appSettings) => {
+          const book$ = this.bookService.getBookByIdFromAPI(this.bookId, false);
+          const pdf$ = this.bookService.getPdfData(this.bookId);
+          const bookSetting$ = this.bookService.getBookSetting(this.bookId);
 
-  private loadBook(bookId: number): void {
-    this.appSettingsSubscription = this.appSettingsService.appSettings$.subscribe((appSettings) => {
-      if (appSettings) {
-        this.bookService.getBookSetting(bookId).subscribe({
-          next: (bookSetting) => {
-            const {pageNumber, zoom, sidebar_visible, spread} = bookSetting;
-            this.page = pageNumber || 1;
-            this.zoom = zoom || appSettings.pdf?.zoom || 'page-fit';
-            this.sidebarVisible = sidebar_visible ?? appSettings.pdf?.sidebar ?? true;
-            this.spread = spread || appSettings.pdf?.spread || 'odd';
+          forkJoin([book$, pdf$, bookSetting$]).subscribe((results) => {
+            const pdf = results[0];
+            const pdfData = results[1];
+            const individualPdfSettings = results[2]?.pdfSettings;
+            const globalPdfSettings = appSettings.pdf;
+
+            console.log(individualPdfSettings);
+            console.log(globalPdfSettings);
+
+            this.page = pdf.pdfProgress || 1;
+            this.zoom = individualPdfSettings?.zoom || globalPdfSettings?.zoom || 'page-fit';
+            this.sidebarVisible = individualPdfSettings?.sidebarVisible ?? globalPdfSettings?.sidebar ?? true;
+            this.spread = individualPdfSettings?.spread || globalPdfSettings?.spread || 'odd';
+
             this.isInitialLoad = false;
-            this.bookService.getBookData(bookId).subscribe({
-              next: (bookData) => {
-                this.bookData = bookData;
-              },
-              error: (e) => {
-                console.error('Error loading book data:', e);
-              },
-            });
-          },
-          error: (e) => {
-            console.error('Error loading book settings:', e);
-          },
+            this.bookData = pdfData;
+            this.updateLastReadTime();
+          });
         });
-      }
     });
   }
 
@@ -100,8 +99,8 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
 
   private updateViewerSetting(): void {
     if (this.isInitialLoad) return;
-    const updatedViewerSetting = {
-      sidebar_visible: this.sidebarVisible,
+    const updatedViewerSetting: PdfViewerSetting = {
+      sidebarVisible: this.sidebarVisible,
       spread: this.spread,
       zoom: this.zoom,
     };

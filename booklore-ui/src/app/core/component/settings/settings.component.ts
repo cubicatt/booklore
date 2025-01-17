@@ -80,7 +80,7 @@ export class SettingsComponent implements OnInit {
     if (settings.epub) {
       const epubSettings = settings.epub;
       this.selectedTheme = this.themes.find(t => t.key === epubSettings.theme)?.key;
-      this.fontSize = parseInt(epubSettings.fontSize, 10);
+      this.fontSize = epubSettings.fontSize;
       this.selectedFont = this.fonts.find(f => f.key === epubSettings.font)?.key;
     }
   }

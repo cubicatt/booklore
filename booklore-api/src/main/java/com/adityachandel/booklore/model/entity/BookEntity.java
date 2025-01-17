@@ -37,7 +37,10 @@ public class BookEntity {
     private LibraryEntity library;
 
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private BookViewerSettingEntity viewerSetting;
+    private PdfViewerPreferencesEntity pdfViewerPrefs;
+
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private EpubViewerPreferencesEntity epubViewerPrefs;
 
     @Column(name = "last_read_time")
     private Instant lastReadTime;

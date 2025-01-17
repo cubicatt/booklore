@@ -7,47 +7,53 @@ import {NgForOf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Divider} from 'primeng/divider';
 import {ActivatedRoute} from '@angular/router';
-import {Book} from '../../book/model/book.model';
+import {Book, BookSetting, EpubViewerSetting} from '../../book/model/book.model';
 import {BookService} from '../../book/service/book.service';
-import {forkJoin} from 'rxjs';
+import {filter, forkJoin, take} from 'rxjs';
 import {AppSettingsService} from '../../core/service/app-settings.service';
 import {Select} from 'primeng/select';
+
+const FALLBACK_EPUB_SETTINGS = {
+  fontSize: 150,
+  fontType: 'serif',
+  theme: 'white',
+  maxFontSize: 300,
+  minFontSize: 50,
+};
 
 @Component({
   selector: 'app-epub-viewer',
   templateUrl: './epub-viewer.component.html',
   styleUrls: ['./epub-viewer.component.scss'],
-  imports: [Drawer, Button, NgForOf, FormsModule, Divider, Select]
+  imports: [Drawer, Button, NgForOf, FormsModule, Divider, Select],
 })
 export class EpubViewerComponent implements OnInit, OnDestroy {
+  @ViewChild('epubContainer', { static: true }) epubContainer!: ElementRef;
 
-  @ViewChild('epubContainer', {static: true}) epubContainer!: ElementRef;
   chapters: { label: string; href: string }[] = [];
   isDrawerVisible = false;
-  isSettingsDrawerVisible: boolean = false;
+  isSettingsDrawerVisible = false;
   private book: any;
   private rendition: any;
-  private keyListener: (e: KeyboardEvent) => void = () => {
-  };
-  fontSize: number = 120;
+  private keyListener: (e: KeyboardEvent) => void = () => {};
 
-  epub!: Book;
+  fontSize = FALLBACK_EPUB_SETTINGS.fontSize;
+  selectedFontType = FALLBACK_EPUB_SETTINGS.fontType;
+  selectedTheme = FALLBACK_EPUB_SETTINGS.theme;
 
   fontTypes: any[] = [
-    {label: 'Serif', value: 'serif'},
-    {label: 'Sans Serif', value: 'sans-serif'},
-    {label: 'Roboto', value: 'roboto'},
-    {label: 'Cursive', value: 'cursive'},
-    {label: 'Monospace', value: 'monospace'}
+    { label: 'Serif', value: 'serif' },
+    { label: 'Sans Serif', value: 'sans-serif' },
+    { label: 'Roboto', value: 'roboto' },
+    { label: 'Cursive', value: 'cursive' },
+    { label: 'Monospace', value: 'monospace' },
   ];
-  selectedFontType: string = 'serif';
 
-  selectedTheme: string = 'white';
   themes: any[] = [
-    {label: 'White', value: 'white'},
-    {label: 'Black', value: 'black'},
-    {label: 'Grey', value: 'grey'},
-    {label: 'Sepia', value: 'sepia'}
+    { label: 'White', value: 'white' },
+    { label: 'Black', value: 'black' },
+    { label: 'Grey', value: 'grey' },
+    { label: 'Sepia', value: 'sepia' },
   ];
 
   private epubService = inject(EpubService);
@@ -55,119 +61,134 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   private bookService = inject(BookService);
   private appSettingsService = inject(AppSettingsService);
 
+  epub!: Book;
+
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
-      let book$ = this.bookService.getBookByIdFromAPI(+params.get('bookId')!, false);
-      let epub$ = this.epubService.downloadEpub(+params.get('bookId')!);
-      forkJoin([book$, epub$]).subscribe(results => {
-        this.epub = results[0];
+      const bookId = +params.get('bookId')!;
+      this.appSettingsService.appSettings$
+        .pipe(filter((appSettings) => appSettings !== null), take(1))
+        .subscribe((appSettings) => {
+          const epub$ = this.bookService.getBookByIdFromAPI(bookId, false);
+          const epubData$ = this.epubService.downloadEpub(bookId);
+          const bookSetting$ = this.bookService.getBookSetting(bookId);
 
-        const fileReader = new FileReader();
-        fileReader.onload = () => {
-          const epubData = fileReader.result as ArrayBuffer;
-          this.book = ePub(epubData);
+          forkJoin([epub$, epubData$, bookSetting$]).subscribe((results) => {
+            const epub = results[0];
+            const epubData = results[1];
+            const individualSetting = results[2]?.epubSettings;
+            const globalSetting = appSettings.epub;
 
-          this.book.loaded.navigation.then((nav: any) => {
-            this.chapters = nav.toc.map((chapter: any) => ({
-              label: chapter.label,
-              href: chapter.href,
-            }));
+            console.log(individualSetting)
+            console.log(globalSetting)
+
+            this.epub = epub;
+            const fileReader = new FileReader();
+
+            fileReader.onload = () => {
+              this.book = ePub(fileReader.result as ArrayBuffer);
+
+              this.book.loaded.navigation.then((nav: any) => {
+                this.chapters = nav.toc.map((chapter: any) => ({
+                  label: chapter.label,
+                  href: chapter.href,
+                }));
+              });
+
+              this.rendition = this.book.renderTo(this.epubContainer.nativeElement, {
+                flow: 'paginated',
+                width: '100%',
+                height: '100%',
+                allowScriptedContent: true,
+              });
+
+              this.selectedTheme = individualSetting?.theme || globalSetting?.theme || FALLBACK_EPUB_SETTINGS.theme;
+              this.selectedFontType = individualSetting?.font || globalSetting?.font || FALLBACK_EPUB_SETTINGS.fontType;
+              this.fontSize = individualSetting?.fontSize || globalSetting?.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
+
+              this.applyViewerSettings();
+              this.setupKeyListener();
+              this.trackProgress();
+            };
+
+            fileReader.readAsArrayBuffer(epubData);
           });
-
-          this.rendition = this.book.renderTo(this.epubContainer.nativeElement, {
-            flow: 'paginated',
-            width: '100%',
-            height: '100%',
-            allowScriptedContent: true,
-          });
-
-          if (this.epub?.epubProgress) {
-            this.rendition.display(this.epub.epubProgress);
-          } else {
-            this.rendition.display();
-          }
-
-          this.themesMap.forEach((theme, name) => {
-            this.rendition.themes.register(name, theme);
-          });
-
-          this.setupKeyListener();
-          this.trackProgress();
-          this.subscribeToSettings();
-        };
-        fileReader.readAsArrayBuffer(results[1]);
-      })
-
+        });
     });
   }
 
-  private subscribeToSettings(): void {
-    this.appSettingsService.appSettings$.subscribe((settings) => {
-      if (settings) {
-        if (settings.epub) {
-          this.selectedTheme = settings.epub.theme || 'white';
-          this.selectedFontType = settings.epub.font || 'serif';
-          this.fontSize = parseInt(settings.epub.fontSize, 10) || 120;
-          this.changeFontType();
-          this.updateFontSize();
-          this.changeThemes();
-        }
-      }
-    });
-  }
-
-  private trackProgress(): void {
-    if (this.rendition) {
-      this.rendition.on('relocated', (location: any) => {
-        this.bookService.saveEpubProgress(this.epub.id, location.start.cfi).subscribe({
-          next: () => {
-          },
-          error: () => {
-          }
-        })
-      });
-    }
+  private applyViewerSettings(): void {
+    this.changeFontType();
+    this.updateFontSize();
+    this.changeThemes();
   }
 
   updateFontSize(): void {
     if (this.rendition) {
       this.rendition.themes.fontSize(`${this.fontSize}%`);
+      this.updateViewerSetting();
     }
   }
 
   increaseFontSize(): void {
-    this.fontSize += 10;
-    if (this.fontSize > 300) {
-      this.fontSize = 300;
-    }
+    this.fontSize = Math.min(this.fontSize + 10, FALLBACK_EPUB_SETTINGS.maxFontSize);
     this.updateFontSize();
   }
 
   decreaseFontSize(): void {
-    this.fontSize -= 10;
-    if (this.fontSize < 50) {
-      this.fontSize = 50;
-    }
+    this.fontSize = Math.max(this.fontSize - 10, FALLBACK_EPUB_SETTINGS.minFontSize);
     this.updateFontSize();
   }
 
   changeFontType(): void {
     if (this.rendition) {
       this.rendition.themes.font(this.selectedFontType);
+      this.updateViewerSetting();
     }
   }
 
-  changeThemes() {
+  changeThemes(): void {
     if (this.rendition) {
       this.rendition.themes.select(this.selectedTheme);
       this.rendition.clear();
       this.rendition.start();
+      this.updateViewerSetting();
     }
   }
 
-  navigateToChapter(chapter: { label: string; href: string }): void {
-    if (this.book && chapter.href) {
-      this.book.rendition.display(chapter.href);
+  private updateViewerSetting(): void {
+    const bookSetting: BookSetting = {
+      epubSettings: {
+        theme: this.selectedTheme,
+        font: this.selectedFontType,
+        fontSize: this.fontSize,
+      }
+    }
+    this.bookService.updateViewerSetting(bookSetting, this.epub.id).subscribe();
+  }
+
+  private setupKeyListener(): void {
+    this.keyListener = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        this.prevPage();
+      } else if (e.key === 'ArrowRight') {
+        this.nextPage();
+      }
+    };
+    document.addEventListener('keyup', this.keyListener);
+  }
+
+  private trackProgress(): void {
+    if (this.rendition) {
+      this.rendition.on('relocated', (location: any) => {
+        this.bookService.saveEpubProgress(this.epub.id, location.start.cfi).subscribe();
+      });
+    }
+  }
+
+  prevPage(): void {
+    if (this.rendition) {
+      this.rendition.prev();
     }
   }
 
@@ -177,9 +198,9 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     }
   }
 
-  prevPage(): void {
-    if (this.rendition) {
-      this.rendition.prev();
+  navigateToChapter(chapter: { label: string; href: string }): void {
+    if (this.book && chapter.href) {
+      this.book.rendition.display(chapter.href);
     }
   }
 
@@ -191,83 +212,10 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     this.isSettingsDrawerVisible = !this.isSettingsDrawerVisible;
   }
 
-  private setupKeyListener(): void {
-    this.keyListener = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case 'ArrowLeft':
-          this.prevPage();
-          break;
-        case 'ArrowRight':
-          this.nextPage();
-          break;
-        default:
-          break;
-      }
-    };
-    if (this.rendition) {
-      this.rendition.on('keyup', this.keyListener);
-    }
-    document.addEventListener('keyup', this.keyListener);
-  }
-
   ngOnDestroy(): void {
     if (this.rendition) {
       this.rendition.off('keyup', this.keyListener);
     }
     document.removeEventListener('keyup', this.keyListener);
   }
-
-  themesMap = new Map<string, any>([
-    [
-      'black', {
-      "body": {"background-color": "#000000", "color": "#f9f9f9"},
-      "p": {"color": "#f9f9f9"},
-      "h1, h2, h3, h4, h5, h6": {"color": "#f9f9f9"},
-      "a": {"color": "#f9f9f9"},
-      "img": {
-        "-webkit-filter": "invert(1) hue-rotate(180deg)",
-        "filter": "invert(1) hue-rotate(180deg)"
-      },
-      "code": {"color": "#00ff00", "background-color": "black"}
-    }
-    ],
-    [
-      'sepia', {
-      "body": {"background-color": "#f4ecd8", "color": "#6e4b3a"},
-      "p": {"color": "#6e4b3a"},
-      "h1, h2, h3, h4, h5, h6": {"color": "#6e4b3a"},
-      "a": {"color": "#8b4513"},
-      "img": {
-        "-webkit-filter": "sepia(1) contrast(1.5)",
-        "filter": "sepia(1) contrast(1.5)"
-      },
-      "code": {"color": "#8b0000", "background-color": "#f4ecd8"}
-    }
-    ],
-    [
-      'white', {
-      "body": {"background-color": "#ffffff", "color": "#000000"},
-      "p": {"color": "#000000"},
-      "h1, h2, h3, h4, h5, h6": {"color": "#000000"},
-      "a": {"color": "#000000"},
-      "img": {
-        "-webkit-filter": "none",
-        "filter": "none"
-      },
-      "code": {"color": "#d14", "background-color": "#f5f5f5"}
-    }
-    ],
-    [
-      'grey', {
-      "body": {"background-color": "#404040", "color": "#d3d3d3"},
-      "p": {"color": "#d3d3d3"},
-      "h1, h2, h3, h4, h5, h6": {"color": "#d3d3d3"},
-      "a": {"color": "#1e90ff"},
-      "img": {
-        "filter": "none"
-      },
-      "code": {"color": "#d14", "background-color": "#585858"}
-    }
-    ]
-  ]);
 }

@@ -72,14 +72,22 @@ CREATE TABLE IF NOT EXISTS category
 );
 
 -- Create the book_viewer_setting table
-CREATE TABLE IF NOT EXISTS book_viewer_setting
+CREATE TABLE IF NOT EXISTS pdf_viewer_preference
 (
     book_id         BIGINT PRIMARY KEY,
-    page_number     INT         NULL,
     zoom            VARCHAR(16) NULL,
     sidebar_visible BOOLEAN     NULL,
     spread          VARCHAR(16) NULL,
-    CONSTRAINT fk_book_viewer_setting FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE
+    CONSTRAINT fk_pdf_viewer_setting FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS epub_viewer_preference
+(
+    book_id   BIGINT PRIMARY KEY,
+    theme     VARCHAR(128) NULL,
+    font      VARCHAR(128) NULL,
+    font_size TINYINT      NULL,
+    CONSTRAINT fk_epub_viewer_setting FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE
 );
 
 -- Create the book_metadata_category_mapping table
@@ -131,6 +139,6 @@ CREATE TABLE app_settings
     id       BIGINT AUTO_INCREMENT PRIMARY KEY,
     category VARCHAR(255) NOT NULL,
     name     VARCHAR(255) NOT NULL,
-    val    TEXT         NOT NULL,
+    val      TEXT         NOT NULL,
     UNIQUE (category, name)
 );

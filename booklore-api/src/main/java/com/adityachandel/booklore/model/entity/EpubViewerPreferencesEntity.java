@@ -10,8 +10,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "book_viewer_setting")
-public class BookViewerSettingEntity {
+@Table(name = "epub_viewer_preference")
+public class EpubViewerPreferencesEntity {
     @Id
     private Long bookId;
 
@@ -21,15 +21,12 @@ public class BookViewerSettingEntity {
     @JsonIgnore
     private BookEntity book;
 
-    @Column(name = "page_number")
-    private int pageNumber;
+    @Column(name = "theme")
+    private String theme;
 
-    @Column(name = "zoom")
-    private String zoom;
+    @Column(name = "font")
+    private String font;
 
-    @Column(name = "sidebar_visible")
-    private Boolean sidebar_visible;
-
-    @Column(name = "spread")
-    private String spread;
+    @Column(name = "font_size")
+    private Integer fontSize;
 }

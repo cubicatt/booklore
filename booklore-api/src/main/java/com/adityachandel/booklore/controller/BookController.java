@@ -2,6 +2,7 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookViewerSetting;
+import com.adityachandel.booklore.model.dto.BookViewerSettings;
 import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.dto.request.ShelvesAssignmentRequest;
 import com.adityachandel.booklore.service.BooksService;
@@ -47,14 +48,14 @@ public class BookController {
         return booksService.getBookData(bookId);
     }
 
-    @GetMapping("/{bookId}/viewer-setting")
-    public ResponseEntity<BookViewerSetting> getBookViewerSettings(@PathVariable long bookId) {
+    @GetMapping("/{bookId}/book-viewer-setting")
+    public ResponseEntity<BookViewerSettings> getBookViewerSettings(@PathVariable long bookId) {
         return ResponseEntity.ok(booksService.getBookViewerSetting(bookId));
     }
 
-    @PutMapping("/{bookId}/viewer-setting")
-    public ResponseEntity<Void> updateBookViewerSettings(@RequestBody BookViewerSetting bookViewerSetting, @PathVariable long bookId) {
-        booksService.saveBookViewerSetting(bookId, bookViewerSetting);
+    @PutMapping("/{bookId}/book-viewer-setting")
+    public ResponseEntity<Void> updateBookViewerSettings(@RequestBody BookViewerSettings bookViewerSettings, @PathVariable long bookId) {
+        booksService.updateBookViewerSetting(bookId, bookViewerSettings);
         return ResponseEntity.noContent().build();
     }
 

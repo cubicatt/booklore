@@ -4,16 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
-
 @Builder
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Library {
+public class LibraryPath {
     private Long id;
-    private String name;
-    private Sort sort;
-    private String icon;
-    private List<LibraryPath> paths;
+    private Long libraryId;
+    private String path;
 }
-

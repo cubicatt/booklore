@@ -9,6 +9,7 @@ import com.adityachandel.booklore.model.dto.Sort;
 import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
+import com.adityachandel.booklore.model.entity.LibraryPathEntity;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,9 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,7 +36,13 @@ public class LibraryService {
     public Library createLibrary(CreateLibraryRequest request) {
         LibraryEntity libraryEntity = LibraryEntity.builder()
                 .name(request.getName())
-                .paths(request.getPaths())
+                .libraryPaths(
+                        request.getPaths() == null || request.getPaths().isEmpty() ?
+                                Collections.emptyList() :
+                                request.getPaths().stream()
+                                        .map(path -> LibraryPathEntity.builder().path(path.getPath()).build())
+                                        .collect(Collectors.toList())
+                )
                 .icon(request.getIcon())
                 .build();
         libraryEntity = libraryRepository.save(libraryEntity);

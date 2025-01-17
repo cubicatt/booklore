@@ -13,6 +13,7 @@ import {NgIf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
 import {BookService} from '../../service/book.service';
+import {Library, LibraryPath} from '../../model/library.model';
 
 @Component({
   selector: 'app-library-creator',
@@ -97,21 +98,21 @@ export class LibraryCreatorComponent {
   }
 
   addLibrary() {
-    const newLibrary = {
+    const library: Library = {
       name: this.libraryName,
-      paths: this.folders,
-      icon: this.selectedIcon ? this.selectedIcon.replace('pi pi-', '') : 'heart'
+      icon: this.selectedIcon?.replace('pi pi-', '') || 'heart',
+      paths: this.folders.map(folder => ({ path: folder }))
     };
-    this.libraryService.createLibrary(newLibrary).subscribe({
+
+    this.libraryService.createLibrary(library).subscribe({
       next: (createdLibrary) => {
-        this.router.navigate(
-          ['/library', createdLibrary.id, 'books']
-        );
+        this.router.navigate(['/library', createdLibrary.id, 'books']);
       },
       error: (err) => {
         console.error('Failed to create library:', err);
       }
     });
+
     this.dynamicDialogRef.close();
   }
 

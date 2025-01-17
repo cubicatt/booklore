@@ -16,6 +16,7 @@ import {StyleClass} from 'primeng/styleclass';
 import {Divider} from 'primeng/divider';
 import {ThemeConfiguratorComponent} from '../theme-configurator/theme-configurator.component';
 import {LiveNotificationBoxComponent} from '../../../core/component/live-notification-box/live-notification-box.component';
+import {BookUploaderComponent} from '../../../book-uploader/book-uploader.component';
 
 @Component({
   selector: 'app-topbar',
@@ -88,12 +89,10 @@ export class AppTopBarComponent implements OnDestroy {
   }
 
   openFileUploadDialog() {
-    this.ref = this.dialogService.open(FileUploadComponent, {
-      header: 'Upload Book',
+    this.ref = this.dialogService.open(BookUploaderComponent, {
+      header: 'Book Uploader',
       modal: true,
       closable: true,
-      width: '600px',
-      height: '330px',
       style: {
         position: 'absolute',
         top: '15%',

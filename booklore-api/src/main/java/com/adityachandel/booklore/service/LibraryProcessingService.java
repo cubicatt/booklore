@@ -5,6 +5,7 @@ import com.adityachandel.booklore.model.LibraryFile;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
+import com.adityachandel.booklore.model.entity.LibraryPathEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookRepository;
@@ -81,7 +82,7 @@ public class LibraryProcessingService {
     protected Book processLibraryFile(LibraryFile libraryFile) {
         if (libraryFile.getBookFileType() == BookFileType.PDF) {
             return pdfFileProcessor.processFile(libraryFile, false);
-        } else if(libraryFile.getBookFileType() == BookFileType.EPUB) {
+        } else if (libraryFile.getBookFileType() == BookFileType.EPUB) {
             return epubFileProcessor.processFile(libraryFile, false);
         }
         return null;
@@ -113,8 +114,8 @@ public class LibraryProcessingService {
 
     private List<LibraryFile> getLibraryFiles(LibraryEntity libraryEntity) throws IOException {
         List<LibraryFile> libraryFiles = new ArrayList<>();
-        for (String libraryPath : libraryEntity.getPaths()) {
-            libraryFiles.addAll(findLibraryFiles(libraryPath, libraryEntity));
+        for (LibraryPathEntity libraryPath : libraryEntity.getLibraryPaths()) {
+            libraryFiles.addAll(findLibraryFiles(libraryPath.getPath(), libraryEntity));
         }
         return libraryFiles;
     }

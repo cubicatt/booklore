@@ -5,5 +5,10 @@ export interface Library {
   name: string;
   icon: string;
   sort?: SortOption;
-  paths: string[];
+  paths: LibraryPath[];
+}
+
+export interface LibraryPath {
+  id?: number;
+  path: string;
 }

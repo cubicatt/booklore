@@ -1,10 +1,17 @@
 CREATE TABLE IF NOT EXISTS library
 (
-    id    BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name  VARCHAR(255) UNIQUE NOT NULL,
-    sort  VARCHAR(255)        NULL,
-    icon  VARCHAR(64)         NOT NULL,
-    paths TEXT
+    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    sort VARCHAR(255)        NULL,
+    icon VARCHAR(64)         NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS library_path
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    path       TEXT,
+    library_id BIGINT,
+    CONSTRAINT fk_library_path FOREIGN KEY (library_id) REFERENCES library (id)
 );
 
 CREATE TABLE IF NOT EXISTS book

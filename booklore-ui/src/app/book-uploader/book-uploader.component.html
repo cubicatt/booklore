@@ -1,0 +1,38 @@
+<div
+  *ngIf="(libraryState$ | async)?.libraries as libraries"
+  class="flex flex-col gap-10 p-4 items-center justify-center min-w-[400px] max-w-[600px] w-full">
+
+  <p-dropdown
+    [options]="libraries"
+    optionLabel="name"
+    placeholder="Select Library"
+    [(ngModel)]="selectedLibrary"
+    class="w-full"></p-dropdown>
+
+  <p-dropdown
+    [options]="selectedLibrary?.paths"
+    optionLabel="path"
+    placeholder="Select Upload Location"
+    [(ngModel)]="selectedPath"
+    [disabled]="!selectedLibrary"
+    class="w-full"></p-dropdown>
+
+  <p-fileupload
+    #fu
+    mode="basic"
+    chooseLabel="Choose"
+    chooseIcon="pi pi-upload"
+    name="file"
+    [url]="getUploadUrl()"
+    accept=".pdf,.epub"
+    maxFileSize="104857600"
+    (onUpload)="onUpload($event)"
+    [disabled]="!selectedLibrary || !selectedPath"
+    class="w-full">
+  </p-fileupload>
+
+  <div class="flex flex-row items-center justify-between w-full">
+    <p-button label="Upload" (onClick)="fu.upload()" severity="primary" [disabled]="!fu.files.length" class=""/>
+    <p-button label="Clear" (click)="fu.clear()" severity="info" [disabled]="!fu.files.length" class=""/>
+  </div>
+</div>

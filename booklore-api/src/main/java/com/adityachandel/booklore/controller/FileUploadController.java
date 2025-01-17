@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.controller;
 
+import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.service.FileUploadService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,11 @@ public class FileUploadController {
 
     private final FileUploadService fileUploadService;
 
-    @PostMapping("/upload")
-    public ResponseEntity<Void> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("libraryId") long libraryId, @RequestParam("filePath") String filePath) {
-        fileUploadService.uploadFile(file, libraryId, filePath);
-        return ResponseEntity.noContent().build();
+    @PostMapping(value = "/upload", consumes = "multipart/form-data")
+    public ResponseEntity<Book> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("libraryId") long libraryId, @RequestParam("pathId") long pathId) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("Uploaded file is missing.");
+        }
+        return ResponseEntity.ok(fileUploadService.uploadFile(file, libraryId, pathId));
     }
 }

@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.model.dto.request;
 
+import com.adityachandel.booklore.model.dto.LibraryPath;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -17,5 +18,5 @@ public class CreateLibraryRequest {
     @NotBlank
     private String icon;
     @NotEmpty
-    private List<String> paths;
+    private List<LibraryPath> paths;
 }

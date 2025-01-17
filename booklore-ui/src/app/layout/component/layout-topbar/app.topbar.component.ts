@@ -8,7 +8,6 @@ import {TooltipModule} from 'primeng/tooltip';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {BookSearcherComponent} from '../../../book/components/book-searcher/book-searcher.component';
-import {FileUploadComponent} from '../../../utilities/component/file-upload/file-upload.component';
 import {NgClass} from '@angular/common';
 import {EventService} from '../../../shared/websocket/event.service';
 import {Button} from 'primeng/button';
@@ -16,7 +15,7 @@ import {StyleClass} from 'primeng/styleclass';
 import {Divider} from 'primeng/divider';
 import {ThemeConfiguratorComponent} from '../theme-configurator/theme-configurator.component';
 import {LiveNotificationBoxComponent} from '../../../core/component/live-notification-box/live-notification-box.component';
-import {BookUploaderComponent} from '../../../book-uploader/book-uploader.component';
+import {BookUploaderComponent} from '../../../utilities/component/book-uploader/book-uploader.component';
 
 @Component({
   selector: 'app-topbar',

@@ -21,18 +21,40 @@
     #fu
     mode="basic"
     chooseLabel="Choose"
-    chooseIcon="pi pi-upload"
+    chooseIcon="pi pi-file"
+    uploadIcon="pi pi-file"
     name="file"
     [url]="getUploadUrl()"
     accept=".pdf,.epub"
     maxFileSize="104857600"
+    (onSelect)="onSelect()"
+    (onClear)="onClear($event)"
     (onUpload)="onUpload($event)"
-    [disabled]="!selectedLibrary || !selectedPath"
+    (onProgress)="onProgress($event)"
+    (onSend)="onSend($event)"
+    (onError)="onError($event)"
+    [disabled]="!selectedLibrary || !selectedPath || isUploading"
     class="w-full">
   </p-fileupload>
 
   <div class="flex flex-row items-center justify-between w-full">
-    <p-button label="Upload" (onClick)="fu.upload()" severity="primary" [disabled]="!fu.files.length" class=""/>
-    <p-button label="Clear" (click)="fu.clear()" severity="info" [disabled]="!fu.files.length" class=""/>
+
+    <div class="flex flex-row items-center gap-4">
+      <p-button
+        icon="pi pi-upload"
+        label="Upload"
+        (onClick)="fu.upload()"
+        severity="info"
+        [disabled]="!fu.files.length || isUploading"/>
+      <p *ngIf="isUploading" class="text-base">Progress: {{ progressPercent }}%</p>
+      <p *ngIf="errorMessage" class="text-base text-red-600">{{ errorMessage }}</p>
+    </div>
+
+    <p-button
+      icon="pi pi-times"
+      label="Clear"
+      (click)="fu.clear()"
+      severity="warn"
+      [hidden]="!fu.files.length || isUploading"/>
   </div>
 </div>

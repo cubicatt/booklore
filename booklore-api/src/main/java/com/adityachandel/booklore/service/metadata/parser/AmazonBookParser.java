@@ -81,6 +81,7 @@ public class AmazonBookParser implements BookParser {
         } catch (Exception e) {
             log.error("Failed to get asin: {}", e.getMessage(), e);
         }
+        log.info("Amazon: Found {} book ids", bookIds.size());
         return bookIds;
     }
 
@@ -90,17 +91,17 @@ public class AmazonBookParser implements BookParser {
             Element link = item.select("a:containsOwn(" + type + ")").first();
             if (link != null) {
                 bookLink = link.attr("href");
-                log.info("{} link found: {}", type, bookLink);
+                //log.info("{} link found: {}", type, bookLink);
                 break; // Take the first found link, whether Paperback or Hardcover
             } else {
-                log.info("No link containing '{}' found.", type);
+                //log.info("No link containing '{}' found.", type);
             }
         }
         if (bookLink != null) {
             return extractAsinFromUrl(bookLink);
         } else {
             String asin = item.attr("data-asin");
-            log.info("No book link found, returning ASIN: {}", asin);
+            //log.info("No book link found, returning ASIN: {}", asin);
             return asin;
         }
     }
@@ -149,9 +150,10 @@ public class AmazonBookParser implements BookParser {
         // Add title if present, otherwise check filename if title is absent
         String title = fetchMetadataRequest.getTitle();
         if (title != null && !title.isEmpty()) {
+            title = BookUtils.cleanAndTruncateSearchTerm(title);
             queryBuilder.append("&field-title=").append(title.replace(" ", "%20"));
         } else {
-            String filename = BookUtils.cleanFileName(book.getFileName());
+            String filename = BookUtils.cleanAndTruncateSearchTerm(BookUtils.cleanFileName(book.getFileName()));
             if (filename != null && !filename.isEmpty()) {
                 queryBuilder.append("&field-title=").append(filename.replace(" ", "%20"));
             }

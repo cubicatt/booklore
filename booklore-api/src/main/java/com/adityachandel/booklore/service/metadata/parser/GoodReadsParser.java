@@ -295,21 +295,9 @@ public class GoodReadsParser implements BookParser {
                 : (book.getFileName() != null && !book.getFileName().isEmpty()
                 ? BookUtils.cleanFileName(book.getFileName())
                 : null);
-
         if (searchTerm != null) {
-            searchTerm = searchTerm.replaceAll("[.,\\-\\[\\]{}()!@#$%^&*_=+|~`<>?/\";:]", "").trim();
-            if (searchTerm.length() > 60) {
-                String[] words = searchTerm.split("\\s+");
-                StringBuilder truncated = new StringBuilder();
-                for (String word : words) {
-                    if (truncated.length() + word.length() + 1 > 60) break;
-                    if (!truncated.isEmpty()) truncated.append(" ");
-                    truncated.append(word);
-                }
-                searchTerm = truncated.toString();
-            }
+            BookUtils.cleanAndTruncateSearchTerm(searchTerm);
         }
-
         return searchTerm;
     }
 

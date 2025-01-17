@@ -34,7 +34,7 @@ export class MetadataPickerComponent implements OnInit {
   @Input() fetchedMetadata!: FetchedMetadata;
   @Output() goBack = new EventEmitter<boolean>();
 
-  bookMetadataForm: FormGroup;
+  metadataForm: FormGroup;
   currentBookId!: number;
   updateThumbnailUrl: boolean = false;
   thumbnailSaved: boolean = false;
@@ -46,10 +46,10 @@ export class MetadataPickerComponent implements OnInit {
   private messageService = inject(MessageService);
   private metadataService = inject(MetadataService);
 
-  metadata$: Observable<BookMetadata | null> = this.metadataCenterService.bookMetadata$;
+  currentMetadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
 
   constructor() {
-    this.bookMetadataForm = new FormGroup({
+    this.metadataForm = new FormGroup({
       title: new FormControl(''),
       subtitle: new FormControl(''),
       authors: new FormControl(''),
@@ -67,10 +67,10 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.metadata$.subscribe((metadata) => {
+    this.currentMetadata$.subscribe((metadata) => {
       if (metadata) {
         this.currentBookId = metadata.bookId;
-        this.bookMetadataForm.setValue({
+        this.metadataForm.setValue({
           title: metadata.title,
           subtitle: metadata.subtitle,
           authors: metadata.authors.map((author) => author.name).join(', '),
@@ -104,24 +104,24 @@ export class MetadataPickerComponent implements OnInit {
   onSave(): void {
     const updatedBookMetadata: BookMetadata = {
       bookId: this.currentBookId,
-      title: this.bookMetadataForm.get('title')?.value || this.copiedFields['title'] ? this.getValueOrCopied('title') : '',
-      subtitle: this.bookMetadataForm.get('subtitle')?.value || this.copiedFields['subtitle'] ? this.getValueOrCopied('subtitle') : '',
-      authors: this.bookMetadataForm.get('authors')?.value || this.copiedFields['authors'] ? this.getArrayFromFormField('authors', this.fetchedMetadata.authors) : [],
-      categories: this.bookMetadataForm.get('categories')?.value || this.copiedFields['categories'] ? this.getArrayFromFormField('categories', this.fetchedMetadata.categories) : [],
-      publisher: this.bookMetadataForm.get('publisher')?.value || this.copiedFields['publisher'] ? this.getValueOrCopied('publisher') : '',
-      publishedDate: this.bookMetadataForm.get('publishedDate')?.value || this.copiedFields['publishedDate'] ? this.getValueOrCopied('publishedDate') : '',
-      isbn10: this.bookMetadataForm.get('isbn10')?.value || this.copiedFields['isbn10'] ? this.getValueOrCopied('isbn10') : '',
-      isbn13: this.bookMetadataForm.get('isbn13')?.value || this.copiedFields['isbn13'] ? this.getValueOrCopied('isbn13') : '',
-      description: this.bookMetadataForm.get('description')?.value || this.copiedFields['description'] ? this.getValueOrCopied('description') : '',
-      pageCount: this.bookMetadataForm.get('pageCount')?.value || this.copiedFields['pageCount'] ? this.getPageCountOrCopied() : null,
-      language: this.bookMetadataForm.get('language')?.value || this.copiedFields['language'] ? this.getValueOrCopied('language') : '',
-      rating: this.bookMetadataForm.get('rating')?.value || this.copiedFields['rating'] ? this.getNumberOrCopied('rating') : null,
-      reviewCount: this.bookMetadataForm.get('reviewCount')?.value || this.copiedFields['reviewCount'] ? this.getNumberOrCopied('reviewCount') : null,
+      title: this.metadataForm.get('title')?.value || this.copiedFields['title'] ? this.getValueOrCopied('title') : '',
+      subtitle: this.metadataForm.get('subtitle')?.value || this.copiedFields['subtitle'] ? this.getValueOrCopied('subtitle') : '',
+      authors: this.metadataForm.get('authors')?.value || this.copiedFields['authors'] ? this.getArrayFromFormField('authors', this.fetchedMetadata.authors) : [],
+      categories: this.metadataForm.get('categories')?.value || this.copiedFields['categories'] ? this.getArrayFromFormField('categories', this.fetchedMetadata.categories) : [],
+      publisher: this.metadataForm.get('publisher')?.value || this.copiedFields['publisher'] ? this.getValueOrCopied('publisher') : '',
+      publishedDate: this.metadataForm.get('publishedDate')?.value || this.copiedFields['publishedDate'] ? this.getValueOrCopied('publishedDate') : '',
+      isbn10: this.metadataForm.get('isbn10')?.value || this.copiedFields['isbn10'] ? this.getValueOrCopied('isbn10') : '',
+      isbn13: this.metadataForm.get('isbn13')?.value || this.copiedFields['isbn13'] ? this.getValueOrCopied('isbn13') : '',
+      description: this.metadataForm.get('description')?.value || this.copiedFields['description'] ? this.getValueOrCopied('description') : '',
+      pageCount: this.metadataForm.get('pageCount')?.value || this.copiedFields['pageCount'] ? this.getPageCountOrCopied() : null,
+      language: this.metadataForm.get('language')?.value || this.copiedFields['language'] ? this.getValueOrCopied('language') : '',
+      rating: this.metadataForm.get('rating')?.value || this.copiedFields['rating'] ? this.getNumberOrCopied('rating') : null,
+      reviewCount: this.metadataForm.get('reviewCount')?.value || this.copiedFields['reviewCount'] ? this.getNumberOrCopied('reviewCount') : null,
       thumbnailUrl: this.updateThumbnailUrl ? this.fetchedMetadata.thumbnailUrl : '',
     };
 
     this.metadataService.updateBookMetadata(this.currentBookId, updatedBookMetadata).subscribe({
-      next: () => {
+      next: (bookMetadata) => {
         Object.keys(this.copiedFields).forEach((field) => {
           if (this.copiedFields[field]) {
             this.savedFields[field] = true;
@@ -131,7 +131,7 @@ export class MetadataPickerComponent implements OnInit {
           this.thumbnailSaved = true;
         }
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
-        this.metadataCenterService.emit(updatedBookMetadata);
+        this.metadataCenterService.emit(bookMetadata);
       },
       error: () => {
         this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book metadata'});
@@ -141,14 +141,14 @@ export class MetadataPickerComponent implements OnInit {
 
   copyMissing() {
     Object.keys(this.fetchedMetadata).forEach((field) => {
-      if (!this.bookMetadataForm.get(field)?.value && this.fetchedMetadata[field]) {
+      if (!this.metadataForm.get(field)?.value && this.fetchedMetadata[field]) {
         this.copyFetchedToCurrent(field);
       }
     });
   }
 
   private getNumberOrCopied(field: string): number | null {
-    const formValue = this.bookMetadataForm.get(field)?.value;
+    const formValue = this.metadataForm.get(field)?.value;
     if (formValue === '' || formValue === null || isNaN(formValue)) {
       this.copiedFields[field] = true;
       return this.fetchedMetadata[field] || null;
@@ -157,7 +157,7 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   private getPageCountOrCopied(): number | null {
-    const formValue = this.bookMetadataForm.get('pageCount')?.value;
+    const formValue = this.metadataForm.get('pageCount')?.value;
     if (formValue === '' || formValue === null || isNaN(formValue)) {
       this.copiedFields['pageCount'] = true;
       return this.fetchedMetadata.pageCount || null;
@@ -166,7 +166,7 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   private getValueOrCopied(field: string): string {
-    const formValue = this.bookMetadataForm.get(field)?.value;
+    const formValue = this.metadataForm.get(field)?.value;
     if (!formValue || formValue === '') {
       this.copiedFields[field] = true;
       return this.fetchedMetadata[field] || '';
@@ -175,7 +175,7 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   getArrayFromFormField(field: string, fallbackValue: any): any[] {
-    const fieldValue = this.bookMetadataForm.get(field)?.value;
+    const fieldValue = this.metadataForm.get(field)?.value;
     if (!fieldValue) {
       return fallbackValue ? (Array.isArray(fallbackValue) ? fallbackValue : [fallbackValue]) : [];
     }
@@ -192,7 +192,7 @@ export class MetadataPickerComponent implements OnInit {
   copyFetchedToCurrent(field: string): void {
     const value = this.fetchedMetadata[field];
     if (value) {
-      this.bookMetadataForm.get(field)?.setValue(value);
+      this.metadataForm.get(field)?.setValue(value);
       this.copiedFields[field] = true;
       this.highlightCopiedInput(field);
     }

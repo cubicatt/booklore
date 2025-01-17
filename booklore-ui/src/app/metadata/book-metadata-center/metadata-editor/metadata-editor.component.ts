@@ -37,7 +37,7 @@ export class MetadataEditorComponent implements OnInit {
   private messageService = inject(MessageService);
   private metadataService = inject(MetadataService);
 
-  bookMetadata$: Observable<BookMetadata | null> = this.metadataCenterService.bookMetadata$;
+  bookMetadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
   bookMetadataForm: FormGroup;
   currentBookId!: number;
 

@@ -7,16 +7,16 @@ import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
-import {Editor} from 'primeng/editor';
 import {Author, Book} from '../../../book/model/book.model';
 import {FileService} from '../../../book/service/file.service';
+import {Divider} from 'primeng/divider';
 
 @Component({
   selector: 'app-metadata-viewer',
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Editor]
+  imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Divider]
 })
 export class MetadataViewerComponent {
 
@@ -24,7 +24,7 @@ export class MetadataViewerComponent {
   private fileService = inject(FileService);
   private metadataCenterService = inject(BookMetadataCenterService);
 
-  metadata$: Observable<Book['metadata'] | null> = this.metadataCenterService.bookMetadata$;
+  metadata$: Observable<Book['metadata'] | null> = this.metadataCenterService.currentMetadata$;
 
   coverImageSrc(bookId: number | undefined): string {
     return bookId ? this.bookService.getBookCoverUrl(bookId) : 'assets/book-cover-metadata.png';

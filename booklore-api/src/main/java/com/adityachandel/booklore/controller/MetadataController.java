@@ -34,14 +34,8 @@ public class MetadataController {
     }
 
     @PutMapping("/{bookId}")
-    public ResponseEntity<BookMetadata> setBookMetadata(@RequestBody FetchedBookMetadata setMetadataRequest, @PathVariable long bookId) {
-        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true), false);
-        return ResponseEntity.ok(bookMetadata);
-    }
-
-    @PutMapping("/{bookId}/source/{source}")
-    public ResponseEntity<BookMetadata> setBookMetadata(@RequestBody FetchedBookMetadata setMetadataRequest, @PathVariable long bookId, @PathVariable MetadataProvider source) {
-        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true), false);
+    public ResponseEntity<BookMetadata> updateMetadata(@RequestBody FetchedBookMetadata setMetadataRequest, @PathVariable long bookId) {
+        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true), true);
         return ResponseEntity.ok(bookMetadata);
     }
 

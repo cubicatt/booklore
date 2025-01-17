@@ -54,7 +54,7 @@ export class MetadataSearcherComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.metadataCenterService.bookMetadata$.subscribe((metadata => {
+    this.metadataCenterService.currentMetadata$.subscribe((metadata => {
       if (metadata) {
         this.bookId = metadata.bookId;
         this.form.setValue(({
@@ -62,9 +62,9 @@ export class MetadataSearcherComponent implements OnInit {
           isbn: metadata.isbn10,
           title: metadata.title,
           author: metadata.authors?.length! > 0 ? metadata.authors[0].name : ''
-        }))
+        }));
       }
-    }))
+    }));
   }
 
   get isSearchEnabled(): boolean {
@@ -94,9 +94,9 @@ export class MetadataSearcherComponent implements OnInit {
         .subscribe({
           next: (fetchedMetadata) => {
             this.loading = false;
-            this.allFetchedMetadata = fetchedMetadata.map((book) => ({
-              ...book,
-              thumbnailUrl: book.thumbnailUrl
+            this.allFetchedMetadata = fetchedMetadata.map((fetchedMetadata) => ({
+              ...fetchedMetadata,
+              thumbnailUrl: fetchedMetadata.thumbnailUrl
             }));
           },
           error: () => {

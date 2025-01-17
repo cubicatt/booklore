@@ -8,7 +8,7 @@ import {Book, BookMetadata} from '../../book/model/book.model';
 export class BookMetadataCenterService {
 
   private bookMetadataSubject = new BehaviorSubject<BookMetadata | null>(null);
-  bookMetadata$ = this.bookMetadataSubject.asObservable();
+  currentMetadata$ = this.bookMetadataSubject.asObservable();
 
   private dialogCloseSubject = new BehaviorSubject<boolean | null>(null);
   dialogClose$ = this.dialogCloseSubject.asObservable();

@@ -15,9 +15,9 @@ public class AppSettingEntity {
     @Column(name = "category", nullable = false)
     private String category;
 
-    @Column(name = "key1", nullable = false)
-    private String key;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-    @Column(name = "value", nullable = false, columnDefinition = "TEXT")
-    private String value;
+    @Column(name = "val", nullable = false, columnDefinition = "TEXT")
+    private String val;
 }

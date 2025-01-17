@@ -14,10 +14,10 @@ spring:
   application:
     name: booklore-api
   datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: ${SOLITUDE_API_MARIADB_URL:jdbc:mariadb://localhost:3306/booklore}
-    username: ${SOLITUDE_API_MARIADB_USERNAME:root}
-    password: ${SOLITUDE_API_MARIADB_PASSWORD:cfcNEBdUm6QerR6oo2UM}
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:tcp://localhost:9092/~/my-library-temp/config/db/booklore
+    username: sa
+    password: password
   jpa:
     hibernate:
       naming:

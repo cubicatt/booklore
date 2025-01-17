@@ -19,7 +19,7 @@ public class AppSettingService {
 
     public AppSettings getAppSettings() {
         List<AppSettingEntity> settings = appSettingsRepository.findAll();
-        Map<String, Map<String, String>> settingsMap = settings.stream().collect(Collectors.groupingBy(AppSettingEntity::getCategory, Collectors.toMap(AppSettingEntity::getKey, AppSettingEntity::getValue)));
+        Map<String, Map<String, String>> settingsMap = settings.stream().collect(Collectors.groupingBy(AppSettingEntity::getCategory, Collectors.toMap(AppSettingEntity::getName, AppSettingEntity::getVal)));
         AppSettings appSettings = new AppSettings();
         if (settingsMap.containsKey("epub")) {
             Map<String, String> epubSettings = settingsMap.get("epub");
@@ -33,13 +33,13 @@ public class AppSettingService {
     }
 
     @Transactional
-    public void updateSetting(String category, String key, String newValue) {
-        AppSettingEntity setting = appSettingsRepository.findByCategoryAndKey(category, key);
+    public void updateSetting(String category, String name, String newValue) {
+        AppSettingEntity setting = appSettingsRepository.findByCategoryAndName(category, name);
         if (setting != null) {
-            setting.setValue(newValue);
+            setting.setVal(newValue);
             appSettingsRepository.save(setting);
         } else {
-            throw new IllegalArgumentException("Setting not found for category: " + category + " and key: " + key);
+            throw new IllegalArgumentException("Setting not found for category: " + category + " and key: " + name);
         }
     }
 }

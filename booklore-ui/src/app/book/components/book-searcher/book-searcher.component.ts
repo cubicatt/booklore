@@ -4,14 +4,10 @@ import {catchError, debounceTime, distinctUntilChanged, switchMap} from 'rxjs/op
 import {Book} from '../../model/book.model';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
-import {Router} from '@angular/router';
 import {BookService} from '../../service/book.service';
-import {BookMetadataCenterComponent} from '../../../metadata/book-metadata-center/book-metadata-center.component';
-import {DialogService} from 'primeng/dynamicdialog';
 import {Button} from 'primeng/button';
 import {NgForOf, NgIf} from '@angular/common';
 import {MetadataDialogService} from '../../../metadata/service/metadata-dialog.service';
-import {LibraryShelfMenuService} from '../../service/library-shelf-menu.service';
 
 @Component({
   selector: 'app-book-searcher',

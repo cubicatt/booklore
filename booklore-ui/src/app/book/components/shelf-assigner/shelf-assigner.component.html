@@ -1,38 +1,41 @@
-<div class="dialog-container">
-  <div class="checkbox-list">
-    <div *ngFor="let shelf of (shelfState$ | async)?.shelves" class="flex items-center">
-      <p-checkbox [inputId]="shelf.name" name="group" [value]="shelf" [(ngModel)]="selectedShelves"></p-checkbox>
-      <label [for]="shelf.id" class="ml-2">{{ shelf.name }}</label>
-    </div>
-  </div>
+<div class="p-4 min-w-[26rem] min-h-[30rem] flex flex-col">
 
-  <div class="bottom-section">
-    <p-divider></p-divider>
-    <div class="bottom-container">
+  <div class="flex flex-col flex-grow">
+    <!-- Dynamic shelves content -->
+    <div *ngFor="let shelf of (shelfState$ | async)?.shelves">
+      <div class="flex flex-row items-center gap-4 py-2">
+        <p-checkbox [inputId]="shelf.name" name="group" [value]="shelf" [(ngModel)]="selectedShelves"></p-checkbox>
+        <label [for]="shelf.id">{{ shelf.name }}</label>
+      </div>
+    </div>
+
+    <!-- Button section, anchored to the bottom -->
+    <div class="flex justify-between items-center pt-4 mt-auto">
       <p-button outlined="true" label="Create Shelf" (onClick)="createShelfDialog()"></p-button>
-      <div>
-        <p-button class="spacing-right" severity="secondary" label="Cancel" (onClick)="closeDialog()"></p-button>
+      <div class="flex gap-4">
+        <p-button severity="secondary" label="Cancel" (onClick)="closeDialog()"></p-button>
         <p-button label="Save" (onClick)="updateBooksShelves()"></p-button>
       </div>
     </div>
   </div>
 
+  <!-- Icon picker component -->
   <app-icon-picker (iconSelected)="onIconSelected($event)"></app-icon-picker>
-  <p-dialog [(visible)]="displayShelfDialog" header="Create Shelf" [modal]="true" [draggable]="false" [closable]="true" (onHide)="closeShelfDialog()" [style]="{ width: '400px', height: 'auto' }">
-    <div class="p-fluid">
-      <div class="field">
-        <label for="shelfName">Shelf Name</label>
-        <input id="shelfName" type="text" pInputText [(ngModel)]="shelfName" />
+
+  <!-- Shelf dialog component -->
+  <p-dialog [style]="{ width: '26rem', height: '30rem' }"  [(visible)]="displayShelfDialog" header="Create Shelf" [modal]="true" [draggable]="false" [closable]="true" (onHide)="closeShelfDialog()">
+    <div class="py-2">
+      <label for="shelfName">Shelf Name</label>
+      <input id="shelfName" type="text" pInputText [(ngModel)]="shelfName" class="w-full"/>
+    </div>
+    <div class="py-4">
+      <label>Shelf Icon</label>
+      <div *ngIf="!selectedIcon">
+        <p-button label="Select Icon" icon="pi pi-search" (onClick)="openIconPicker()"></p-button>
       </div>
-      <div class="field">
-        <label>Shelf Icon</label>
-        <div *ngIf="!selectedIcon">
-          <p-button label="Select Icon" icon="pi pi-search" (onClick)="openIconPicker()"></p-button>
-        </div>
-        <div *ngIf="selectedIcon" class="mt-2 flex items-center">
-          <i [class]="selectedIcon" class="mr-2"></i>
-          <p-button label="Remove" icon="pi pi-times" text="true" outlined="true" severity="warn" (onClick)="clearSelectedIcon()"></p-button>
-        </div>
+      <div *ngIf="selectedIcon" class="flex items-center gap-4">
+        <i [class]="selectedIcon"></i>
+        <p-button icon="pi pi-times" text="true" outlined="true" severity="warn" (onClick)="clearSelectedIcon()"></p-button>
       </div>
     </div>
     <ng-template pTemplate="footer">

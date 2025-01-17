@@ -84,10 +84,13 @@ export class BookCardComponent implements OnInit {
     this.dialogService.open(ShelfAssignerComponent, {
       header: `Update Shelves: ${book.metadata?.title}`,
       modal: true,
-      width: '30%',
-      height: '70%',
+      closable: true,
       contentStyle: {overflow: 'auto'},
       baseZIndex: 10,
+      style: {
+        position: 'absolute',
+        top: '15%',
+      },
       data: {
         book: this.book
       },

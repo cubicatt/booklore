@@ -321,8 +321,6 @@ export class BookBrowserComponent implements OnInit {
       header: `Update Books Shelves`,
       modal: true,
       closable: true,
-      width: '30%',
-      height: '60%',
       contentStyle: {overflow: 'auto'},
       baseZIndex: 10,
       style: {

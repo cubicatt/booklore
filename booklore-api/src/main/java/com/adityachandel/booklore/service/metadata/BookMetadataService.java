@@ -6,12 +6,14 @@ import com.adityachandel.booklore.model.dto.Author;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
+import com.adityachandel.booklore.model.dto.settings.AppSettings;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
+import com.adityachandel.booklore.service.AppSettingService;
 import com.adityachandel.booklore.service.NotificationService;
 import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
 import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
@@ -42,6 +44,7 @@ public class BookMetadataService {
     private final BookMapper bookMapper;
     private final BookMetadataUpdater bookMetadataUpdater;
     private final NotificationService notificationService;
+    private final AppSettingService appSettingService;
     private final Map<MetadataProvider, BookParser> parserMap;
 
 
@@ -85,6 +88,12 @@ public class BookMetadataService {
     @Transactional
     public void refreshMetadata(MetadataRefreshRequest request) {
         log.info("Refresh Metadata task started!");
+
+        if (request.getQuick() != null && request.getQuick()) {
+            AppSettings appSettings = appSettingService.getAppSettings();
+            request.setRefreshOptions(appSettings.getMetadataRefreshOptions());
+        }
+
         List<MetadataProvider> providers = prepareProviders(request);
         List<BookEntity> books = getBookEntities(request);
         for (BookEntity bookEntity : books) {

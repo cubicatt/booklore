@@ -1,3 +1,5 @@
+import {MetadataRefreshOptions} from '../../metadata/model/request/metadata-refresh-options.model';
+
 export interface EpubSettings {
   theme: string;
   fontSize: number;
@@ -13,12 +15,13 @@ export interface PdfSettings {
 }
 
 export interface ReaderSettings {
-  pdfScope: 'Global' | 'Individual';
-  epubScope: 'Global' | 'Individual';
+  pdfScope: 'global' | 'individual';
+  epubScope: 'global' | 'individual';
 }
 
 export interface AppSettings {
   epub?: EpubSettings;
   pdf?: PdfSettings;
   readerSettings?: ReaderSettings;
+  metadataRefreshOptions: MetadataRefreshOptions;
 }

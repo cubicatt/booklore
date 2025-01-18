@@ -28,15 +28,15 @@ export class AppSettingsService {
     });
   }
 
-  saveAppSetting(category: string, key: string, newValue: string | number): void {
-    const params = new HttpParams()
-      .set('category', category)
-      .set('name', key)
-      .set('val', newValue);
-
-    this.http.put(this.apiUrl, null, { params }).subscribe({
+  saveAppSetting(category: string, key: string, newValue: any): void {
+    const payload = {
+      category,
+      name: key,
+      value: newValue
+    };
+    this.http.put(this.apiUrl, payload).subscribe({
       next: () => {
-
+        console.log('Settings saved successfully');
       },
       error: (error) => {
         console.error('Error saving setting:', error);

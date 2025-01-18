@@ -18,17 +18,7 @@ import {info} from 'autoprefixer';
   selector: 'app-metadata-searcher',
   templateUrl: './metadata-searcher.component.html',
   styleUrls: ['./metadata-searcher.component.scss'],
-  imports: [
-    ReactiveFormsModule,
-    Button,
-    InputText,
-    Divider,
-    NgForOf,
-    NgIf,
-    ProgressSpinner,
-    MetadataPickerComponent,
-    MultiSelect
-  ],
+  imports: [ReactiveFormsModule, Button, InputText, Divider, NgForOf, NgIf, ProgressSpinner, MetadataPickerComponent, MultiSelect],
   standalone: true
 })
 export class MetadataSearcherComponent implements OnInit {
@@ -58,13 +48,14 @@ export class MetadataSearcherComponent implements OnInit {
       if (metadata) {
         this.bookId = metadata.bookId;
         this.form.setValue(({
-          provider: null,
+          provider: Object.values(MetadataProvider),
           isbn: metadata.isbn10,
           title: metadata.title,
           author: metadata.authors?.length! > 0 ? metadata.authors[0].name : ''
         }));
       }
     }));
+    this.onSubmit();
   }
 
   get isSearchEnabled(): boolean {

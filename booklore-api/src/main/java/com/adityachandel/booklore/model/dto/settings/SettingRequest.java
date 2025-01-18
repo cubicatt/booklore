@@ -1,0 +1,12 @@
+package com.adityachandel.booklore.model.dto.settings;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class SettingRequest {
+    private String category;
+    private String name;
+    private Object value;
+}

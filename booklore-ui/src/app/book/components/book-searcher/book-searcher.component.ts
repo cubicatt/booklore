@@ -69,7 +69,7 @@ export class BookSearcherComponent implements OnInit, OnDestroy {
 
   onBookClick(book: Book): void {
     this.clearSearch();
-    this.metadataDialogService.openBookDetailsDialog(book.id);
+    this.metadataDialogService.openBookMetadataCenterDialog(book.id, 'view');
   }
 
   getBookCoverUrl(bookId: number): string {

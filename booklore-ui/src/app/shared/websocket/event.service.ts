@@ -24,12 +24,12 @@ export class EventService {
 
     this.eventTimeout = setTimeout(() => {
       this.eventHighlightSubject.next(false);
-    }, 5000);
+    }, 7500);
 
     setTimeout(() => {
       if (!this.eventHighlightSubject.value) {
         this.latestEventSubject.next({message: 'No recent notifications...'});
       }
-    }, 12000);
+    }, 20000);
   }
 }

@@ -15,7 +15,6 @@ import lombok.AllArgsConstructor;
 public class MetadataRefreshOptions {
     @NotNull(message = "Default Provider cannot be null")
     private MetadataProvider defaultProvider;
-
     private boolean refreshCovers;
     private FieldOptions fieldOptions;
 

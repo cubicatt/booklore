@@ -1,4 +1,4 @@
-import {Component, Output, EventEmitter, inject} from '@angular/core';
+import {Component, Output, EventEmitter, inject, Input, OnInit, OnChanges, SimpleChanges} from '@angular/core';
 import {Select, SelectChangeEvent} from 'primeng/select';
 import {FormsModule} from '@angular/forms';
 import {NgForOf, TitleCasePipe} from '@angular/common';
@@ -14,7 +14,7 @@ import {FieldOptions, FieldProvider, MetadataRefreshOptions} from '../../model/r
   styleUrl: './metadata-advanced-fetch-options.component.scss',
   standalone: true
 })
-export class MetadataAdvancedFetchOptionsComponent {
+export class MetadataAdvancedFetchOptionsComponent implements OnChanges {
 
   @Output() metadataOptionsSubmitted: EventEmitter<MetadataRefreshOptions> = new EventEmitter<MetadataRefreshOptions>();
   fields: (keyof FieldOptions)[] = ['title', 'description', 'authors', 'categories', 'cover'];
@@ -34,6 +34,16 @@ export class MetadataAdvancedFetchOptionsComponent {
   };
 
   private messageService = inject(MessageService);
+  @Input() currentMetadataOptions!: MetadataRefreshOptions;
+
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['currentMetadataOptions'] && this.currentMetadataOptions) {
+      this.refreshCovers = this.currentMetadataOptions.refreshCovers || false;
+      this.fieldOptions = this.currentMetadataOptions.fieldOptions || this.fieldOptions;
+      this.allDefault.value = this.currentMetadataOptions.defaultProvider || '';
+    }
+  }
 
   syncProvider(event: SelectChangeEvent, providerType: keyof FieldProvider) {
     for (const field of Object.keys(this.fieldOptions)) {
@@ -75,4 +85,5 @@ export class MetadataAdvancedFetchOptionsComponent {
       };
     }
   }
+
 }

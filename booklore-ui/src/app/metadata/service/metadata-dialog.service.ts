@@ -12,7 +12,7 @@ export class MetadataDialogService {
   private bookService = inject(BookService);
 
 
-  public openBookDetailsDialog(bookId: number): void {
+  public openBookMetadataCenterDialog(bookId: number, tab: string): void {
     this.bookService.getBookByIdFromAPI(bookId, true).subscribe({
       next: (book) => {
         this.dialogService.open(BookMetadataCenterComponent, {
@@ -26,6 +26,7 @@ export class MetadataDialogService {
           dismissableMask: true,
           data: {
             book: book,
+            tab: tab
           },
         });
       },

@@ -1,17 +1,17 @@
-<p-tabs value="0" style="height: 100%; overflow: hidden;">
+<p-tabs [value]="tab" lazy="true" style="height: 100%; overflow: hidden;">
   <p-tablist>
-    <p-tab value="0">Book Details</p-tab>
-    <p-tab value="1">Edit Details</p-tab>
-    <p-tab value="2">Match Book</p-tab>
+    <p-tab value="view">Book Details</p-tab>
+    <p-tab value="edit">Edit Details</p-tab>
+    <p-tab value="match">Match Book</p-tab>
   </p-tablist>
   <p-tabpanels style="height: 100%; overflow: hidden; padding-bottom: 0">
-    <p-tabpanel value="0" style="height: 100%; overflow: hidden;">
+    <p-tabpanel value="view" style="height: 100%; overflow: hidden;">
       <app-metadata-viewer></app-metadata-viewer>
     </p-tabpanel>
-    <p-tabpanel value="1" style="height: 100%; overflow: hidden;">
+    <p-tabpanel value="edit" style="height: 100%; overflow: hidden;">
       <app-metadata-editor></app-metadata-editor>
     </p-tabpanel>
-    <p-tabpanel value="2" style="height: 100%; overflow: hidden;">
+    <p-tabpanel value="match" style="height: 100%; overflow: hidden;">
       <app-metadata-searcher></app-metadata-searcher>
     </p-tabpanel>
   </p-tabpanels>

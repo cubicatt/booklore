@@ -53,32 +53,7 @@ export class MetadataFetchOptionsComponent {
       bookIds: this.bookIds,
       libraryId: this.libraryId
     };
-    this.metadataService.autoRefreshMetadata(metadataRefreshRequest).subscribe({
-      next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Metadata Update Scheduled',
-          detail: 'The metadata update for the selected books has been successfully scheduled.'
-        });
-      },
-      error: (e) => {
-        if (e.status === 409) {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Task Already Running',
-            life: 5000,
-            detail: 'A metadata refresh task is already in progress. Please wait for it to complete before starting another one.'
-          });
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Metadata Update Failed',
-            life: 5000,
-            detail: 'An unexpected error occurred while scheduling the metadata update. Please try again later or contact support if the issue persists.'
-          });
-        }
-      }
-    });
+    this.metadataService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
     this.dynamicDialogRef.close();
   }
 }

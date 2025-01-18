@@ -9,11 +9,9 @@ import java.util.Set;
 public class MetadataRefreshRequest {
     @NotNull(message = "Refresh type cannot be null")
     private RefreshType refreshType;
-
+    private Boolean quick;
     private Long libraryId;
     private Set<Long> bookIds;
-
-    @NotNull(message = "Refresh options cannot be null")
     private MetadataRefreshOptions refreshOptions;
 
     public enum RefreshType {

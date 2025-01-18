@@ -73,7 +73,7 @@ export class BookTableComponent implements OnChanges {
   }
 
   openMetadataCenter(id: number): void {
-    this.metadataDialogService.openBookDetailsDialog(id);
+    this.metadataDialogService.openBookMetadataCenterDialog(id, 'view');
   }
 
   getStarColor(rating: number): string {

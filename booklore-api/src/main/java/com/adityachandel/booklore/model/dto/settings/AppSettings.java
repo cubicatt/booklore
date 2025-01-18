@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.model.dto.settings;
 
+import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ public class AppSettings {
     private EpubSettings epub;
     private PdfSettings pdf;
     private ReaderSettings readerSettings;
+    private MetadataRefreshOptions metadataRefreshOptions;
 
     @Data
     @Builder
@@ -44,6 +46,6 @@ public class AppSettings {
     }
 
     public enum SettingScope {
-        Global, Individual
+        global, individual
     }
 }

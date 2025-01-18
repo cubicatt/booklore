@@ -10,6 +10,11 @@ import {CheckboxModule} from 'primeng/checkbox';
 import {FormsModule} from '@angular/forms';
 import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
 import {FileService} from '../../../service/file.service';
+import {MetadataFetchOptionsComponent} from '../../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
+import {MetadataRefreshType} from '../../../../metadata/model/request/metadata-refresh-type.enum';
+import {MetadataRefreshRequest} from '../../../../metadata/model/request/metadata-refresh-request.model';
+import {Meta} from '@angular/platform-browser';
+import {MetadataService} from '../../../../metadata/service/metadata.service';
 
 
 @Component({
@@ -30,6 +35,7 @@ export class BookCardComponent implements OnInit {
   private fileService = inject(FileService);
   private bookService = inject(BookService);
   private dialogService = inject(DialogService);
+  private metadataService = inject(MetadataService);
   private metadataDialogService = inject(MetadataDialogService);
 
   ngOnInit(): void {
@@ -55,14 +61,46 @@ export class BookCardComponent implements OnInit {
         label: 'Options',
         items: [
           {
-            label: 'Edit shelf',
+            label: 'Assign Shelves',
             icon: 'pi pi-folder',
             command: () => this.openShelfDialog(this.book),
           },
           {
-            label: 'View metadata',
+            label: 'View Details',
             icon: 'pi pi-info-circle',
-            command: () => this.metadataDialogService.openBookDetailsDialog(this.book.id),
+            command: () => this.metadataDialogService.openBookMetadataCenterDialog(this.book.id, 'view'),
+          },
+          {
+            label: 'Match Book',
+            icon: 'pi pi-sparkles',
+            command: () => this.metadataDialogService.openBookMetadataCenterDialog(this.book.id, 'match'),
+          },
+          {
+            label: 'Quick Refresh',
+            icon: 'pi pi-bolt',
+            command: () => {
+              const metadataRefreshRequest: MetadataRefreshRequest = {
+                quick: true,
+                refreshType: MetadataRefreshType.BOOKS,
+                bookIds: [this.book.id]
+              };
+              this.metadataService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
+            },
+          },
+          {
+            label: 'Advanced Refresh',
+            icon: 'pi pi-database',
+            command: () => {
+              this.dialogService.open(MetadataFetchOptionsComponent, {
+                header: 'Metadata Refresh Options',
+                modal: true,
+                closable: true,
+                data: {
+                  bookIds: [this.book!.id],
+                  metadataRefreshType: MetadataRefreshType.BOOKS
+                }
+              })
+            },
           },
           {
             label: 'Download',
@@ -78,7 +116,7 @@ export class BookCardComponent implements OnInit {
 
   private openShelfDialog(book: Book): void {
     this.dialogService.open(ShelfAssignerComponent, {
-      header: `Update Shelves: ${book.metadata?.title}`,
+      header: `Update Book's Shelves`,
       modal: true,
       closable: true,
       contentStyle: {overflow: 'auto'},
@@ -94,6 +132,6 @@ export class BookCardComponent implements OnInit {
   }
 
   openBookInfo(book: Book): void {
-    this.metadataDialogService.openBookDetailsDialog(book.id);
+    this.metadataDialogService.openBookMetadataCenterDialog(book.id, 'view');
   }
 }

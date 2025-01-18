@@ -18,9 +18,11 @@ export class BookMetadataCenterComponent implements OnInit {
   private dynamicDialogConfig = inject(DynamicDialogConfig);
   private dynamicDialogRef = inject(DynamicDialogRef);
   private metadataCenterService = inject(BookMetadataCenterService);
+  tab = 'view';
 
   ngOnInit(): void {
     const book = this.dynamicDialogConfig.data.book;
+    this.tab = this.dynamicDialogConfig.data.tab;
     if (book?.metadata) {
       this.metadataCenterService.emit(book.metadata);
     }

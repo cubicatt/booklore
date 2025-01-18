@@ -54,7 +54,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
 
             this.page = pdf.pdfProgress || 1;
 
-            if (pdfScope === 'Global') {
+            if (pdfScope === 'global') {
               this.zoom = globalPdfSettings?.zoom || 'page-fit';
               this.sidebarVisible = globalPdfSettings?.sidebar ?? true;
               this.spread = globalPdfSettings?.spread || 'odd';

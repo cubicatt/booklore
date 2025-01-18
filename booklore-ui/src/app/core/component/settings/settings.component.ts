@@ -10,20 +10,13 @@ import {RadioButton} from 'primeng/radiobutton';
 import {Divider} from 'primeng/divider';
 import {Button} from 'primeng/button';
 import {Tooltip} from 'primeng/tooltip';
+import {MetadataAdvancedFetchOptionsComponent} from '../../../metadata/metadata-options-dialog/metadata-advanced-fetch-options/metadata-advanced-fetch-options.component';
+import {MetadataRefreshOptions} from '../../../metadata/model/request/metadata-refresh-options.model';
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
-  imports: [
-    Select,
-    FormsModule,
-    NgForOf,
-    ToggleSwitch,
-    RadioButton,
-    Divider,
-    Button,
-    Tooltip
-  ],
+  imports: [Select, FormsModule, NgForOf, ToggleSwitch, RadioButton, Divider, Button, Tooltip, MetadataAdvancedFetchOptionsComponent],
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent implements OnInit {
@@ -63,12 +56,15 @@ export class SettingsComponent implements OnInit {
 
   private appSettingsService = inject(AppSettingsService);
   appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
-  individualOrGlobal = ['Global', 'Individual'];
+  individualOrGlobal = ['global', 'individual'];
+  currentMetadataOptions!: MetadataRefreshOptions;
 
   ngOnInit(): void {
     this.appSettings$.subscribe(settings => {
       if (settings) {
         this.populateSettings(settings);
+        this.currentMetadataOptions = settings.metadataRefreshOptions;
+        console.log(this.currentMetadataOptions)
       }
     });
   }
@@ -138,5 +134,9 @@ export class SettingsComponent implements OnInit {
       this.fontSize -= 10;
       this.onFontSizeChange();
     }
+  }
+
+  onMetadataSubmit(metadataRefreshOptions: MetadataRefreshOptions) {
+    this.appSettingsService.saveAppSetting('quick_book_match', 'all_books', metadataRefreshOptions)
   }
 }

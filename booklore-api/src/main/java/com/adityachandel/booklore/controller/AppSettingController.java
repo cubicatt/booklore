@@ -1,6 +1,7 @@
 package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.settings.AppSettings;
+import com.adityachandel.booklore.model.dto.settings.SettingRequest;
 import com.adityachandel.booklore.service.AppSettingService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,7 @@ public class AppSettingController {
     }
 
     @PutMapping("/api/settings")
-    public void updateSetting(@RequestParam String category, @RequestParam String name, @RequestParam String val) {
-        appSettingService.updateSetting(category, name, val);
+    public void updateSetting(@RequestBody SettingRequest settingRequest) {
+        appSettingService.updateSetting(settingRequest.getCategory(), settingRequest.getName(), settingRequest.getValue());
     }
-
 }

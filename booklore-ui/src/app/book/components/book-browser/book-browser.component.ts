@@ -319,7 +319,7 @@ export class BookBrowserComponent implements OnInit {
 
   openShelfAssigner() {
     this.dynamicDialogRef = this.dialogService.open(ShelfAssignerComponent, {
-      header: `Update Books Shelves`,
+      header: `Update Books' Shelves`,
       modal: true,
       closable: true,
       contentStyle: {overflow: 'auto'},

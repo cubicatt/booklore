@@ -165,12 +165,12 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   }
 
   increaseFontSize(): void {
-    this.fontSize = Math.min(this.fontSize + 10, FALLBACK_EPUB_SETTINGS.maxFontSize);
+    this.fontSize = Math.min(Number(this.fontSize) + 10, FALLBACK_EPUB_SETTINGS.maxFontSize);
     this.updateFontSize();
   }
 
   decreaseFontSize(): void {
-    this.fontSize = Math.max(this.fontSize - 10, FALLBACK_EPUB_SETTINGS.minFontSize);
+    this.fontSize = Math.max(Number(this.fontSize) - 10, FALLBACK_EPUB_SETTINGS.minFontSize);
     this.updateFontSize();
   }
 

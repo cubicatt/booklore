@@ -1,13 +1,14 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {Subject, Subscription} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
-import {Book} from '../../model/book.model';
+import {Author, Book} from '../../model/book.model';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {BookService} from '../../service/book.service';
 import {Button} from 'primeng/button';
-import {NgForOf, NgIf} from '@angular/common';
+import {NgForOf, NgIf, SlicePipe} from '@angular/common';
 import {MetadataDialogService} from '../../../metadata/service/metadata-dialog.service';
+import {Divider} from 'primeng/divider';
 
 @Component({
   selector: 'app-book-searcher',
@@ -17,7 +18,9 @@ import {MetadataDialogService} from '../../../metadata/service/metadata-dialog.s
     InputTextModule,
     Button,
     NgIf,
-    NgForOf
+    NgForOf,
+    SlicePipe,
+    Divider
   ],
   styleUrls: ['./book-searcher.component.scss'],
   standalone: true
@@ -50,6 +53,14 @@ export class BookSearcherComponent implements OnInit, OnDestroy {
       next: (result: Book[]) => this.books = result,
       error: (error) => console.error('Subscription error:', error)
     });
+  }
+
+  getLibraryName(libraryId: number): string {
+    return `${libraryId}`;
+  }
+
+  getAuthorNames(authors: Author[] | undefined): string {
+    return authors?.map(author => author.name).join(', ') || 'Unknown Author';
   }
 
   onSearchInputChange(): void {

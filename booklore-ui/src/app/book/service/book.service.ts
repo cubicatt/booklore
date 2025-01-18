@@ -139,7 +139,8 @@ export class BookService {
     return this.bookState$.pipe(
       map(state =>
         (state.books || []).filter(book =>
-          book.metadata?.title?.toLowerCase().includes(query.toLowerCase())
+          (book.metadata?.title?.toLowerCase().includes(query.toLowerCase()) ||
+            book.metadata?.authors.some(author => author.name.toLowerCase().includes(query.toLowerCase())))
         )
       )
     );

@@ -20,11 +20,11 @@ export class BookService {
 
   private http = inject(HttpClient);
 
-  constructor() {
-    this.loadBooks();
-  }
-
-  private loadBooks(): void {
+  loadBooks(): void {
+    const currentState = this.bookStateSubject.value;
+    if (currentState.loaded) {
+      return;
+    }
     this.http.get<Book[]>(this.url).pipe(
       tap(books => {
         this.bookStateSubject.next({

@@ -21,7 +21,6 @@ export class AppComponent implements OnInit {
   private rxStompService = inject(RxStompService);
   private eventService = inject(EventService);
 
-
   ngOnInit(): void {
 
     this.rxStompService.watch('/topic/book-add').subscribe((message: Message) => {

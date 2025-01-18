@@ -91,6 +91,7 @@ export class BookBrowserComponent implements OnInit {
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
 
   ngOnInit(): void {
+    this.bookService.loadBooks();
     this.sortOptions = SortService.generateSortOptions();
     const isAllBooksRoute = this.activatedRoute.snapshot.routeConfig?.path === 'all-books';
 

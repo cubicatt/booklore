@@ -1,11 +1,59 @@
 <p class="text-3xl font-semibold">Preferences</p>
 <p-divider></p-divider>
 
-<p class="text-xl font-medium pb-4 pt-6">PDF Reader Settings</p>
+<p class="text-xl pb-4 pt-4">
+  Book Reader Settings: Global or Per-Book
+  <i class="pi pi-info-circle text-sky-600"
+     pTooltip="Choose whether you want to apply the same settings (like font, theme, spread, zoom, etc.) to all your books by default, or have individual setting for each book."
+     tooltipPosition="right"
+     style="cursor: pointer;">
+  </i>
+</p>
 
 <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
 
-  <p class="text-lg font-medium py-1">Page Spread:</p>
+  <p class="text-lg  py-1">PDF:</p>
+  <div class="flex gap-4 justify-start">
+    <div *ngFor="let item of individualOrGlobal" class="flex items-center gap-2">
+      <p-radiobutton
+        [inputId]="item"
+        name="spread"
+        [value]="item"
+        [(ngModel)]="selectedPdf"
+        (ngModelChange)="onPdfIndividualOrGlobalChange()">
+      </p-radiobutton>
+      <label [for]="item">{{ item }}</label>
+    </div>
+  </div>
+
+  <p class="text-lg  py-1">Epub:</p>
+  <div class="flex gap-4 justify-start">
+    <div *ngFor="let item of individualOrGlobal" class="flex items-center gap-2">
+      <p-radiobutton
+        [inputId]="item"
+        name="spread"
+        [value]="item"
+        [(ngModel)]="selectedEpub"
+        (ngModelChange)="onEpubIndividualOrGlobalChange()">
+      </p-radiobutton>
+      <label [for]="item">{{ item }}</label>
+    </div>
+  </div>
+
+</div>
+
+<p-divider></p-divider>
+<p class="text-xl pb-4 pt-4">
+  PDF Reader: Global Preferences
+  <i class="pi pi-info-circle text-sky-600"
+     pTooltip="These settings apply globally to all PDFs. You can customize how PDFs are displayed, including page spread type, zoom level, and sidebar visibility."
+     tooltipPosition="right"
+     style="cursor: pointer;"></i>
+</p>
+
+<div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
+
+  <p class="text-lg  py-1">Page Spread:</p>
   <div class="flex gap-4 justify-start">
     <div *ngFor="let spread of spreads" class="flex items-center gap-2">
       <p-radiobutton
@@ -19,7 +67,7 @@
     </div>
   </div>
 
-  <p class="text-lg font-medium py-1">Page Zoom:</p>
+  <p class="text-lg  py-1">Page Zoom:</p>
   <div class="flex gap-4 justify-start">
     <div *ngFor="let zoom of zooms" class="flex items-center gap-2">
       <p-radiobutton
@@ -33,7 +81,7 @@
     </div>
   </div>
 
-  <p class="text-lg font-medium py-1">Show Sidebar:</p>
+  <p class="text-lg py-1">Show Sidebar:</p>
   <div class="flex justify-start">
     <p-toggleswitch
       [(ngModel)]="showSidebar"
@@ -44,11 +92,14 @@
 
 <p-divider></p-divider>
 
-<p class="text-xl font-medium pb-4 pt-4">ePUB Reader Settings</p>
+<p class="text-xl pb-4 pt-4">
+  Epub Reader: Global Preferences
+  <i class="pi pi-info-circle text-sky-600" pTooltip="These settings apply globally to all EPUBs. Customize how EPUBs are displayed, including themes, font types, and font sizes." tooltipPosition="right" style="cursor: pointer;"></i>
+</p>
 
 <div class="grid grid-cols-[auto,1fr] pl-6 gap-y-4 gap-x-4 items-center">
 
-  <p class="text-lg font-medium">Theme:</p>
+  <p class="text-lg">Theme:</p>
   <div class="flex gap-4 justify-start">
     <p-select
       [options]="themes"
@@ -61,7 +112,7 @@
     </p-select>
   </div>
 
-  <p class="text-lg font-medium">Font:</p>
+  <p class="text-lg">Font:</p>
   <div class="flex gap-4 justify-start">
     <p-select
       [options]="fonts"
@@ -74,7 +125,7 @@
     </p-select>
   </div>
 
-  <p class="text-lg font-medium py-1">Font Size:</p>
+  <p class="text-lg py-1">Font Size:</p>
   <div class="flex gap-4 justify-start items-center">
     <p-button icon="pi pi-minus" rounded="true" (click)="decreaseFontSize()"></p-button>
     <p>{{ fontSize }}%</p>

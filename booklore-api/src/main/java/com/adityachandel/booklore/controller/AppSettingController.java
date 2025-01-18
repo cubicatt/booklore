@@ -17,8 +17,8 @@ public class AppSettingController {
     }
 
     @PutMapping("/api/settings")
-    public void updateSetting(@RequestParam String category, @RequestParam String name, @RequestParam String newValue) {
-        appSettingService.updateSetting(category, name, newValue);
+    public void updateSetting(@RequestParam String category, @RequestParam String name, @RequestParam String val) {
+        appSettingService.updateSetting(category, name, val);
     }
 
 }

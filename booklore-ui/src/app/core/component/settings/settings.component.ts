@@ -9,6 +9,7 @@ import {ToggleSwitch} from 'primeng/toggleswitch';
 import {RadioButton} from 'primeng/radiobutton';
 import {Divider} from 'primeng/divider';
 import {Button} from 'primeng/button';
+import {Tooltip} from 'primeng/tooltip';
 
 @Component({
   selector: 'app-settings',
@@ -20,7 +21,8 @@ import {Button} from 'primeng/button';
     ToggleSwitch,
     RadioButton,
     Divider,
-    Button
+    Button,
+    Tooltip
   ],
   styleUrls: ['./settings.component.scss']
 })
@@ -56,10 +58,12 @@ export class SettingsComponent implements OnInit {
   selectedTheme!: any;
   fontSize: number = 100;
   selectedFont: any;
+  selectedPdf!: string;
+  selectedEpub!: string;
 
   private appSettingsService = inject(AppSettingsService);
   appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
-
+  individualOrGlobal = ['Global', 'Individual'];
 
   ngOnInit(): void {
     this.appSettings$.subscribe(settings => {
@@ -80,7 +84,7 @@ export class SettingsComponent implements OnInit {
     if (settings.epub) {
       const epubSettings = settings.epub;
       this.selectedTheme = this.themes.find(t => t.key === epubSettings.theme)?.key;
-      this.fontSize = epubSettings.fontSize;
+      this.fontSize = Number(epubSettings.fontSize);
       this.selectedFont = this.fonts.find(f => f.key === epubSettings.font)?.key;
     }
   }
@@ -106,7 +110,7 @@ export class SettingsComponent implements OnInit {
   }
 
   onFontSizeChange(): void {
-    this.appSettingsService.saveAppSetting('epub', 'fontSize', this.fontSize.toString());
+    this.appSettingsService.saveAppSetting('epub', 'fontSize', this.fontSize);
   }
 
   increaseFontSize(): void {
@@ -121,5 +125,13 @@ export class SettingsComponent implements OnInit {
       this.fontSize -= 10;
       this.onFontSizeChange();
     }
+  }
+
+  onPdfIndividualOrGlobalChange() {
+
+  }
+
+  onEpubIndividualOrGlobalChange() {
+
   }
 }

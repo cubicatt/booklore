@@ -33,10 +33,10 @@ public class AppSettingService {
     }
 
     @Transactional
-    public void updateSetting(String category, String name, String newValue) {
+    public void updateSetting(String category, String name, String val) {
         AppSettingEntity setting = appSettingsRepository.findByCategoryAndName(category, name);
         if (setting != null) {
-            setting.setVal(newValue);
+            setting.setVal(val);
             appSettingsRepository.save(setting);
         } else {
             throw new IllegalArgumentException("Setting not found for category: " + category + " and key: " + name);

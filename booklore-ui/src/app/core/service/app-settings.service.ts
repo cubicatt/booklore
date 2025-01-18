@@ -28,11 +28,11 @@ export class AppSettingsService {
     });
   }
 
-  saveAppSetting(category: string, key: string, newValue: string): void {
+  saveAppSetting(category: string, key: string, newValue: string | number): void {
     const params = new HttpParams()
       .set('category', category)
-      .set('key', key)
-      .set('newValue', newValue);
+      .set('name', key)
+      .set('val', newValue);
 
     this.http.put(this.apiUrl, null, { params }).subscribe({
       next: () => {

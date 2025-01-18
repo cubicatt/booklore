@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,6 +69,7 @@ public class BookMetadataUpdater {
             String thumbnailPath = null;
             try {
                 thumbnailPath = fileService.createThumbnail(bookId, newMetadata.getThumbnailUrl());
+                bookEntity.setCoverUpdatedOn(Instant.now());
             } catch (IOException e) {
                 log.error(e.getMessage());
             }

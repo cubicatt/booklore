@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
@@ -72,6 +73,7 @@ public class PdfProcessor implements FileProcessor {
         boolean success = generateCoverImageAndSave(bookEntity.getId(), document);
         if (success) {
             fileProcessingUtils.setBookCoverPath(bookEntity.getId(), bookEntity.getMetadata());
+            bookEntity.setCoverUpdatedOn(Instant.now());
         }
     }
 

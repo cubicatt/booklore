@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
@@ -82,6 +83,7 @@ public class EpubProcessor implements FileProcessor {
             boolean success = saveCoverImage(coverImage, bookEntity.getId());
             if (success) {
                 fileProcessingUtils.setBookCoverPath(bookEntity.getId(), bookEntity.getMetadata());
+                bookEntity.setCoverUpdatedOn(Instant.now());
             }
         }
     }

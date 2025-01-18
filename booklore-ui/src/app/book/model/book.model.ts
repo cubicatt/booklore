@@ -9,6 +9,7 @@ export interface Book {
   metadata?: BookMetadata;
   shelves?: Shelf[];
   lastReadTime?: string;
+  coverUpdatedOn?: string;
   addedOn?: string;
   epubProgress?: string;
   pdfProgress?: number;

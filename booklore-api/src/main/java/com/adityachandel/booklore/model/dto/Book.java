@@ -17,6 +17,7 @@ public class Book {
     private String title;
     private Instant lastReadTime;
     private Instant addedOn;
+    private Instant coverUpdatedOn;
     private BookMetadata metadata;
     private Integer pdfProgress;
     private String epubProgress;

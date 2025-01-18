@@ -46,9 +46,9 @@ public class BookMetadataService {
 
     public List<FetchedBookMetadata> fetchMetadataForRequest(long bookId, FetchMetadataRequest request) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-
+        Book book = bookMapper.toBook(bookEntity);
         List<List<FetchedBookMetadata>> allMetadata = request.getProviders().stream()
-                .map(provider -> CompletableFuture.supplyAsync(() -> fetchMetadataListFromAProvider(provider, bookMapper.toBook(bookEntity), request))
+                .map(provider -> CompletableFuture.supplyAsync(() -> fetchMetadataListFromAProvider(provider, book, request))
                         .exceptionally(e -> {
                             log.error("Error fetching metadata from provider: {}", provider, e);
                             return List.of();

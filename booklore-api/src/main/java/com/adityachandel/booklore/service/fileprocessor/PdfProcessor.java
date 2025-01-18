@@ -73,7 +73,6 @@ public class PdfProcessor implements FileProcessor {
         boolean success = generateCoverImageAndSave(bookEntity.getId(), document);
         if (success) {
             fileProcessingUtils.setBookCoverPath(bookEntity.getId(), bookEntity.getMetadata());
-            bookEntity.setCoverUpdatedOn(Instant.now());
         }
     }
 

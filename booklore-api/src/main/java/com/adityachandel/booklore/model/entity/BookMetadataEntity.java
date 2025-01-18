@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -55,6 +56,12 @@ public class BookMetadataEntity {
 
     @Column(name = "review_count")
     private Integer reviewCount;
+
+    @Column(name = "cover")
+    private String cover;
+
+    @Column(name = "cover_updated_on")
+    private Instant coverUpdatedOn;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId

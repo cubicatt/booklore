@@ -36,10 +36,6 @@ export class BookCardComponent implements OnInit {
     this.initMenu();
   }
 
-  coverImageSrc(book: Book): string {
-    return this.bookService.getBookCoverUrl(book.id);
-  }
-
   readBook(book: Book): void {
     this.bookService.readBook(book.id);
   }

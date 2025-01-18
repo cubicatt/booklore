@@ -3,6 +3,7 @@ package com.adityachandel.booklore.model.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -21,6 +22,8 @@ public class BookMetadata {
     private String language;
     private Float rating;
     private Integer reviewCount;
+    private String cover;
+    private Instant coverUpdatedOn;
     private List<Author> authors;
     private List<Category> categories;
 }

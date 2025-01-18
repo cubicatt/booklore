@@ -48,9 +48,6 @@ public class BookEntity {
     @Column(name = "added_on")
     private Instant addedOn;
 
-    @Column(name = "cover_updated_on")
-    private Instant coverUpdatedOn;
-
     @Column(name = "epub_progress")
     private String epubProgress;
 

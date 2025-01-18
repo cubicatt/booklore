@@ -9,7 +9,6 @@ export interface Book {
   metadata?: BookMetadata;
   shelves?: Shelf[];
   lastReadTime?: string;
-  coverUpdatedOn?: string;
   addedOn?: string;
   epubProgress?: string;
   pdfProgress?: number;
@@ -29,6 +28,8 @@ export interface BookMetadata {
   language?: string;
   rating?: number | null;
   reviewCount?: number | null;
+  coverUrl?: string;
+  coverUpdatedOn?: string;
   authors: Author[];
   categories: Category[];
 
@@ -83,5 +84,6 @@ export interface EpubViewerSetting {
 export interface BookSetting {
   pdfSettings?: PdfViewerSetting;
   epubSettings?: EpubViewerSetting;
+
   [key: string]: any;
 }

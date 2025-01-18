@@ -27,8 +27,9 @@ export class BookService {
     }
     this.http.get<Book[]>(this.url).pipe(
       tap(books => {
+        const bookWithCover = books.map(book => this.updateBookWithCoverUrl(book));
         this.bookStateSubject.next({
-          books: books || [],
+          books: bookWithCover || [],
           loaded: true,
           error: null,
         });
@@ -171,11 +172,12 @@ export class BookService {
   handleNewlyCreatedBook(book: Book): void {
     const currentState = this.bookStateSubject.value;
     const updatedBooks = currentState.books ? [...currentState.books] : [];
+    const updatedBook = this.updateBookWithCoverUrl(book);
     const bookIndex = updatedBooks.findIndex(existingBook => existingBook.id === book.id);
     if (bookIndex > -1) {
-      updatedBooks[bookIndex] = book;
+      updatedBooks[bookIndex] = updatedBook;
     } else {
-      updatedBooks.push(book);
+      updatedBooks.push(updatedBook);
     }
     this.bookStateSubject.next({...currentState, books: updatedBooks});
   }
@@ -189,16 +191,37 @@ export class BookService {
   handleBookUpdate(updatedBook: Book) {
     const currentState = this.bookStateSubject.value;
     const updatedBooks = (currentState.books || []).map(book => {
-      return book.id == updatedBook.id ? {...book, metadata: updatedBook.metadata} : book
+      if (book.id === updatedBook.id) {
+        return this.updateBookWithCoverUrl(updatedBook);
+      } else {
+        return book;
+      }
     });
-    this.bookStateSubject.next({...currentState, books: updatedBooks})
+    this.bookStateSubject.next({...currentState, books: updatedBooks});
   }
 
   handleBookMetadataUpdate(bookId: number, updatedMetadata: BookMetadata) {
     const currentState = this.bookStateSubject.value;
     const updatedBooks = (currentState.books || []).map(book => {
-      return book.id == bookId ? {...book, metadata: updatedMetadata} : book
+      return book.id == bookId ? {...book, metadata: updatedMetadata} : book;
     });
-    this.bookStateSubject.next({...currentState, books: updatedBooks})
+    this.bookStateSubject.next({...currentState, books: updatedBooks});
+  }
+
+
+  /*--------------------------Helpers --------------------------*/
+
+  private getCoverUrlForBook(book: Book): string {
+    return `${this.url}/${book.id}/cover?${book.metadata?.coverUpdatedOn}`;
+  }
+
+  private updateBookWithCoverUrl(book: Book): Book {
+    return {
+      ...book,
+      metadata: book.metadata ? {
+        ...book.metadata,
+        coverUrl: this.getCoverUrlForBook(book)
+      } : undefined
+    };
   }
 }

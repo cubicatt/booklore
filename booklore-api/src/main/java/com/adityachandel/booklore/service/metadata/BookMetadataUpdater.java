@@ -69,7 +69,7 @@ public class BookMetadataUpdater {
             String thumbnailPath = null;
             try {
                 thumbnailPath = fileService.createThumbnail(bookId, newMetadata.getThumbnailUrl());
-                bookEntity.setCoverUpdatedOn(Instant.now());
+                metadata.setCoverUpdatedOn(Instant.now());
             } catch (IOException e) {
                 log.error(e.getMessage());
             }

@@ -16,16 +16,15 @@ CREATE TABLE IF NOT EXISTS library_path
 
 CREATE TABLE IF NOT EXISTS book
 (
-    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
-    file_name        VARCHAR(255)  NOT NULL,
-    book_type        VARCHAR(6)    NOT NULL,
-    library_id       BIGINT        NOT NULL,
-    path             VARCHAR(1000) NOT NULL,
-    cover_updated_on TIMESTAMP     NULL,
-    added_on         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_read_time   TIMESTAMP     NULL,
-    pdf_progress     INT           NULL,
-    epub_progress    VARCHAR(1000) NULL,
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    file_name      VARCHAR(255)  NOT NULL,
+    book_type      VARCHAR(6)    NOT NULL,
+    library_id     BIGINT        NOT NULL,
+    path           VARCHAR(1000) NOT NULL,
+    added_on       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_read_time TIMESTAMP     NULL,
+    pdf_progress   INT           NULL,
+    epub_progress  VARCHAR(1000) NULL,
 
     CONSTRAINT fk_library FOREIGN KEY (library_id) REFERENCES library (id) ON DELETE CASCADE,
     CONSTRAINT unique_file_library UNIQUE (file_name, library_id)
@@ -36,19 +35,21 @@ CREATE INDEX IF NOT EXISTS idx_last_read_time ON book (last_read_time);
 
 CREATE TABLE IF NOT EXISTS book_metadata
 (
-    book_id        BIGINT NOT NULL PRIMARY KEY,
-    title          VARCHAR(255),
-    subtitle       VARCHAR(255),
-    publisher      VARCHAR(255),
-    published_date DATE,
-    description    TEXT,
-    isbn_13        VARCHAR(20),
-    isbn_10        VARCHAR(20),
-    page_count     INT,
-    thumbnail      VARCHAR(1000),
-    language       VARCHAR(10),
-    rating         FLOAT,
-    review_count   INT,
+    book_id          BIGINT    NOT NULL PRIMARY KEY,
+    title            VARCHAR(255),
+    subtitle         VARCHAR(255),
+    publisher        VARCHAR(255),
+    published_date   DATE,
+    description      TEXT,
+    isbn_13          VARCHAR(20),
+    isbn_10          VARCHAR(20),
+    page_count       INT,
+    thumbnail        VARCHAR(1000),
+    language         VARCHAR(10),
+    rating           FLOAT,
+    review_count     INT,
+    cover            VARCHAR(255),
+    cover_updated_on TIMESTAMP NULL,
     CONSTRAINT fk_book_metadata FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE
 );
 

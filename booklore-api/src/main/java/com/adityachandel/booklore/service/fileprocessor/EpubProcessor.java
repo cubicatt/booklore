@@ -83,7 +83,6 @@ public class EpubProcessor implements FileProcessor {
             boolean success = saveCoverImage(coverImage, bookEntity.getId());
             if (success) {
                 fileProcessingUtils.setBookCoverPath(bookEntity.getId(), bookEntity.getMetadata());
-                bookEntity.setCoverUpdatedOn(Instant.now());
             }
         }
     }

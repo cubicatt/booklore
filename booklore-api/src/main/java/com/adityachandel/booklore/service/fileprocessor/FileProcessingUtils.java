@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 
 @AllArgsConstructor
 @Service
@@ -19,6 +20,7 @@ public class FileProcessingUtils {
 
     public void setBookCoverPath(long bookId, BookMetadataEntity bookMetadataEntity) {
         bookMetadataEntity.setThumbnail(appProperties.getPathConfig() + "/thumbs/" + bookId + "/f.jpg");
+        bookMetadataEntity.setCoverUpdatedOn(Instant.now());
     }
 
     public boolean saveCoverImage(BufferedImage coverImage, long bookId) throws IOException {

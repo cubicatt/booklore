@@ -7,7 +7,7 @@
       pInputText
       [(ngModel)]="searchQuery"
       (input)="onSearchInputChange()"
-      placeholder="Search books..."
+      placeholder="Search books by title or author..."
       class="search-input"
     />
     <p-button *ngIf="searchQuery" icon="pi pi-times" (click)="clearSearch()" [text]="true" [rounded]="true" class="clear-btn" aria-label="Clear Search"></p-button>

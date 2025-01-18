@@ -120,19 +120,24 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
                 this.selectedFontType = individualSetting?.font || globalSetting?.font || FALLBACK_EPUB_SETTINGS.fontType;
                 this.fontSize = individualSetting?.fontSize || globalSetting?.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
               }
-              
+
               this.rendition.themes.select(this.selectedTheme);
               this.rendition.themes.fontSize(`${this.fontSize}%`);
               this.rendition.themes.font(this.selectedFontType);
 
               this.setupKeyListener();
               this.trackProgress();
+              this.updateLastReadTime();
             };
 
             fileReader.readAsArrayBuffer(epubData);
           });
         });
     });
+  }
+
+  private updateLastReadTime(): void {
+    this.bookService.updateLastReadTime(this.epub.id).subscribe();
   }
 
   changeThemes(): void {
@@ -237,6 +242,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     if (this.rendition) {
       this.rendition.off('keyup', this.keyListener);
     }
+    this.updateLastReadTime();
     document.removeEventListener('keyup', this.keyListener);
   }
 

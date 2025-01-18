@@ -12,7 +12,13 @@ export interface PdfSettings {
   page: number;
 }
 
+export interface ReaderSettings {
+  pdfScope: 'Global' | 'Individual';
+  epubScope: 'Global' | 'Individual';
+}
+
 export interface AppSettings {
   epub?: EpubSettings;
   pdf?: PdfSettings;
+  readerSettings?: ReaderSettings;
 }

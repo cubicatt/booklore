@@ -8,6 +8,8 @@ import com.adityachandel.booklore.model.entity.LibraryPathEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.LibraryRepository;
+import com.adityachandel.booklore.service.fileprocessor.EpubProcessor;
+import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,8 +32,8 @@ public class FileUploadService {
     private static final String EPUB_MIME_TYPE = "application/epub+zip";
 
     private final LibraryRepository libraryRepository;
-    private final PdfFileProcessor pdfProcessor;
-    private final EpubFileProcessor epubProcessor;
+    private final PdfProcessor pdfProcessor;
+    private final EpubProcessor epubProcessor;
     private final NotificationService notificationService;
 
     public Book uploadFile(MultipartFile file, long libraryId, long pathId) {

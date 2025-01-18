@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.service;
+package com.adityachandel.booklore.service.fileprocessor;
 
 import com.adityachandel.booklore.model.LibraryFile;
 import com.adityachandel.booklore.model.dto.Book;

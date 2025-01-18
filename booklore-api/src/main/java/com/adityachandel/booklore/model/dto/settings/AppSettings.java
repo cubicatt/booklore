@@ -1,6 +1,5 @@
 package com.adityachandel.booklore.model.dto.settings;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class AppSettings {
     private EpubSettings epub;
     private PdfSettings pdf;
+    private ReaderSettings readerSettings;
 
     @Data
     @Builder
@@ -32,5 +32,18 @@ public class AppSettings {
         private String spread;
         private String zoom;
         private Boolean sidebar;
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReaderSettings {
+        private SettingScope pdfScope;
+        private SettingScope epubScope;
+    }
+
+    public enum SettingScope {
+        Global, Individual
     }
 }

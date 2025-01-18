@@ -79,6 +79,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
             const epubData = results[1];
             const individualSetting = results[2]?.epubSettings;
             const globalSetting = appSettings.epub;
+            const epubScope = appSettings?.readerSettings?.epubScope;
 
             this.epub = epub;
             const fileReader = new FileReader();
@@ -110,10 +111,16 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
                 this.rendition.themes.register(name, theme);
               });
 
-              this.selectedTheme = individualSetting?.theme || globalSetting?.theme || FALLBACK_EPUB_SETTINGS.theme;
-              this.selectedFontType = individualSetting?.font || globalSetting?.font || FALLBACK_EPUB_SETTINGS.fontType;
-              this.fontSize = individualSetting?.fontSize || globalSetting?.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
-
+              if (epubScope === 'Global') {
+                this.selectedTheme = globalSetting?.theme || FALLBACK_EPUB_SETTINGS.theme;
+                this.selectedFontType = globalSetting?.font || FALLBACK_EPUB_SETTINGS.fontType;
+                this.fontSize = globalSetting?.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
+              } else {
+                this.selectedTheme = individualSetting?.theme || globalSetting?.theme || FALLBACK_EPUB_SETTINGS.theme;
+                this.selectedFontType = individualSetting?.font || globalSetting?.font || FALLBACK_EPUB_SETTINGS.fontType;
+                this.fontSize = individualSetting?.fontSize || globalSetting?.fontSize || FALLBACK_EPUB_SETTINGS.fontSize;
+              }
+              
               this.rendition.themes.select(this.selectedTheme);
               this.rendition.themes.fontSize(`${this.fontSize}%`);
               this.rendition.themes.font(this.selectedFontType);

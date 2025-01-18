@@ -19,17 +19,38 @@ public class AppSettingService {
 
     public AppSettings getAppSettings() {
         List<AppSettingEntity> settings = appSettingsRepository.findAll();
-        Map<String, Map<String, String>> settingsMap = settings.stream().collect(Collectors.groupingBy(AppSettingEntity::getCategory, Collectors.toMap(AppSettingEntity::getName, AppSettingEntity::getVal)));
-        AppSettings appSettings = new AppSettings();
+        Map<String, Map<String, String>> settingsMap = settings.stream()
+                .collect(Collectors.groupingBy(AppSettingEntity::getCategory,
+                        Collectors.toMap(AppSettingEntity::getName, AppSettingEntity::getVal)));
+
+        AppSettings.AppSettingsBuilder appSettingsBuilder = AppSettings.builder();
+
         if (settingsMap.containsKey("epub")) {
             Map<String, String> epubSettings = settingsMap.get("epub");
-            appSettings.setEpub(new AppSettings.EpubSettings(epubSettings.get("theme"), epubSettings.get("fontSize"), epubSettings.get("font")));
+            appSettingsBuilder.epub(AppSettings.EpubSettings.builder()
+                    .theme(epubSettings.get("theme"))
+                    .fontSize(epubSettings.get("fontSize"))
+                    .font(epubSettings.get("font"))
+                    .build());
         }
+
         if (settingsMap.containsKey("pdf")) {
             Map<String, String> pdfSettings = settingsMap.get("pdf");
-            appSettings.setPdf(new AppSettings.PdfSettings(pdfSettings.get("spread"), pdfSettings.get("zoom"), Boolean.parseBoolean(pdfSettings.get("sidebar"))));
+            appSettingsBuilder.pdf(AppSettings.PdfSettings.builder()
+                    .spread(pdfSettings.get("spread"))
+                    .zoom(pdfSettings.get("zoom"))
+                    .sidebar(Boolean.parseBoolean(pdfSettings.get("sidebar")))
+                    .build());
         }
-        return appSettings;
+
+        if (settingsMap.containsKey("reader_setting")) {
+            Map<String, String> readerSetting = settingsMap.get("reader_setting");
+            appSettingsBuilder.readerSettings(AppSettings.ReaderSettings.builder()
+                    .pdfScope(AppSettings.SettingScope.valueOf(readerSetting.get("pdf")))
+                    .epubScope(AppSettings.SettingScope.valueOf(readerSetting.get("epub")))
+                    .build());
+        }
+        return appSettingsBuilder.build();
     }
 
     @Transactional

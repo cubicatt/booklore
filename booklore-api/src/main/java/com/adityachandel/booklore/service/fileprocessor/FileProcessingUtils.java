@@ -1,9 +1,8 @@
-package com.adityachandel.booklore.service.fileprocessing;
+package com.adityachandel.booklore.service.fileprocessor;
 
 import com.adityachandel.booklore.config.AppProperties;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import lombok.AllArgsConstructor;
-import org.apache.pdfbox.rendering.ImageType;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;

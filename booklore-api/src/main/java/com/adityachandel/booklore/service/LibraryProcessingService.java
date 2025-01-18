@@ -10,6 +10,8 @@ import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
+import com.adityachandel.booklore.service.fileprocessor.EpubProcessor;
+import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,8 +34,8 @@ public class LibraryProcessingService {
 
     private final LibraryRepository libraryRepository;
     private final NotificationService notificationService;
-    private final PdfFileProcessor pdfFileProcessor;
-    private final EpubFileProcessor epubFileProcessor;
+    private final PdfProcessor pdfProcessor;
+    private final EpubProcessor epubProcessor;
     private final BookRepository bookRepository;
 
 
@@ -81,9 +83,9 @@ public class LibraryProcessingService {
     @Transactional
     protected Book processLibraryFile(LibraryFile libraryFile) {
         if (libraryFile.getBookFileType() == BookFileType.PDF) {
-            return pdfFileProcessor.processFile(libraryFile, false);
+            return pdfProcessor.processFile(libraryFile, false);
         } else if (libraryFile.getBookFileType() == BookFileType.EPUB) {
-            return epubFileProcessor.processFile(libraryFile, false);
+            return epubProcessor.processFile(libraryFile, false);
         }
         return null;
     }

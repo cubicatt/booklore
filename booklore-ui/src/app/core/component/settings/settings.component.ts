@@ -58,8 +58,8 @@ export class SettingsComponent implements OnInit {
   selectedTheme!: any;
   fontSize: number = 100;
   selectedFont: any;
-  selectedPdf!: string;
-  selectedEpub!: string;
+  selectedPdfScope!: string;
+  selectedEpubScope!: string;
 
   private appSettingsService = inject(AppSettingsService);
   appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
@@ -87,6 +87,11 @@ export class SettingsComponent implements OnInit {
       this.fontSize = Number(epubSettings.fontSize);
       this.selectedFont = this.fonts.find(f => f.key === epubSettings.font)?.key;
     }
+
+    if (settings.readerSettings) {
+      this.selectedPdfScope = settings.readerSettings.pdfScope;
+      this.selectedEpubScope = settings.readerSettings.epubScope;
+    }
   }
 
   onThemeChange(): void {
@@ -113,6 +118,14 @@ export class SettingsComponent implements OnInit {
     this.appSettingsService.saveAppSetting('epub', 'fontSize', this.fontSize);
   }
 
+  onPdfScopeChange(): void {
+    this.appSettingsService.saveAppSetting('reader_setting', 'pdf', this.selectedPdfScope);
+  }
+
+  onEpubScopeChange(): void {
+    this.appSettingsService.saveAppSetting('reader_setting', 'epub', this.selectedEpubScope);
+  }
+
   increaseFontSize(): void {
     if (this.fontSize < 250) {
       this.fontSize += 10;
@@ -125,13 +138,5 @@ export class SettingsComponent implements OnInit {
       this.fontSize -= 10;
       this.onFontSizeChange();
     }
-  }
-
-  onPdfIndividualOrGlobalChange() {
-
-  }
-
-  onEpubIndividualOrGlobalChange() {
-
   }
 }

@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.service;
+package com.adityachandel.booklore.service.fileprocessor;
 
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.model.LibraryFile;
@@ -7,7 +7,7 @@ import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.BookRepository;
-import com.adityachandel.booklore.service.fileprocessing.FileProcessingUtils;
+import com.adityachandel.booklore.service.BookCreatorService;
 import io.documentnode.epub4j.domain.Identifier;
 import io.documentnode.epub4j.domain.Metadata;
 import io.documentnode.epub4j.domain.Resource;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class EpubFileProcessor implements FileProcessor {
+public class EpubProcessor implements FileProcessor {
 
     private final BookRepository bookRepository;
     private final BookCreatorService bookCreatorService;
@@ -92,7 +92,7 @@ public class EpubFileProcessor implements FileProcessor {
                 .collect(Collectors.toSet());
     }
 
-    private void setBookMetadata(io.documentnode.epub4j.domain.Book book, BookEntity bookEntity){
+    private void setBookMetadata(io.documentnode.epub4j.domain.Book book, BookEntity bookEntity) {
         BookMetadataEntity bookMetadata = bookEntity.getMetadata();
         Metadata epubMetadata = book.getMetadata();
 
@@ -162,5 +162,4 @@ public class EpubFileProcessor implements FileProcessor {
             return false;
         }
     }
-
 }

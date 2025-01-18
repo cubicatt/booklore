@@ -10,3 +10,7 @@ INSERT INTO app_settings (category, name, val)
 VALUES ('pdf', 'spread', 'odd'),
        ('pdf', 'zoom', 'page-fit'),
        ('pdf', 'sidebar', 'true');
+
+INSERT INTO app_settings (category, name, val)
+VALUES ('reader_setting', 'pdf', 'individual'),
+       ('reader_setting', 'epub', 'individual');

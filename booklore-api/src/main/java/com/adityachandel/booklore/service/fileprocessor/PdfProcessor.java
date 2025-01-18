@@ -1,13 +1,12 @@
-package com.adityachandel.booklore.service;
+package com.adityachandel.booklore.service.fileprocessor;
 
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.model.LibraryFile;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.entity.BookEntity;
-import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.BookRepository;
-import com.adityachandel.booklore.service.fileprocessing.FileProcessingUtils;
+import com.adityachandel.booklore.service.BookCreatorService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class PdfFileProcessor implements FileProcessor {
+public class PdfProcessor implements FileProcessor {
 
     private final BookRepository bookRepository;
     private final BookCreatorService bookCreatorService;
@@ -107,5 +106,4 @@ public class PdfFileProcessor implements FileProcessor {
         BufferedImage coverImage = new PDFRenderer(document).renderImageWithDPI(0, 300, ImageType.RGB);
         return fileProcessingUtils.saveCoverImage(coverImage, bookId);
     }
-
 }

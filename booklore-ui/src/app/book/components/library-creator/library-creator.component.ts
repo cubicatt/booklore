@@ -31,6 +31,7 @@ export class LibraryCreatorComponent implements OnInit {
   mode!: string;
   library!: Library | undefined;
   editModeLibraryName: string = '';
+  directoryPickerDialogRef!: DynamicDialogRef<DirectoryPickerComponent>;
 
   private dialogService = inject(DialogService);
   private dynamicDialogRef = inject(DynamicDialogRef);
@@ -54,7 +55,7 @@ export class LibraryCreatorComponent implements OnInit {
   }
 
   show() {
-    this.dynamicDialogRef = this.dialogService.open(DirectoryPickerComponent, {
+    this.directoryPickerDialogRef = this.dialogService.open(DirectoryPickerComponent, {
       header: 'Select Media Directory',
       modal: true,
       width: '50%',
@@ -63,7 +64,7 @@ export class LibraryCreatorComponent implements OnInit {
       baseZIndex: 10
     });
 
-    this.dynamicDialogRef.onClose.subscribe((selectedFolder: string) => {
+    this.directoryPickerDialogRef.onClose.subscribe((selectedFolder: string) => {
       if (selectedFolder) {
         this.addFolder(selectedFolder);
       }

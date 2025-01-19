@@ -16,17 +16,18 @@ CREATE TABLE IF NOT EXISTS library_path
 
 CREATE TABLE IF NOT EXISTS book
 (
-    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
-    file_name      VARCHAR(255)  NOT NULL,
-    book_type      VARCHAR(6)    NOT NULL,
-    library_id     BIGINT        NOT NULL,
-    path           VARCHAR(1000) NOT NULL,
-    added_on       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_read_time TIMESTAMP     NULL,
-    pdf_progress   INT           NULL,
-    epub_progress  VARCHAR(1000) NULL,
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    file_name       VARCHAR(255)  NOT NULL,
+    book_type       VARCHAR(6)    NOT NULL,
+    library_id      BIGINT        NOT NULL,
+    library_path_id BIGINT        NOT NULL,
+    added_on        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_read_time  TIMESTAMP     NULL,
+    pdf_progress    INT           NULL,
+    epub_progress   VARCHAR(1000) NULL,
 
     CONSTRAINT fk_library FOREIGN KEY (library_id) REFERENCES library (id) ON DELETE CASCADE,
+    CONSTRAINT fk_library_path_id FOREIGN KEY (library_path_id) REFERENCES library_path (id) ON DELETE CASCADE,
     CONSTRAINT unique_file_library UNIQUE (file_name, library_id)
 );
 

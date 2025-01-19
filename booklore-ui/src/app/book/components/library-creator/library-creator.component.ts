@@ -1,57 +1,60 @@
-import {Component, inject, ViewChild} from '@angular/core';
-import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
+import {Component, inject, OnInit, ViewChild} from '@angular/core';
+import {DialogService, DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {DirectoryPickerComponent} from '../../../utilities/component/directory-picker/directory-picker.component';
 import {MessageService} from 'primeng/api';
 import {Router} from '@angular/router';
 import {LibraryService} from '../../service/library.service';
 import {IconPickerComponent} from '../../../utilities/component/icon-picker/icon-picker.component';
-import {take} from 'rxjs';
 import {Button} from 'primeng/button';
 import {TableModule} from 'primeng/table';
 import {Step, StepList, StepPanel, StepPanels, Stepper} from 'primeng/stepper';
 import {NgIf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
-import {BookService} from '../../service/book.service';
-import {Library, LibraryPath} from '../../model/library.model';
+import {Library} from '../../model/library.model';
 
 @Component({
   selector: 'app-library-creator',
   standalone: true,
   templateUrl: './library-creator.component.html',
-  imports: [
-    Button,
-    TableModule,
-    StepPanel,
-    IconPickerComponent,
-    NgIf,
-    FormsModule,
-    InputText,
-    Stepper,
-    StepList,
-    Step,
-    StepPanels
-  ],
+  imports: [Button, TableModule, StepPanel, IconPickerComponent, NgIf, FormsModule, InputText, Stepper, StepList, Step, StepPanels],
   styleUrl: './library-creator.component.scss'
 })
-export class LibraryCreatorComponent {
+export class LibraryCreatorComponent implements OnInit {
 
   @ViewChild(IconPickerComponent) iconPicker: IconPickerComponent | undefined;
 
-  libraryName: string = '';
+  chosenLibraryName: string = '';
   folders: string[] = [];
-  ref: DynamicDialogRef | undefined;
   selectedIcon: string | null = null;
+
+  mode!: string;
+  library!: Library | undefined;
+  editModeLibraryName: string = '';
 
   private dialogService = inject(DialogService);
   private dynamicDialogRef = inject(DynamicDialogRef);
+  private dynamicDialogConfig = inject(DynamicDialogConfig);
   private libraryService = inject(LibraryService);
   private messageService = inject(MessageService);
   private router = inject(Router);
 
 
+  ngOnInit(): void {
+    this.mode = this.dynamicDialogConfig.data.mode;
+    if (this.mode === 'edit') {
+      this.library = this.libraryService.findLibraryById(this.dynamicDialogConfig.data.libraryId);
+      if (this.library) {
+        this.chosenLibraryName = this.library.name;
+        this.editModeLibraryName = this.library.name;
+        this.selectedIcon = 'pi pi-' + this.library.icon;
+        this.folders = this.library.paths.map(path => path.path);
+      }
+    }
+  }
+
   show() {
-    this.ref = this.dialogService.open(DirectoryPickerComponent, {
+    this.dynamicDialogRef = this.dialogService.open(DirectoryPickerComponent, {
       header: 'Select Media Directory',
       modal: true,
       width: '50%',
@@ -60,7 +63,7 @@ export class LibraryCreatorComponent {
       baseZIndex: 10
     });
 
-    this.ref.onClose.subscribe((selectedFolder: string) => {
+    this.dynamicDialogRef.onClose.subscribe((selectedFolder: string) => {
       if (selectedFolder) {
         this.addFolder(selectedFolder);
       }
@@ -90,49 +93,65 @@ export class LibraryCreatorComponent {
   }
 
   isLibraryDetailsValid(): boolean {
-    return !!this.libraryName.trim() && !!this.selectedIcon;
+    return !!this.chosenLibraryName.trim() && !!this.selectedIcon;
   }
 
   isDirectorySelectionValid(): boolean {
     return this.folders.length > 0;
   }
 
-  addLibrary() {
-    const library: Library = {
-      name: this.libraryName,
-      icon: this.selectedIcon?.replace('pi pi-', '') || 'heart',
-      paths: this.folders.map(folder => ({ path: folder }))
-    };
-
-    this.libraryService.createLibrary(library).subscribe({
-      next: (createdLibrary) => {
-        this.router.navigate(['/library', createdLibrary.id, 'books']);
-      },
-      error: (err) => {
-        console.error('Failed to create library:', err);
-      }
-    });
-
-    this.dynamicDialogRef.close();
+  createOrUpdateLibrary() {
+    if (this.mode === 'edit') {
+      const library: Library = {
+        name: this.chosenLibraryName,
+        icon: this.selectedIcon?.replace('pi pi-', '') || 'heart',
+        paths: this.folders.map(folder => ({path: folder}))
+      };
+      this.libraryService.updateLibrary(library, this.library?.id).subscribe({
+        next: () => {
+          this.messageService.add({severity: 'success', summary: 'Library Updated', detail: 'The library was updated successfully.'});
+          this.dynamicDialogRef.close();
+        },
+        error: (e) => {
+          this.messageService.add({severity: 'error', summary: 'Update Failed', detail: 'An error occurred while updating the library. Please try again.'});
+          console.error(e);
+        }
+      });
+    } else {
+      const library: Library = {
+        name: this.chosenLibraryName,
+        icon: this.selectedIcon?.replace('pi pi-', '') || 'heart',
+        paths: this.folders.map(folder => ({path: folder}))
+      };
+      this.libraryService.createLibrary(library).subscribe({
+        next: (createdLibrary) => {
+          this.router.navigate(['/library', createdLibrary.id, 'books']);
+          this.messageService.add({severity: 'success', summary: 'Library Created', detail: 'The library was created successfully.'});
+          this.dynamicDialogRef.close();
+        },
+        error: (e) => {
+          this.messageService.add({severity: 'error', summary: 'Creation Failed', detail: 'An error occurred while creating the library. Please try again.'});
+          console.error(e);
+        }
+      });
+    }
   }
 
   validateLibraryNameAndProceed(activateCallback: Function) {
-    if (this.libraryName.trim()) {
-      const libraryName = this.libraryName.trim();
-      this.libraryService.libraryState$
-        .pipe(take(1))
-        .subscribe(libraryState => {
-          const library = libraryState.libraries?.find(library => library.name === libraryName);
-          if (library) {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Library Name Exists',
-              detail: 'This library name is already taken.',
-            });
-          } else {
-            activateCallback(2);
-          }
+    let trimmedLibraryName = this.chosenLibraryName.trim();
+    if (trimmedLibraryName && trimmedLibraryName != this.editModeLibraryName) {
+      let exists = this.libraryService.doesLibraryExistByName(trimmedLibraryName);
+      if (exists) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Library Name Exists',
+          detail: 'This library name is already taken.',
         });
+      } else {
+        activateCallback(2);
+      }
+    } else {
+      activateCallback(2);
     }
   }
 

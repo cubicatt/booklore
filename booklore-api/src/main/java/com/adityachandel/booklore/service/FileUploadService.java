@@ -86,7 +86,7 @@ public class FileUploadService {
         LibraryFile libraryFile = LibraryFile.builder()
                 .libraryEntity(libraryEntity)
                 .bookFileType(fileType)
-                .filePath(storageFile.getAbsolutePath())
+                .fileName(storageFile.getAbsolutePath())
                 .build();
 
         switch (fileType) {

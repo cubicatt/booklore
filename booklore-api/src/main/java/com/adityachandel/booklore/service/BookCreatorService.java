@@ -24,10 +24,10 @@ public class BookCreatorService {
     private EpubViewerPreferencesRepository epubViewerPreferencesRepository;
 
     public BookEntity createShellBook(LibraryFile libraryFile, BookFileType bookFileType) {
-        File bookFile = new File(libraryFile.getFilePath());
+        File bookFile = new File(libraryFile.getLibraryPathEntity().getPath() + "/" + libraryFile.getFileName());
         BookEntity bookEntity = BookEntity.builder()
                 .library(libraryFile.getLibraryEntity())
-                .path(bookFile.getPath())
+                .libraryPath(libraryFile.getLibraryPathEntity())
                 .fileName(bookFile.getName())
                 .bookType(bookFileType)
                 .addedOn(Instant.now())

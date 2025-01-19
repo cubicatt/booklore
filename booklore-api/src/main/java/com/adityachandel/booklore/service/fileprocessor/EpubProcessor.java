@@ -24,7 +24,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
@@ -46,7 +45,7 @@ public class EpubProcessor implements FileProcessor {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public Book processFile(LibraryFile libraryFile, boolean forceProcess) {
-        File bookFile = new File(libraryFile.getFilePath());
+        File bookFile = new File(libraryFile.getFileName());
         String fileName = bookFile.getName();
         if (!forceProcess) {
             Optional<BookEntity> bookOptional = bookRepository.findBookByFileNameAndLibraryId(fileName, libraryFile.getLibraryEntity().getId());
@@ -62,7 +61,7 @@ public class EpubProcessor implements FileProcessor {
     protected Book processNewFile(LibraryFile libraryFile) {
         BookEntity bookEntity = bookCreatorService.createShellBook(libraryFile, BookFileType.EPUB);
         try {
-            io.documentnode.epub4j.domain.Book epub = new EpubReader().readEpub(new FileInputStream(libraryFile.getFilePath()));
+            io.documentnode.epub4j.domain.Book epub = new EpubReader().readEpub(new FileInputStream(libraryFile.getLibraryPathEntity().getPath() + "/" + libraryFile.getFileName()));
 
             setBookMetadata(epub, bookEntity);
             processCover(epub, bookEntity);
@@ -72,7 +71,7 @@ public class EpubProcessor implements FileProcessor {
             bookRepository.flush();
 
         } catch (Exception e) {
-            log.error("Error while processing file {}, error: {}", libraryFile.getFilePath(), e.getMessage());
+            log.error("Error while processing file {}, error: {}", libraryFile.getFileName(), e.getMessage());
         }
         return bookMapper.toBook(bookEntity);
     }

@@ -48,14 +48,14 @@ public class LibraryProcessingService {
         notificationService.sendMessage(Topic.LOG, createLogNotification("Finished processing library: " + libraryEntity.getName()));
     }
 
-    @Transactional
+    /*@Transactional
     public void refreshLibrary(long libraryId) throws IOException {
         LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         notificationService.sendMessage(Topic.LOG, createLogNotification("Started refreshing library: " + libraryEntity.getName()));
         processLibraryFiles(getUnProcessedFiles(libraryEntity));
         deleteRemovedBooks(getRemovedBooks(libraryEntity));
         notificationService.sendMessage(Topic.LOG, createLogNotification("Finished refreshing library: " + libraryEntity.getName()));
-    }
+    }*/
 
     @Transactional
     protected void deleteRemovedBooks(List<BookEntity> removedBookEntities) {
@@ -70,12 +70,12 @@ public class LibraryProcessingService {
     @Transactional
     protected void processLibraryFiles(List<LibraryFile> libraryFiles) {
         for (LibraryFile libraryFile : libraryFiles) {
-            log.info("Processing file: {}", libraryFile.getFilePath());
+            log.info("Processing file: {}", libraryFile.getFileName());
             Book book = processLibraryFile(libraryFile);
             if (book != null) {
                 notificationService.sendMessage(Topic.BOOK_ADD, book);
                 notificationService.sendMessage(Topic.LOG, createLogNotification("Book added: " + book.getFileName()));
-                log.info("Processed file: {}", libraryFile.getFilePath());
+                log.info("Processed file: {}", libraryFile.getFileName());
             }
         }
     }
@@ -90,19 +90,19 @@ public class LibraryProcessingService {
         return null;
     }
 
-    @Transactional
+    /*@Transactional
     protected List<BookEntity> getRemovedBooks(LibraryEntity libraryEntity) throws IOException {
         List<LibraryFile> libraryFiles = getLibraryFiles(libraryEntity);
         List<BookEntity> bookEntities = libraryEntity.getBookEntities();
         Set<String> libraryFilePaths = libraryFiles.stream()
-                .map(LibraryFile::getFilePath)
+                .map(LibraryFile::getFileName)
                 .collect(Collectors.toSet());
         return bookEntities.stream()
                 .filter(book -> !libraryFilePaths.contains(book.getPath()))
                 .collect(Collectors.toList());
-    }
+    }*/
 
-    @Transactional
+    /*@Transactional
     protected List<LibraryFile> getUnProcessedFiles(LibraryEntity libraryEntity) throws IOException {
         List<LibraryFile> libraryFiles = getLibraryFiles(libraryEntity);
         List<BookEntity> bookEntities = libraryEntity.getBookEntities();
@@ -110,21 +110,21 @@ public class LibraryProcessingService {
                 .map(BookEntity::getPath)
                 .collect(Collectors.toSet());
         return libraryFiles.stream()
-                .filter(libraryFile -> !processedPaths.contains(libraryFile.getFilePath()))
+                .filter(libraryFile -> !processedPaths.contains(libraryFile.getFileName()))
                 .collect(Collectors.toList());
-    }
+    }*/
 
     private List<LibraryFile> getLibraryFiles(LibraryEntity libraryEntity) throws IOException {
         List<LibraryFile> libraryFiles = new ArrayList<>();
-        for (LibraryPathEntity libraryPath : libraryEntity.getLibraryPaths()) {
-            libraryFiles.addAll(findLibraryFiles(libraryPath.getPath(), libraryEntity));
+        for (LibraryPathEntity libraryPathEntity : libraryEntity.getLibraryPaths()) {
+            libraryFiles.addAll(findLibraryFiles(libraryPathEntity, libraryEntity));
         }
         return libraryFiles;
     }
 
-    private List<LibraryFile> findLibraryFiles(String directoryPath, LibraryEntity libraryEntity) throws IOException {
+    private List<LibraryFile> findLibraryFiles(LibraryPathEntity libraryPathEntity, LibraryEntity libraryEntity) throws IOException {
         List<LibraryFile> libraryFiles = new ArrayList<>();
-        try (var stream = Files.walk(Path.of(directoryPath))) {
+        try (var stream = Files.walk(Path.of(libraryPathEntity.getPath()))) {
             stream.filter(Files::isRegularFile)
                     .filter(file -> {
                         String fileName = file.getFileName().toString().toLowerCase();
@@ -132,7 +132,7 @@ public class LibraryProcessingService {
                     })
                     .forEach(file -> {
                         BookFileType fileType = file.getFileName().toString().toLowerCase().endsWith(".pdf") ? BookFileType.PDF : BookFileType.EPUB;
-                        libraryFiles.add(new LibraryFile(libraryEntity, file.toAbsolutePath().toString(), fileType));
+                        libraryFiles.add(new LibraryFile(libraryEntity, libraryPathEntity, file.toFile().getName(), fileType));
                     });
         }
         return libraryFiles;

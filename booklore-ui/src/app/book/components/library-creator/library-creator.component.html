@@ -11,7 +11,7 @@
             <div class="library-name-icon-parent">
               <div class="library-name-div">
                 <p>Library Name: </p>
-                <input type="text" pInputText [(ngModel)]="libraryName" placeholder="Enter library name..."/>
+                <input type="text" pInputText [(ngModel)]="chosenLibraryName" placeholder="Enter library name..."/>
               </div>
               <div class="library-icon-div">
                 <p>Library Icon:</p>
@@ -64,7 +64,7 @@
           </div>
           <div class="flex pt-6 justify-between">
             <p-button label="Back" icon="pi pi-arrow-left" iconPos="right" (onClick)="activateCallback(1)" />
-            <p-button severity="success" label="Save" icon="pi pi-save" [disabled]="!isDirectorySelectionValid()" (onClick)="addLibrary()"></p-button>
+            <p-button severity="success" label="Save" icon="pi pi-save" [disabled]="!isDirectorySelectionValid()" (onClick)="createOrUpdateLibrary()"></p-button>
           </div>
         </div>
       </ng-template>

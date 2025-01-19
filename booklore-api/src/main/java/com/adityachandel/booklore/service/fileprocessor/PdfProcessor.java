@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
@@ -40,7 +39,7 @@ public class PdfProcessor implements FileProcessor {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public Book processFile(LibraryFile libraryFile, boolean forceProcess) {
-        File bookFile = new File(libraryFile.getFilePath());
+        File bookFile = new File(libraryFile.getFileName());
         String fileName = bookFile.getName();
         if (!forceProcess) {
             Optional<BookEntity> bookOptional = bookRepository.findBookByFileNameAndLibraryId(fileName, libraryFile.getLibraryEntity().getId());
@@ -55,7 +54,7 @@ public class PdfProcessor implements FileProcessor {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     protected Book processNewFile(LibraryFile libraryFile) {
         BookEntity bookEntity = bookCreatorService.createShellBook(libraryFile, BookFileType.PDF);
-        try (PDDocument pdf = Loader.loadPDF(new File(libraryFile.getFilePath()))) {
+        try (PDDocument pdf = Loader.loadPDF(new File(libraryFile.getLibraryPathEntity().getPath() + "/" + libraryFile.getFileName()))) {
 
             setMetadata(pdf, bookEntity);
             processCover(pdf, bookEntity);
@@ -64,7 +63,7 @@ public class PdfProcessor implements FileProcessor {
             bookEntity = bookRepository.save(bookEntity);
             bookRepository.flush();
         } catch (Exception e) {
-            log.error("Error while processing file {}, error: {}", libraryFile.getFilePath(), e.getMessage());
+            log.error("Error while processing file {}, error: {}", libraryFile.getFileName(), e.getMessage());
         }
         return bookMapper.toBook(bookEntity);
     }

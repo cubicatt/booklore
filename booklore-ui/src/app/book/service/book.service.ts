@@ -182,10 +182,10 @@ export class BookService {
     this.bookStateSubject.next({...currentState, books: updatedBooks});
   }
 
-  handleRemovedBookIds(removedBookIds: Set<number>): void {
+  handleRemovedBookIds(removedBookIds: number[]): void {
     const currentState = this.bookStateSubject.value;
-    const filteredBooks = (currentState.books || []).filter(book => !removedBookIds.has(book.id));
-    this.bookStateSubject.next({...currentState, books: filteredBooks});
+    const filteredBooks = (currentState.books || []).filter(book => !removedBookIds.includes(book.id)); // Check using includes() method
+    this.bookStateSubject.next({ ...currentState, books: filteredBooks });
   }
 
   handleBookUpdate(updatedBook: Book) {

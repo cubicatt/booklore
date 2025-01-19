@@ -99,7 +99,7 @@ public class BooksService {
 
     public ResponseEntity<byte[]> getBookData(long bookId) throws IOException {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        byte[] pdfBytes = Files.readAllBytes(new File(bookEntity.getPath()).toPath());
+        byte[] pdfBytes = Files.readAllBytes(new File(bookEntity.getLibraryPath().getPath() + "/" + bookEntity.getFileName()).toPath());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
                 .body(pdfBytes);
@@ -158,7 +158,7 @@ public class BooksService {
     public ResponseEntity<Resource> prepareFileForDownload(Long bookId) {
         try {
             BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-            String filePath = bookEntity.getPath();
+            String filePath = bookEntity.getLibraryPath().getPath() + "/" + bookEntity.getFileName();
             Path file = Paths.get(filePath).toAbsolutePath().normalize();
             Resource resource = new UrlResource(file.toUri());
             String contentType = Files.probeContentType(file);

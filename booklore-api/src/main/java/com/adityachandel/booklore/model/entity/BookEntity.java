@@ -23,9 +23,6 @@ public class BookEntity {
     @Column(name = "file_name", length = 1000)
     private String fileName;
 
-    @Column(name = "path")
-    private String path;
-
     @Column(name = "book_type")
     private BookFileType bookType;
 
@@ -35,6 +32,10 @@ public class BookEntity {
     @ManyToOne
     @JoinColumn(name = "library_id", nullable = false)
     private LibraryEntity library;
+
+    @ManyToOne
+    @JoinColumn(name = "library_path_id", nullable = false)
+    private LibraryPathEntity libraryPath;
 
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private PdfViewerPreferencesEntity pdfViewerPrefs;

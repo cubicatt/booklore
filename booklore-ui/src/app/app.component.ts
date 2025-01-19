@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
       this.bookService.handleNewlyCreatedBook(JSON.parse(message.body));
     });
 
-    this.rxStompService.watch('/topic/books-removed').subscribe((message: Message) => {
+    this.rxStompService.watch('/topic/books-remove').subscribe((message: Message) => {
       this.bookService.handleRemovedBookIds(JSON.parse(message.body));
     });
 

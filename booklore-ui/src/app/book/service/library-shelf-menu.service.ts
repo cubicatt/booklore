@@ -8,6 +8,7 @@ import {Shelf} from '../model/shelf.model';
 import {DialogService} from 'primeng/dynamicdialog';
 import {MetadataFetchOptionsComponent} from '../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../metadata/model/request/metadata-refresh-type.enum';
+import {LibraryCreatorComponent} from '../components/library-creator/library-creator.component';
 
 @Injectable({
   providedIn: 'root',
@@ -21,12 +22,32 @@ export class LibraryShelfMenuService {
   private router = inject(Router);
   private dialogService = inject(DialogService);
 
-
   initializeLibraryMenuItems(entity: Library | Shelf | null): MenuItem[] {
     return [
       {
         label: 'Options',
         items: [
+          {
+            label: 'Edit Library',
+            icon: 'pi pi-pen-to-square',
+            command: () => {
+              this.dialogService.open(LibraryCreatorComponent, {
+                header: 'Edit Library',
+                modal: true,
+                closable: true,
+                width: '675px',
+                height: '480px',
+                style: {
+                  position: 'absolute',
+                  top: '15%',
+                },
+                data: {
+                  mode: 'edit',
+                  libraryId: entity?.id
+                }
+              });
+            }
+          },
           {
             label: 'Delete Library',
             icon: 'pi pi-trash',
@@ -56,7 +77,7 @@ export class LibraryShelfMenuService {
             }
           },
           {
-            label: 'Refresh Library',
+            label: 'Re-scan Library',
             icon: 'pi pi-refresh',
             command: () => {
               this.confirmationService.confirm({

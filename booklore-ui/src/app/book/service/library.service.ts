@@ -46,6 +46,15 @@ export class LibraryService {
     });
   }
 
+  doesLibraryExistByName(name: string): boolean {
+    const libraries = this.libraryStateSubject.value.libraries || [];
+    return libraries.some(library => library.name === name);
+  }
+
+  findLibraryById(id: number): Library | undefined {
+    return this.libraryStateSubject.value.libraries?.find(library => library.id === id);
+  }
+
   createLibrary(newLibrary: Library): Observable<Library> {
     return this.http.post<Library>(this.url, newLibrary).pipe(
       map(createdLibrary => {
@@ -55,8 +64,21 @@ export class LibraryService {
         return createdLibrary;
       }),
       catchError(error => {
+        throw error;
+      })
+    );
+  }
+
+  updateLibrary(library: Library, libraryId: number | undefined): Observable<Library> {
+    return this.http.put<Library>(`${this.url}/${libraryId}`, library).pipe(
+      map(updatedLibrary => {
         const currentState = this.libraryStateSubject.value;
-        this.libraryStateSubject.next({...currentState, error: error.message});
+        const updatedLibraries = currentState.libraries ? currentState.libraries.map(existingLibrary =>
+          existingLibrary.id === updatedLibrary.id ? updatedLibrary : existingLibrary) : [updatedLibrary];
+        this.libraryStateSubject.next({...currentState, libraries: updatedLibraries,});
+        return updatedLibrary;
+      }),
+      catchError(error => {
         throw error;
       })
     );

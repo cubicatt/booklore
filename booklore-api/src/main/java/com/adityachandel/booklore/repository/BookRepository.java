@@ -1,6 +1,7 @@
 package com.adityachandel.booklore.repository;
 
 import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.model.entity.LibraryPathEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,16 +22,15 @@ public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpec
 
     List<BookEntity> findBooksByLibraryId(Long libraryId);
 
+    @Query("SELECT b.id FROM BookEntity b WHERE b.libraryPath.id IN :libraryPathIds")
+    List<Long> findAllBookIdsByLibraryPathIdIn(@Param("libraryPathIds") Collection<Long> libraryPathIds);
+
     Optional<BookEntity> findBookByIdAndLibraryId(long id, long libraryId);
 
     Optional<BookEntity> findBookByFileNameAndLibraryId(String fileName, long libraryId);
 
     @Query("SELECT b FROM BookEntity b JOIN b.metadata bm WHERE LOWER(bm.title) LIKE LOWER(CONCAT('%', :title, '%'))")
     List<BookEntity> findByTitleContainingIgnoreCase(@Param("title") String title);
-
-    Optional<BookEntity> findFirstByLibraryIdAndIdLessThanOrderByIdDesc(Long libraryId, Long currentBookId);
-
-    Optional<BookEntity> findFirstByLibraryIdAndIdGreaterThanOrderByIdAsc(Long libraryId, Long currentBookId);
 
     @Query("SELECT b FROM BookEntity b JOIN b.shelves s WHERE s.id = :shelfId")
     List<BookEntity> findByShelfId(@Param("shelfId") Long shelfId);

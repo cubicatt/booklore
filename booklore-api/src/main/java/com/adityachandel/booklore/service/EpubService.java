@@ -18,7 +18,7 @@ public class EpubService {
 
     public ByteArrayResource getEpubFile(Long bookId) throws IOException {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        try (FileInputStream inputStream = new FileInputStream(bookEntity.getPath())) {
+        try (FileInputStream inputStream = new FileInputStream(bookEntity.getLibraryPath().getPath() + "/" + bookEntity.getFileName())) {
             byte[] fileContent = inputStream.readAllBytes();
             return new ByteArrayResource(fileContent);
         }

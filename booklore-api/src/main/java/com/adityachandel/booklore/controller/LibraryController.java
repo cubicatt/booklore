@@ -1,19 +1,16 @@
 package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.Book;
-import com.adityachandel.booklore.model.dto.BookWithNeighbors;
 import com.adityachandel.booklore.model.dto.Library;
-import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
 import com.adityachandel.booklore.model.dto.Sort;
+import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
 import com.adityachandel.booklore.service.BooksService;
 import com.adityachandel.booklore.service.LibraryService;
-import com.adityachandel.booklore.service.metadata.parser.AmazonBookParser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/v1/library")
@@ -38,6 +35,11 @@ public class LibraryController {
         return ResponseEntity.ok(libraryService.createLibrary(request));
     }
 
+    @PutMapping("/{libraryId}")
+    public ResponseEntity<Library> updateLibrary(@RequestBody CreateLibraryRequest request, @PathVariable Long libraryId) {
+        return ResponseEntity.ok(libraryService.updateLibrary(request, libraryId));
+    }
+
     @DeleteMapping("/{libraryId}")
     public ResponseEntity<?> deleteLibrary(@PathVariable long libraryId) {
         libraryService.deleteLibrary(libraryId);
@@ -60,9 +62,9 @@ public class LibraryController {
         return ResponseEntity.ok(libraryService.updateSort(libraryId, sort));
     }
 
-    @PutMapping("/{libraryId}/refresh")
+    /*@PutMapping("/{libraryId}/refresh")
     public ResponseEntity<?> refreshLibrary(@PathVariable long libraryId) {
         libraryService.refreshLibrary(libraryId);
         return ResponseEntity.noContent().build();
-    }
+    }*/
 }

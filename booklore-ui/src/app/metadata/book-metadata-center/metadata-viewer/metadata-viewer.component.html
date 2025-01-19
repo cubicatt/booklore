@@ -2,7 +2,7 @@
   <div class="book-metadata-container flex-shrink-0" *ngIf="metadata$ | async as metadata">
     <div class="flex flex-row w-full">
 
-      <img [src]="metadata.coverUrl" class="book-cover placeholder" alt="Cover of {{ metadata.title }}" loading="lazy" width="225"/>
+      <img [src]="baseUrl + '/v1/book/' + metadata.bookId + '/cover?' + metadata?.coverUpdatedOn" class="book-cover placeholder" alt="Cover of {{ metadata.title }}" loading="lazy" width="225"/>
 
       <div class="pl-6 flex flex-col w-full space-y-4">
         <div class="flex flex-row items-center justify-between">

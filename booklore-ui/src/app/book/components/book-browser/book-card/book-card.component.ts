@@ -13,8 +13,8 @@ import {FileService} from '../../../service/file.service';
 import {MetadataFetchOptionsComponent} from '../../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../../../metadata/model/request/metadata-refresh-type.enum';
 import {MetadataRefreshRequest} from '../../../../metadata/model/request/metadata-refresh-request.model';
-import {Meta} from '@angular/platform-browser';
 import {MetadataService} from '../../../../metadata/service/metadata.service';
+import {API_CONFIG} from '../../../../config/api-config';
 
 
 @Component({
@@ -29,6 +29,7 @@ export class BookCardComponent implements OnInit {
   @Input() onBookSelect?: (bookId: number, selected: boolean) => void;
   @Input() isSelected: boolean = false;
 
+  baseUrl = API_CONFIG.BASE_URL;
   items: MenuItem[] | undefined;
   isHovered: boolean = false;
 

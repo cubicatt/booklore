@@ -11,6 +11,7 @@ import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Observable} from 'rxjs';
 import {Tooltip} from 'primeng/tooltip';
 import {MetadataService} from '../../service/metadata.service';
+import {API_CONFIG} from '../../../config/api-config';
 
 @Component({
   selector: 'app-metadata-picker',
@@ -47,6 +48,8 @@ export class MetadataPickerComponent implements OnInit {
   private metadataService = inject(MetadataService);
 
   currentMetadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
+  baseUrl = API_CONFIG.BASE_URL;
+  protected metadata!: BookMetadata;
 
   constructor() {
     this.metadataForm = new FormGroup({
@@ -70,6 +73,7 @@ export class MetadataPickerComponent implements OnInit {
     this.currentMetadata$.subscribe((metadata) => {
       if (metadata) {
         this.currentBookId = metadata.bookId;
+        this.metadata = metadata;
         this.metadataForm.setValue({
           title: metadata.title,
           subtitle: metadata.subtitle,

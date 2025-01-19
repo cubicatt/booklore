@@ -9,6 +9,7 @@ import {DialogService} from 'primeng/dynamicdialog';
 import {Book} from '../../../model/book.model';
 import {SortOption} from '../../../model/sort.model';
 import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
+import {API_CONFIG} from '../../../../config/api-config';
 
 @Component({
   selector: 'app-book-table',
@@ -32,9 +33,11 @@ export class BookTableComponent implements OnChanges {
 
   private bookService = inject(BookService);
   private metadataDialogService = inject(MetadataDialogService);
+  baseUrl = API_CONFIG.BASE_URL;
 
 
   // Hack to set virtual-scroller height
+
   ngOnChanges() {
     const wrapperElements: HTMLCollection = document.getElementsByClassName('p-virtualscroller');
     Array.prototype.forEach.call(wrapperElements, function (wrapperElement) {

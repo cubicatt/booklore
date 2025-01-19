@@ -12,6 +12,7 @@ import {BookService} from '../../../book/service/book.service';
 import {MessageService} from 'primeng/api';
 import {MetadataService} from '../../service/metadata.service';
 import {Book, BookMetadata} from '../../../book/model/book.model';
+import {API_CONFIG} from '../../../config/api-config';
 
 @Component({
   selector: 'app-metadata-editor',
@@ -39,7 +40,7 @@ export class MetadataEditorComponent implements OnInit {
   bookMetadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
   bookMetadataForm: FormGroup;
   currentBookId!: number;
-
+  baseUrl = API_CONFIG.BASE_URL;
 
   constructor() {
     this.bookMetadataForm = new FormGroup({

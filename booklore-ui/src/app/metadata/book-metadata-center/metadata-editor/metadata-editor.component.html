@@ -1,10 +1,10 @@
-<form [formGroup]="bookMetadataForm" (ngSubmit)="onSave()" *ngIf="bookMetadata$ | async as bookMetadata" class="pt-2 flex flex-col h-full">
+<form [formGroup]="bookMetadataForm" (ngSubmit)="onSave()" *ngIf="bookMetadata$ | async as metadata" class="pt-2 flex flex-col h-full">
 
   <div class="overflow-y-scroll flex-1">
 
     <div class="flex flex-row w-full gap-4">
 
-      <img [src]="bookMetadata.coverUrl" alt="Image" width="225"/>
+      <img [src]="baseUrl + '/v1/book/' + metadata.bookId + '/cover?' + metadata?.coverUpdatedOn" alt="Image" width="225"/>
 
       <div class="flex flex-col flex-grow pl-2">
 

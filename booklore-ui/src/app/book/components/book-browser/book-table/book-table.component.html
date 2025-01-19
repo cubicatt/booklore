@@ -29,7 +29,7 @@
   </ng-template>
   <ng-template #body let-book>
     <tr style="height:46px">
-      <td (click)="openMetadataCenter(book.id)"><img [src]="book.metadata.coverUrl" alt="Book Cover" class="size-7"/></td>
+      <td (click)="openMetadataCenter(book.id)"><img [src]="baseUrl + '/v1/book/' + book.id + '/cover?' + book.metadata?.coverUpdatedOn" alt="Book Cover" class="size-7"/></td>
       <td (click)="openMetadataCenter(book.id)" class="w-1/2 max-w-96 overflow-hidden truncate" [title]="book.metadata?.id">{{ book.metadata?.title }}</td>
       <td class="w-1/6 max-w-40 overflow-hidden truncate">{{ book.metadata?.publisher }}</td>
       <td class="w-1/12 max-w-30 overflow-hidden truncate">{{ book.metadata?.publishedDate }}</td>

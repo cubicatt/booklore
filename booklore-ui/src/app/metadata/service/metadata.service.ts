@@ -7,13 +7,14 @@ import {catchError, map, tap} from "rxjs/operators";
 import {BookService} from "../../book/service/book.service";
 import {MetadataRefreshRequest} from '../model/request/metadata-refresh-request.model';
 import {MessageService} from 'primeng/api';
+import {API_CONFIG} from '../../config/api-config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MetadataService {
 
-  private readonly url = 'http://localhost:8080/v1/metadata';
+  private readonly url = `${API_CONFIG.BASE_URL}/v1/metadata`;
 
   private http = inject(HttpClient);
   private bookService = inject(BookService);

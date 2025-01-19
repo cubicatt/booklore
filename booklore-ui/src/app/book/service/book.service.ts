@@ -4,12 +4,14 @@ import {HttpClient} from '@angular/common/http';
 import {catchError, map, switchMap, tap} from 'rxjs/operators';
 import {Book, BookMetadata, BookSetting, BookType, EpubViewerSetting, PdfViewerSetting} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
+import {API_CONFIG} from '../../config/api-config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BookService {
-  private readonly url = 'http://localhost:8080/v1/book';
+
+  private readonly url = `${API_CONFIG.BASE_URL}/v1/book`;
 
   private bookStateSubject = new BehaviorSubject<BookState>({
     books: null,
@@ -205,13 +207,9 @@ export class BookService {
   handleBookMetadataUpdate(bookId: number, updatedMetadata: BookMetadata) {
     const currentState = this.bookStateSubject.value;
     const updatedBooks = (currentState.books || []).map(book => {
-      if (book.id === bookId) {
-        const updatedBook = {...book, metadata: updatedMetadata};
-        return this.updateBookWithCoverUrl(updatedBook);
-      }
-      return book;
+      return book.id == bookId ? {...book, metadata: updatedMetadata} : book
     });
-    this.bookStateSubject.next({...currentState, books: updatedBooks});
+    this.bookStateSubject.next({...currentState, books: updatedBooks})
   }
 
   /*--------------------------Helpers --------------------------*/

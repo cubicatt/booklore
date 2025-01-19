@@ -10,6 +10,7 @@ import {Tag} from 'primeng/tag';
 import {Author, Book, BookMetadata} from '../../../book/model/book.model';
 import {FileService} from '../../../book/service/file.service';
 import {Divider} from 'primeng/divider';
+import {API_CONFIG} from '../../../config/api-config';
 
 @Component({
   selector: 'app-metadata-viewer',
@@ -25,6 +26,7 @@ export class MetadataViewerComponent {
   private metadataCenterService = inject(BookMetadataCenterService);
 
   metadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
+  baseUrl = API_CONFIG.BASE_URL;
 
   readBook(bookId: number): void {
     this.bookService.readBook(bookId);

@@ -98,17 +98,13 @@ export class BookService {
     return this.http.put<void>(`${this.url}/${bookId}/book-viewer-setting`, bookSetting);
   }
 
-  updateLastReadTime(bookId: number): Observable<void> {
-    const timestamp = Math.floor(Date.now() / 1000).toString();
-    return this.http.put<void>(`${this.url}/${bookId}/update-last-read/${timestamp}`, {}).pipe(
-      tap(() => {
-        const currentState = this.bookStateSubject.value;
-        const updatedBooks = (currentState.books || []).map(book =>
-          book.id === bookId ? {...book, lastReadTime: timestamp} : book
-        );
-        this.bookStateSubject.next({...currentState, books: updatedBooks});
-      })
+  updateLastReadTime(bookId: number) {
+    const timestamp = new Date().toISOString();
+    const currentState = this.bookStateSubject.value;
+    const updatedBooks = (currentState.books || []).map(book =>
+      book.id === bookId ? {...book, lastReadTime: timestamp} : book
     );
+    this.bookStateSubject.next({...currentState, books: updatedBooks});
   }
 
   readBook(bookId: number): void {
@@ -118,14 +114,11 @@ export class BookService {
       if (book.bookType === "PDF") {
         const url = `/pdf-viewer/book/${book.id}`;
         window.open(url, '_blank');
-        this.updateLastReadTime(book.id).subscribe({
-          next: () => {
-          },
-          error: err => console.error('Failed to update last read time', err),
-        });
+        this.updateLastReadTime(book.id);
       } else if (book.bookType === "EPUB") {
         const url = `/epub-viewer/book/${book.id}`;
         window.open(url, '_blank');
+        this.updateLastReadTime(book.id);
       } else {
         console.error('Unsupported book type:', book.bookType);
       }

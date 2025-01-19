@@ -38,19 +38,26 @@ export class DashboardScrollerComponent implements OnInit {
           ...state,
           books: (state.books || [])
             .filter(book => book.lastReadTime)
-            .sort((a, b) => new Date(b.lastReadTime!).getTime() - new Date(a.lastReadTime!).getTime())
+            .sort((a, b) => {
+              const aTime = new Date(a.lastReadTime!).getTime();
+              const bTime = new Date(b.lastReadTime!).getTime();
+              return bTime - aTime;
+            })
             .slice(0, 25)
         }))
       );
     }
-
     if (this.bookListType === 'latestAdded') {
       this.bookState$ = this.bookService.bookState$.pipe(
         map((state: BookState) => ({
           ...state,
           books: (state.books || [])
             .filter(book => book.addedOn)
-            .sort((a, b) => new Date(b.addedOn!).getTime() - new Date(a.addedOn!).getTime())
+            .sort((a, b) => {
+              const aTime = new Date(a.addedOn!).getTime();
+              const bTime = new Date(b.addedOn!).getTime();
+              return bTime - aTime;
+            })
             .slice(0, 25)
         }))
       );

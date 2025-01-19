@@ -9,7 +9,7 @@ import {Button} from 'primeng/button';
 import {NgForOf, NgIf, SlicePipe} from '@angular/common';
 import {MetadataDialogService} from '../../../metadata/service/metadata-dialog.service';
 import {Divider} from 'primeng/divider';
-import {API_CONFIG} from '../../../config/api-config';
+import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 
 @Component({
   selector: 'app-book-searcher',
@@ -34,8 +34,7 @@ export class BookSearcherComponent implements OnInit, OnDestroy {
 
   private bookService = inject(BookService);
   private metadataDialogService = inject(MetadataDialogService);
-  baseUrl = API_CONFIG.BASE_URL;
-
+  protected urlHelper = inject(UrlHelperService);
 
   ngOnInit(): void {
     this.initializeSearch();

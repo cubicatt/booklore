@@ -1,5 +1,5 @@
 import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
-import {Book, BookMetadata, FetchedMetadata} from '../../../book/model/book.model';
+import {BookMetadata, FetchedMetadata} from '../../../book/model/book.model';
 import {BookService} from '../../../book/service/book.service';
 import {MessageService} from 'primeng/api';
 import {Button} from 'primeng/button';
@@ -11,7 +11,7 @@ import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Observable} from 'rxjs';
 import {Tooltip} from 'primeng/tooltip';
 import {MetadataService} from '../../service/metadata.service';
-import {API_CONFIG} from '../../../config/api-config';
+import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 
 @Component({
   selector: 'app-metadata-picker',
@@ -46,9 +46,9 @@ export class MetadataPickerComponent implements OnInit {
   private metadataCenterService = inject(BookMetadataCenterService);
   private messageService = inject(MessageService);
   private metadataService = inject(MetadataService);
+  protected urlHelper = inject(UrlHelperService);
 
   currentMetadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
-  baseUrl = API_CONFIG.BASE_URL;
   protected metadata!: BookMetadata;
 
   constructor() {

@@ -1,7 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {InputText} from 'primeng/inputtext';
 import {Textarea} from 'primeng/textarea';
-import {Image} from 'primeng/image';
 import {Button} from 'primeng/button';
 import {Divider} from 'primeng/divider';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -11,8 +10,8 @@ import {AsyncPipe, NgIf} from '@angular/common';
 import {BookService} from '../../../book/service/book.service';
 import {MessageService} from 'primeng/api';
 import {MetadataService} from '../../service/metadata.service';
-import {Book, BookMetadata} from '../../../book/model/book.model';
-import {API_CONFIG} from '../../../config/api-config';
+import {BookMetadata} from '../../../book/model/book.model';
+import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 
 @Component({
   selector: 'app-metadata-editor',
@@ -36,11 +35,11 @@ export class MetadataEditorComponent implements OnInit {
   private bookService = inject(BookService);
   private messageService = inject(MessageService);
   private metadataService = inject(MetadataService);
+  protected urlHelper = inject(UrlHelperService);
 
   bookMetadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
   bookMetadataForm: FormGroup;
   currentBookId!: number;
-  baseUrl = API_CONFIG.BASE_URL;
 
   constructor() {
     this.bookMetadataForm = new FormGroup({

@@ -4,12 +4,10 @@ import {NgIf} from '@angular/common';
 import {BookService} from '../../../service/book.service';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
-import {BookMetadataCenterComponent} from '../../../../metadata/book-metadata-center/book-metadata-center.component';
-import {DialogService} from 'primeng/dynamicdialog';
 import {Book} from '../../../model/book.model';
 import {SortOption} from '../../../model/sort.model';
 import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
-import {API_CONFIG} from '../../../../config/api-config';
+import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
 
 @Component({
   selector: 'app-book-table',
@@ -32,12 +30,10 @@ export class BookTableComponent implements OnChanges {
   @Input() sortOption: SortOption | null = null;
 
   private bookService = inject(BookService);
+  protected urlHelper = inject(UrlHelperService);
   private metadataDialogService = inject(MetadataDialogService);
-  baseUrl = API_CONFIG.BASE_URL;
-
 
   // Hack to set virtual-scroller height
-
   ngOnChanges() {
     const wrapperElements: HTMLCollection = document.getElementsByClassName('p-virtualscroller');
     Array.prototype.forEach.call(wrapperElements, function (wrapperElement) {

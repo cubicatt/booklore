@@ -7,10 +7,10 @@ import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
-import {Author, Book, BookMetadata} from '../../../book/model/book.model';
+import {Author, BookMetadata} from '../../../book/model/book.model';
 import {FileService} from '../../../book/service/file.service';
 import {Divider} from 'primeng/divider';
-import {API_CONFIG} from '../../../config/api-config';
+import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 
 @Component({
   selector: 'app-metadata-viewer',
@@ -24,9 +24,9 @@ export class MetadataViewerComponent {
   private bookService = inject(BookService);
   private fileService = inject(FileService);
   private metadataCenterService = inject(BookMetadataCenterService);
+  protected urlHelper = inject(UrlHelperService);
 
   metadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
-  baseUrl = API_CONFIG.BASE_URL;
 
   readBook(bookId: number): void {
     this.bookService.readBook(bookId);

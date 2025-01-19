@@ -14,7 +14,7 @@ import {MetadataFetchOptionsComponent} from '../../../../metadata/metadata-optio
 import {MetadataRefreshType} from '../../../../metadata/model/request/metadata-refresh-type.enum';
 import {MetadataRefreshRequest} from '../../../../metadata/model/request/metadata-refresh-request.model';
 import {MetadataService} from '../../../../metadata/service/metadata.service';
-import {API_CONFIG} from '../../../../config/api-config';
+import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
 
 
 @Component({
@@ -29,7 +29,6 @@ export class BookCardComponent implements OnInit {
   @Input() onBookSelect?: (bookId: number, selected: boolean) => void;
   @Input() isSelected: boolean = false;
 
-  baseUrl = API_CONFIG.BASE_URL;
   items: MenuItem[] | undefined;
   isHovered: boolean = false;
 
@@ -38,6 +37,7 @@ export class BookCardComponent implements OnInit {
   private dialogService = inject(DialogService);
   private metadataService = inject(MetadataService);
   private metadataDialogService = inject(MetadataDialogService);
+  protected urlHelper = inject(UrlHelperService);
 
   ngOnInit(): void {
     this.initMenu();

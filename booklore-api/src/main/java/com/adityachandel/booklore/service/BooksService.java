@@ -16,6 +16,7 @@ import com.adityachandel.booklore.repository.EpubViewerPreferencesRepository;
 import com.adityachandel.booklore.repository.PdfViewerPreferencesRepository;
 import com.adityachandel.booklore.repository.ShelfRepository;
 import com.adityachandel.booklore.util.FileService;
+import com.adityachandel.booklore.util.FileUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -99,7 +100,7 @@ public class BooksService {
 
     public ResponseEntity<byte[]> getBookData(long bookId) throws IOException {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        byte[] pdfBytes = Files.readAllBytes(new File(bookEntity.getLibraryPath().getPath() + "/" + bookEntity.getFileName()).toPath());
+        byte[] pdfBytes = Files.readAllBytes(new File(FileUtils.getBookFullPath(bookEntity)).toPath());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
                 .body(pdfBytes);
@@ -108,12 +109,6 @@ public class BooksService {
     public List<Book> search(String title) {
         List<BookEntity> bookEntities = bookRepository.findByTitleContainingIgnoreCase(title);
         return bookEntities.stream().map(bookMapper::toBook).toList();
-    }
-
-    public Book updateLastReadTime(long bookId) {
-        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        bookEntity.setLastReadTime(Instant.now());
-        return bookMapper.toBook(bookRepository.save(bookEntity));
     }
 
     @Transactional
@@ -158,8 +153,7 @@ public class BooksService {
     public ResponseEntity<Resource> prepareFileForDownload(Long bookId) {
         try {
             BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-            String filePath = bookEntity.getLibraryPath().getPath() + "/" + bookEntity.getFileName();
-            Path file = Paths.get(filePath).toAbsolutePath().normalize();
+            Path file = Paths.get(FileUtils.getBookFullPath(bookEntity)).toAbsolutePath().normalize();
             Resource resource = new UrlResource(file.toUri());
             String contentType = Files.probeContentType(file);
             if (contentType == null) {

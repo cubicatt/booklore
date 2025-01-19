@@ -8,6 +8,7 @@ import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.service.BookCreatorService;
+import com.adityachandel.booklore.util.FileUtils;
 import io.documentnode.epub4j.domain.Identifier;
 import io.documentnode.epub4j.domain.Metadata;
 import io.documentnode.epub4j.domain.Resource;
@@ -61,7 +62,7 @@ public class EpubProcessor implements FileProcessor {
     protected Book processNewFile(LibraryFile libraryFile) {
         BookEntity bookEntity = bookCreatorService.createShellBook(libraryFile, BookFileType.EPUB);
         try {
-            io.documentnode.epub4j.domain.Book epub = new EpubReader().readEpub(new FileInputStream(libraryFile.getLibraryPathEntity().getPath() + "/" + libraryFile.getFileName()));
+            io.documentnode.epub4j.domain.Book epub = new EpubReader().readEpub(new FileInputStream(FileUtils.getBookFullPath(bookEntity)));
 
             setBookMetadata(epub, bookEntity);
             processCover(epub, bookEntity);

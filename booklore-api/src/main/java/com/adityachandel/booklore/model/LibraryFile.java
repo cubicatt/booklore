@@ -13,6 +13,7 @@ import lombok.Data;
 public class LibraryFile {
     private LibraryEntity libraryEntity;
     private LibraryPathEntity libraryPathEntity;
+    private String fileSubPath;
     private String fileName;
     private BookFileType bookFileType;
 }

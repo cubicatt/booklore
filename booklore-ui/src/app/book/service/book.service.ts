@@ -98,15 +98,15 @@ export class BookService {
     return this.http.put<void>(`${this.url}/${bookId}/book-viewer-setting`, bookSetting);
   }
 
-  updateLastReadTime(bookId: number): Observable<Book> {
-    return this.http.put<Book>(`${this.url}/${bookId}/update-last-read`, {}).pipe(
-      switchMap(updatedBook => {
+  updateLastReadTime(bookId: number): Observable<void> {
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    return this.http.put<void>(`${this.url}/${bookId}/update-last-read/${timestamp}`, {}).pipe(
+      tap(() => {
         const currentState = this.bookStateSubject.value;
         const updatedBooks = (currentState.books || []).map(book =>
-          book.id === updatedBook.id ? {...book, lastReadTime: updatedBook.lastReadTime} : book
+          book.id === bookId ? {...book, lastReadTime: timestamp} : book
         );
         this.bookStateSubject.next({...currentState, books: updatedBooks});
-        return [updatedBook];
       })
     );
   }
@@ -164,6 +164,10 @@ export class BookService {
     });
   }
 
+  savePdfProgress(bookId: number, progress: number): Observable<void> {
+    return this.http.post<void>(`${this.url}/progress`, {bookId: bookId, pdfProgress: progress});
+  }
+
   saveEpubProgress(bookId: number, progress: string): Observable<void> {
     return this.http.post<void>(`${this.url}/progress`, {bookId: bookId, epubProgress: progress});
   }
@@ -185,7 +189,7 @@ export class BookService {
   handleRemovedBookIds(removedBookIds: number[]): void {
     const currentState = this.bookStateSubject.value;
     const filteredBooks = (currentState.books || []).filter(book => !removedBookIds.includes(book.id)); // Check using includes() method
-    this.bookStateSubject.next({ ...currentState, books: filteredBooks });
+    this.bookStateSubject.next({...currentState, books: filteredBooks});
   }
 
   handleBookUpdate(updatedBook: Book) {

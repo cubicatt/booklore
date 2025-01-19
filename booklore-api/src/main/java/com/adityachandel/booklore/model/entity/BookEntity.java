@@ -23,6 +23,9 @@ public class BookEntity {
     @Column(name = "file_name", length = 1000)
     private String fileName;
 
+    @Column(name = "file_sub_path")
+    private String fileSubPath;
+
     @Column(name = "book_type")
     private BookFileType bookType;
 

@@ -12,6 +12,7 @@ import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.service.fileprocessor.EpubProcessor;
 import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
+import com.adityachandel.booklore.util.FileUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -124,15 +125,26 @@ public class LibraryProcessingService {
 
     private List<LibraryFile> findLibraryFiles(LibraryPathEntity libraryPathEntity, LibraryEntity libraryEntity) throws IOException {
         List<LibraryFile> libraryFiles = new ArrayList<>();
-        try (var stream = Files.walk(Path.of(libraryPathEntity.getPath()))) {
+        Path libraryPath = Path.of(libraryPathEntity.getPath());
+        try (var stream = Files.walk(libraryPath)) {
             stream.filter(Files::isRegularFile)
                     .filter(file -> {
                         String fileName = file.getFileName().toString().toLowerCase();
                         return fileName.endsWith(".pdf") || fileName.endsWith(".epub");
                     })
-                    .forEach(file -> {
-                        BookFileType fileType = file.getFileName().toString().toLowerCase().endsWith(".pdf") ? BookFileType.PDF : BookFileType.EPUB;
-                        libraryFiles.add(new LibraryFile(libraryEntity, libraryPathEntity, file.toFile().getName(), fileType));
+                    .forEach(fullFilePath -> {
+                        BookFileType fileType = fullFilePath.getFileName().toString().toLowerCase().endsWith(".pdf")
+                                ? BookFileType.PDF
+                                : BookFileType.EPUB;
+                        String relativePath = FileUtils.getRelativeSubPath(libraryPathEntity.getPath(), fullFilePath);
+                        LibraryFile libraryFile = LibraryFile.builder()
+                                .libraryEntity(libraryEntity)
+                                .libraryPathEntity(libraryPathEntity)
+                                .fileSubPath(relativePath)
+                                .fileName(fullFilePath.getFileName().toString())
+                                .bookFileType(fileType)
+                                .build();
+                        libraryFiles.add(libraryFile);
                     });
         }
         return libraryFiles;

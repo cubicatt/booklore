@@ -101,10 +101,6 @@ export class MetadataPickerComponent implements OnInit {
     return this.fetchedMetadata.categories ? this.fetchedMetadata.categories.map(category => category).join(', ') : '';
   }
 
-  coverImageSrc(bookId: number): string {
-    return this.bookService.getBookCoverUrl(bookId);
-  }
-
   onSave(): void {
     const updatedBookMetadata: BookMetadata = {
       bookId: this.currentBookId,

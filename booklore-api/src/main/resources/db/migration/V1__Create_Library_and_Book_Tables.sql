@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS book
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     file_name       VARCHAR(255)  NOT NULL,
+    file_sub_path   VARCHAR(512)  NOT NULL,
     book_type       VARCHAR(6)    NOT NULL,
     library_id      BIGINT        NOT NULL,
     library_path_id BIGINT        NOT NULL,

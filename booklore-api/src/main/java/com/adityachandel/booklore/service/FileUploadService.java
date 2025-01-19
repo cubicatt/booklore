@@ -10,9 +10,11 @@ import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.service.fileprocessor.EpubProcessor;
 import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
+import com.adityachandel.booklore.util.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -36,18 +39,19 @@ public class FileUploadService {
     private final EpubProcessor epubProcessor;
     private final NotificationService notificationService;
 
+
     public Book uploadFile(MultipartFile file, long libraryId, long pathId) {
         validateFile(file);
 
         LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
 
-        LibraryPathEntity libraryPath = libraryEntity.getLibraryPaths()
+        LibraryPathEntity libraryPathEntity = libraryEntity.getLibraryPaths()
                 .stream()
                 .filter(p -> p.getId() == pathId)
                 .findFirst()
                 .orElseThrow(() -> ApiError.INVALID_LIBRARY_PATH.createException(libraryId));
 
-        Path storagePath = Paths.get(libraryPath.getPath(), Objects.requireNonNull(file.getOriginalFilename()));
+        Path storagePath = Paths.get(libraryPathEntity.getPath(), Objects.requireNonNull(file.getOriginalFilename()));
         File storageFile = storagePath.toFile();
 
         if (storageFile.exists()) {
@@ -57,7 +61,7 @@ public class FileUploadService {
         try {
             file.transferTo(storageFile);
             log.info("File uploaded successfully: {}", storageFile.getAbsolutePath());
-            Book book = processFile(file, libraryEntity, storageFile);
+            Book book = processFile(file, libraryEntity, libraryPathEntity, storageFile);
             notificationService.sendMessage(Topic.BOOK_ADD, book);
             log.info("Book processed successfully: {}", book.getMetadata().getTitle());
             return book;
@@ -77,16 +81,20 @@ public class FileUploadService {
         }
     }
 
-    private Book processFile(MultipartFile file, LibraryEntity libraryEntity, File storageFile) {
-        BookFileType fileType = determineFileType(file.getContentType());
+    private Book processFile(MultipartFile file, LibraryEntity libraryEntity, LibraryPathEntity libraryPathEntity, File storageFile) {
+        BookFileType fileType = determineFileType(Objects.requireNonNull(file.getContentType()));
         if (fileType == null) {
             throw ApiError.INVALID_FILE_FORMAT.createException();
         }
 
+        String subPath = FileUtils.getRelativeSubPath(libraryPathEntity.getPath(), storageFile.toPath());
+
         LibraryFile libraryFile = LibraryFile.builder()
                 .libraryEntity(libraryEntity)
+                .libraryPathEntity(libraryPathEntity)
+                .fileSubPath(subPath)
                 .bookFileType(fileType)
-                .fileName(storageFile.getAbsolutePath())
+                .fileName(file.getOriginalFilename())
                 .build();
 
         switch (fileType) {

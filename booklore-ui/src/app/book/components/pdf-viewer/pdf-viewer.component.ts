@@ -4,7 +4,7 @@ import {NgxExtendedPdfViewerModule, ScrollModeType} from 'ngx-extended-pdf-viewe
 import {BookService} from '../../service/book.service';
 import {AppSettingsService} from '../../../core/service/app-settings.service';
 import {filter, forkJoin, Subscription, take} from 'rxjs';
-import {BookSetting, PdfViewerSetting} from '../../model/book.model';
+import {BookSetting} from '../../model/book.model';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -65,21 +65,17 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
             }
             this.isInitialLoad = false;
             this.bookData = pdfData;
-            this.updateLastReadTime();
+            this.updateProgress();
           });
         });
     });
   }
 
-  private updateLastReadTime(): void {
-    this.bookService.updateLastReadTime(this.bookId).subscribe();
-  }
-
   onPageChange(page: number): void {
     if (page !== this.page) {
       this.page = page;
-      this.updateViewerSetting();
     }
+    this.updateProgress();
   }
 
   onZoomChange(zoom: string | number): void {
@@ -115,10 +111,14 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
     this.bookService.updateViewerSetting(bookSetting, this.bookId).subscribe();
   }
 
+  updateProgress() {
+    this.bookService.savePdfProgress(this.bookId, this.page).subscribe();
+  }
+
   ngOnDestroy(): void {
-    this.updateLastReadTime();
     if (this.appSettingsSubscription) {
       this.appSettingsSubscription.unsubscribe();
     }
+    this.updateProgress();
   }
 }

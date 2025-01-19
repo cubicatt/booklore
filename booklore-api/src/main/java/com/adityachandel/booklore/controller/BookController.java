@@ -59,11 +59,6 @@ public class BookController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{bookId}/update-last-read")
-    public ResponseEntity<Book> updateBookViewerSettings(@PathVariable long bookId) {
-        return ResponseEntity.ok(booksService.updateLastReadTime(bookId));
-    }
-
     @PostMapping("/assign-shelves")
     public ResponseEntity<List<Book>> addBookToShelf(@RequestBody @Valid ShelvesAssignmentRequest request) {
         return ResponseEntity.ok(booksService.assignShelvesToBooks(request.getBookIds(), request.getShelvesToAssign(), request.getShelvesToUnassign()));

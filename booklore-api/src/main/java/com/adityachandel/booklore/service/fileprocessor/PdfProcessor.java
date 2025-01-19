@@ -7,6 +7,7 @@ import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.service.BookCreatorService;
+import com.adityachandel.booklore.util.FileUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
@@ -54,7 +55,7 @@ public class PdfProcessor implements FileProcessor {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     protected Book processNewFile(LibraryFile libraryFile) {
         BookEntity bookEntity = bookCreatorService.createShellBook(libraryFile, BookFileType.PDF);
-        try (PDDocument pdf = Loader.loadPDF(new File(libraryFile.getLibraryPathEntity().getPath() + "/" + libraryFile.getFileName()))) {
+        try (PDDocument pdf = Loader.loadPDF(new File(FileUtils.getBookFullPath(bookEntity)))) {
 
             setMetadata(pdf, bookEntity);
             processCover(pdf, bookEntity);

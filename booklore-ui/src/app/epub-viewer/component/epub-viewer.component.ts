@@ -35,6 +35,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   isSettingsDrawerVisible = false;
   private book: any;
   private rendition: any;
+  location: any;
   private keyListener: (e: KeyboardEvent) => void = () => {
   };
 
@@ -127,7 +128,6 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
 
               this.setupKeyListener();
               this.trackProgress();
-              this.updateLastReadTime();
             };
 
             fileReader.readAsArrayBuffer(epubData);
@@ -136,13 +136,8 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     });
   }
 
-  private updateLastReadTime(): void {
-    this.bookService.updateLastReadTime(this.epub.id).subscribe();
-  }
-
   changeThemes(): void {
     if (this.rendition) {
-      console.log(this.selectedTheme)
       this.rendition.themes.select(this.selectedTheme);
       this.rendition.clear();
       this.rendition.start();
@@ -204,14 +199,6 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     document.addEventListener('keyup', this.keyListener);
   }
 
-  private trackProgress(): void {
-    if (this.rendition) {
-      this.rendition.on('relocated', (location: any) => {
-        this.bookService.saveEpubProgress(this.epub.id, location.start.cfi).subscribe();
-      });
-    }
-  }
-
   prevPage(): void {
     if (this.rendition) {
       this.rendition.prev();
@@ -227,6 +214,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   navigateToChapter(chapter: { label: string; href: string }): void {
     if (this.book && chapter.href) {
       this.book.rendition.display(chapter.href);
+      this.trackProgress();
     }
   }
 
@@ -238,12 +226,20 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     this.isSettingsDrawerVisible = !this.isSettingsDrawerVisible;
   }
 
+  private trackProgress(): void {
+    if (this.rendition) {
+      this.rendition.on('relocated', (location: any) => {
+        this.bookService.saveEpubProgress(this.epub.id, location.start.cfi).subscribe();
+      });
+    }
+  }
+
   ngOnDestroy(): void {
     if (this.rendition) {
       this.rendition.off('keyup', this.keyListener);
     }
-    this.updateLastReadTime();
     document.removeEventListener('keyup', this.keyListener);
+    this.trackProgress();
   }
 
   themesMap = new Map<string, any>([

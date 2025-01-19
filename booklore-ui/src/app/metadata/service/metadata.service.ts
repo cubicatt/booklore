@@ -27,9 +27,8 @@ export class MetadataService {
   updateBookMetadata(bookId: number, bookMetadata: BookMetadata): Observable<BookMetadata> {
     return this.http.put<BookMetadata>(`${this.url}/${bookId}`, bookMetadata).pipe(
       map(updatedMetadata => {
-        const updatedMetadataWithCoverUrl = this.bookService.updateMetadataWithCoverUrl(updatedMetadata);
-        this.bookService.handleBookMetadataUpdate(bookId, updatedMetadataWithCoverUrl);
-        return updatedMetadataWithCoverUrl;
+        this.bookService.handleBookMetadataUpdate(bookId, updatedMetadata);
+        return updatedMetadata;
       })
     );
   }

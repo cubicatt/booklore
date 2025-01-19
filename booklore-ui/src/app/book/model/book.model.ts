@@ -28,7 +28,6 @@ export interface BookMetadata {
   language?: string;
   rating?: number | null;
   reviewCount?: number | null;
-  coverUrl?: string;
   coverUpdatedOn?: string;
   authors: Author[];
   categories: Category[];

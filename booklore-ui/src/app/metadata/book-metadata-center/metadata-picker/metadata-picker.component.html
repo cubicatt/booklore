@@ -128,7 +128,7 @@
     <div class="form-row">
       <label class="label"></label>
       <div class="input-container">
-        <img *ngIf="!updateThumbnailUrl" [src]="baseUrl + '/v1/book/' + currentBookId + '/cover?' + metadata?.coverUpdatedOn" alt="Book Thumbnail" class="thumbnail"/>
+        <img *ngIf="!updateThumbnailUrl" [src]="baseUrl + '/v1/book/' + currentBookId + '/cover?' + metadata.coverUpdatedOn" alt="Book Thumbnail" class="thumbnail"/>
         <img *ngIf="updateThumbnailUrl" [src]="fetchedMetadata.thumbnailUrl" alt="Fetched Thumbnail" class="thumbnail"/>
         <p-button
           [icon]="thumbnailSaved ? 'pi pi-check' : 'pi pi-arrow-left'"

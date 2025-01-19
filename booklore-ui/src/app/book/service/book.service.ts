@@ -29,9 +29,8 @@ export class BookService {
     }
     this.http.get<Book[]>(this.url).pipe(
       tap(books => {
-        const bookWithCover = books.map(book => this.updateBookWithCoverUrl(book));
         this.bookStateSubject.next({
-          books: bookWithCover || [],
+          books: books || [],
           loaded: true,
           error: null,
         });
@@ -162,9 +161,7 @@ export class BookService {
       params: {
         withDescription: withDescription.toString()
       }
-    }).pipe(
-      map((book) => this.updateBookWithCoverUrl(book))
-    );
+    });
   }
 
   saveEpubProgress(bookId: number, progress: string): Observable<void> {
@@ -176,12 +173,11 @@ export class BookService {
   handleNewlyCreatedBook(book: Book): void {
     const currentState = this.bookStateSubject.value;
     const updatedBooks = currentState.books ? [...currentState.books] : [];
-    const updatedBook = this.updateBookWithCoverUrl(book);
     const bookIndex = updatedBooks.findIndex(existingBook => existingBook.id === book.id);
     if (bookIndex > -1) {
-      updatedBooks[bookIndex] = updatedBook;
+      updatedBooks[bookIndex] = book;
     } else {
-      updatedBooks.push(updatedBook);
+      updatedBooks.push(book);
     }
     this.bookStateSubject.next({...currentState, books: updatedBooks});
   }
@@ -195,11 +191,7 @@ export class BookService {
   handleBookUpdate(updatedBook: Book) {
     const currentState = this.bookStateSubject.value;
     const updatedBooks = (currentState.books || []).map(book => {
-      if (book.id === updatedBook.id) {
-        return this.updateBookWithCoverUrl(updatedBook);
-      } else {
-        return book;
-      }
+      return book.id == updatedBook.id ? {...book, metadata: updatedBook.metadata} : book
     });
     this.bookStateSubject.next({...currentState, books: updatedBooks});
   }
@@ -210,32 +202,5 @@ export class BookService {
       return book.id == bookId ? {...book, metadata: updatedMetadata} : book
     });
     this.bookStateSubject.next({...currentState, books: updatedBooks})
-  }
-
-  /*--------------------------Helpers --------------------------*/
-
-  private getCoverUrlForBook(book: Book): string {
-    return `${this.url}/${book.id}/cover?${book.metadata?.coverUpdatedOn}`;
-  }
-
-  updateBookWithCoverUrl(book: Book): Book {
-    return {
-      ...book,
-      metadata: book.metadata ? {
-        ...book.metadata,
-        coverUrl: this.getCoverUrlForBook(book)
-      } : undefined
-    };
-  }
-
-  updateMetadataWithCoverUrl(metadata: BookMetadata): BookMetadata {
-    return {
-      ...metadata,
-      coverUrl: this.getCoverUrlForMetadata(metadata)
-    };
-  }
-
-  private getCoverUrlForMetadata(metadata: BookMetadata): string {
-    return `${this.url}/${metadata.bookId}/cover?${metadata.coverUpdatedOn}`;
   }
 }

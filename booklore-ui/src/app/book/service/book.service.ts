@@ -160,7 +160,9 @@ export class BookService {
       params: {
         withDescription: withDescription.toString()
       }
-    });
+    }).pipe(
+      map((book) => this.updateBookWithCoverUrl(book))
+    );
   }
 
   saveEpubProgress(bookId: number, progress: string): Observable<void> {
@@ -203,11 +205,14 @@ export class BookService {
   handleBookMetadataUpdate(bookId: number, updatedMetadata: BookMetadata) {
     const currentState = this.bookStateSubject.value;
     const updatedBooks = (currentState.books || []).map(book => {
-      return book.id == bookId ? {...book, metadata: updatedMetadata} : book;
+      if (book.id === bookId) {
+        const updatedBook = {...book, metadata: updatedMetadata};
+        return this.updateBookWithCoverUrl(updatedBook);
+      }
+      return book;
     });
     this.bookStateSubject.next({...currentState, books: updatedBooks});
   }
-
 
   /*--------------------------Helpers --------------------------*/
 
@@ -215,7 +220,7 @@ export class BookService {
     return `${this.url}/${book.id}/cover?${book.metadata?.coverUpdatedOn}`;
   }
 
-  private updateBookWithCoverUrl(book: Book): Book {
+  updateBookWithCoverUrl(book: Book): Book {
     return {
       ...book,
       metadata: book.metadata ? {
@@ -223,5 +228,16 @@ export class BookService {
         coverUrl: this.getCoverUrlForBook(book)
       } : undefined
     };
+  }
+
+  updateMetadataWithCoverUrl(metadata: BookMetadata): BookMetadata {
+    return {
+      ...metadata,
+      coverUrl: this.getCoverUrlForMetadata(metadata)
+    };
+  }
+
+  private getCoverUrlForMetadata(metadata: BookMetadata): string {
+    return `${this.url}/${metadata.bookId}/cover?${metadata.coverUpdatedOn}`;
   }
 }

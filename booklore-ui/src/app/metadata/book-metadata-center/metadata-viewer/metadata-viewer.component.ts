@@ -7,7 +7,7 @@ import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
-import {Author, Book} from '../../../book/model/book.model';
+import {Author, Book, BookMetadata} from '../../../book/model/book.model';
 import {FileService} from '../../../book/service/file.service';
 import {Divider} from 'primeng/divider';
 
@@ -24,11 +24,7 @@ export class MetadataViewerComponent {
   private fileService = inject(FileService);
   private metadataCenterService = inject(BookMetadataCenterService);
 
-  metadata$: Observable<Book['metadata'] | null> = this.metadataCenterService.currentMetadata$;
-
-  coverImageSrc(bookId: number | undefined): string {
-    return bookId ? this.bookService.getBookCoverUrl(bookId) : 'assets/book-cover-metadata.png';
-  }
+  metadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
 
   readBook(bookId: number): void {
     this.bookService.readBook(bookId);

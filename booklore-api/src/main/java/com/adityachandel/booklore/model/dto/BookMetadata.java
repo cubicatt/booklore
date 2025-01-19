@@ -22,7 +22,6 @@ public class BookMetadata {
     private String language;
     private Float rating;
     private Integer reviewCount;
-    private String cover;
     private Instant coverUpdatedOn;
     private List<Author> authors;
     private List<Category> categories;

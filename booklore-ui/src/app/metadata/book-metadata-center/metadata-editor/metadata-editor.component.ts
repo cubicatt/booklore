@@ -21,7 +21,6 @@ import {Book, BookMetadata} from '../../../book/model/book.model';
   imports: [
     InputText,
     Textarea,
-    Image,
     Button,
     Divider,
     FormsModule,

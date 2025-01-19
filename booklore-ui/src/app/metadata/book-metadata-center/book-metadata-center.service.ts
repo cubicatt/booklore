@@ -14,6 +14,7 @@ export class BookMetadataCenterService {
   dialogClose$ = this.dialogCloseSubject.asObservable();
 
   emit(bookMetadata: BookMetadata) {
+    console.log(bookMetadata)
     this.bookMetadataSubject.next(bookMetadata);
   }
 

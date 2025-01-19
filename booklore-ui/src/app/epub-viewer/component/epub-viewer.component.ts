@@ -214,7 +214,6 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
   navigateToChapter(chapter: { label: string; href: string }): void {
     if (this.book && chapter.href) {
       this.book.rendition.display(chapter.href);
-      this.trackProgress();
     }
   }
 

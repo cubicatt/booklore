@@ -4,7 +4,7 @@ import {MenuItem, MessageService} from 'primeng/api';
 import {LibraryService} from '../../service/library.service';
 import {BookService} from '../../service/book.service';
 import {map, switchMap} from 'rxjs/operators';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, of} from 'rxjs';
 import {ShelfService} from '../../service/shelf.service';
 import {ShelfAssignerComponent} from '../shelf-assigner/shelf-assigner.component';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
@@ -13,14 +13,14 @@ import {Shelf} from '../../model/shelf.model';
 import {SortService} from '../../service/sort.service';
 import {SortOption} from '../../model/sort.model';
 import {BookState} from '../../model/state/book-state.model';
-import {Book} from '../../model/book.model';
+import {Author, Book, Category} from '../../model/book.model';
 import {LibraryShelfMenuService} from '../../service/library-shelf-menu.service';
 import {BookTableComponent} from './book-table/book-table.component';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MetadataFetchOptionsComponent} from '../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../../metadata/model/request/metadata-refresh-type.enum';
 import {Button} from 'primeng/button';
-import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
 import {BookCardComponent} from './book-card/book-card.component';
 import {ProgressSpinner} from 'primeng/progressspinner';
@@ -29,6 +29,8 @@ import {RadioButton} from 'primeng/radiobutton';
 import {Menu} from 'primeng/menu';
 import {InputText} from 'primeng/inputtext';
 import {FormsModule} from '@angular/forms';
+import {Accordion, AccordionContent, AccordionHeader, AccordionPanel} from 'primeng/accordion';
+import {Badge} from 'primeng/badge';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -41,7 +43,7 @@ export enum EntityType {
   standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
-  imports: [Button, NgIf, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Select, RadioButton, Menu, NgForOf, InputText, FormsModule, BookTableComponent],
+  imports: [Button, NgIf, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Select, RadioButton, Menu, NgForOf, InputText, FormsModule, BookTableComponent, AccordionHeader, AccordionContent, AccordionPanel, Accordion, Badge, NgClass],
   animations: [
     trigger('slideInOut', [
       state('void', style({
@@ -75,9 +77,11 @@ export class BookBrowserComponent implements OnInit {
   isDrawerVisible: boolean = false;
   dynamicDialogRef: DynamicDialogRef | undefined;
   EntityType = EntityType;
+  showFilters: boolean = false;
+
 
   stateOptions: any[] = [{label: 'Grid', value: 'grid'}, {label: 'Table', value: 'table'}];
-  value: string = 'table';
+  value: string = 'grid';
 
   @ViewChild(BookTableComponent) bookTableComponent!: BookTableComponent;
 
@@ -90,6 +94,13 @@ export class BookBrowserComponent implements OnInit {
   private sortService = inject(SortService);
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
 
+  authorBookCount$: Observable<{ author: Author; bookCount: number; }[]> | undefined = this.bookService.authorBookCount$;
+  categoryBookCount$: Observable<{ category: Category; bookCount: number; }[]> | undefined = this.bookService.categoryBookCount$;
+
+  toggleFilters() {
+    this.showFilters = !this.showFilters;
+  }
+
   ngOnInit(): void {
     this.bookService.loadBooks();
     this.sortOptions = SortService.generateSortOptions();
@@ -99,6 +110,7 @@ export class BookBrowserComponent implements OnInit {
       this.entityType = EntityType.ALL_BOOKS;
       this.entityType$ = of(EntityType.ALL_BOOKS);
       this.bookState$ = this.fetchAllBooks();
+
     } else {
 
       const routeEntityInfo$ = this.getEntityInfoFromRoute();
@@ -178,7 +190,75 @@ export class BookBrowserComponent implements OnInit {
   private fetchAllBooks(): Observable<BookState> {
     return this.bookService.bookState$.pipe(
       map(bookState => this.processBookState(bookState)),
-      switchMap(bookState => this.filterBooks(bookState))
+      switchMap(bookState => this.filterBooks(bookState)),
+      switchMap(bookState => this.newFilter(bookState))
+    );
+  }
+
+
+  author = new BehaviorSubject<number | null>(null);
+  category = new BehaviorSubject<number | null>(null);
+
+  activeAuthor: string | null = null;
+  activeCategory: string | null = null;
+
+  authorClicked(author: { author: Author; bookCount: number }) {
+    this.activeAuthor = author.author.name;
+    if (this.author.value === author.author.id) {
+      this.author.next(null);
+      this.activeAuthor = null;
+    } else {
+      this.category.next(null);
+      this.activeCategory = null;
+      this.author.next(author.author.id);
+    }
+  }
+
+  categoryClicked(category: { category: Category; bookCount: number }) {
+    this.activeCategory = category.category.name;
+    if (this.category.value === category.category.id) {
+      this.category.next(null);
+      this.activeCategory = null;
+    } else {
+      this.author.next(null);
+      this.activeAuthor = null;
+      this.category.next(category.category.id);
+    }
+  }
+
+  private newFilter(bookState: BookState): Observable<BookState> {
+    return combineLatest([this.author, this.category]).pipe(
+      map(([authorId, categoryId]) => {
+        let filteredBooks = bookState.books || [];
+        if (authorId !== null) {
+          filteredBooks = filteredBooks.filter(book =>
+            book.metadata?.authors.some(author => author.id === authorId)
+          );
+        } else if (categoryId !== null) {
+          filteredBooks = filteredBooks.filter(book =>
+            book.metadata?.categories?.some(category => category.id === categoryId)
+          );
+        }
+        return {...bookState, books: filteredBooks};
+      })
+    );
+  }
+
+  private filterBooks(bookState: BookState): Observable<BookState> {
+    return this.bookOrAuthor$.pipe(
+      map(title => {
+        if (title && title.trim() !== '') {
+          const filteredBooks = bookState.books?.filter(book => {
+            const matchesTitle = book.metadata?.title?.toLowerCase().includes(title.toLowerCase());
+            const matchesAuthor = book.metadata?.authors.some(author =>
+              author.name.toLowerCase().includes(title.toLowerCase())
+            );
+            return matchesTitle || matchesAuthor;
+          }) || null;
+          return {...bookState, books: filteredBooks};
+        }
+        return bookState;
+      })
     );
   }
 
@@ -204,23 +284,6 @@ export class BookBrowserComponent implements OnInit {
     return bookState;
   }
 
-  private filterBooks(bookState: BookState): Observable<BookState> {
-    return this.bookOrAuthor$.pipe(
-      map(title => {
-        if (title && title.trim() !== '') {
-          const filteredBooks = bookState.books?.filter(book => {
-            const matchesTitle = book.metadata?.title?.toLowerCase().includes(title.toLowerCase());
-            const matchesAuthor = book.metadata?.authors.some(author =>
-              author.name.toLowerCase().includes(title.toLowerCase())
-            );
-            return matchesTitle || matchesAuthor;
-          }) || null;
-          return {...bookState, books: filteredBooks};
-        }
-        return bookState;
-      })
-    );
-  }
 
   private fetchLibrary(libraryId: number): Observable<Library | null> {
     return this.libraryService.libraryState$.pipe(
@@ -261,7 +324,7 @@ export class BookBrowserComponent implements OnInit {
   deselectAllBooks(): void {
     this.selectedBooks.clear();
     this.isDrawerVisible = false;
-    if(this.bookTableComponent) {
+    if (this.bookTableComponent) {
       this.bookTableComponent.clearSelectedBooks();
     }
   }
@@ -349,5 +412,6 @@ export class BookBrowserComponent implements OnInit {
       }
     })
   }
+
 
 }

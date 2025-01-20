@@ -7,9 +7,9 @@ import com.adityachandel.booklore.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,6 +18,7 @@ import java.util.Set;
 public class BookCreatorService {
 
     private AuthorRepository authorRepository;
+    private CategoryRepository categoryRepository;
     private BookRepository bookRepository;
     private BookMetadataRepository bookMetadataRepository;
     private PdfViewerPreferencesRepository pdfViewerPreferencesRepository;
@@ -50,6 +51,25 @@ public class BookCreatorService {
         bookEntity = bookRepository.saveAndFlush(bookEntity);
 
         return bookEntity;
+    }
+
+    public void addCategoriesToBook(List<String> categories, BookEntity bookEntity) {
+        for (String category : categories) {
+            Optional<CategoryEntity> catOpt = categoryRepository.findByName(category);
+            CategoryEntity categoryEntity;
+            if (catOpt.isPresent()) {
+                categoryEntity = catOpt.get();
+            } else {
+                categoryEntity = CategoryEntity.builder()
+                        .name(category)
+                        .build();
+                categoryEntity = categoryRepository.save(categoryEntity);
+            }
+            if (bookEntity.getMetadata().getCategories() == null) {
+                bookEntity.getMetadata().setCategories(new ArrayList<>());
+            }
+            bookEntity.getMetadata().getCategories().add(categoryEntity);
+        }
     }
 
     public void addAuthorsToBook(Set<String> authors, BookEntity bookEntity) {

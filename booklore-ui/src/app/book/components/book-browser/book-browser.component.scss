@@ -1,28 +1,11 @@
 .book-browser-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 16px;
   background-color: var(--card-background);
-  border-radius: 12px 12px 0 0;
-  margin-bottom: 15px;
-  align-items: center;
-
-  .left-items {
-    display: flex;
-    align-items: center;
-  }
 }
 
-.p {
-  color: var(--text-color);
+.book-browser-filters {
+  background-color: var(--card-background);
+  overflow: hidden;
 }
-
-.header-right-items {
-  display: flex;
-  gap: 2rem;
-  align-items: center;
-}
-
 
 .virtual-scroller-container {
   position: relative;
@@ -61,11 +44,6 @@
   align-items: start;
 }
 
-.empty-message {
-  display: flex;
-  justify-content: space-around;
-}
-
 .book-browser-footer {
   position: absolute;
   bottom: 0;
@@ -99,11 +77,5 @@
 
 .book-browser-footer:hover::before {
   pointer-events: none;
-}
-
-.footer-items-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 2rem;
 }
 

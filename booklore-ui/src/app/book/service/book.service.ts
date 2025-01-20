@@ -1,8 +1,8 @@
 import {inject, Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import {catchError, map, switchMap, tap} from 'rxjs/operators';
-import {Book, BookMetadata, BookSetting, BookType, EpubViewerSetting, PdfViewerSetting} from '../model/book.model';
+import {catchError, distinctUntilChanged, map, tap} from 'rxjs/operators';
+import {Author, Book, BookMetadata, BookSetting, Category} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 import {API_CONFIG} from '../../config/api-config';
 
@@ -19,6 +19,57 @@ export class BookService {
     error: null,
   });
   bookState$ = this.bookStateSubject.asObservable();
+
+  authorBookCount$: Observable<{ author: Author; bookCount: number }[]> = this.bookState$.pipe(
+    map((state) => {
+      const books = state.books || [];
+      const authorMap = new Map<number, { author: Author; bookCount: number }>();
+      books.forEach((book) => {
+        book.metadata?.authors.forEach((author) => {
+          if (!authorMap.has(author.id)) {
+            authorMap.set(author.id, {author, bookCount: 0});
+          }
+          const authorData = authorMap.get(author.id);
+          if (authorData) {
+            authorData.bookCount += 1;
+          }
+        });
+      });
+      return Array.from(authorMap.values()).sort((a, b) => {
+        if (b.bookCount !== a.bookCount) {
+          return b.bookCount - a.bookCount;
+        }
+        return a.author.name.localeCompare(b.author.name);
+      });
+    }),
+    distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+  );
+
+  categoryBookCount$: Observable<{ category: Category; bookCount: number }[]> = this.bookState$.pipe(
+    map((state) => {
+      const books = state.books || [];
+      const categoryMap = new Map<number, { category: Category; bookCount: number }>();
+      books.forEach((book) => {
+        book.metadata?.categories.forEach((category) => {
+          if (!categoryMap.has(category.id)) {
+            categoryMap.set(category.id, {category, bookCount: 0});
+          }
+          let categoryData = categoryMap.get(category.id);
+          if (categoryData) {
+            categoryData.bookCount += 1;
+          }
+        });
+      });
+      return Array.from(categoryMap.values()).sort((a, b) => {
+        if (b.bookCount !== a.bookCount) {
+          return b.bookCount - a.bookCount;
+        }
+        return a.category.name.localeCompare(b.category.name);
+      });
+    }),
+    distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+  )
+
 
   private http = inject(HttpClient);
 
@@ -204,27 +255,5 @@ export class BookService {
   getBookMetadata(bookId: number): BookMetadata | null {
     const book = this.bookStateSubject.value.books?.find(book => book.id === bookId);
     return book?.metadata ?? null;
-  }
-
-  updateBookMetadata(bookId: number | undefined, metadataField: string | undefined, value: any) {
-    if (!bookId || !metadataField) {
-      console.error("Invalid bookId or metadataField.");
-      return;
-    }
-    const currentState = this.bookStateSubject.value;
-    const updatedBooks = (currentState.books || []).map(book => {
-      if (book.id === bookId) {
-        const updatedBook = {
-          ...book,
-          metadata: {
-            ...book.metadata,
-            [metadataField]: value
-          }
-        };
-        return updatedBook as Book;
-      }
-      return book;
-    });
-    this.bookStateSubject.next({...currentState, books: updatedBooks});
   }
 }

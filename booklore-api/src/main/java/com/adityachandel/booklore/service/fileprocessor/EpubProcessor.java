@@ -138,6 +138,7 @@ public class EpubProcessor implements FileProcessor {
             }
 
             bookCreatorService.addAuthorsToBook(getAuthors(book), bookEntity);
+            bookCreatorService.addCategoriesToBook(epubMetadata.getSubjects(), bookEntity);
         }
     }
 

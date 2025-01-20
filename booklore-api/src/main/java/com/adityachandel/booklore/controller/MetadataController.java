@@ -2,15 +2,12 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.mapper.BookMetadataMapper;
 import com.adityachandel.booklore.model.dto.BookMetadata;
-import com.adityachandel.booklore.model.dto.request.BooksMetadataRefreshRequest;
-import com.adityachandel.booklore.model.dto.request.LibraryMetadataRefreshRequest;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import com.adityachandel.booklore.quartz.JobSchedulerService;
 import com.adityachandel.booklore.service.metadata.BookMetadataService;
 import com.adityachandel.booklore.service.metadata.BookMetadataUpdater;
 import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
 import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
-import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -34,9 +31,14 @@ public class MetadataController {
     }
 
     @PutMapping("/{bookId}")
-    public ResponseEntity<BookMetadata> updateMetadata(@RequestBody FetchedBookMetadata setMetadataRequest, @PathVariable long bookId) {
+    public ResponseEntity<BookMetadata> updateMetadataFromFetch(@RequestBody FetchedBookMetadata setMetadataRequest, @PathVariable long bookId) {
         BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true), true);
         return ResponseEntity.ok(bookMetadata);
+    }
+
+    @PutMapping("/update/{bookId}")
+    public ResponseEntity<BookMetadata> updateMetadata(@PathVariable long bookId, @RequestBody BookMetadata bookMetadata) {
+        return ResponseEntity.ok(bookMetadataUpdater.updateMetadata(bookId, bookMetadata));
     }
 
     @PutMapping(path = "/refreshV2")

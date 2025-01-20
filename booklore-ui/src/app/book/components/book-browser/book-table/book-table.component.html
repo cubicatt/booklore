@@ -10,13 +10,16 @@
   [(selection)]="selectedBooks"
   (onHeaderCheckboxToggle)="onHeaderCheckboxToggle($event)"
   (onRowSelect)="onRowSelect($event)"
-  (onRowUnselect)="onRowUnselect($event)">
+  (onRowUnselect)="onRowUnselect($event)"
+  (onEditComplete)="onEditComplete($event)">
   <ng-template #header>
     <tr>
       <th class="max-w-16">Cover</th>
       <th pResizableColumn>Title</th>
+      <th pResizableColumn>Authors</th>
       <th pResizableColumn>Publisher</th>
       <th>Published</th>
+      <th>Genres</th>
       <th>ISBN</th>
       <th>Language</th>
       <th>Rating</th>
@@ -28,25 +31,85 @@
     </tr>
   </ng-template>
   <ng-template #body let-book>
-    <tr style="height:46px">
-      <td (click)="openMetadataCenter(book.id)"><img [src]="urlHelper.getCoverUrl(book.id, book.metadata?.coverUpdatedOn)" alt="Book Cover" class="size-7"/></td>
-      <td (click)="openMetadataCenter(book.id)" class="w-1/2 max-w-96 overflow-hidden truncate" [title]="book.metadata?.id">{{ book.metadata?.title }}</td>
-      <td class="w-1/6 max-w-40 overflow-hidden truncate">{{ book.metadata?.publisher }}</td>
-      <td class="w-1/12 max-w-30 overflow-hidden truncate">{{ book.metadata?.publishedDate }}</td>
-      <td class="w-1/12 max-w-32 overflow-hidden truncate">{{ book.metadata?.isbn10 }}</td>
-      <td class="w-1/12 max-w-28 overflow-hidden truncate">{{ book.metadata?.language }}</td>
-      <td class="w-1/12 max-w-30 overflow-hidden truncate">
-        <ng-container *ngIf="book.metadata">
+    <tr *ngIf="book.metadata as metadata" style="height:46px">
+      <td (click)="openMetadataCenter(book.id)">
+        <img [src]="urlHelper.getCoverUrl(book.id, metadata.coverUpdatedOn)" alt="Book Cover" class="size-7"/>
+      </td>
+
+      <td [pEditableColumn]="metadata.title"
+          pEditableColumnField="metadata.title"
+          class="min-w-[25rem] max-w-[35rem] overflow-hidden truncate"
+          [pEditableColumnRowIndex]="book.id"
+          [title]="book.metadata?.id">
+        <p-cellEditor>
+          <ng-template #input>
+            <input pInputText class="w-full max-w-full" type="text" [(ngModel)]="metadata.title"/>
+          </ng-template>
+          <ng-template #output>
+            {{ metadata.title }}
+          </ng-template>
+        </p-cellEditor>
+      </td>
+
+      <td class="min-w-[10rem] max-w-[15rem] overflow-hidden truncate">{{ getAuthorNames(metadata.authors) }}</td>
+
+      <td [pEditableColumn]="metadata.publisher"
+          pEditableColumnField="metadata.publisher"
+          class="min-w-[6rem] max-w-[10rem] overflow-hidden truncate"
+          [pEditableColumnRowIndex]="book.id">
+        <p-cellEditor>
+          <ng-template #input>
+            <input pInputText class="w-full max-w-full" type="text" [(ngModel)]="metadata.publisher"/>
+          </ng-template>
+          <ng-template #output>
+            {{ metadata.publisher }}
+          </ng-template>
+        </p-cellEditor>
+      </td>
+
+      <td [pEditableColumn]="metadata.publishedDate"
+          pEditableColumnField="metadata.publishedDate"
+          class="min-w-[9.5rem] max-w-[9.5rem] overflow-hidden truncate"
+          [pEditableColumnRowIndex]="book.id">
+        <p-cellEditor>
+          <ng-template #input>
+            <input pInputText class="w-full max-w-full" type="text" [(ngModel)]="metadata.publishedDate"/>
+          </ng-template>
+          <ng-template #output>
+            {{ metadata.publishedDate }}
+          </ng-template>
+        </p-cellEditor>
+      </td>
+
+      <td class="min-w-[8rem] max-w-[10rem] overflow-hidden truncate">{{ getGenres(metadata.categories) }}</td>
+
+      <td [pEditableColumn]="metadata.isbn10"
+          pEditableColumnField="metadata.isbn10"
+          class="overflow-hidden truncate max-w-15"
+          [pEditableColumnRowIndex]="book.id">
+        <p-cellEditor>
+          <ng-template #input>
+            <input pInputText type="text" [(ngModel)]="metadata.isbn10" class="w-full"/>
+          </ng-template>
+          <ng-template #output>
+            {{ metadata.isbn10 }}
+          </ng-template>
+        </p-cellEditor>
+      </td>
+
+      <td class="max-w-28 overflow-hidden truncate">{{ metadata.language }}</td>
+      <td class="max-w-30 overflow-hidden truncate">
+        <ng-container>
           <p-rating
-            [(ngModel)]="book.metadata.rating"
+            [(ngModel)]="metadata.rating"
             readonly
             stars="5"
-            [style.--p-rating-icon-active-color]="getStarColor(book.metadata.rating)">
+            [style.--p-rating-icon-active-color]="getStarColor(metadata.rating)">
           </p-rating>
         </ng-container>
       </td>
-      <td class="w-1/12 max-w-32 overflow-hidden truncate">{{ book.metadata?.pageCount }}</td>
-      <td class="w-1/12 max-w-32 overflow-hidden truncate">{{ book.metadata?.reviewCount }}</td>
+      <td class="max-w-32 overflow-hidden truncate">{{ metadata.pageCount }}</td>
+      <td class="max-w-32 overflow-hidden truncate">{{ metadata.reviewCount }}</td>
       <td class="max-w-16">
         <p-tableCheckbox [value]="book"></p-tableCheckbox>
       </td>

@@ -77,7 +77,7 @@ export class BookBrowserComponent implements OnInit {
   EntityType = EntityType;
 
   stateOptions: any[] = [{label: 'Grid', value: 'grid'}, {label: 'Table', value: 'table'}];
-  value: string = 'grid';
+  value: string = 'table';
 
   @ViewChild(BookTableComponent) bookTableComponent!: BookTableComponent;
 

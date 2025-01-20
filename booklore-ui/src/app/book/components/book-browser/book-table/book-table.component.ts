@@ -1,13 +1,14 @@
 import {Component, EventEmitter, inject, Input, OnChanges, Output} from '@angular/core';
-import {TableModule} from 'primeng/table';
+import {TableEditCompleteEvent, TableModule} from 'primeng/table';
 import {NgIf} from '@angular/common';
-import {BookService} from '../../../service/book.service';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
-import {Book} from '../../../model/book.model';
+import {Author, Book, Category} from '../../../model/book.model';
 import {SortOption} from '../../../model/sort.model';
 import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
+import {InputText} from 'primeng/inputtext';
+import {MetadataService} from '../../../../metadata/service/metadata.service';
 
 @Component({
   selector: 'app-book-table',
@@ -17,7 +18,8 @@ import {UrlHelperService} from '../../../../utilities/service/url-helper.service
     TableModule,
     NgIf,
     Rating,
-    FormsModule
+    FormsModule,
+    InputText
   ],
   styleUrl: './book-table.component.scss'
 })
@@ -29,9 +31,9 @@ export class BookTableComponent implements OnChanges {
   @Input() books: Book[] = [];
   @Input() sortOption: SortOption | null = null;
 
-  private bookService = inject(BookService);
   protected urlHelper = inject(UrlHelperService);
   private metadataDialogService = inject(MetadataDialogService);
+  private metadataService = inject(MetadataService)
 
   // Hack to set virtual-scroller height
   ngOnChanges() {
@@ -67,10 +69,6 @@ export class BookTableComponent implements OnChanges {
     this.selectedBooksChange.emit(this.selectedBookIds);
   }
 
-  getBookCoverUrl(bookId: number): string {
-    return this.bookService.getBookCoverUrl(bookId);
-  }
-
   openMetadataCenter(id: number): void {
     this.metadataDialogService.openBookMetadataCenterDialog(id, 'view');
   }
@@ -87,5 +85,26 @@ export class BookTableComponent implements OnChanges {
     } else {
       return 'rgb(239, 68, 68)';
     }
+  }
+
+  onEditComplete($event: TableEditCompleteEvent) {
+    const field = $event.field?.replace(/^metadata\./, '');
+    this.metadataService.updateMetadataField($event.index, field, $event.data).subscribe();
+  }
+
+  removeAuthor(authorToRemove: { name: string }) {
+    /*const authors = this.books[0].metadata.authors; // Adjust this to get the correct book metadata
+    const index = authors.findIndex(author => author.name === authorToRemove.name);
+    if (index !== -1) {
+      authors.splice(index, 1); // Remove the author from the array
+    }*/
+  }
+
+  getAuthorNames(authors: Author[]): string {
+    return authors?.map(author => author.name).join(', ') || 'No authors available';
+  }
+
+  getGenres(genres: Category[]) {
+    return genres?.map(g => g.name).join(', ') || 'No genres available';
   }
 }

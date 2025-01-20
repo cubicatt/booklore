@@ -20,7 +20,7 @@ public class BookMetadata {
     private String isbn10;
     private Integer pageCount;
     private String language;
-    private Float rating;
+    private Double rating;
     private Integer reviewCount;
     private Instant coverUpdatedOn;
     private List<Author> authors;

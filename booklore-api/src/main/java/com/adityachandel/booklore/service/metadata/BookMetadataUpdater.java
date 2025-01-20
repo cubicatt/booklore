@@ -1,7 +1,10 @@
 package com.adityachandel.booklore.service.metadata;
 
 import com.adityachandel.booklore.exception.ApiError;
+import com.adityachandel.booklore.mapper.AuthorMapper;
 import com.adityachandel.booklore.mapper.BookMetadataMapper;
+import com.adityachandel.booklore.mapper.CategoryMapper;
+import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.entity.AuthorEntity;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
@@ -32,6 +35,9 @@ public class BookMetadataUpdater {
     private BookMetadataRepository bookMetadataRepository;
     private CategoryRepository categoryRepository;
     private FileService fileService;
+    private BookMetadataMapper bookMetadataMapper;
+    private AuthorMapper authorMapper;
+    private CategoryMapper categoryMapper;
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -85,6 +91,56 @@ public class BookMetadataUpdater {
 
         bookMetadataRepository.save(metadata);
         return metadata;
+    }
+
+    public BookMetadata updateMetadata(long bookId, BookMetadata updatedMetadata) {
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        BookMetadataEntity metadata = bookEntity.getMetadata();
+
+        if (updatedMetadata.getTitle() != null) {
+            metadata.setTitle(updatedMetadata.getTitle());
+        }
+        if (updatedMetadata.getSubtitle() != null) {
+            metadata.setSubtitle(updatedMetadata.getSubtitle());
+        }
+        if (updatedMetadata.getPublisher() != null) {
+            metadata.setPublisher(updatedMetadata.getPublisher());
+        }
+        if (updatedMetadata.getPublishedDate() != null) {
+            metadata.setPublishedDate(updatedMetadata.getPublishedDate());
+        }
+        if (updatedMetadata.getDescription() != null) {
+            metadata.setDescription(updatedMetadata.getDescription());
+        }
+        if (updatedMetadata.getIsbn13() != null) {
+            metadata.setIsbn13(updatedMetadata.getIsbn13());
+        }
+        if (updatedMetadata.getIsbn10() != null) {
+            metadata.setIsbn10(updatedMetadata.getIsbn10());
+        }
+        if (updatedMetadata.getPageCount() != null) {
+            metadata.setPageCount(updatedMetadata.getPageCount());
+        }
+        if (updatedMetadata.getLanguage() != null) {
+            metadata.setLanguage(updatedMetadata.getLanguage());
+        }
+        if (updatedMetadata.getRating() != null) {
+            metadata.setRating(updatedMetadata.getRating());
+        }
+        if (updatedMetadata.getReviewCount() != null) {
+            metadata.setReviewCount(updatedMetadata.getReviewCount());
+        }
+        if (updatedMetadata.getCoverUpdatedOn() != null) {
+            metadata.setCoverUpdatedOn(updatedMetadata.getCoverUpdatedOn());
+        }
+        if (updatedMetadata.getAuthors() != null) {
+            metadata.setAuthors(authorMapper.toAuthorEntityList(updatedMetadata.getAuthors()));
+        }
+        if (updatedMetadata.getCategories() != null) {
+            metadata.setCategories(categoryMapper.toCategoryEntities(updatedMetadata.getCategories()));
+        }
+        bookRepository.save(bookEntity);
+        return bookMetadataMapper.toBookMetadata(metadata, false);
     }
 
 }

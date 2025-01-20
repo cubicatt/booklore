@@ -200,4 +200,31 @@ export class BookService {
     });
     this.bookStateSubject.next({...currentState, books: updatedBooks})
   }
+
+  getBookMetadata(bookId: number): BookMetadata | null {
+    const book = this.bookStateSubject.value.books?.find(book => book.id === bookId);
+    return book?.metadata ?? null;
+  }
+
+  updateBookMetadata(bookId: number | undefined, metadataField: string | undefined, value: any) {
+    if (!bookId || !metadataField) {
+      console.error("Invalid bookId or metadataField.");
+      return;
+    }
+    const currentState = this.bookStateSubject.value;
+    const updatedBooks = (currentState.books || []).map(book => {
+      if (book.id === bookId) {
+        const updatedBook = {
+          ...book,
+          metadata: {
+            ...book.metadata,
+            [metadataField]: value
+          }
+        };
+        return updatedBook as Book;
+      }
+      return book;
+    });
+    this.bookStateSubject.next({...currentState, books: updatedBooks});
+  }
 }

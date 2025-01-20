@@ -5,7 +5,7 @@ VALUES
 INSERT INTO app_settings (category, name, val)
 VALUES
     ('epub', 'theme', 'white'),
-    ('epub', 'fontSize', '120'),
+    ('epub', 'fontSize', '150'),
     ('epub', 'font', 'serif');
 
 INSERT INTO app_settings (category, name, val)

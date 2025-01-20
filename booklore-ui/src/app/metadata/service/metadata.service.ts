@@ -33,6 +33,33 @@ export class MetadataService {
     );
   }
 
+  updateBookMetadataNew(bookId: number, bookMetadata: BookMetadata): Observable<BookMetadata> {
+    return this.http.put<BookMetadata>(`${this.url}/update/${bookId}`, bookMetadata).pipe(
+      map(updatedMetadata => {
+        this.bookService.handleBookMetadataUpdate(bookId, updatedMetadata);
+        return updatedMetadata;
+      })
+    );
+  }
+
+  updateMetadataField(bookId: number | undefined, field: string | undefined, value: any): Observable<BookMetadata> {
+    if (!bookId || !field) {
+      throw new Error('Invalid bookId or field');
+    }
+    const currentMetadata = this.bookService.getBookMetadata(bookId);
+    if (!currentMetadata) {
+      throw new Error('Metadata not found');
+    }
+    const updatedMetadata: BookMetadata = {
+      ...currentMetadata,
+      [field]: value
+    };
+    if (!updatedMetadata.bookId) {
+      throw new Error('Invalid bookId in metadata');
+    }
+    return this.updateBookMetadataNew(bookId, updatedMetadata);
+  }
+
   autoRefreshMetadata(metadataRefreshRequest: MetadataRefreshRequest): Observable<any> {
     return this.http.put<void>(`${this.url}/refreshV2`, metadataRefreshRequest).pipe(
       map(() => {

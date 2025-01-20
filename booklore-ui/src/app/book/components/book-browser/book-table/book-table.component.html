@@ -69,11 +69,11 @@
 
       <td [pEditableColumn]="metadata.publishedDate"
           pEditableColumnField="metadata.publishedDate"
-          class="min-w-[9.5rem] max-w-[9.5rem] overflow-hidden truncate"
+          class="min-w-[8rem] max-w-[8rem] overflow-hidden truncate"
           [pEditableColumnRowIndex]="book.id">
         <p-cellEditor>
           <ng-template #input>
-            <input pInputText class="w-full max-w-full" type="text" [(ngModel)]="metadata.publishedDate"/>
+            <input pInputText class="w-full min-w-[7.5rem] max-w-full" type="text" [(ngModel)]="metadata.publishedDate"/>
           </ng-template>
           <ng-template #output>
             {{ metadata.publishedDate }}

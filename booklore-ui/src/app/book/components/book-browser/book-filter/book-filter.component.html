@@ -6,11 +6,11 @@
 
     <p-accordion-panel value="0">
       <p-accordion-header>Authors</p-accordion-header>
-      <p-accordion-content class="h-[35rem] !overflow-y-auto">
+      <p-accordion-content class="h-[40rem] !overflow-y-auto">
         <div *ngIf="authorBookCount$ | async as authors">
           <div *ngFor="let author of authors">
             <p
-              class="cursor-pointer transition-colors duration-200 ease-in-out"
+              class="cursor-pointer transition-colors duration-200 ease-in-out pb-1"
               [ngClass]="{'text-[var(--primary-color)]': activeAuthor === author.author.id}"
               (click)="authorClicked(author)">
               <p-badge [value]="author.bookCount"></p-badge>
@@ -23,11 +23,11 @@
 
     <p-accordion-panel value="1">
       <p-accordion-header>Genres</p-accordion-header>
-      <p-accordion-content class="h-[35rem] !overflow-y-auto">
+      <p-accordion-content class="h-[40rem] !overflow-y-auto">
         <div *ngIf="categoryBookCount$ | async as categories">
           <div *ngFor="let category of categories">
             <p
-              class="cursor-pointer transition-colors duration-200 ease-in-out"
+              class="cursor-pointer transition-colors duration-200 ease-in-out pb-1"
               [ngClass]="{'text-[var(--primary-color)]': activeCategory === category.category.id}"
               (click)="categoryClicked(category)">
               <p-badge [value]="category.bookCount"></p-badge>

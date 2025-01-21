@@ -66,3 +66,44 @@
   pointer-events: none;
 }
 
+.topbar-items {
+  display: flex;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.3rem;
+  align-items: center;
+
+  li {
+    position: relative;
+  }
+
+
+}
+
+.topbar-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.5rem;
+  border: 1px solid var(--border-color);
+  width: 2.5rem;
+  height: 2.5rem;
+  transition: outline-color .2s, border-color .2s;
+  border-radius: 6px;
+  margin: 0;
+  padding: 0;
+  outline-color: transparent;
+  background-color: var(--card-background);
+  cursor: pointer;
+  &:hover {
+    border-color: var(--primary-color);
+  }
+
+  i, span {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    font-weight: 100;
+  }
+}

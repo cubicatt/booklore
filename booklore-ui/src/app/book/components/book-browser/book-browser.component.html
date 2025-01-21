@@ -17,7 +17,25 @@
       </div>
 
       <div class="flex items-center gap-8">
+
+        <a *ngIf="isFilterActive" class="topbar-items topbar-item" (click)="clearFilter()">
+          <i
+            class="pi pi-filter-slash"
+            pTooltip="Clear applied filters"
+            tooltipPosition="top">
+          </i>
+        </a>
+
+        <a class="topbar-items topbar-item" (click)="toggleTableGrid()">
+          <i
+            [ngClass]="viewIcon"
+            pTooltip="Toggle between Grid and Table view"
+            tooltipPosition="top">
+          </i>
+        </a>
+
         <input type="text" pInputText placeholder="Search title or author..." [(ngModel)]="bookTitle" (ngModelChange)="onBookTitleChange($event)"/>
+
         <p-select
           [options]="sortOptions"
           optionLabel="label"
@@ -25,16 +43,16 @@
           [(ngModel)]="selectedSort"
           (onChange)="updateSortOption($event.value)"/>
 
-        <p-button
+        <!--<p-button
           [icon]="viewIcon"
           size="large"
           [rounded]="true"
           text="true"
           pTooltip="Toggle between Grid and Table view"
           tooltipPosition="top"
-          (click)="toggleTableGrid()"/>
+          (click)="toggleTableGrid()"/>-->
 
-        <p-button
+        <!--<p-button
           *ngIf="isFilterActive"
           icon="pi pi-filter-slash"
           size="large"
@@ -42,14 +60,14 @@
           text="true"
           (click)="clearFilter()"
           pTooltip="Clear applied filters"
-          tooltipPosition="top"/>
+          tooltipPosition="top"/>-->
 
         <p-button
+          class="pr-2"
           icon="pi pi-chevron-right"
           size="large"
-          text="true"
-          [rounded]="true"
           [outlined]="true"
+          [rounded]="true"
           (click)="toggleFilterSidebar()"
           pTooltip="Toggle filter sidebar"
           tooltipPosition="top"/>

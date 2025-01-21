@@ -19,8 +19,8 @@ import {BookTableComponent} from './book-table/book-table.component';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MetadataFetchOptionsComponent} from '../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../../metadata/model/request/metadata-refresh-type.enum';
-import {Button} from 'primeng/button';
-import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
+import {Button, ButtonDirective, ButtonIcon} from 'primeng/button';
+import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
 import {BookCardComponent} from './book-card/book-card.component';
 import {ProgressSpinner} from 'primeng/progressspinner';
@@ -30,6 +30,8 @@ import {InputText} from 'primeng/inputtext';
 import {FormsModule} from '@angular/forms';
 import {BookFilterComponent} from './book-filter/book-filter.component';
 import {Tooltip} from 'primeng/tooltip';
+import {WindowMaximizeIcon} from 'primeng/icons';
+import {Ripple} from 'primeng/ripple';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -42,7 +44,7 @@ export enum EntityType {
   standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
-  imports: [Button, NgIf, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Select, Menu, NgForOf, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip],
+  imports: [Button, NgIf, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Select, Menu, NgForOf, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, ButtonDirective, WindowMaximizeIcon, ButtonIcon, Ripple, NgClass],
   animations: [
     trigger('slideInOut', [
       state('void', style({
@@ -139,7 +141,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   }
 
   get viewIcon(): string {
-    return this.gridOrTable === 'grid' ? 'pi pi-table' : 'pi pi-objects-column';
+    return this.gridOrTable === 'grid' ? 'pi pi-objects-column' : 'pi pi-table';
   }
 
   private getEntityInfoFromRoute(): Observable<{ entityId: number; entityType: EntityType }> {

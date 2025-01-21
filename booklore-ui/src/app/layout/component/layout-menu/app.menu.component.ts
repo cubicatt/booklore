@@ -49,7 +49,7 @@ export class AppMenuComponent implements OnInit {
           label: 'Shelves',
           separator: false,
           items: state.shelves?.map((shelf) => ({
-            menu: this.libraryShelfMenuService.initializeLibraryMenuItems(shelf),
+            menu: this.libraryShelfMenuService.initializeShelfMenuItems(shelf),
             label: shelf.name,
             type: 'Shelf',
             icon: 'pi pi-' + shelf.icon,

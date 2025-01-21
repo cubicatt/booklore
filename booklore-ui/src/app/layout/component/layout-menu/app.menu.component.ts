@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {AppMenuitemComponent} from './app.menuitem.component';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {MenuModule} from 'primeng/menu';
@@ -7,6 +7,7 @@ import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {ShelfService} from '../../../book/service/shelf.service';
 import {BookService} from '../../../book/service/book.service';
+import {LibraryShelfMenuService} from '../../../book/service/library-shelf-menu.service';
 
 @Component({
   selector: 'app-menu',
@@ -18,8 +19,11 @@ export class AppMenuComponent implements OnInit {
   shelfMenu$: Observable<any> | undefined;
   homeMenu$: Observable<any> | undefined;
 
-  constructor(private libraryService: LibraryService, private shelfService: ShelfService, private bookService: BookService) {
-  }
+  private libraryService = inject(LibraryService);
+  private shelfService = inject(ShelfService);
+  private bookService = inject(BookService);
+  private libraryShelfMenuService = inject(LibraryShelfMenuService);
+
 
   ngOnInit(): void {
     this.libraryMenu$ = this.libraryService.libraryState$.pipe(
@@ -28,7 +32,9 @@ export class AppMenuComponent implements OnInit {
           label: 'Library',
           separator: false,
           items: state.libraries?.map((library) => ({
+            menu: this.libraryShelfMenuService.initializeLibraryMenuItems(library),
             label: library.name,
+            type: 'Library',
             icon: 'pi pi-' + library.icon,
             routerLink: [`/library/${library.id}/books`],
             bookCount$: this.libraryService.getBookCount(library.id ?? 0),
@@ -43,7 +49,9 @@ export class AppMenuComponent implements OnInit {
           label: 'Shelves',
           separator: false,
           items: state.shelves?.map((shelf) => ({
+            menu: this.libraryShelfMenuService.initializeLibraryMenuItems(shelf),
             label: shelf.name,
+            type: 'Shelf',
             icon: 'pi pi-' + shelf.icon,
             routerLink: [`/shelf/${shelf.id}/books`],
             bookCount$: this.shelfService.getBookCount(shelf.id ?? 0),
@@ -66,6 +74,7 @@ export class AppMenuComponent implements OnInit {
               },
               {
                 label: 'All Books',
+                type: 'All Books',
                 icon: 'pi pi-fw pi-book',
                 routerLink: ['/all-books'],
                 bookCount$: of(bookState.books ? bookState.books.length : 0),

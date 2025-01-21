@@ -50,43 +50,46 @@ public class LibraryService {
         Set<String> deletedPaths = currentPaths.stream().filter(path -> !updatedPaths.contains(path)).collect(Collectors.toSet());
         Set<String> newPaths = updatedPaths.stream().filter(path -> !currentPaths.contains(path)).collect(Collectors.toSet());
 
-        if (!deletedPaths.isEmpty()) {
-            Set<LibraryPathEntity> pathsToRemove = library.getLibraryPaths().stream()
-                    .filter(pathEntity -> deletedPaths.contains(pathEntity.getPath()))
-                    .collect(Collectors.toSet());
-            library.getLibraryPaths().removeAll(pathsToRemove);
+        if(newPaths.isEmpty() && deletedPaths.isEmpty()) {
+            return libraryMapper.toLibrary(libraryRepository.save(library));
+        } else {
+            if (!deletedPaths.isEmpty()) {
+                Set<LibraryPathEntity> pathsToRemove = library.getLibraryPaths().stream()
+                        .filter(pathEntity -> deletedPaths.contains(pathEntity.getPath()))
+                        .collect(Collectors.toSet());
+                library.getLibraryPaths().removeAll(pathsToRemove);
 
-            List<Long> books = bookRepository.findAllBookIdsByLibraryPathIdIn(pathsToRemove.stream().map(LibraryPathEntity::getId).collect(Collectors.toSet()));
-            if (!books.isEmpty()) {
-                notificationService.sendMessage(Topic.BOOKS_REMOVE, books);
+                List<Long> books = bookRepository.findAllBookIdsByLibraryPathIdIn(pathsToRemove.stream().map(LibraryPathEntity::getId).collect(Collectors.toSet()));
+                if (!books.isEmpty()) {
+                    notificationService.sendMessage(Topic.BOOKS_REMOVE, books);
+                }
+
+                libraryPathRepository.deleteAll(pathsToRemove);
+                libraryPathRepository.saveAll(library.getLibraryPaths());
+                libraryRepository.save(library);
             }
 
-            libraryPathRepository.deleteAll(pathsToRemove);
-            libraryPathRepository.saveAll(library.getLibraryPaths());
-            libraryRepository.save(library);
+            if (!newPaths.isEmpty()) {
+                Set<LibraryPathEntity> newPathEntities = newPaths.stream()
+                        .map(path -> LibraryPathEntity.builder().path(path).library(library).build())
+                        .collect(Collectors.toSet());
+                library.getLibraryPaths().addAll(newPathEntities);
+                libraryPathRepository.saveAll(library.getLibraryPaths());
+                libraryRepository.save(library);
+
+                Thread.startVirtualThread(() -> {
+                    try {
+                        libraryProcessingService.processLibrary(libraryId);
+                    } catch (InvalidDataAccessApiUsageException e) {
+                        log.warn("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
+                    } catch (IOException e) {
+                        log.error("Error while parsing library books", e);
+                    }
+                    log.info("Parsing task completed!");
+                });
+            }
+            return libraryMapper.toLibrary(libraryRepository.save(library));
         }
-
-        if (!newPaths.isEmpty()) {
-            Set<LibraryPathEntity> newPathEntities = newPaths.stream()
-                    .map(path -> LibraryPathEntity.builder().path(path).library(library).build())
-                    .collect(Collectors.toSet());
-            library.getLibraryPaths().addAll(newPathEntities);
-            libraryPathRepository.saveAll(library.getLibraryPaths());
-            libraryRepository.save(library);
-
-            Thread.startVirtualThread(() -> {
-                try {
-                    libraryProcessingService.processLibrary(libraryId);
-                } catch (InvalidDataAccessApiUsageException e) {
-                    log.warn("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
-                } catch (IOException e) {
-                    log.error("Error while parsing library books", e);
-                }
-                log.info("Parsing task completed!");
-            });
-        }
-
-        return libraryMapper.toLibrary(library);
     }
 
     public Library createLibrary(CreateLibraryRequest request) {

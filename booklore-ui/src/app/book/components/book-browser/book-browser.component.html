@@ -1,6 +1,6 @@
 <div class="flex flex-row">
   <div class="flex flex-col flex-grow">
-    <div class="book-browser-header flex justify-between items-center p-2 rounded-t-xl mb-4">
+    <div class="flex justify-between items-center p-2 rounded-t-xl mb-4 bg-[var(--card-background)]">
       <div class="flex items-center">
         <ng-container *ngIf="entityType$ | async as entityType">
           <p *ngIf="entityType !== EntityType.ALL_BOOKS" class="text-2xl">
@@ -18,12 +18,41 @@
 
       <div class="flex items-center gap-8">
         <input type="text" pInputText placeholder="Search title or author..." [(ngModel)]="bookTitle" (ngModelChange)="onBookTitleChange($event)"/>
-        <p-select [options]="sortOptions" optionLabel="label" placeholder="Select Sorting" [(ngModel)]="selectedSort" (onChange)="updateSortOption($event.value)"></p-select>
-        <div *ngFor="let option of stateOptions" class="field-checkbox">
-          <p-radioButton [inputId]="option.key" [value]="option.value" [(ngModel)]="value" (onClick)="viewChanged()"></p-radioButton>
-          <label [for]="option.key" class="ml-2">{{ option.label }}</label>
-        </div>
-        <p-button icon="pi pi-heart" [rounded]="true" severity="help" [outlined]="true" (click)="toggleFilters()"/>
+        <p-select
+          [options]="sortOptions"
+          optionLabel="label"
+          placeholder="Select Sorting"
+          [(ngModel)]="selectedSort"
+          (onChange)="updateSortOption($event.value)"/>
+
+        <p-button
+          [icon]="viewIcon"
+          size="large"
+          [rounded]="true"
+          text="true"
+          pTooltip="Toggle between Grid and Table view"
+          tooltipPosition="top"
+          (click)="toggleTableGrid()"/>
+
+        <p-button
+          *ngIf="isFilterActive"
+          icon="pi pi-filter-slash"
+          size="large"
+          [rounded]="true"
+          text="true"
+          (click)="clearFilter()"
+          pTooltip="Clear applied filters"
+          tooltipPosition="top"/>
+
+        <p-button
+          icon="pi pi-chevron-right"
+          size="large"
+          text="true"
+          [rounded]="true"
+          [outlined]="true"
+          (click)="toggleFilterSidebar()"
+          pTooltip="Toggle filter sidebar"
+          tooltipPosition="top"/>
       </div>
     </div>
 
@@ -32,7 +61,7 @@
         <p-progressSpinner></p-progressSpinner>
       </div>
 
-      <div class="virtual-scroller-container">
+      <div class="relative">
         <div class="no-books-container" *ngIf="bookState?.error">
           <p class="no-books-text">
             {{ entityType === EntityType.LIBRARY ? "Failed to load library's books!" : "Failed to load shelf's books!" }}
@@ -45,10 +74,10 @@
         </div>
 
         <div class="book-card-container" *ngIf="bookState?.books as books">
-          <app-book-table *ngIf="value === 'table' && books.length > 0" [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)"
+          <app-book-table *ngIf="gridOrTable === 'table' && books.length > 0" [books]="books" (selectedBooksChange)="onSelectedBooksChange($event)"
                           [sortOption]="selectedSort"></app-book-table>
 
-          <virtual-scroller *ngIf="value === 'grid'" class="virtual-scroller" #scroll [items]="books">
+          <virtual-scroller *ngIf="gridOrTable === 'grid'" class="virtual-scroller" #scroll [items]="books">
             <div class="grid grid-cols-12 gap-4" #container>
               <div class="virtual-scroller-item" *ngFor="let book of scroll.viewPortItems">
                 <app-book-card
@@ -95,45 +124,6 @@
     </div>
   </div>
 
-  <div *ngIf="showFilters" class="w-[225px] ml-4 h-[calc(100vh-6.5rem)] rounded-xl book-browser-filters">
-    <p class="text-xl p-4">Filters:</p>
-    <p-accordion value="0">
-
-      <p-accordion-panel value="0">
-        <p-accordion-header>Authors</p-accordion-header>
-        <p-accordion-content class="h-[35rem] !overflow-y-auto">
-          <div *ngIf="authorBookCount$ | async as authors">
-            <div *ngFor="let author of authors">
-              <p
-                class="cursor-pointer transition-colors duration-200 ease-in-out"
-                [ngClass]="{'text-[var(--primary-color)]': activeAuthor === author.author.name}"
-                (click)="authorClicked(author)">
-                <p-badge [value]="author.bookCount"></p-badge>
-                {{ author.author.name }}
-              </p>
-            </div>
-          </div>
-        </p-accordion-content>
-      </p-accordion-panel>
-
-      <p-accordion-panel value="1">
-        <p-accordion-header>Genres</p-accordion-header>
-        <p-accordion-content class="h-[35rem] !overflow-y-auto">
-          <div *ngIf="categoryBookCount$ | async as categories">
-            <div *ngFor="let category of categories">
-              <p
-                class="cursor-pointer transition-colors duration-200 ease-in-out"
-                [ngClass]="{'text-[var(--primary-color)]': activeCategory === category.category.name}"
-                (click)="categoryClicked(category)">
-                <p-badge [value]="category.bookCount"></p-badge>
-                {{ category.category.name }}
-              </p>
-            </div>
-          </div>
-        </p-accordion-content>
-      </p-accordion-panel>
-    </p-accordion>
-  </div>
-
+  <app-book-filter></app-book-filter>
 
 </div>

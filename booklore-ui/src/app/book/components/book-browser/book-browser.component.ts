@@ -1,4 +1,4 @@
-import {Component, inject, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, inject, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {MenuItem, MessageService} from 'primeng/api';
 import {LibraryService} from '../../service/library.service';
@@ -13,24 +13,23 @@ import {Shelf} from '../../model/shelf.model';
 import {SortService} from '../../service/sort.service';
 import {SortOption} from '../../model/sort.model';
 import {BookState} from '../../model/state/book-state.model';
-import {Author, Book, Category} from '../../model/book.model';
+import {Book} from '../../model/book.model';
 import {LibraryShelfMenuService} from '../../service/library-shelf-menu.service';
 import {BookTableComponent} from './book-table/book-table.component';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MetadataFetchOptionsComponent} from '../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../../metadata/model/request/metadata-refresh-type.enum';
 import {Button} from 'primeng/button';
-import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
 import {BookCardComponent} from './book-card/book-card.component';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {Select} from 'primeng/select';
-import {RadioButton} from 'primeng/radiobutton';
 import {Menu} from 'primeng/menu';
 import {InputText} from 'primeng/inputtext';
 import {FormsModule} from '@angular/forms';
-import {Accordion, AccordionContent, AccordionHeader, AccordionPanel} from 'primeng/accordion';
-import {Badge} from 'primeng/badge';
+import {BookFilterComponent} from './book-filter/book-filter.component';
+import {Tooltip} from 'primeng/tooltip';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -43,7 +42,7 @@ export enum EntityType {
   standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
-  imports: [Button, NgIf, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Select, RadioButton, Menu, NgForOf, InputText, FormsModule, BookTableComponent, AccordionHeader, AccordionContent, AccordionPanel, Accordion, Badge, NgClass],
+  imports: [Button, NgIf, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Select, Menu, NgForOf, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip],
   animations: [
     trigger('slideInOut', [
       state('void', style({
@@ -61,7 +60,7 @@ export enum EntityType {
     ])
   ]
 })
-export class BookBrowserComponent implements OnInit {
+export class BookBrowserComponent implements OnInit, AfterViewInit {
   bookState$: Observable<BookState> | undefined;
   entity$: Observable<Library | Shelf | null> | undefined;
   entityType$: Observable<EntityType> | undefined;
@@ -77,13 +76,14 @@ export class BookBrowserComponent implements OnInit {
   isDrawerVisible: boolean = false;
   dynamicDialogRef: DynamicDialogRef | undefined;
   EntityType = EntityType;
-  showFilters: boolean = false;
 
-
-  stateOptions: any[] = [{label: 'Grid', value: 'grid'}, {label: 'Table', value: 'table'}];
-  value: string = 'grid';
+  gridOrTable: string = 'grid';
 
   @ViewChild(BookTableComponent) bookTableComponent!: BookTableComponent;
+  @ViewChild(BookFilterComponent) bookFilterComponent!: BookFilterComponent;
+
+  selectedAuthor = new BehaviorSubject<number | null>(null);
+  selectedCategory = new BehaviorSubject<number | null>(null);
 
   private activatedRoute = inject(ActivatedRoute);
   private messageService = inject(MessageService);
@@ -93,13 +93,6 @@ export class BookBrowserComponent implements OnInit {
   private dialogService = inject(DialogService);
   private sortService = inject(SortService);
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
-
-  authorBookCount$: Observable<{ author: Author; bookCount: number; }[]> | undefined = this.bookService.authorBookCount$;
-  categoryBookCount$: Observable<{ category: Category; bookCount: number; }[]> | undefined = this.bookService.categoryBookCount$;
-
-  toggleFilters() {
-    this.showFilters = !this.showFilters;
-  }
 
   ngOnInit(): void {
     this.bookService.loadBooks();
@@ -139,6 +132,14 @@ export class BookBrowserComponent implements OnInit {
       this.bookTitle = '';
       this.deselectAllBooks();
     });
+  }
+
+  toggleTableGrid() {
+    this.gridOrTable = this.gridOrTable === 'grid' ? 'table' : 'grid';
+  }
+
+  get viewIcon(): string {
+    return this.gridOrTable === 'grid' ? 'pi pi-table' : 'pi pi-objects-column';
   }
 
   private getEntityInfoFromRoute(): Observable<{ entityId: number; entityType: EntityType }> {
@@ -190,51 +191,21 @@ export class BookBrowserComponent implements OnInit {
   private fetchAllBooks(): Observable<BookState> {
     return this.bookService.bookState$.pipe(
       map(bookState => this.processBookState(bookState)),
-      switchMap(bookState => this.filterBooks(bookState)),
-      switchMap(bookState => this.newFilter(bookState))
+      switchMap(bookState => this.headerFilter(bookState)),
+      switchMap(bookState => this.sideBarFilter(bookState))
     );
   }
 
-
-  author = new BehaviorSubject<number | null>(null);
-  category = new BehaviorSubject<number | null>(null);
-
-  activeAuthor: string | null = null;
-  activeCategory: string | null = null;
-
-  authorClicked(author: { author: Author; bookCount: number }) {
-    this.activeAuthor = author.author.name;
-    if (this.author.value === author.author.id) {
-      this.author.next(null);
-      this.activeAuthor = null;
-    } else {
-      this.category.next(null);
-      this.activeCategory = null;
-      this.author.next(author.author.id);
-    }
-  }
-
-  categoryClicked(category: { category: Category; bookCount: number }) {
-    this.activeCategory = category.category.name;
-    if (this.category.value === category.category.id) {
-      this.category.next(null);
-      this.activeCategory = null;
-    } else {
-      this.author.next(null);
-      this.activeAuthor = null;
-      this.category.next(category.category.id);
-    }
-  }
-
-  private newFilter(bookState: BookState): Observable<BookState> {
-    return combineLatest([this.author, this.category]).pipe(
+  private sideBarFilter(bookState: BookState): Observable<BookState> {
+    return combineLatest([this.selectedAuthor, this.selectedCategory]).pipe(
       map(([authorId, categoryId]) => {
         let filteredBooks = bookState.books || [];
         if (authorId !== null) {
           filteredBooks = filteredBooks.filter(book =>
             book.metadata?.authors.some(author => author.id === authorId)
           );
-        } else if (categoryId !== null) {
+        }
+        if (categoryId !== null) {
           filteredBooks = filteredBooks.filter(book =>
             book.metadata?.categories?.some(category => category.id === categoryId)
           );
@@ -244,7 +215,7 @@ export class BookBrowserComponent implements OnInit {
     );
   }
 
-  private filterBooks(bookState: BookState): Observable<BookState> {
+  private headerFilter(bookState: BookState): Observable<BookState> {
     return this.bookOrAuthor$.pipe(
       map(title => {
         if (title && title.trim() !== '') {
@@ -272,7 +243,7 @@ export class BookBrowserComponent implements OnInit {
         }
         return bookState;
       }),
-      switchMap(bookState => this.filterBooks(bookState))
+      switchMap(bookState => this.headerFilter(bookState))
     );
   }
 
@@ -413,5 +384,33 @@ export class BookBrowserComponent implements OnInit {
     })
   }
 
+  toggleFilterSidebar() {
+    this.bookFilterComponent.showFilters = !this.bookFilterComponent.showFilters;
+  }
 
+  get isFilterActive(): boolean {
+    return this.selectedAuthor.value !== null || this.selectedCategory.value !== null;
+  }
+
+  clearFilter() {
+    if (this.selectedAuthor.value !== null) {
+      this.selectedAuthor.next(null);
+    }
+    if (this.selectedCategory.value !== null) {
+      this.selectedCategory.next(null);
+    }
+    this.bookFilterComponent.activeCategory = null;
+    this.bookFilterComponent.activeAuthor = null;
+  }
+
+
+  ngAfterViewInit() {
+    this.bookFilterComponent.authorSelected.subscribe((authorId: number) => {
+      this.selectedAuthor.next(authorId);
+    });
+
+    this.bookFilterComponent.categorySelected.subscribe((categoryId: number) => {
+      this.selectedCategory.next(categoryId);
+    });
+  }
 }

@@ -1,0 +1,41 @@
+<div *ngIf="showFilters"
+     class="w-[225px] ml-4 h-[calc(100vh-6.5rem)] rounded-xl bg-[var(--card-background)] overflow-hidden">
+
+  <p class="text-xl p-4">Filters:</p>
+  <p-accordion value="0">
+
+    <p-accordion-panel value="0">
+      <p-accordion-header>Authors</p-accordion-header>
+      <p-accordion-content class="h-[35rem] !overflow-y-auto">
+        <div *ngIf="authorBookCount$ | async as authors">
+          <div *ngFor="let author of authors">
+            <p
+              class="cursor-pointer transition-colors duration-200 ease-in-out"
+              [ngClass]="{'text-[var(--primary-color)]': activeAuthor === author.author.id}"
+              (click)="authorClicked(author)">
+              <p-badge [value]="author.bookCount"></p-badge>
+              {{ author.author.name }}
+            </p>
+          </div>
+        </div>
+      </p-accordion-content>
+    </p-accordion-panel>
+
+    <p-accordion-panel value="1">
+      <p-accordion-header>Genres</p-accordion-header>
+      <p-accordion-content class="h-[35rem] !overflow-y-auto">
+        <div *ngIf="categoryBookCount$ | async as categories">
+          <div *ngFor="let category of categories">
+            <p
+              class="cursor-pointer transition-colors duration-200 ease-in-out"
+              [ngClass]="{'text-[var(--primary-color)]': activeCategory === category.category.id}"
+              (click)="categoryClicked(category)">
+              <p-badge [value]="category.bookCount"></p-badge>
+              {{ category.category.name }}
+            </p>
+          </div>
+        </div>
+      </p-accordion-content>
+    </p-accordion-panel>
+  </p-accordion>
+</div>

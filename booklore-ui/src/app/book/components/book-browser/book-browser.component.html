@@ -1,7 +1,7 @@
 <div class="flex flex-row">
   <div class="flex flex-col flex-grow">
     <div class="flex justify-between items-center p-2 rounded-t-xl mb-4 bg-[var(--card-background)]">
-      <div class="flex items-center">
+      <div class="flex items-center pl-2">
         <ng-container *ngIf="entityType$ | async as entityType">
           <p *ngIf="entityType !== EntityType.ALL_BOOKS" class="text-2xl">
             {{ entityType }}: {{ (entity$ | async)?.name }}

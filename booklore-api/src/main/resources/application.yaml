@@ -1,6 +1,6 @@
 app:
-  path-book: '/Users/aditya.chandel/my-library-temp/books'
-  path-config: '/Users/aditya.chandel/my-library-temp/config'
+  path-book: '/app/books'
+  path-config: '/app/config'
 
 spring:
   servlet:
@@ -15,7 +15,7 @@ spring:
     name: booklore-api
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:tcp://localhost:9092/~/my-library-temp/config/db/booklore
+    url: 'jdbc:h2:/app/config/db/booklore'
     username: sa
     password: password
   jpa:

@@ -19,7 +19,7 @@ import {BookTableComponent} from './book-table/book-table.component';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MetadataFetchOptionsComponent} from '../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../../metadata/model/request/metadata-refresh-type.enum';
-import {Button, ButtonDirective, ButtonIcon} from 'primeng/button';
+import {Button} from 'primeng/button';
 import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
 import {BookCardComponent} from './book-card/book-card.component';
@@ -30,8 +30,6 @@ import {InputText} from 'primeng/inputtext';
 import {FormsModule} from '@angular/forms';
 import {BookFilterComponent} from './book-filter/book-filter.component';
 import {Tooltip} from 'primeng/tooltip';
-import {WindowMaximizeIcon} from 'primeng/icons';
-import {Ripple} from 'primeng/ripple';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -44,7 +42,7 @@ export enum EntityType {
   standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
-  imports: [Button, NgIf, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Select, Menu, NgForOf, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, ButtonDirective, WindowMaximizeIcon, ButtonIcon, Ripple, NgClass],
+  imports: [Button, NgIf, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Select, Menu, NgForOf, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass],
   animations: [
     trigger('slideInOut', [
       state('void', style({

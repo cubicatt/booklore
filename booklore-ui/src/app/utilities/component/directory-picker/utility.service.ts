@@ -1,13 +1,14 @@
 import {inject, Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
+import {API_CONFIG} from '../../../config/api-config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UtilityService {
 
-  private pathUrl = 'http://localhost:8080/v1/path';
+  private pathUrl = `${API_CONFIG.BASE_URL}/v1/path`;
 
   private http = inject(HttpClient);
 

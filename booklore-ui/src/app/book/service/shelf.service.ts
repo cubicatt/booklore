@@ -6,12 +6,13 @@ import { Shelf } from '../model/shelf.model';
 import { SortOption } from '../model/sort.model';
 import { BookService } from './book.service';
 import { ShelfState } from '../model/state/shelf-state.model';
+import {API_CONFIG} from '../../config/api-config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ShelfService {
-  private readonly url = 'http://localhost:8080/v1/shelf';
+  private readonly url = `${API_CONFIG.BASE_URL}/v1/shelf`;
   private shelfStateSubject = new BehaviorSubject<ShelfState>({
     shelves: null,
     loaded: false,

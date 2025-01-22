@@ -1,8 +1,9 @@
-import { RxStompConfig } from '@stomp/rx-stomp';
+import {RxStompConfig} from '@stomp/rx-stomp';
+import {API_CONFIG} from '../../config/api-config';
 
 export const rxStompConfig: RxStompConfig = {
   // Which server?
-  brokerURL: 'ws://localhost:8080/ws',
+  brokerURL: API_CONFIG.BROKER_URL,
 
   // Headers
   // Typical keys: login, passcode, host

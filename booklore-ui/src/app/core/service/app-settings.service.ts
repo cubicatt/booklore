@@ -2,12 +2,13 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {BehaviorSubject} from 'rxjs';
 import {AppSettings} from '../model/app-settings.model';
+import {API_CONFIG} from '../../config/api-config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppSettingsService {
-  private apiUrl = 'http://localhost:8080/api/settings';
+  private readonly apiUrl = `${API_CONFIG.BASE_URL}/api/settings`;
 
   private appSettingsSubject = new BehaviorSubject<AppSettings | null>(null);
   appSettings$ = this.appSettingsSubject.asObservable();

@@ -6,12 +6,13 @@ import {Library} from '../model/library.model';
 import {BookService} from './book.service';
 import {SortOption} from '../model/sort.model';
 import {LibraryState} from '../model/state/library-state.model';
+import {API_CONFIG} from '../../config/api-config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LibraryService {
-  private readonly url = 'http://localhost:8080/v1/library';
+  private readonly url = `${API_CONFIG.BASE_URL}/v1/library`;
 
   private libraryStateSubject = new BehaviorSubject<LibraryState>({
     libraries: null,

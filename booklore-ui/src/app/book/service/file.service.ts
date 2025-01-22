@@ -1,11 +1,12 @@
 import {Injectable, inject} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {API_CONFIG} from '../../config/api-config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FileService {
-  private readonly url = 'http://localhost:8080/v1/book';
+  private readonly url = `${API_CONFIG.BASE_URL}/v1/book`;
   private readonly http = inject(HttpClient);
 
   downloadFile(bookId: number): void {

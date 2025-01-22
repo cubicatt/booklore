@@ -10,6 +10,7 @@ import {Library, LibraryPath} from '../../../book/model/library.model';
 import {MessageService} from 'primeng/api';
 import {DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Select} from 'primeng/select';
+import {API_CONFIG} from '../../../config/api-config';
 
 @Component({
   selector: 'app-book-uploader',
@@ -26,7 +27,7 @@ import {Select} from 'primeng/select';
 })
 export class BookUploaderComponent {
 
-  private uploadUrl = 'http://localhost:8080/api/v1/files/upload';
+  private uploadUrl = `${API_CONFIG.BASE_URL}/api/v1/files/upload`;
 
   private libraryService = inject(LibraryService);
   private messageService = inject(MessageService);

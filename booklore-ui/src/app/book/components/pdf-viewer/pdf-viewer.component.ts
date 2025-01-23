@@ -39,6 +39,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
       this.bookId = +params.get('bookId')!;
+
       this.appSettingsService.appSettings$
         .pipe(
           filter((appSettings) => appSettings !== null),
@@ -48,6 +49,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
           const book$ = this.bookService.getBookByIdFromAPI(this.bookId, false);
           const pdf$ = this.bookService.getPdfData(this.bookId);
           const bookSetting$ = this.bookService.getBookSetting(this.bookId);
+
           forkJoin([book$, pdf$, bookSetting$]).subscribe((results) => {
             const pdf = results[0];
             const pdfData = results[1];
@@ -61,20 +63,6 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
     });
   }
 
-  onPdfLoaded($event: PdfLoadedEvent) {
-    this.pdfLoaded = true;
-    this.updateProgress();
-    if (this.pdfScope === 'global') {
-      this.zoom = this.globalPdfSettings?.zoom || 'page-fit';
-      this.sidebarVisible = this.globalPdfSettings?.sidebar ?? true;
-      this.spread = this.globalPdfSettings?.spread || 'odd';
-    } else {
-      this.zoom = this.individualPdfSettings?.zoom || this.globalPdfSettings?.zoom || 'page-fit';
-      this.sidebarVisible = this.individualPdfSettings?.sidebarVisible ?? this.globalPdfSettings?.sidebar ?? true;
-      this.spread = this.individualPdfSettings?.spread || this.globalPdfSettings?.spread || 'odd';
-    }
-  }
-
   onPageChange(page: number): void {
     if (!this.pdfLoaded) return;
     if (page !== this.page) {
@@ -84,6 +72,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   }
 
   onZoomChange(zoom: string | number): void {
+    if (!this.pdfLoaded) return;
     if (zoom !== this.zoom) {
       this.zoom = zoom;
       this.updateViewerSetting();
@@ -91,6 +80,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   }
 
   onSidebarVisibleChange(visible: boolean): void {
+    if (!this.pdfLoaded) return;
     if (visible !== this.sidebarVisible) {
       this.sidebarVisible = visible;
       this.updateViewerSetting();
@@ -98,6 +88,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   }
 
   onSpreadChange(spread: 'off' | 'even' | 'odd'): void {
+    if (!this.pdfLoaded) return;
     if (spread !== this.spread) {
       this.spread = spread;
       this.updateViewerSetting();
@@ -105,6 +96,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   }
 
   private updateViewerSetting(): void {
+    if (!this.pdfLoaded) return;
     const bookSetting: BookSetting = {
       pdfSettings: {
         sidebarVisible: this.sidebarVisible,
@@ -124,5 +116,19 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
       this.appSettingsSubscription.unsubscribe();
     }
     this.updateProgress();
+  }
+
+  onPdfLoaded($event: PdfLoadedEvent) {
+    this.pdfLoaded = true;
+    this.updateProgress();
+    if (this.pdfScope === 'global') {
+      this.zoom = this.globalPdfSettings?.zoom || 'page-fit';
+      this.sidebarVisible = this.globalPdfSettings?.sidebar ?? true;
+      this.spread = this.globalPdfSettings?.spread || 'odd';
+    } else {
+      this.zoom = this.individualPdfSettings?.zoom || this.globalPdfSettings?.zoom || 'page-fit';
+      this.sidebarVisible = this.individualPdfSettings?.sidebarVisible ?? this.globalPdfSettings?.sidebar ?? true;
+      this.spread = this.individualPdfSettings?.spread || this.globalPdfSettings?.spread || 'odd';
+    }
   }
 }

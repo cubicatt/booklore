@@ -15,6 +15,7 @@ import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryPathRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
+import com.adityachandel.booklore.service.fileprocessor.FileProcessingUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -38,6 +39,7 @@ public class LibraryService {
     private final BookMapper bookMapper;
     private final LibraryMapper libraryMapper;
     private final NotificationService notificationService;
+    private final FileProcessingUtils fileProcessingUtils;
 
     public Library updateLibrary(CreateLibraryRequest request, Long libraryId) {
         LibraryEntity library = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
@@ -144,7 +146,9 @@ public class LibraryService {
     }
 
     public void deleteLibrary(long id) {
-        libraryRepository.findById(id).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(id));
+        LibraryEntity library = libraryRepository.findById(id).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(id));
+        Set<Long> bookIds = library.getBookEntities().stream().map(BookEntity::getId).collect(Collectors.toSet());
+        fileProcessingUtils.deleteBookCovers(bookIds);
         libraryRepository.deleteById(id);
     }
 

@@ -84,8 +84,6 @@ export class AppTopBarComponent implements OnDestroy {
       header: 'Create New Library',
       modal: true,
       closable: true,
-      width: '675px',
-      height: '480px',
       style: {
         position: 'absolute',
         top: '15%',

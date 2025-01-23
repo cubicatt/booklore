@@ -1,6 +1,6 @@
 app:
   path-book: '/Users/aditya.chandel/my-library-temp/books'
-  path-config: '/Users/aditya.chandel/my-library-temp/config'
+  path-config: '/Users/aditya.chandel/my-library-temp/config/local'
 
 spring:
   servlet:

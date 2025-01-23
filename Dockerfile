@@ -22,7 +22,7 @@ COPY ./booklore-api/src /springboot-app/src
 RUN ./gradlew clean build
 
 # Stage 3: Final image combining everything
-FROM eclipse-temurin:21-jdk-alpine
+FROM eclipse-temurin:21.0.5_11-jre-alpine
 
 RUN apk update && apk add nginx
 

@@ -8,6 +8,9 @@ export class UrlHelperService {
   private readonly baseUrl = API_CONFIG.BASE_URL;
 
   getCoverUrl(bookId: number, coverUpdatedOn?: string): string {
-    return `${this.baseUrl}/api/v1/book/${bookId}/cover?${coverUpdatedOn || ''}`;
+    if (!coverUpdatedOn) {
+      return 'assets/images/missing-cover.jpg';
+    }
+    return `${this.baseUrl}/api/v1/book/${bookId}/cover?${coverUpdatedOn}`;
   }
 }

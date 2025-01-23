@@ -2,9 +2,9 @@ version: '3.8'
 services:
   booklore-app:
     container_name: booklore
-    image: localhost:5000/booklore-app:v24
+    image: localhost:5000/booklore-app:v33
     ports:
       - "5050:6060"
     volumes:
-      - /Users/aditya.chandel/my-library-temp/config:/app/config
+      - /Users/aditya.chandel/my-library-temp/config/docker:/app/config
       - /Users/aditya.chandel/my-library-temp/books:/app/books

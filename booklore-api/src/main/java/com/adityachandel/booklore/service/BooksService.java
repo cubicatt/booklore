@@ -102,7 +102,7 @@ public class BooksService {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         byte[] pdfBytes = Files.readAllBytes(new File(FileUtils.getBookFullPath(bookEntity)).toPath());
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
+                .header(HttpHeaders.CONTENT_TYPE, "text/plain")
                 .body(pdfBytes);
     }
 

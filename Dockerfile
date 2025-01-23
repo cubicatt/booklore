@@ -7,7 +7,7 @@ COPY ./booklore-ui/package.json ./booklore-ui/package-lock.json ./
 RUN npm install
 COPY ./booklore-ui /angular-app/
 
-RUN npm run build --prod
+RUN npm run build --configuration=production
 
 # Stage 2: Build the Spring Boot app with Gradle
 FROM gradle:jdk21-alpine AS springboot-build

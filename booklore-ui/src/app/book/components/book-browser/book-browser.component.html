@@ -3,10 +3,10 @@
     <div class="flex justify-between items-center p-2 rounded-t-xl mb-4 bg-[var(--card-background)]">
       <div class="flex items-center pl-2">
         <ng-container *ngIf="entityType$ | async as entityType">
-          <p *ngIf="entityType !== EntityType.ALL_BOOKS" class="text-2xl">
+          <p *ngIf="entityType !== EntityType.ALL_BOOKS" class="text-2xl whitespace-nowrap overflow-hidden text-ellipsis">
             {{ entityType }}: {{ (entity$ | async)?.name }}
           </p>
-          <p *ngIf="entityType === EntityType.ALL_BOOKS" class="text-2xl">
+          <p *ngIf="entityType === EntityType.ALL_BOOKS" class="text-2xl whitespace-nowrap overflow-hidden text-ellipsis">
             All Books
           </p>
           <div *ngIf="entityType !== EntityType.ALL_BOOKS">
@@ -121,24 +121,21 @@
           <div class="flex justify-between gap-8">
             <ng-container *ngIf="entityType$ | async as entityType">
               <p-button *ngIf="entityType === EntityType.LIBRARY || entityType === EntityType.ALL_BOOKS"
-                        icon="pi pi-book"
                         label="Assign Shelf"
                         severity="info"
                         (onClick)="openShelfAssigner()">
               </p-button>
               <p-button *ngIf="entityType === EntityType.SHELF"
-                        icon="pi pi-minus-circle"
                         label="Unshelf"
                         severity="info"
                         (click)="unshelfBooks()">
               </p-button>
               <p-button
-                icon="pi pi-database"
                 label="Refresh Metadata"
                 severity="info"
                 (click)="updateMetadata()">
               </p-button>
-              <p-button icon="pi pi-times"
+              <p-button
                         label="Deselect All"
                         severity="warn"
                         (click)="deselectAllBooks()">

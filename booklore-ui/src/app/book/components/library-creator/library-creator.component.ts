@@ -47,7 +47,7 @@ export class LibraryCreatorComponent implements OnInit {
       this.mode = data.mode;
       this.library = this.libraryService.findLibraryById(data.libraryId);
       if (this.library) {
-        const { name, icon, paths } = this.library;
+        const {name, icon, paths} = this.library;
         this.chosenLibraryName = name;
         this.editModeLibraryName = name;
         this.selectedIcon = `pi pi-${icon}`;
@@ -63,7 +63,6 @@ export class LibraryCreatorComponent implements OnInit {
       contentStyle: {overflow: 'auto'},
       baseZIndex: 10
     });
-
     this.directoryPickerDialogRef.onClose.subscribe((selectedFolder: string) => {
       if (selectedFolder) {
         this.addFolder(selectedFolder);

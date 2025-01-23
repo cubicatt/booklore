@@ -11,7 +11,7 @@ import {API_CONFIG} from '../../config/api-config';
 })
 export class BookService {
 
-  private readonly url = `${API_CONFIG.BASE_URL}/v1/book`;
+  private readonly url = `${API_CONFIG.BASE_URL}/api/v1/book`;
 
   private bookStateSubject = new BehaviorSubject<BookState>({
     books: null,

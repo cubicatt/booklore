@@ -8,16 +8,17 @@ import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @RestController
+@RequestMapping("/api/v1/settings")
 public class AppSettingController {
 
     private AppSettingService appSettingService;
 
-    @GetMapping("/api/settings")
+    @GetMapping
     public AppSettings getAppSettings() {
         return appSettingService.getAppSettings();
     }
 
-    @PutMapping("/api/settings")
+    @PutMapping
     public void updateSetting(@RequestBody SettingRequest settingRequest) {
         appSettingService.updateSetting(settingRequest.getCategory(), settingRequest.getName(), settingRequest.getValue());
     }

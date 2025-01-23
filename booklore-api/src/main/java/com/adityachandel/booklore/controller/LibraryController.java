@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/library")
+@RequestMapping("/api/v1/library")
 @AllArgsConstructor
 public class LibraryController {
 

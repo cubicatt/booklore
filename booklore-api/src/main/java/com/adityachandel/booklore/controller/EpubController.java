@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/epub")
+@RequestMapping("/api/v1/epub")
 public class EpubController {
 
     private final EpubService epubService;

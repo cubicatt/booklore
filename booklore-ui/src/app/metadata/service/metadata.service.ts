@@ -14,7 +14,7 @@ import {API_CONFIG} from '../../config/api-config';
 })
 export class MetadataService {
 
-  private readonly url = `${API_CONFIG.BASE_URL}/v1/metadata`;
+  private readonly url = `${API_CONFIG.BASE_URL}/api/v1/metadata`;
 
   private http = inject(HttpClient);
   private bookService = inject(BookService);

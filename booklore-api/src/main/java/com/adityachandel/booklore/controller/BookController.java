@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-@RequestMapping("/v1/book")
+@RequestMapping("/api/v1/book")
 @RestController
 @AllArgsConstructor
 public class BookController {

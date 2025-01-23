@@ -8,7 +8,7 @@ import {API_CONFIG} from '../../config/api-config';
   providedIn: 'root'
 })
 export class AppSettingsService {
-  private readonly apiUrl = `${API_CONFIG.BASE_URL}/api/settings`;
+  private readonly apiUrl = `${API_CONFIG.BASE_URL}/api/v1/settings`;
 
   private appSettingsSubject = new BehaviorSubject<AppSettings | null>(null);
   appSettings$ = this.appSettingsSubject.asObservable();

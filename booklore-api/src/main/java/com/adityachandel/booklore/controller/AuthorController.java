@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/v1/author")
+@RequestMapping("/api/v1/author")
 @RestController
 @AllArgsConstructor
 public class AuthorController {

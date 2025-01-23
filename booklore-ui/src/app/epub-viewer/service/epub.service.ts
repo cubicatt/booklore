@@ -7,7 +7,7 @@ import {API_CONFIG} from '../../config/api-config';
   providedIn: 'root',
 })
 export class EpubService {
-  private baseUrl = `${API_CONFIG.BASE_URL}/api/epub`;
+  private baseUrl = `${API_CONFIG.BASE_URL}/api/v1/epub`;
 
   private http = inject(HttpClient);
 

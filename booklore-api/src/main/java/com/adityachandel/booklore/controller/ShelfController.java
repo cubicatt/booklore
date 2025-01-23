@@ -15,7 +15,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping(("/v1/shelf"))
+@RequestMapping(("/api/v1/shelf"))
 public class ShelfController {
 
     private final ShelfService shelfService;

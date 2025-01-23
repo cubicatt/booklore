@@ -12,7 +12,7 @@ import {API_CONFIG} from '../../config/api-config';
   providedIn: 'root',
 })
 export class ShelfService {
-  private readonly url = `${API_CONFIG.BASE_URL}/v1/shelf`;
+  private readonly url = `${API_CONFIG.BASE_URL}/api/v1/shelf`;
   private shelfStateSubject = new BehaviorSubject<ShelfState>({
     shelves: null,
     loaded: false,

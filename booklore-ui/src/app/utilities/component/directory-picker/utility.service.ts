@@ -8,7 +8,7 @@ import {API_CONFIG} from '../../../config/api-config';
 })
 export class UtilityService {
 
-  private pathUrl = `${API_CONFIG.BASE_URL}/v1/path`;
+  private pathUrl = `${API_CONFIG.BASE_URL}/api/v1/path`;
 
   private http = inject(HttpClient);
 

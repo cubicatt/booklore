@@ -6,7 +6,7 @@ import {API_CONFIG} from '../../config/api-config';
   providedIn: 'root',
 })
 export class FileService {
-  private readonly url = `${API_CONFIG.BASE_URL}/v1/book`;
+  private readonly url = `${API_CONFIG.BASE_URL}/api/v1/book`;
   private readonly http = inject(HttpClient);
 
   downloadFile(bookId: number): void {

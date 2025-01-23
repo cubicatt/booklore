@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/v1/metadata")
+@RequestMapping("/api/v1/metadata")
 @AllArgsConstructor
 public class MetadataController {
 

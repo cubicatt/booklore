@@ -178,17 +178,14 @@ export class BookService {
     }
   }
 
-  searchBooks(query: string): Observable<Book[]> {
+  searchBooks(query: string): Book[] {
     if (query.length < 2) {
-      return of([]);
+      return [];
     }
-    return this.bookState$.pipe(
-      map(state =>
-        (state.books || []).filter(book =>
-          (book.metadata?.title?.toLowerCase().includes(query.toLowerCase()) ||
-            book.metadata?.authors.some(author => author.name.toLowerCase().includes(query.toLowerCase())))
-        )
-      )
+    const state = this.bookStateSubject.value;
+    return (state.books || []).filter(book =>
+      book.metadata?.title?.toLowerCase().includes(query.toLowerCase()) ||
+      book.metadata?.authors.some(author => author.name.toLowerCase().includes(query.toLowerCase()))
     );
   }
 

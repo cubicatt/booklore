@@ -3,7 +3,7 @@ import {DynamicDialogRef} from 'primeng/dynamicdialog';
 import {UtilityService} from './utility.service';
 import {Button} from 'primeng/button';
 import {TableModule} from 'primeng/table';
-import {NgIf, NgStyle} from '@angular/common';
+import {NgIf} from '@angular/common';
 import {InputText} from 'primeng/inputtext';
 
 @Component({
@@ -13,7 +13,6 @@ import {InputText} from 'primeng/inputtext';
   imports: [
     Button,
     TableModule,
-    NgStyle,
     InputText,
     NgIf
   ],

@@ -1,5 +1,5 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {Subject, Subscription} from 'rxjs';
+import {of, Subject, Subscription} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
 import {Author, Book} from '../../model/book.model';
 import {FormsModule} from '@angular/forms';
@@ -44,20 +44,18 @@ export class BookSearcherComponent implements OnInit, OnDestroy {
     this.#subscription = this.#searchSubject.pipe(
       debounceTime(350),
       distinctUntilChanged(),
-      switchMap((query) => this.bookService.searchBooks(query).pipe(
-        catchError((error) => {
-          console.error('Error while searching books:', error);
-          return [];
-        })
-      ))
+      switchMap((query) => {
+        const result = this.bookService.searchBooks(query);
+        return of(result);
+      }),
+      catchError((error) => {
+        console.error('Error while searching books:', error);
+        return of([]);
+      })
     ).subscribe({
       next: (result: Book[]) => this.books = result,
       error: (error) => console.error('Subscription error:', error)
     });
-  }
-
-  getLibraryName(libraryId: number): string {
-    return `${libraryId}`;
   }
 
   getAuthorNames(authors: Author[] | undefined): string {
@@ -71,10 +69,6 @@ export class BookSearcherComponent implements OnInit, OnDestroy {
   onBookClick(book: Book): void {
     this.clearSearch();
     this.metadataDialogService.openBookMetadataCenterDialog(book.id, 'view');
-  }
-
-  getBookCoverUrl(bookId: number): string {
-    return this.bookService.getBookCoverUrl(bookId);
   }
 
   clearSearch(): void {

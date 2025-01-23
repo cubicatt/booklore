@@ -25,6 +25,7 @@ export class MainDashboardComponent implements OnInit {
   ref: DynamicDialogRef | undefined;
 
   private bookService = inject(BookService);
+  private dialogService = inject(DialogService);
 
   ngOnInit(): void {
     this.bookService.loadBooks();
@@ -35,7 +36,7 @@ export class MainDashboardComponent implements OnInit {
   );
 
   createNewLibrary() {
-    this.ref = inject(DialogService).open(LibraryCreatorComponent, {
+    this.ref = this.dialogService.open(LibraryCreatorComponent, {
       header: 'Create New Library',
       modal: true,
       closable: true,

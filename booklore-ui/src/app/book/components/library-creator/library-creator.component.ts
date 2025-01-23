@@ -42,14 +42,16 @@ export class LibraryCreatorComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.mode = this.dynamicDialogConfig.data.mode;
-    if (this.mode === 'edit') {
-      this.library = this.libraryService.findLibraryById(this.dynamicDialogConfig.data.libraryId);
+    const data = this.dynamicDialogConfig?.data;
+    if (data?.mode === 'edit') {
+      this.mode = data.mode;
+      this.library = this.libraryService.findLibraryById(data.libraryId);
       if (this.library) {
-        this.chosenLibraryName = this.library.name;
-        this.editModeLibraryName = this.library.name;
-        this.selectedIcon = 'pi pi-' + this.library.icon;
-        this.folders = this.library.paths.map(path => path.path);
+        const { name, icon, paths } = this.library;
+        this.chosenLibraryName = name;
+        this.editModeLibraryName = name;
+        this.selectedIcon = `pi pi-${icon}`;
+        this.folders = paths.map(path => path.path);
       }
     }
   }

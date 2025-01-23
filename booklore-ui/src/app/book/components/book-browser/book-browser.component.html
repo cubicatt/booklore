@@ -117,7 +117,7 @@
           </virtual-scroller>
         </div>
 
-        <div class="book-browser-footer" *ngIf="selectedBooks.size > 0" [@slideInOut]>
+        <div class="book-browser-footer bg-[var(--card-background)] bg-opacity-10" *ngIf="selectedBooks.size > 0" [@slideInOut]>
           <div class="flex justify-between gap-8">
             <ng-container *ngIf="entityType$ | async as entityType">
               <p-button *ngIf="entityType === EntityType.LIBRARY || entityType === EntityType.ALL_BOOKS"

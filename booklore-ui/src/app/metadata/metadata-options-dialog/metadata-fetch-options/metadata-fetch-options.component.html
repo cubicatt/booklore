@@ -1,13 +1,5 @@
 <div class="flex flex-col space-y-6">
-  <ng-container *ngIf="isBasicMode; else advancedOptions">
-    <app-metadata-basic-fetch-options (metadataOptionsSubmitted)="onMetadataSubmit($event)"></app-metadata-basic-fetch-options>
-  </ng-container>
 
-  <ng-template #advancedOptions>
-    <app-metadata-advanced-fetch-options (metadataOptionsSubmitted)="onMetadataSubmit($event)"></app-metadata-advanced-fetch-options>
-  </ng-template>
+  <app-metadata-advanced-fetch-options (metadataOptionsSubmitted)="onMetadataSubmit($event)"></app-metadata-advanced-fetch-options>
 
-  <p-divider></p-divider>
-
-  <p-button severity="info" label="{{ isBasicMode ? 'Switch to Advanced' : 'Switch to Basic' }}" (onClick)="toggleMode()" class="w-full"></p-button>
 </div>

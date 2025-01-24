@@ -24,8 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
@@ -102,8 +100,8 @@ public class BookMetadataService {
                 if (providers.contains(GoodReads)) {
                     Thread.sleep(ThreadLocalRandom.current().nextLong(500, 1500));
                 }
-                FetchedBookMetadata fetchedBookMetadata = getRawOrCombinedMetadata(request, metadataMap);
-                updateBookMetadata(bookEntity, fetchedBookMetadata, request.getRefreshOptions().isRefreshCovers());
+                FetchedBookMetadata fetchedBookMetadata = buildFetchMetadata(request, metadataMap);
+                updateBookMetadata(bookEntity, fetchedBookMetadata, request.getRefreshOptions().isRefreshCovers(), request.getRefreshOptions().isMergeCategories());
             } catch (Exception e) {
                 log.error("Error while updating book metadata, book: {}", bookEntity.getFileName(), e);
             }
@@ -112,9 +110,9 @@ public class BookMetadataService {
     }
 
     @Transactional
-    protected void updateBookMetadata(BookEntity bookEntity, FetchedBookMetadata metadata, boolean replaceCover) {
+    protected void updateBookMetadata(BookEntity bookEntity, FetchedBookMetadata metadata, boolean replaceCover, boolean mergeCategories) {
         if (metadata != null) {
-            BookMetadataEntity bookMetadata = bookMetadataUpdater.setBookMetadata(bookEntity.getId(), metadata, replaceCover);
+            BookMetadataEntity bookMetadata = bookMetadataUpdater.setBookMetadata(bookEntity.getId(), metadata, replaceCover, mergeCategories);
             bookEntity.setMetadata(bookMetadata);
             bookRepository.save(bookEntity);
             Book book = bookMapper.toBook(bookEntity);
@@ -152,60 +150,20 @@ public class BookMetadataService {
     }
 
     @Transactional
-    protected FetchedBookMetadata getRawOrCombinedMetadata(MetadataRefreshRequest request, Map<MetadataProvider, FetchedBookMetadata> metadataMap) {
-        if (request.getRefreshOptions().getFieldOptions() == null) {
-            return metadataMap.get(request.getRefreshOptions().getDefaultProvider());
-        } else {
-            MetadataProvider defaultProvider = request.getRefreshOptions().getDefaultProvider();
-            Set<MetadataProvider> nonDefaultProviders = getNonDefaultProviders(request);
-            FetchedBookMetadata combinedMetadata = setSpecificMetadata(request, metadataMap);
-
-            nonDefaultProviders.forEach(provider -> setUnspecificMetadata(metadataMap, combinedMetadata, provider));
-            setUnspecificMetadata(metadataMap, combinedMetadata, defaultProvider);
-
-            if (request.getRefreshOptions().isMergeCategories()) {
-                log.info("Merging categories");
-                Set<String> mergedCategoriesSet = new HashSet<>();
-                metadataMap.forEach((k, v) -> {
-                    if (v.getCategories() != null) {
-                        mergedCategoriesSet.addAll(v.getCategories());
-                    }
-                });
-                combinedMetadata.setCategories(new ArrayList<>(mergedCategoriesSet));
-            }
-
-            return combinedMetadata;
-        }
-    }
-
-    @Transactional
-    protected FetchedBookMetadata setSpecificMetadata(MetadataRefreshRequest request, Map<MetadataProvider, FetchedBookMetadata> metadataMap) {
-        FetchedBookMetadata metadataCombined = FetchedBookMetadata.builder().build();
+    protected FetchedBookMetadata buildFetchMetadata(MetadataRefreshRequest request, Map<MetadataProvider, FetchedBookMetadata> metadataMap) {
+        FetchedBookMetadata metadata = FetchedBookMetadata.builder().build();
         MetadataRefreshOptions.FieldOptions fieldOptions = request.getRefreshOptions().getFieldOptions();
 
-        metadataCombined.setTitle(resolveFieldAsString(metadataMap, fieldOptions.getTitle(), FetchedBookMetadata::getTitle));
-        metadataCombined.setDescription(resolveFieldAsString(metadataMap, fieldOptions.getDescription(), FetchedBookMetadata::getDescription));
-        metadataCombined.setAuthors(resolveFieldAsList(metadataMap, fieldOptions.getAuthors(), FetchedBookMetadata::getAuthors));
-        metadataCombined.setCategories(resolveFieldAsList(metadataMap, fieldOptions.getCategories(), FetchedBookMetadata::getCategories));
-        metadataCombined.setThumbnailUrl(resolveFieldAsString(metadataMap, fieldOptions.getCover(), FetchedBookMetadata::getThumbnailUrl));
-        return metadataCombined;
-    }
-
-    @Transactional
-    protected void setUnspecificMetadata(Map<MetadataProvider, FetchedBookMetadata> metadataMap, FetchedBookMetadata metadataCombined, MetadataProvider provider) {
-        if (metadataMap.containsKey(provider)) {
-            FetchedBookMetadata metadata = metadataMap.get(provider);
-            metadataCombined.setSubtitle(metadata.getSubtitle() != null ? metadata.getSubtitle() : metadata.getTitle());
-            metadataCombined.setPublisher(metadata.getPublisher() != null ? metadata.getPublisher() : metadataCombined.getPublisher());
-            metadataCombined.setPublishedDate(metadata.getPublishedDate() != null ? metadata.getPublishedDate() : metadataCombined.getPublishedDate());
-            metadataCombined.setIsbn10(metadata.getIsbn10() != null ? metadata.getIsbn10() : metadataCombined.getIsbn10());
-            metadataCombined.setIsbn13(metadata.getIsbn13() != null ? metadata.getIsbn13() : metadataCombined.getIsbn13());
-            metadataCombined.setPageCount(metadata.getPageCount() != null ? metadata.getPageCount() : metadataCombined.getPageCount());
-            metadataCombined.setLanguage(metadata.getLanguage() != null ? metadata.getLanguage() : metadataCombined.getLanguage());
-            metadataCombined.setRating(metadata.getRating() != null ? metadata.getRating() : metadataCombined.getRating());
-            metadataCombined.setRatingCount(metadata.getRatingCount() != null ? metadata.getRatingCount() : metadataCombined.getRatingCount());
-            metadataCombined.setReviewCount(metadata.getReviewCount() != null ? metadata.getReviewCount() : metadataCombined.getReviewCount());
+        metadata.setTitle(resolveFieldAsString(metadataMap, fieldOptions.getTitle(), FetchedBookMetadata::getTitle));
+        metadata.setDescription(resolveFieldAsString(metadataMap, fieldOptions.getDescription(), FetchedBookMetadata::getDescription));
+        metadata.setAuthors(resolveFieldAsList(metadataMap, fieldOptions.getAuthors(), FetchedBookMetadata::getAuthors));
+        if (request.getRefreshOptions().isMergeCategories()) {
+            metadata.setCategories(getAllCategories(metadataMap, fieldOptions.getCategories(), FetchedBookMetadata::getCategories));
+        } else {
+            metadata.setCategories(resolveFieldAsList(metadataMap, fieldOptions.getCategories(), FetchedBookMetadata::getCategories));
         }
+        metadata.setThumbnailUrl(resolveFieldAsString(metadataMap, fieldOptions.getCover(), FetchedBookMetadata::getThumbnailUrl));
+        return metadata;
     }
 
     @Transactional
@@ -221,6 +179,29 @@ public class BookMetadataService {
             value = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP1()));
         }
         return value;
+    }
+
+    List<String> getAllCategories(Map<MetadataProvider, FetchedBookMetadata> metadataMap, MetadataRefreshOptions.FieldProvider fieldProvider, FieldValueExtractorList fieldValueExtractor) {
+        Set<String> uniqueCategories = new HashSet<>();
+        if (fieldProvider.getDefaultProvider() != null && metadataMap.containsKey(fieldProvider.getDefaultProvider())) {
+            List<String> extracted = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getDefaultProvider()));
+            if (extracted != null) {
+                uniqueCategories.addAll(extracted);
+            }
+        }
+        if (fieldProvider.getP2() != null && metadataMap.containsKey(fieldProvider.getP2())) {
+            List<String> extracted = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP2()));
+            if (extracted != null) {
+                uniqueCategories.addAll(extracted);
+            }
+        }
+        if (fieldProvider.getP1() != null && metadataMap.containsKey(fieldProvider.getP1())) {
+            List<String> extracted = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP1()));
+            if (extracted != null) {
+                uniqueCategories.addAll(extracted);
+            }
+        }
+        return new ArrayList<>(uniqueCategories);
     }
 
     @Transactional

@@ -11,7 +11,6 @@ import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.entity.CategoryEntity;
 import com.adityachandel.booklore.repository.*;
 import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
-import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import com.adityachandel.booklore.util.FileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,7 +40,7 @@ public class BookMetadataUpdater {
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public BookMetadataEntity setBookMetadata(long bookId, FetchedBookMetadata newMetadata, boolean setThumbnail) {
+    public BookMetadataEntity setBookMetadata(long bookId, FetchedBookMetadata newMetadata, boolean setThumbnail, boolean mergeCategories) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         BookMetadataEntity metadata = bookEntity.getMetadata();
 
@@ -64,12 +63,24 @@ public class BookMetadataUpdater {
                         .collect(Collectors.toList())
                 : metadata.getAuthors());
 
-        metadata.setCategories(newMetadata.getCategories() != null && !newMetadata.getCategories().isEmpty() ?
-                new HashSet<>(newMetadata.getCategories()).stream()
-                        .map(categoryName -> categoryRepository.findByName(categoryName)
-                                .orElseGet(() -> categoryRepository.save(CategoryEntity.builder().name(categoryName).build())))
-                        .collect(Collectors.toList())
-                : metadata.getCategories());
+        if (mergeCategories) {
+            if (metadata.getCategories() != null) {
+                HashSet<CategoryEntity> existingCategories = new HashSet<>(metadata.getCategories());
+                newMetadata.getCategories().forEach(categoryName -> {
+                    CategoryEntity categoryEntity = categoryRepository.findByName(categoryName)
+                            .orElseGet(() -> categoryRepository.save(CategoryEntity.builder().name(categoryName).build()));
+                    existingCategories.add(categoryEntity);
+                });
+                metadata.setCategories(new ArrayList<>(existingCategories));
+            }
+        } else {
+            metadata.setCategories(newMetadata.getCategories() != null && !newMetadata.getCategories().isEmpty() ?
+                    newMetadata.getCategories().stream()
+                            .map(categoryName -> categoryRepository.findByName(categoryName)
+                                    .orElseGet(() -> categoryRepository.save(CategoryEntity.builder().name(categoryName).build())))
+                            .collect(Collectors.toList())
+                    : metadata.getCategories());
+        }
 
         if (setThumbnail && newMetadata.getThumbnailUrl() != null && !newMetadata.getThumbnailUrl().isEmpty()) {
             String thumbnailPath = null;

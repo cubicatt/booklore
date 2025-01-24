@@ -32,7 +32,7 @@ public class MetadataController {
 
     @PutMapping("/{bookId}")
     public ResponseEntity<BookMetadata> updateMetadataFromFetch(@RequestBody FetchedBookMetadata setMetadataRequest, @PathVariable long bookId) {
-        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true), true);
+        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true, true), true);
         return ResponseEntity.ok(bookMetadata);
     }
 

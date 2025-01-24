@@ -90,7 +90,7 @@ export class BookCardComponent implements OnInit {
             },
           },
           {
-            label: 'Advanced Refresh',
+            label: 'Granular Refresh',
             icon: 'pi pi-database',
             command: () => {
               this.dialogService.open(MetadataFetchOptionsComponent, {

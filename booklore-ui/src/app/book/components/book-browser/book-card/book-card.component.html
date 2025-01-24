@@ -9,6 +9,7 @@
       alt="Cover of {{ book.metadata?.title }}"
       loading="lazy"/>
     <p-checkbox
+      *ngIf="isCheckboxEnabled"
       [(ngModel)]="isSelected"
       binary="true"
       id="select-checkbox-{{book.id}}"

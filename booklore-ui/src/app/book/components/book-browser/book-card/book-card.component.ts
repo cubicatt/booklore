@@ -15,13 +15,14 @@ import {MetadataRefreshType} from '../../../../metadata/model/request/metadata-r
 import {MetadataRefreshRequest} from '../../../../metadata/model/request/metadata-refresh-request.model';
 import {MetadataService} from '../../../../metadata/service/metadata.service';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
+import {NgIf} from '@angular/common';
 
 
 @Component({
   selector: 'app-book-card',
   templateUrl: './book-card.component.html',
   styleUrls: ['./book-card.component.scss'],
-  imports: [Button, MenuModule, CheckboxModule, FormsModule],
+  imports: [Button, MenuModule, CheckboxModule, FormsModule, NgIf],
 })
 export class BookCardComponent implements OnInit {
   @Input() book!: Book;

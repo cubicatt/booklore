@@ -42,7 +42,9 @@
           </i>
         </a>
 
-        <input type="text" pInputText placeholder="Search title or author..." [(ngModel)]="bookTitle" (ngModelChange)="onBookTitleChange($event)"/>
+        <p-fluid>
+          <input type="text" pInputText placeholder="Search title or author..." [(ngModel)]="bookTitle" (ngModelChange)="onBookTitleChange($event)"/>
+        </p-fluid>
 
         <p-select
           [options]="sortOptions"

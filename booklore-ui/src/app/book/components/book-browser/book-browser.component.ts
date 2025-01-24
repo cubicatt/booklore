@@ -409,6 +409,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     }
     this.bookFilterComponent.activeCategory = null;
     this.bookFilterComponent.activeAuthor = null;
+    this.clearSearch();
   }
 
   ngAfterViewInit() {

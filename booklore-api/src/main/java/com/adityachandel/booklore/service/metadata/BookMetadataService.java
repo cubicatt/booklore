@@ -100,7 +100,7 @@ public class BookMetadataService {
             try {
                 Map<MetadataProvider, FetchedBookMetadata> metadataMap = fetchMetadataForBook(providers, bookEntity);
                 if (providers.contains(GoodReads)) {
-                    Thread.sleep(Duration.ofSeconds(ThreadLocalRandom.current().nextInt(2, 6)).toMillis());
+                    Thread.sleep(ThreadLocalRandom.current().nextLong(500, 1500));
                 }
                 FetchedBookMetadata fetchedBookMetadata = getRawOrCombinedMetadata(request, metadataMap);
                 updateBookMetadata(bookEntity, fetchedBookMetadata, shouldRefreshCovers(request));

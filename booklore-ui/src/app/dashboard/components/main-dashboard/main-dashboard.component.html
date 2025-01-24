@@ -20,14 +20,18 @@
       [title]="'Last Read Books'">
     </app-dashboard-scroller>
 
-    <p-divider></p-divider>
+    <div class="mb-8">
+      <p-divider></p-divider>
+    </div>
 
     <app-dashboard-scroller
       [books]="latestAddedBooks$ | async"
       [title]="'Latest Added Books'">
     </app-dashboard-scroller>
 
-    <p-divider></p-divider>
+    <div class="mb-8">
+      <p-divider></p-divider>
+    </div>
 
     <app-dashboard-scroller
       [books]="randomBooks$ | async"

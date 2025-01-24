@@ -43,7 +43,21 @@
         </a>
 
         <p-fluid>
-          <input type="text" pInputText placeholder="Search title or author..." [(ngModel)]="bookTitle" (ngModelChange)="onBookTitleChange($event)"/>
+          <div class="relative">
+            <input type="text"
+                   pInputText
+                   placeholder="Search title or author..."
+                   [(ngModel)]="bookTitle"
+                   (ngModelChange)="onBookTitleChange($event)"/>
+            <p-button *ngIf="bookTitle"
+                      icon="pi pi-times"
+                      [text]="true"
+                      size="small"
+                      [rounded]="true"
+                      class="absolute right-2 top-1/2 transform -translate-y-1/2"
+                      (click)="clearSearch()">
+            </p-button>
+          </div>
         </p-fluid>
 
         <p-select

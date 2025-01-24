@@ -354,6 +354,11 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     this.bookOrAuthor$.next(newTitle);
   }
 
+  clearSearch(): void {
+    this.bookTitle = '';
+    this.onBookTitleChange('');
+  }
+
   openShelfAssigner() {
     this.dynamicDialogRef = this.dialogService.open(ShelfAssignerComponent, {
       header: `Update Books' Shelves`,

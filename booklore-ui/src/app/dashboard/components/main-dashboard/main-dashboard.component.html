@@ -20,16 +20,21 @@
       [title]="'Last Read Books'">
     </app-dashboard-scroller>
 
+    <p-divider></p-divider>
+
     <app-dashboard-scroller
       [books]="latestAddedBooks$ | async"
       [title]="'Latest Added Books'">
     </app-dashboard-scroller>
+
+    <p-divider></p-divider>
 
     <app-dashboard-scroller
       [books]="randomBooks$ | async"
       [title]="'Explore Random Reads'">
     </app-dashboard-scroller>
 
+    <p-divider></p-divider>
 
   </ng-template>
 

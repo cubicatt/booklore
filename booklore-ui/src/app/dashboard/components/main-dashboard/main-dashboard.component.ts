@@ -11,6 +11,7 @@ import {BookService} from '../../../book/service/book.service';
 import {BookState} from '../../../book/model/state/book-state.model';
 import {Book} from '../../../book/model/book.model';
 import {LibraryState} from '../../../book/model/state/library-state.model';
+import {Divider} from 'primeng/divider';
 
 @Component({
   selector: 'app-main-dashboard',
@@ -20,7 +21,8 @@ import {LibraryState} from '../../../book/model/state/library-state.model';
     Button,
     NgIf,
     DashboardScrollerComponent,
-    AsyncPipe
+    AsyncPipe,
+    Divider
   ],
   providers: [DialogService],
 })

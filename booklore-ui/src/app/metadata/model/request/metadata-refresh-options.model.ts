@@ -1,6 +1,7 @@
 export interface MetadataRefreshOptions {
   defaultProvider: string;
   refreshCovers: boolean;
+  mergeCategories: boolean;
   fieldOptions?: FieldOptions;
 }
 

@@ -103,7 +103,7 @@ public class BookMetadataService {
                     Thread.sleep(ThreadLocalRandom.current().nextLong(500, 1500));
                 }
                 FetchedBookMetadata fetchedBookMetadata = getRawOrCombinedMetadata(request, metadataMap);
-                updateBookMetadata(bookEntity, fetchedBookMetadata, shouldRefreshCovers(request));
+                updateBookMetadata(bookEntity, fetchedBookMetadata, request.getRefreshOptions().isRefreshCovers());
             } catch (Exception e) {
                 log.error("Error while updating book metadata, book: {}", bookEntity.getFileName(), e);
             }
@@ -163,13 +163,13 @@ public class BookMetadataService {
             nonDefaultProviders.forEach(provider -> setUnspecificMetadata(metadataMap, combinedMetadata, provider));
             setUnspecificMetadata(metadataMap, combinedMetadata, defaultProvider);
 
+            if(request.getRefreshOptions().isMergeCategories()) {
+                combinedMetadata.getCategories().clear();
+                metadataMap.forEach((k, v) -> combinedMetadata.getCategories().addAll(v.getCategories()));
+            }
+
             return combinedMetadata;
         }
-    }
-
-    @Transactional
-    protected boolean shouldRefreshCovers(MetadataRefreshRequest request) {
-        return request.getRefreshOptions().isRefreshCovers();
     }
 
     @Transactional

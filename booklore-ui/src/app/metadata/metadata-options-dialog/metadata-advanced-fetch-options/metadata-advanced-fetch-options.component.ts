@@ -20,6 +20,7 @@ export class MetadataAdvancedFetchOptionsComponent implements OnChanges {
   fields: (keyof FieldOptions)[] = ['title', 'description', 'authors', 'categories', 'cover'];
   providers: string[] = ['Amazon', 'Google', 'GoodReads'];
   refreshCovers: boolean = false;
+  mergeCategories: boolean = false;
 
   allDefault = {placeholder: 'Set All', value: ''};
   allP2 = {placeholder: 'Set All', value: ''};
@@ -40,6 +41,7 @@ export class MetadataAdvancedFetchOptionsComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['currentMetadataOptions'] && this.currentMetadataOptions) {
       this.refreshCovers = this.currentMetadataOptions.refreshCovers || false;
+      this.mergeCategories = this.currentMetadataOptions.mergeCategories || false;
       this.fieldOptions = this.currentMetadataOptions.fieldOptions || this.fieldOptions;
       this.allDefault.value = this.currentMetadataOptions.defaultProvider || '';
     }
@@ -59,6 +61,7 @@ export class MetadataAdvancedFetchOptionsComponent implements OnChanges {
       const metadataRefreshOptions: MetadataRefreshOptions = {
         defaultProvider: this.allDefault.value,
         refreshCovers: this.refreshCovers,
+        mergeCategories: this.mergeCategories,
         fieldOptions: this.fieldOptions
       };
 

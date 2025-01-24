@@ -19,40 +19,40 @@ VALUES
     ('reader_setting', 'pdf', 'individual'),
     ('reader_setting', 'epub', 'individual');
 
--- Insert JSON data into app_settings
 INSERT INTO app_settings (category, name, val)
 VALUES
     (
         'quick_book_match',
         'all_books',
         '{
-            "defaultProvider": "Amazon",
-            "refreshCovers": false,
+            "defaultProvider": "Google",
+            "refreshCovers": true,
+            "mergeCategories": true,
             "fieldOptions": {
                 "title": {
-                    "default": "Amazon",
-                    "p2": null,
-                    "p1": null
+                    "p2": "GoodReads",
+                    "p1": "Amazon",
+                    "default": "Google"
                 },
                 "description": {
-                    "default": "Amazon",
-                    "p2": null,
-                    "p1": null
+                    "p2": "GoodReads",
+                    "p1": "Amazon",
+                    "default": "Google"
                 },
                 "authors": {
-                    "default": "Amazon",
-                    "p2": null,
-                    "p1": null
+                    "p2": "GoodReads",
+                    "p1": "Amazon",
+                    "default": "Google"
                 },
                 "categories": {
-                    "default": "Amazon",
-                    "p2": null,
-                    "p1": null
+                    "p2": "Amazon",
+                    "p1": "GoodReads",
+                    "default": "Google"
                 },
                 "cover": {
-                    "default": "Amazon",
-                    "p2": null,
-                    "p1": null
+                    "p2": "GoodReads",
+                    "p1": "Amazon",
+                    "default": "Google"
                 }
             }
         }'

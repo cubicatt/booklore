@@ -16,6 +16,7 @@ export class MetadataBasicFetchOptionsComponent {
   providers: string[] = ['Amazon', 'Google', 'GoodReads'];
   selectedProvider!: string;
   refreshCovers: boolean = false;
+  mergeCategories: boolean = false;
 
   @Output() metadataOptionsSubmitted: EventEmitter<MetadataRefreshOptions> = new EventEmitter<MetadataRefreshOptions>();
 
@@ -23,6 +24,7 @@ export class MetadataBasicFetchOptionsComponent {
     const metadataRefreshOptions: MetadataRefreshOptions = {
       defaultProvider: this.selectedProvider,
       refreshCovers: this.refreshCovers,
+      mergeCategories: this.mergeCategories
     };
     this.metadataOptionsSubmitted.emit(metadataRefreshOptions);
   }

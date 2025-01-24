@@ -103,8 +103,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     if (isAllBooksRoute) {
       this.entityType = EntityType.ALL_BOOKS;
       this.entityType$ = of(EntityType.ALL_BOOKS);
+      this.entity$ = of(null);
       this.bookState$ = this.fetchAllBooks();
-
     } else {
 
       const routeEntityInfo$ = this.getEntityInfoFromRoute();
@@ -132,6 +132,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       this.bookOrAuthor$.next('');
       this.bookTitle = '';
       this.deselectAllBooks();
+      this.clearFilter();
     });
   }
 
@@ -244,7 +245,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         }
         return bookState;
       }),
-      switchMap(bookState => this.headerFilter(bookState))
+      switchMap(bookState => this.headerFilter(bookState)),
+      switchMap(bookState => this.sideBarFilter(bookState))
     );
   }
 
@@ -403,7 +405,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     this.bookFilterComponent.activeCategory = null;
     this.bookFilterComponent.activeAuthor = null;
   }
-
 
   ngAfterViewInit() {
     this.bookFilterComponent.authorSelected.subscribe((authorId: number) => {

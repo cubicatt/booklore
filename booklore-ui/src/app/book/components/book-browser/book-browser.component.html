@@ -138,9 +138,9 @@
                 (click)="updateMetadata()">
               </p-button>
               <p-button
-                        label="Deselect All"
-                        severity="warn"
-                        (click)="deselectAllBooks()">
+                label="Deselect All"
+                severity="warn"
+                (click)="deselectAllBooks()">
               </p-button>
             </ng-container>
           </div>
@@ -149,6 +149,6 @@
     </div>
   </div>
 
-  <app-book-filter></app-book-filter>
+  <app-book-filter [entity$]="entity$" [entityType$]="entityType$"></app-book-filter>
 
 </div>

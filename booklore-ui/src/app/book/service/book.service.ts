@@ -20,56 +20,6 @@ export class BookService {
   });
   bookState$ = this.bookStateSubject.asObservable();
 
-  authorBookCount$: Observable<{ author: Author; bookCount: number }[]> = this.bookState$.pipe(
-    map((state) => {
-      const books = state.books || [];
-      const authorMap = new Map<number, { author: Author; bookCount: number }>();
-      books.forEach((book) => {
-        book.metadata?.authors.forEach((author) => {
-          if (!authorMap.has(author.id)) {
-            authorMap.set(author.id, {author, bookCount: 0});
-          }
-          const authorData = authorMap.get(author.id);
-          if (authorData) {
-            authorData.bookCount += 1;
-          }
-        });
-      });
-      return Array.from(authorMap.values()).sort((a, b) => {
-        if (b.bookCount !== a.bookCount) {
-          return b.bookCount - a.bookCount;
-        }
-        return a.author.name.localeCompare(b.author.name);
-      });
-    }),
-    distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
-  );
-
-  categoryBookCount$: Observable<{ category: Category; bookCount: number }[]> = this.bookState$.pipe(
-    map((state) => {
-      const books = state.books || [];
-      const categoryMap = new Map<number, { category: Category; bookCount: number }>();
-      books.forEach((book) => {
-        book.metadata?.categories.forEach((category) => {
-          if (!categoryMap.has(category.id)) {
-            categoryMap.set(category.id, {category, bookCount: 0});
-          }
-          let categoryData = categoryMap.get(category.id);
-          if (categoryData) {
-            categoryData.bookCount += 1;
-          }
-        });
-      });
-      return Array.from(categoryMap.values()).sort((a, b) => {
-        if (b.bookCount !== a.bookCount) {
-          return b.bookCount - a.bookCount;
-        }
-        return a.category.name.localeCompare(b.category.name);
-      });
-    }),
-    distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
-  )
-
 
   private http = inject(HttpClient);
 

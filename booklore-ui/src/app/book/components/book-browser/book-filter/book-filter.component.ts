@@ -2,8 +2,8 @@ import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/c
 import {Accordion, AccordionContent, AccordionHeader, AccordionPanel} from 'primeng/accordion';
 import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {Badge} from 'primeng/badge';
-import {combineLatest, Observable} from 'rxjs';
-import {Author, Category} from '../../../model/book.model';
+import {combineLatest, Observable, of} from 'rxjs';
+import {Author, Book, Category} from '../../../model/book.model';
 import {distinctUntilChanged, map} from 'rxjs/operators';
 import {BookService} from '../../../service/book.service';
 import {Library} from '../../../model/library.model';
@@ -27,7 +27,6 @@ import {EntityType} from '../book-browser.component';
   styleUrl: './book-filter.component.scss'
 })
 export class BookFilterComponent implements OnInit {
-
   @Output() authorSelected = new EventEmitter<number | null>();
   @Output() categorySelected = new EventEmitter<number | null>();
 
@@ -43,76 +42,89 @@ export class BookFilterComponent implements OnInit {
 
   bookService = inject(BookService);
 
-
   ngOnInit(): void {
     if (this.entity$ && this.entityType$) {
-      this.authorBookCount$ = combineLatest([this.bookService.bookState$, this.entity$, this.entityType$]).pipe(
-        map(([state, entity, entityType]) => {
-          let filteredBooks = state.books || [];
-          if (entityType === EntityType.LIBRARY && entity && 'id' in entity) {
-            filteredBooks = filteredBooks.filter((book) => book.libraryId === entity.id);
-          }
-          if (entityType === EntityType.SHELF && entity && 'id' in entity) {
-            filteredBooks = filteredBooks.filter((book) =>
-              book.shelves?.some((shelf) => shelf.id === entity.id)
-            );
-          }
-          const authorMap = new Map<number, { author: Author; bookCount: number }>();
-          filteredBooks.forEach((book) => {
-            book.metadata?.authors.forEach((author) => {
-              if (!authorMap.has(author.id)) {
-                authorMap.set(author.id, {author, bookCount: 0});
-              }
-              const authorData = authorMap.get(author.id);
-              if (authorData) {
-                authorData.bookCount += 1;
-              }
-            });
-          });
+      this.authorBookCount$ = this.getAuthorBookCountStream();
+      this.categoryBookCount$ = this.getCategoryBookCountStream();
+    }
+  }
 
-          return Array.from(authorMap.values()).sort((a, b) => {
-            if (b.bookCount !== a.bookCount) {
-              return b.bookCount - a.bookCount;
-            }
-            return a.author.name.localeCompare(b.author.name);
-          });
-        }),
-        distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
-      );
+  private getAuthorBookCountStream(): Observable<{ author: Author; bookCount: number }[]> {
+    return combineLatest([
+      this.bookService.bookState$,
+      this.entity$ ?? of(null),  // Fallback to an observable emitting null
+      this.entityType$ ?? of(EntityType.ALL_BOOKS)  // Fallback to a default entity type
+    ]).pipe(
+      map(([state, entity, entityType]) => {
+        let filteredBooks = this.filterBooksByEntityType(state.books || [], entity, entityType);
 
-      this.categoryBookCount$ = combineLatest([this.bookService.bookState$, this.entity$, this.entityType$]).pipe(
-        map(([state, entity, entityType]) => {
-          let filteredBooks = state.books || [];
-          if (entityType === EntityType.LIBRARY && entity && 'id' in entity) {
-            filteredBooks = filteredBooks.filter((book) => book.libraryId === entity.id);
-          }
-          if (entityType === EntityType.SHELF && entity && 'id' in entity) {
-            filteredBooks = filteredBooks.filter((book) =>
-              book.shelves?.some((shelf) => shelf.id === entity.id)
-            );
-          }
-          const categoryMap = new Map<number, { category: Category; bookCount: number }>();
-          filteredBooks.forEach((book) => {
-            book.metadata?.categories.forEach((category) => {
-              if (!categoryMap.has(category.id)) {
-                categoryMap.set(category.id, {category, bookCount: 0});
-              }
-              const categoryData = categoryMap.get(category.id);
-              if (categoryData) {
-                categoryData.bookCount += 1;
-              }
-            });
-          });
-          return Array.from(categoryMap.values()).sort((a, b) => {
-            if (b.bookCount !== a.bookCount) {
-              return b.bookCount - a.bookCount;
+        const authorMap = new Map<number, { author: Author; bookCount: number }>();
+        filteredBooks.forEach((book) => {
+          book.metadata?.authors.forEach((author) => {
+            if (!authorMap.has(author.id)) {
+              authorMap.set(author.id, { author, bookCount: 0 });
             }
-            return a.category.name.localeCompare(b.category.name);
+            const authorData = authorMap.get(author.id);
+            if (authorData) {
+              authorData.bookCount += 1;
+            }
           });
-        }),
-        distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+        });
+
+        return Array.from(authorMap.values()).sort((a, b) => {
+          if (b.bookCount !== a.bookCount) {
+            return b.bookCount - a.bookCount;
+          }
+          return a.author.name.localeCompare(b.author.name);
+        });
+      }),
+      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+    );
+  }
+
+  private getCategoryBookCountStream(): Observable<{ category: Category; bookCount: number }[]> {
+    return combineLatest([
+      this.bookService.bookState$,
+      this.entity$ ?? of(null),  // Fallback to an observable emitting null
+      this.entityType$ ?? of(EntityType.ALL_BOOKS)  // Fallback to a default entity type
+    ]).pipe(
+      map(([state, entity, entityType]) => {
+        let filteredBooks = this.filterBooksByEntityType(state.books || [], entity, entityType);
+
+        const categoryMap = new Map<number, { category: Category; bookCount: number }>();
+        filteredBooks.forEach((book) => {
+          book.metadata?.categories.forEach((category) => {
+            if (!categoryMap.has(category.id)) {
+              categoryMap.set(category.id, { category, bookCount: 0 });
+            }
+            const categoryData = categoryMap.get(category.id);
+            if (categoryData) {
+              categoryData.bookCount += 1;
+            }
+          });
+        });
+
+        return Array.from(categoryMap.values()).sort((a, b) => {
+          if (b.bookCount !== a.bookCount) {
+            return b.bookCount - a.bookCount;
+          }
+          return a.category.name.localeCompare(b.category.name);
+        });
+      }),
+      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+    );
+  }
+
+  private filterBooksByEntityType(books: Book[], entity: any, entityType: EntityType): Book[] {
+    if (entityType === EntityType.LIBRARY && entity && 'id' in entity) {
+      return books.filter((book) => book.libraryId === entity.id);
+    }
+    if (entityType === EntityType.SHELF && entity && 'id' in entity) {
+      return books.filter((book) =>
+        book.shelves?.some((shelf) => shelf.id === entity.id)
       );
     }
+    return books;
   }
 
   authorClicked(author: { author: Author; bookCount: number }) {
@@ -136,5 +148,4 @@ export class BookFilterComponent implements OnInit {
     this.authorSelected.emit(null);
     this.categorySelected.emit(this.activeCategory);
   }
-
 }

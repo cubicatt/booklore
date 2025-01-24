@@ -8,6 +8,8 @@ import {Button} from 'primeng/button';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {DashboardScrollerComponent} from '../dashboard-scroller/dashboard-scroller.component';
 import {BookService} from '../../../book/service/book.service';
+import {BookState} from '../../../book/model/state/book-state.model';
+import {Book} from '../../../book/model/book.model';
 
 @Component({
   selector: 'app-main-dashboard',
@@ -27,8 +29,34 @@ export class MainDashboardComponent implements OnInit {
   private bookService = inject(BookService);
   private dialogService = inject(DialogService);
 
+  lastReadBooks$: Observable<Book[]> | undefined;
+  latestAddedBooks$!: Observable<Book[]>;
+
   ngOnInit(): void {
     this.bookService.loadBooks();
+    this.lastReadBooks$ = this.bookService.bookState$.pipe(
+      map((state: BookState) => (
+        (state.books || []).filter(book => book.lastReadTime)
+          .sort((a, b) => {
+            const aTime = new Date(a.lastReadTime!).getTime();
+            const bTime = new Date(b.lastReadTime!).getTime();
+            return bTime - aTime;
+          })
+          .slice(0, 25)
+      ))
+    );
+    this.latestAddedBooks$ = this.bookService.bookState$.pipe(
+      map((state: BookState) => (
+        (state.books || [])
+          .filter(book => book.addedOn)
+          .sort((a, b) => {
+            const aTime = new Date(a.addedOn!).getTime();
+            const bTime = new Date(b.addedOn!).getTime();
+            return bTime - aTime;
+          })
+          .slice(0, 25)
+      ))
+    );
   }
 
   isLibrariesEmpty$: Observable<boolean> = inject(LibraryService).libraryState$.pipe(

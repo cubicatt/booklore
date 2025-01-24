@@ -7,6 +7,7 @@ import {BookCardComponent} from '../../../book/components/book-browser/book-card
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import {ProgressSpinnerModule} from 'primeng/progressspinner';
+import {Book} from 'epubjs';
 
 @Component({
   selector: 'app-dashboard-scroller',
@@ -30,6 +31,7 @@ export class DashboardScrollerComponent implements OnInit {
   bookState$: Observable<BookState> | undefined;
 
   private bookService = inject(BookService);
+  @Input() books: Observable<Book[]> | undefined;
 
   ngOnInit(): void {
     if (this.bookListType === 'lastRead') {

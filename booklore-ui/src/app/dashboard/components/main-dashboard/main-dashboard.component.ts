@@ -10,6 +10,7 @@ import {DashboardScrollerComponent} from '../dashboard-scroller/dashboard-scroll
 import {BookService} from '../../../book/service/book.service';
 import {BookState} from '../../../book/model/state/book-state.model';
 import {Book} from '../../../book/model/book.model';
+import {LibraryState} from '../../../book/model/state/library-state.model';
 
 @Component({
   selector: 'app-main-dashboard',
@@ -27,13 +28,17 @@ export class MainDashboardComponent implements OnInit {
   ref: DynamicDialogRef | undefined;
 
   private bookService = inject(BookService);
+  private libraryService = inject(LibraryService);
   private dialogService = inject(DialogService);
 
   lastReadBooks$: Observable<Book[]> | undefined;
-  latestAddedBooks$!: Observable<Book[]>;
+  latestAddedBooks$: Observable<Book[]> | undefined;
+  randomBooks$: Observable<Book[]> | undefined;
+  libraryState$: Observable<LibraryState> | undefined = this.libraryService.libraryState$;
 
   ngOnInit(): void {
     this.bookService.loadBooks();
+
     this.lastReadBooks$ = this.bookService.bookState$.pipe(
       map((state: BookState) => (
         (state.books || []).filter(book => book.lastReadTime)
@@ -45,6 +50,7 @@ export class MainDashboardComponent implements OnInit {
           .slice(0, 25)
       ))
     );
+
     this.latestAddedBooks$ = this.bookService.bookState$.pipe(
       map((state: BookState) => (
         (state.books || [])
@@ -57,24 +63,29 @@ export class MainDashboardComponent implements OnInit {
           .slice(0, 25)
       ))
     );
+
+    this.randomBooks$ = this.bookService.bookState$.pipe(
+      map((state: BookState) => {
+        const books = state.books || [];
+        return this.getRandomBooks(books, 10);
+      })
+    );
   }
 
-  isLibrariesEmpty$: Observable<boolean> = inject(LibraryService).libraryState$.pipe(
-    map(state => !state.libraries || state.libraries.length === 0)
-  );
+  private getRandomBooks(books: Book[], count: number): Book[] {
+    const shuffled = books.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  }
 
   createNewLibrary() {
     this.ref = this.dialogService.open(LibraryCreatorComponent, {
       header: 'Create New Library',
       modal: true,
       closable: true,
-      width: '675px',
-      height: '480px',
       style: {
         position: 'absolute',
         top: '15%',
       }
     });
   }
-
 }

@@ -1,6 +1,6 @@
 <div class="dashboard">
 
-  <div class="dashboard-no-library" *ngIf="isLibrariesEmpty$ | async; else dashboardScroller">
+  <div class="dashboard-no-library" *ngIf="libraryState$ | async; else dashboardScroller">
     <h1 class="no-library-header">
       Looks like you haven't added a library yet. Let's add one!
     </h1>
@@ -13,8 +13,24 @@
   </div>
 
   <ng-template #dashboardScroller>
-    <app-dashboard-scroller [bookListType]="'lastRead'" [books]="lastReadBooks$ || []" title="Last Read Books"></app-dashboard-scroller>
-    <app-dashboard-scroller [bookListType]="'latestAdded'" title="Latest Added Books"></app-dashboard-scroller>
+
+    <app-dashboard-scroller
+      [books]="lastReadBooks$ | async"
+      [bookListType]="'lastRead'"
+      [title]="'Last Read Books'">
+    </app-dashboard-scroller>
+
+    <app-dashboard-scroller
+      [books]="latestAddedBooks$ | async"
+      [title]="'Latest Added Books'">
+    </app-dashboard-scroller>
+
+    <app-dashboard-scroller
+      [books]="randomBooks$ | async"
+      [title]="'Some Random Books'">
+    </app-dashboard-scroller>
+
+
   </ng-template>
 
 </div>

@@ -1,7 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {MetadataAdvancedFetchOptionsComponent} from '../metadata-advanced-fetch-options/metadata-advanced-fetch-options.component';
-import {Divider} from 'primeng/divider';
 import {MetadataService} from '../../service/metadata.service';
 import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
 import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
@@ -12,8 +11,7 @@ import {MetadataRefreshOptions} from '../../model/request/metadata-refresh-optio
   standalone: true,
   templateUrl: './metadata-fetch-options.component.html',
   imports: [
-    MetadataAdvancedFetchOptionsComponent,
-    Divider
+    MetadataAdvancedFetchOptionsComponent
   ],
   styleUrl: './metadata-fetch-options.component.scss'
 })

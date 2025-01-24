@@ -163,9 +163,15 @@ public class BookMetadataService {
             nonDefaultProviders.forEach(provider -> setUnspecificMetadata(metadataMap, combinedMetadata, provider));
             setUnspecificMetadata(metadataMap, combinedMetadata, defaultProvider);
 
-            if(request.getRefreshOptions().isMergeCategories()) {
-                combinedMetadata.getCategories().clear();
-                metadataMap.forEach((k, v) -> combinedMetadata.getCategories().addAll(v.getCategories()));
+            if (request.getRefreshOptions().isMergeCategories()) {
+                log.info("Merging categories");
+                Set<String> mergedCategoriesSet = new HashSet<>();
+                metadataMap.forEach((k, v) -> {
+                    if (v.getCategories() != null) {
+                        mergedCategoriesSet.addAll(v.getCategories());
+                    }
+                });
+                combinedMetadata.setCategories(new ArrayList<>(mergedCategoriesSet));
             }
 
             return combinedMetadata;

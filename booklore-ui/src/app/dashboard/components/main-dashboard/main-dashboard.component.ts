@@ -28,13 +28,15 @@ export class MainDashboardComponent implements OnInit {
   ref: DynamicDialogRef | undefined;
 
   private bookService = inject(BookService);
-  private libraryService = inject(LibraryService);
   private dialogService = inject(DialogService);
 
   lastReadBooks$: Observable<Book[]> | undefined;
   latestAddedBooks$: Observable<Book[]> | undefined;
   randomBooks$: Observable<Book[]> | undefined;
-  libraryState$: Observable<LibraryState> | undefined = this.libraryService.libraryState$;
+
+  isLibrariesEmpty$: Observable<boolean> = inject(LibraryService).libraryState$.pipe(
+    map(state => !state.libraries || state.libraries.length === 0)
+  );
 
   ngOnInit(): void {
     this.bookService.loadBooks();

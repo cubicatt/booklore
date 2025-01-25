@@ -37,14 +37,13 @@
             </a>
             <p-menu #sortMenu [popup]="true" [model]="sortOptions" appendTo="body">
               <ng-template pTemplate="item" let-item>
-                <div class="flex justify-between items-center w-full px-4 py-2 cursor-pointer" (click)="sortBooks(item.field)">
+                <div class="flex justify-between items-center px-4 py-2 cursor-pointer" (click)="sortBooks(item.field)">
                   <span>{{ item.label }}</span>
                   <i *ngIf="item.icon" [class]="item.icon"></i>
                 </div>
               </ng-template>
             </p-menu>
           </div>
-
 
           <a class="topbar-items topbar-item" (click)="toggleTableGrid()">
             <i

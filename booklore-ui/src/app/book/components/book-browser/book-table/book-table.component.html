@@ -14,7 +14,10 @@
   (onEditComplete)="onEditComplete($event)">
   <ng-template #header>
     <tr>
-      <th class="max-w-16">Cover</th>
+      <th>
+        <p-tableHeaderCheckbox/>
+      </th>
+      <th class="max-w-14 min-w-14"></th>
       <th pResizableColumn>Title</th>
       <th pResizableColumn>Authors</th>
       <th pResizableColumn>Publisher</th>
@@ -25,20 +28,20 @@
       <th>Rating</th>
       <th>Pages</th>
       <th>Reviews</th>
-      <th>
-        <p-tableHeaderCheckbox/>
-      </th>
     </tr>
   </ng-template>
   <ng-template #body let-book>
     <tr *ngIf="book.metadata as metadata" style="height:46px">
+      <td class="max-w-16">
+        <p-tableCheckbox [value]="book"></p-tableCheckbox>
+      </td>
       <td (click)="openMetadataCenter(book.id)">
         <img [src]="urlHelper.getCoverUrl(book.id, metadata.coverUpdatedOn)" alt="Book Cover" class="size-7"/>
       </td>
 
       <td [pEditableColumn]="metadata.title"
           pEditableColumnField="metadata.title"
-          class="min-w-[25rem] max-w-[35rem] overflow-hidden truncate"
+          class="min-w-[15rem] max-w-[20rem] overflow-hidden truncate"
           [pEditableColumnRowIndex]="book.id"
           [title]="book.metadata?.id">
         <p-cellEditor>
@@ -51,11 +54,11 @@
         </p-cellEditor>
       </td>
 
-      <td class="min-w-[10rem] max-w-[15rem] overflow-hidden truncate">{{ getAuthorNames(metadata.authors) }}</td>
+      <td class="min-w-[10rem] max-w-[13rem] overflow-hidden truncate">{{ getAuthorNames(metadata.authors) }}</td>
 
       <td [pEditableColumn]="metadata.publisher"
           pEditableColumnField="metadata.publisher"
-          class="min-w-[6rem] max-w-[10rem] overflow-hidden truncate"
+          class="min-w-[12rem] max-w-[12rem] overflow-hidden truncate"
           [pEditableColumnRowIndex]="book.id">
         <p-cellEditor>
           <ng-template #input>
@@ -85,7 +88,7 @@
 
       <td [pEditableColumn]="metadata.isbn10"
           pEditableColumnField="metadata.isbn10"
-          class="overflow-hidden truncate max-w-15"
+          class="overflow-hidden truncate min-w-[8rem] max-w-[8rem]"
           [pEditableColumnRowIndex]="book.id">
         <p-cellEditor>
           <ng-template #input>
@@ -97,8 +100,8 @@
         </p-cellEditor>
       </td>
 
-      <td class="max-w-28 overflow-hidden truncate">{{ metadata.language }}</td>
-      <td class="max-w-30 overflow-hidden truncate">
+      <td class="min-w-[6rem] max-w-[6rem] overflow-hidden truncate">{{ metadata.language }}</td>
+      <td class="min-w-[8rem] max-w-[8rem] overflow-hidden truncate">
         <ng-container>
           <p-rating
             [(ngModel)]="metadata.rating"
@@ -108,11 +111,8 @@
           </p-rating>
         </ng-container>
       </td>
-      <td class="max-w-32 overflow-hidden truncate">{{ metadata.pageCount }}</td>
-      <td class="max-w-32 overflow-hidden truncate">{{ metadata.reviewCount }}</td>
-      <td class="max-w-16">
-        <p-tableCheckbox [value]="book"></p-tableCheckbox>
-      </td>
+      <td class="min-w-[5rem] max-w-[5rem] overflow-hidden truncate">{{ metadata.pageCount }}</td>
+      <td class="min-w-[5rem] max-w-[5rem] overflow-hidden truncate">{{ metadata.reviewCount }}</td>
     </tr>
   </ng-template>
 </p-table>

@@ -5,10 +5,7 @@ import com.adityachandel.booklore.mapper.AuthorMapper;
 import com.adityachandel.booklore.mapper.BookMetadataMapper;
 import com.adityachandel.booklore.mapper.CategoryMapper;
 import com.adityachandel.booklore.model.dto.BookMetadata;
-import com.adityachandel.booklore.model.entity.AuthorEntity;
-import com.adityachandel.booklore.model.entity.BookEntity;
-import com.adityachandel.booklore.model.entity.BookMetadataEntity;
-import com.adityachandel.booklore.model.entity.CategoryEntity;
+import com.adityachandel.booklore.model.entity.*;
 import com.adityachandel.booklore.repository.*;
 import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.util.FileService;
@@ -20,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.stream.Collectors;
@@ -37,6 +35,7 @@ public class BookMetadataUpdater {
     private BookMetadataMapper bookMetadataMapper;
     private AuthorMapper authorMapper;
     private CategoryMapper categoryMapper;
+    private BookAwardRepository bookAwardRepository;
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -55,6 +54,36 @@ public class BookMetadataUpdater {
         metadata.setPageCount(newMetadata.getPageCount() != null ? newMetadata.getPageCount() : metadata.getPageCount());
         metadata.setRating(newMetadata.getRating() != null ? newMetadata.getRating() : metadata.getRating());
         metadata.setReviewCount(newMetadata.getReviewCount() != null ? newMetadata.getReviewCount() : metadata.getReviewCount());
+        metadata.setSeriesName(newMetadata.getSeriesName() != null ? newMetadata.getSeriesName() : metadata.getSeriesName());
+        metadata.setSeriesNumber(newMetadata.getSeriesNumber() != null ? newMetadata.getSeriesNumber() : metadata.getSeriesNumber());
+        metadata.setSeriesTotal(newMetadata.getSeriesTotal() != null ? newMetadata.getSeriesTotal() : metadata.getSeriesTotal());
+
+        if (newMetadata.getAwards() != null && !newMetadata.getAwards().isEmpty()) {
+            HashSet<BookAwardEntity> newAwards = new HashSet<>();
+
+            newMetadata.getAwards().forEach(award -> {
+                boolean awardExists = bookMetadataRepository.findAwardByBookIdAndNameAndCategoryAndAwardedAt(
+                        metadata.getBookId(),
+                        award.getName(),
+                        award.getCategory(),
+                        award.getAwardedAt()) != null;
+
+                if (!awardExists) {
+                    BookAwardEntity awardEntity = new BookAwardEntity();
+                    awardEntity.setBook(metadata);
+                    awardEntity.setName(award.getName());
+                    awardEntity.setCategory(award.getCategory());
+                    awardEntity.setDesignation(award.getDesignation());
+                    awardEntity.setAwardedAt(award.getAwardedAt() != null ? award.getAwardedAt() : Instant.now().atZone(ZoneId.systemDefault()).toLocalDate());
+
+                    newAwards.add(awardEntity);
+                }
+            });
+            if(!newAwards.isEmpty()) {
+                metadata.setAwards(new ArrayList<>(newAwards));
+                bookAwardRepository.saveAll(newAwards);
+            }
+        }
 
         metadata.setAuthors(newMetadata.getAuthors() != null && !newMetadata.getAuthors().isEmpty() ?
                 newMetadata.getAuthors().stream()
@@ -117,6 +146,15 @@ public class BookMetadataUpdater {
         if (updatedMetadata.getPublisher() != null) {
             metadata.setPublisher(updatedMetadata.getPublisher());
         }
+        if (updatedMetadata.getSeriesName() != null) {
+            metadata.setSeriesName(updatedMetadata.getSeriesName());
+        }
+        if (updatedMetadata.getSeriesNumber() != null) {
+            metadata.setSeriesNumber(updatedMetadata.getSeriesNumber());
+        }
+        if (updatedMetadata.getSeriesTotal() != null) {
+            metadata.setSeriesTotal(updatedMetadata.getSeriesTotal());
+        }
         if (updatedMetadata.getPublishedDate() != null) {
             metadata.setPublishedDate(updatedMetadata.getPublishedDate());
         }
@@ -150,6 +188,7 @@ public class BookMetadataUpdater {
         if (updatedMetadata.getCategories() != null) {
             metadata.setCategories(categoryMapper.toCategoryEntities(updatedMetadata.getCategories()));
         }
+
         bookRepository.save(bookEntity);
         return bookMetadataMapper.toBookMetadata(metadata, false);
     }

@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.service.metadata.parser;
 
+import com.adityachandel.booklore.model.dto.Award;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
 import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
@@ -82,6 +83,7 @@ public class GoodReadsParser implements BookParser {
             LinkedHashSet<String> keySet = getJsonKeys(apolloStateJson);
 
             extractContributorDetails(apolloStateJson, keySet, builder);
+            extractSeriesDetails(apolloStateJson, keySet, builder);
             extractBookDetails(apolloStateJson, keySet, builder);
             extractWorkDetails(apolloStateJson, keySet, builder);
         } catch (Exception e) {
@@ -102,10 +104,19 @@ public class GoodReadsParser implements BookParser {
         }
     }
 
+    private void extractSeriesDetails(JSONObject apolloStateJson, LinkedHashSet<String> keySet, FetchedBookMetadata.FetchedBookMetadataBuilder builder) {
+        String seriesKey = findKeyByPrefix(keySet, "Series:kca");
+        if (seriesKey != null) {
+            String seriesName = getSeriesName(apolloStateJson, seriesKey);
+            if (seriesName != null) {
+                builder.seriesName(seriesName);
+            }
+        }
+    }
+
     private void extractBookDetails(JSONObject apolloStateJson, LinkedHashSet<String> keySet, FetchedBookMetadata.FetchedBookMetadataBuilder builder) {
         JSONObject bookJson = getValidBookJson(apolloStateJson, keySet, "Book:kca:");
         if (bookJson != null) {
-
             builder.title(handleStringNull(bookJson.optString("title")))
                     .description(handleStringNull(bookJson.optString("description")))
                     .thumbnailUrl(handleStringNull(bookJson.optString("imageUrl")))
@@ -125,6 +136,14 @@ public class GoodReadsParser implements BookParser {
                     builder.language(handleStringNull(languageJson.optString("name")));
                 }
             }
+
+            JSONArray bookSeriesJson = bookJson.optJSONArray("bookSeries");
+            if (bookSeriesJson != null && bookSeriesJson.length() > 0) {
+                JSONObject firstElement = bookSeriesJson.optJSONObject(0);
+                if (firstElement != null) {
+                    builder.seriesNumber(parseInteger(firstElement.optString("userPosition")));
+                }
+            }
         }
     }
 
@@ -138,6 +157,13 @@ public class GoodReadsParser implements BookParser {
                     builder.rating(parseDouble(statsJson.optString("averageRating")))
                             .ratingCount(parseInteger(statsJson.optString("ratingsCount")))
                             .reviewCount(parseInteger(statsJson.optString("textReviewsCount")));
+                }
+
+                JSONObject detailsJson = workJson.optJSONObject("details");
+                if (detailsJson != null) {
+                    JSONArray awardsWonArray = detailsJson.optJSONArray("awardsWon");
+                    List<Award> awards = getAwards(awardsWonArray);
+                    builder.awards(awards);
                 }
             }
         }
@@ -199,6 +225,37 @@ public class GoodReadsParser implements BookParser {
             if (key.contains(prefix)) {
                 return key;
             }
+        }
+        return null;
+    }
+
+    private List<Award> getAwards(JSONArray awardsWonArray) {
+        List<Award> awards = new ArrayList<>();
+        for (int i = 0; i < awardsWonArray.length(); i++) {
+            JSONObject awardsWon = awardsWonArray.optJSONObject(i);
+            String awardName = awardsWon.optString("name");
+            String awardCategory = awardsWon.optString("category");
+            String awardDesignation = awardsWon.optString("designation");
+            LocalDate awardedAt = awardsWon.isNull("awardedAt") ? null :
+                    Instant.ofEpochMilli(awardsWon.optLong("awardedAt")).atZone(ZoneId.systemDefault()).toLocalDate();
+            awards.add(Award.builder()
+                    .name(awardName)
+                    .category(awardCategory)
+                    .designation(awardDesignation)
+                    .awardedAt(awardedAt)
+                    .build());
+        }
+        return awards;
+    }
+
+    private String getSeriesName(JSONObject apolloStateJson, String seriesKey) {
+        try {
+            if (seriesKey != null) {
+                JSONObject seriesJson = apolloStateJson.getJSONObject(seriesKey);
+                return seriesJson.getString("title");
+            }
+        } catch (Exception e) {
+            log.warn("Error fetching series name: {}, Error: {}", seriesKey, e.getMessage());
         }
         return null;
     }

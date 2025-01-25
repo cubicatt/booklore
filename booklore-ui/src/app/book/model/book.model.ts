@@ -31,6 +31,7 @@ export interface BookMetadata {
   coverUpdatedOn?: string;
   authors: Author[];
   categories: Category[];
+  awards?: Award[];
 
   [key: string]: any;
 }
@@ -66,6 +67,13 @@ export interface Author {
 export interface Category {
   id: number;
   name: string;
+}
+
+export interface Award {
+  name: string;
+  category: string;
+  designation: string;
+  awardedAt: string;
 }
 
 export interface PdfViewerSetting {

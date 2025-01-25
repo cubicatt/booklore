@@ -36,6 +36,15 @@ public class BookMetadataEntity {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "series_name")
+    private String seriesName;
+
+    @Column(name = "series_number")
+    private Integer seriesNumber;
+
+    @Column(name = "series_total")
+    private Integer seriesTotal;
+
     @Column(name = "isbn_13", length = 13)
     private String isbn13;
 
@@ -80,4 +89,7 @@ public class BookMetadataEntity {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private List<CategoryEntity> categories;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "book")
+    private List<BookAwardEntity> awards;
 }

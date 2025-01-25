@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.model.dto;
 
+import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,6 +17,9 @@ public class BookMetadata {
     private String publisher;
     private LocalDate publishedDate;
     private String description;
+    private String seriesName;
+    private Integer seriesNumber;
+    private Integer seriesTotal;
     private String isbn13;
     private String isbn10;
     private Integer pageCount;
@@ -25,4 +29,5 @@ public class BookMetadata {
     private Instant coverUpdatedOn;
     private List<Author> authors;
     private List<Category> categories;
+    private List<Award> awards;
 }

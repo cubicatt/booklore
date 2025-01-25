@@ -159,14 +159,13 @@ public class BookMetadataService {
         }
         metadata.setThumbnailUrl(resolveFieldAsString(metadataMap, fieldOptions.getCover(), FetchedBookMetadata::getThumbnailUrl));
 
-
-        if(request.getRefreshOptions().getAllP3() != null) {
+        if (request.getRefreshOptions().getAllP3() != null) {
             setOtherUnspecifiedMetadata(metadataMap, metadata, request.getRefreshOptions().getAllP3());
         }
-        if(request.getRefreshOptions().getAllP2() != null) {
+        if (request.getRefreshOptions().getAllP2() != null) {
             setOtherUnspecifiedMetadata(metadataMap, metadata, request.getRefreshOptions().getAllP2());
         }
-        if(request.getRefreshOptions().getAllP1() != null) {
+        if (request.getRefreshOptions().getAllP1() != null) {
             setOtherUnspecifiedMetadata(metadataMap, metadata, request.getRefreshOptions().getAllP1());
         }
 
@@ -187,6 +186,10 @@ public class BookMetadataService {
             metadataCombined.setRating(metadata.getRating() != null ? metadata.getRating() : metadataCombined.getRating());
             metadataCombined.setRatingCount(metadata.getRatingCount() != null ? metadata.getRatingCount() : metadataCombined.getRatingCount());
             metadataCombined.setReviewCount(metadata.getReviewCount() != null ? metadata.getReviewCount() : metadataCombined.getReviewCount());
+            metadataCombined.setAwards(metadata.getAwards() != null ? metadata.getAwards() : metadataCombined.getAwards());
+            metadataCombined.setSeriesName(metadata.getSeriesName() != null ? metadata.getSeriesName() : metadataCombined.getSeriesName());
+            metadataCombined.setSeriesNumber(metadata.getSeriesNumber() != null ? metadata.getSeriesNumber() : metadataCombined.getSeriesNumber());
+            metadataCombined.setSeriesTotal(metadata.getSeriesTotal() != null ? metadata.getSeriesTotal() : metadataCombined.getSeriesTotal());
         }
     }
 

@@ -52,7 +52,22 @@ CREATE TABLE IF NOT EXISTS book_metadata
     review_count     INT,
     cover            VARCHAR(255),
     cover_updated_on TIMESTAMP NULL,
+    series_name      VARCHAR(255),
+    series_number    INT,
+    series_total     INT,
     CONSTRAINT fk_book_metadata FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE
+);
+
+CREATE TABLE book_award
+(
+    id          BIGINT       NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    book_id     BIGINT       NOT NULL,
+    name        VARCHAR(255) NOT NULL,
+    awarded_at  TIMESTAMP    NOT NULL,
+    category    VARCHAR(255) NOT NULL,
+    designation VARCHAR(255) NOT NULL,
+    CONSTRAINT fk_book_awards_book FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE,
+    CONSTRAINT unique_book_award UNIQUE (book_id, name, category, awarded_at)
 );
 
 CREATE TABLE IF NOT EXISTS author

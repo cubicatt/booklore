@@ -127,6 +127,9 @@ public class AmazonBookParser implements BookParser {
                 .authors(getAuthors(doc).stream().toList())
                 .categories(getBestSellerCategories(doc).stream().toList())
                 .description(cleanDescriptionHtml(getDescription(doc)))
+                .seriesName(getSeriesName(doc))
+                .seriesNumber(getSeriesNumber(doc))
+                .seriesTotal(getSeriesTotal(doc))
                 .isbn13(getIsbn13(doc))
                 .isbn10(getIsbn10(doc))
                 .publisher(getPublisher(doc))
@@ -285,6 +288,56 @@ public class AmazonBookParser implements BookParser {
             log.warn("Error fetching publication date: Element not found.");
         } catch (Exception e) {
             log.warn("Error fetching publication date: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    private String getSeriesName(Document doc) {
+        try {
+            Element seriesNameElement = doc.selectFirst("#rpi-attribute-book_details-series .rpi-attribute-value a span");
+            if (seriesNameElement != null) {
+                return seriesNameElement.text();
+            } else {
+                log.warn("Error fetching series name: Element not found.");
+            }
+        } catch (Exception e) {
+            log.warn("Error fetching series name: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    private Integer getSeriesNumber(Document doc) {
+        try {
+            Element bookDetailsLabel = doc.selectFirst("#rpi-attribute-book_details-series .rpi-attribute-label span");
+            if (bookDetailsLabel != null) {
+                String bookAndTotal = bookDetailsLabel.text();
+                if (bookAndTotal.matches("Book \\d+ of \\d+")) {
+                    String[] parts = bookAndTotal.split(" ");
+                    return Integer.parseInt(parts[1]);
+                }
+            } else {
+                log.warn("Error fetching series number: Element not found.");
+            }
+        } catch (Exception e) {
+            log.warn("Error fetching series number: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    private Integer getSeriesTotal(Document doc) {
+        try {
+            Element bookDetailsLabel = doc.selectFirst("#rpi-attribute-book_details-series .rpi-attribute-label span");
+            if (bookDetailsLabel != null) {
+                String bookAndTotal = bookDetailsLabel.text();
+                if (bookAndTotal.matches("Book \\d+ of \\d+")) {
+                    String[] parts = bookAndTotal.split(" ");
+                    return Integer.parseInt(parts[3]);
+                }
+            } else {
+                log.warn("Error fetching series total: Element not found.");
+            }
+        } catch (Exception e) {
+            log.warn("Error fetching series total: {}", e.getMessage());
         }
         return null;
     }

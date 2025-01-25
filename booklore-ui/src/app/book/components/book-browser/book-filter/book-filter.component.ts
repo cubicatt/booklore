@@ -30,6 +30,7 @@ export class BookFilterComponent implements OnInit {
   @Output() authorSelected = new EventEmitter<number | null>();
   @Output() categorySelected = new EventEmitter<number | null>();
   @Output() publisherSelected = new EventEmitter<string | null>();
+  @Output() awardSelected = new EventEmitter<string | null>();
 
   @Input() showFilters: boolean = true;
   @Input() entity$!: Observable<Library | Shelf | null> | undefined;
@@ -38,10 +39,12 @@ export class BookFilterComponent implements OnInit {
   activeAuthor: number | null = null;
   activeCategory: number | null = null;
   activePublisher: string | null = null;
+  activeAward: string | null = null;
 
   authorBookCount$!: Observable<{ author: Author; bookCount: number }[]>;
   categoryBookCount$!: Observable<{ category: Category; bookCount: number }[]>;
   publisherBookCount$!: Observable<{ publisher: string; bookCount: number }[]>;
+  awardBookCount$!: Observable<{ award: string; bookCount: number }[]>;
 
   bookService = inject(BookService);
 
@@ -50,6 +53,7 @@ export class BookFilterComponent implements OnInit {
       this.authorBookCount$ = this.getAuthorBookCountStream();
       this.categoryBookCount$ = this.getCategoryBookCountStream();
       this.publisherBookCount$ = this.getPublisherBookCountStream();
+      this.awardBookCount$ = this.getAwardBookCountStream();
     }
   }
 
@@ -153,6 +157,41 @@ export class BookFilterComponent implements OnInit {
     );
   }
 
+  private getAwardBookCountStream(): Observable<{ award: string; bookCount: number }[]> {
+    return combineLatest([
+      this.bookService.bookState$,
+      this.entity$ ?? of(null),
+      this.entityType$ ?? of(EntityType.ALL_BOOKS)
+    ]).pipe(
+      map(([state, entity, entityType]) => {
+        let filteredBooks = this.filterBooksByEntityType(state.books || [], entity, entityType);
+
+        const awardMap = new Map<string, { award: string; bookCount: number }>();
+        filteredBooks.forEach((book) => {
+          book.metadata?.awards
+            ?.filter((award) => award.designation === 'WINNER')
+            .forEach((award) => {
+              if (!awardMap.has(award.name)) {
+                awardMap.set(award.name, {award: award.name, bookCount: 0});
+              }
+              const awardData = awardMap.get(award.name);
+              if (awardData) {
+                awardData.bookCount += 1;
+              }
+            });
+        });
+
+        return Array.from(awardMap.values()).sort((a, b) => {
+          if (b.bookCount !== a.bookCount) {
+            return b.bookCount - a.bookCount;
+          }
+          return a.award.localeCompare(b.award);
+        });
+      }),
+      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+    );
+  }
+
   private filterBooksByEntityType(books: Book[], entity: any, entityType: EntityType): Book[] {
     if (entityType === EntityType.LIBRARY && entity && 'id' in entity) {
       return books.filter((book) => book.libraryId === entity.id);
@@ -172,9 +211,11 @@ export class BookFilterComponent implements OnInit {
       this.activeAuthor = author.author.id;
     }
     this.activeCategory = null;
+    this.activeAward = null;
     this.activePublisher = null;
     this.categorySelected.emit(null);
     this.publisherSelected.emit(null);
+    this.awardSelected.emit(null);
     this.authorSelected.emit(this.activeAuthor);
   }
 
@@ -185,9 +226,11 @@ export class BookFilterComponent implements OnInit {
       this.activeCategory = category.category.id;
     }
     this.activeAuthor = null;
+    this.activeAward = null;
     this.activePublisher = null;
     this.authorSelected.emit(null);
     this.publisherSelected.emit(null);
+    this.awardSelected.emit(null);
     this.categorySelected.emit(this.activeCategory);
   }
 
@@ -198,9 +241,26 @@ export class BookFilterComponent implements OnInit {
       this.activePublisher = publisher.publisher;
     }
     this.activeAuthor = null;
+    this.activeAward = null;
     this.activeCategory = null;
     this.authorSelected.emit(null);
     this.categorySelected.emit(null);
+    this.awardSelected.emit(null);
     this.publisherSelected.emit(this.activePublisher);
+  }
+
+  awardClicked(award: { award: string; bookCount: number }) {
+    if (this.activeAward === award.award) {
+      this.activeAward = null;
+    } else {
+      this.activeAward = award.award;
+    }
+    this.activeAuthor = null;
+    this.activeCategory = null;
+    this.activePublisher = null;
+    this.authorSelected.emit(null);
+    this.categorySelected.emit(null);
+    this.publisherSelected.emit(null);
+    this.awardSelected.emit(this.activeAward);
   }
 }

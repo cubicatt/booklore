@@ -4,7 +4,7 @@ import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {AuthorMapper.class, CategoryMapper.class})
+@Mapper(componentModel = "spring", uses = {AuthorMapper.class, CategoryMapper.class, AwardMapper.class})
 public interface BookMetadataMapper {
 
     @Mapping(target = "description", ignore = true)

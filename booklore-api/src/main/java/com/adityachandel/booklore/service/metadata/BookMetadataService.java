@@ -157,13 +157,39 @@ public class BookMetadataService {
         metadata.setTitle(resolveFieldAsString(metadataMap, fieldOptions.getTitle(), FetchedBookMetadata::getTitle));
         metadata.setDescription(resolveFieldAsString(metadataMap, fieldOptions.getDescription(), FetchedBookMetadata::getDescription));
         metadata.setAuthors(resolveFieldAsList(metadataMap, fieldOptions.getAuthors(), FetchedBookMetadata::getAuthors));
+
         if (request.getRefreshOptions().isMergeCategories()) {
             metadata.setCategories(getAllCategories(metadataMap, fieldOptions.getCategories(), FetchedBookMetadata::getCategories));
         } else {
             metadata.setCategories(resolveFieldAsList(metadataMap, fieldOptions.getCategories(), FetchedBookMetadata::getCategories));
         }
         metadata.setThumbnailUrl(resolveFieldAsString(metadataMap, fieldOptions.getCover(), FetchedBookMetadata::getThumbnailUrl));
+
+
+        MetadataProvider defaultProvider = request.getRefreshOptions().getDefaultProvider();
+        Set<MetadataProvider> nonDefaultProviders = getNonDefaultProviders(request);
+
+        nonDefaultProviders.forEach(provider -> setOtherUnspecifiedMetadata(metadataMap, metadata, provider));
+        setOtherUnspecifiedMetadata(metadataMap, metadata, defaultProvider);
+
         return metadata;
+    }
+
+    @Transactional
+    protected void setOtherUnspecifiedMetadata(Map<MetadataProvider, FetchedBookMetadata> metadataMap, FetchedBookMetadata metadataCombined, MetadataProvider provider) {
+        if (metadataMap.containsKey(provider)) {
+            FetchedBookMetadata metadata = metadataMap.get(provider);
+            metadataCombined.setSubtitle(metadata.getSubtitle() != null ? metadata.getSubtitle() : metadata.getTitle());
+            metadataCombined.setPublisher(metadata.getPublisher() != null ? metadata.getPublisher() : metadataCombined.getPublisher());
+            metadataCombined.setPublishedDate(metadata.getPublishedDate() != null ? metadata.getPublishedDate() : metadataCombined.getPublishedDate());
+            metadataCombined.setIsbn10(metadata.getIsbn10() != null ? metadata.getIsbn10() : metadataCombined.getIsbn10());
+            metadataCombined.setIsbn13(metadata.getIsbn13() != null ? metadata.getIsbn13() : metadataCombined.getIsbn13());
+            metadataCombined.setPageCount(metadata.getPageCount() != null ? metadata.getPageCount() : metadataCombined.getPageCount());
+            metadataCombined.setLanguage(metadata.getLanguage() != null ? metadata.getLanguage() : metadataCombined.getLanguage());
+            metadataCombined.setRating(metadata.getRating() != null ? metadata.getRating() : metadataCombined.getRating());
+            metadataCombined.setRatingCount(metadata.getRatingCount() != null ? metadata.getRatingCount() : metadataCombined.getRatingCount());
+            metadataCombined.setReviewCount(metadata.getReviewCount() != null ? metadata.getReviewCount() : metadataCombined.getReviewCount());
+        }
     }
 
     @Transactional

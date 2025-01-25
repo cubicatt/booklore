@@ -254,11 +254,22 @@ public class AmazonBookParser implements BookParser {
 
     private String getPublisher(Document doc) {
         try {
-            Element publisherElement = doc.select("#rpi-attribute-book_details-publisher .rpi-attribute-value span").first();
-            if (publisherElement != null) {
-                return publisherElement.text();
+            Element featureElement = doc.getElementById("detailBullets_feature_div");
+            if (featureElement != null) {
+                Elements listItems = featureElement.select("li");
+                for (Element listItem : listItems) {
+                    Element boldText = listItem.selectFirst("span.a-text-bold");
+                    if (boldText != null && boldText.text().contains("Publisher")) {
+                        Element publisherSpan = boldText.nextElementSibling();
+                        if (publisherSpan != null) {
+                            String fullPublisher = publisherSpan.text().trim();
+                            return fullPublisher.split(";")[0].trim().replaceAll("\\s*\\(.*?\\)", "").trim();
+                        }
+                    }
+                }
+            } else {
+                log.warn("Error fetching publisher: Element 'detailBullets_feature_div' not found.");
             }
-            log.warn("Error fetching publisher: Element not found.");
         } catch (Exception e) {
             log.warn("Error fetching publisher: {}", e.getMessage());
         }

@@ -38,6 +38,7 @@ public class ShelfService {
         ShelfEntity shelfEntity = shelfRepository.findById(id)
                 .orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(id));
         shelfEntity.setName(request.getName());
+        shelfEntity.setIcon(request.getIcon());
         return shelfMapper.toShelf(shelfRepository.save(shelfEntity));
     }
 

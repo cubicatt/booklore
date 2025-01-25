@@ -7,6 +7,7 @@ import { SortOption } from '../model/sort.model';
 import { BookService } from './book.service';
 import { ShelfState } from '../model/state/shelf-state.model';
 import {API_CONFIG} from '../../config/api-config';
+import {Library} from '../model/library.model';
 
 @Injectable({
   providedIn: 'root',
@@ -46,6 +47,11 @@ export class ShelfService {
     });
   }
 
+  getShelfById(shelfId: number): Shelf | undefined {
+    let shelfState = this.shelfStateSubject.value;
+    return shelfState.shelves?.find(shelf => shelf.id === shelfId);
+  }
+
   createShelf(shelf: Shelf): Observable<Shelf> {
     return this.http.post<Shelf>(this.url, shelf).pipe(
       map(newShelf => {
@@ -57,6 +63,21 @@ export class ShelfService {
       catchError(error => {
         const currentState = this.shelfStateSubject.value;
         this.shelfStateSubject.next({ ...currentState, error: error.message });
+        throw error;
+      })
+    );
+  }
+
+  updateShelf(shelf: Shelf, shelfId: number | undefined): Observable<Shelf> {
+    return this.http.put<Shelf>(`${this.url}/${shelfId}`, shelf).pipe(
+      map(updatedShelf => {
+        const currentState = this.shelfStateSubject.value;
+        const updatedShelves = currentState.shelves ? currentState.shelves.map(existingShelf =>
+          existingShelf.id === updatedShelf.id ? updatedShelf : existingShelf) : [updatedShelf];
+        this.shelfStateSubject.next({...currentState, shelves: updatedShelves,});
+        return updatedShelf;
+      }),
+      catchError(error => {
         throw error;
       })
     );

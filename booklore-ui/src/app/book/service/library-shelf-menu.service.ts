@@ -9,6 +9,7 @@ import {DialogService} from 'primeng/dynamicdialog';
 import {MetadataFetchOptionsComponent} from '../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../metadata/model/request/metadata-refresh-type.enum';
 import {LibraryCreatorComponent} from '../components/library-creator/library-creator.component';
+import {ShelfEditDialogComponent} from '../components/shelf-edit-dialog/shelf-edit-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -126,6 +127,24 @@ export class LibraryShelfMenuService {
       {
         label: 'Options',
         items: [
+          {
+            label: 'Edit Shelf',
+            icon: 'pi pi-pen-to-square',
+            command: () => {
+              this.dialogService.open(ShelfEditDialogComponent, {
+                header: 'Edit Shelf',
+                modal: true,
+                closable: true,
+                data: {
+                  shelfId: entity?.id
+                },
+                style: {
+                  position: 'absolute',
+                  top: '15%',
+                }
+              })
+            }
+          },
           {
             label: 'Delete Shelf',
             icon: 'pi pi-trash',

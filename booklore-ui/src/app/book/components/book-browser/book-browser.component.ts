@@ -82,6 +82,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   selectedAuthor = new BehaviorSubject<number | null>(null);
   selectedCategory = new BehaviorSubject<number | null>(null);
+  selectedPublisher = new BehaviorSubject<string | null>(null);
 
   private activatedRoute = inject(ActivatedRoute);
   private messageService = inject(MessageService);
@@ -211,8 +212,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   }
 
   private sideBarFilter(bookState: BookState): Observable<BookState> {
-    return combineLatest([this.selectedAuthor, this.selectedCategory]).pipe(
-      map(([authorId, categoryId]) => {
+    return combineLatest([this.selectedAuthor, this.selectedCategory, this.selectedPublisher]).pipe(
+      map(([authorId, categoryId, publisher]) => {
         let filteredBooks = bookState.books || [];
         if (authorId !== null) {
           filteredBooks = filteredBooks.filter(book =>
@@ -222,6 +223,11 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         if (categoryId !== null) {
           filteredBooks = filteredBooks.filter(book =>
             book.metadata?.categories?.some(category => category.id === categoryId)
+          );
+        }
+        if (publisher != null) {
+          filteredBooks = filteredBooks.filter(book =>
+            book.metadata?.publisher === publisher
           );
         }
         return {...bookState, books: filteredBooks};
@@ -412,7 +418,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   }
 
   get isFilterActive(): boolean {
-    return this.selectedAuthor.value !== null || this.selectedCategory.value !== null;
+    return this.selectedAuthor.value !== null || this.selectedCategory.value !== null || this.selectedPublisher.value !== null;
   }
 
   clearFilter() {
@@ -422,8 +428,13 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     if (this.selectedCategory.value !== null) {
       this.selectedCategory.next(null);
     }
+
+    if (this.selectedPublisher.value !== null) {
+      this.selectedPublisher.next(null);
+    }
     this.bookFilterComponent.activeCategory = null;
     this.bookFilterComponent.activeAuthor = null;
+    this.bookFilterComponent.activePublisher = null;
     this.clearSearch();
   }
 
@@ -453,6 +464,10 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
     this.bookFilterComponent.categorySelected.subscribe((categoryId: number) => {
       this.selectedCategory.next(categoryId);
+    });
+
+    this.bookFilterComponent.publisherSelected.subscribe((publisher: string) => {
+      this.selectedPublisher.next(publisher);
     });
   }
 }

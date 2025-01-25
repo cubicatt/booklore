@@ -37,5 +37,22 @@
         </div>
       </p-accordion-content>
     </p-accordion-panel>
+
+    <p-accordion-panel value="2">
+      <p-accordion-header>Publishers</p-accordion-header>
+      <p-accordion-content class="h-[40rem] !overflow-y-auto">
+        <div *ngIf="publisherBookCount$ | async as publishers">
+          <div *ngFor="let publisher of publishers">
+            <p
+              class="cursor-pointer transition-colors duration-200 ease-in-out pb-1"
+              [ngClass]="{'text-[var(--primary-color)]': activePublisher === publisher.publisher}"
+              (click)="publisherClicked(publisher)">
+              <p-badge [value]="publisher.bookCount"></p-badge>
+              {{ publisher.publisher }}
+            </p>
+          </div>
+        </div>
+      </p-accordion-content>
+    </p-accordion-panel>
   </p-accordion>
 </div>

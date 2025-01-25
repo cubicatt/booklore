@@ -29,6 +29,7 @@ import {EntityType} from '../book-browser.component';
 export class BookFilterComponent implements OnInit {
   @Output() authorSelected = new EventEmitter<number | null>();
   @Output() categorySelected = new EventEmitter<number | null>();
+  @Output() publisherSelected = new EventEmitter<string | null>();
 
   @Input() showFilters: boolean = true;
   @Input() entity$!: Observable<Library | Shelf | null> | undefined;
@@ -36,9 +37,11 @@ export class BookFilterComponent implements OnInit {
 
   activeAuthor: number | null = null;
   activeCategory: number | null = null;
+  activePublisher: string | null = null;
 
   authorBookCount$!: Observable<{ author: Author; bookCount: number }[]>;
   categoryBookCount$!: Observable<{ category: Category; bookCount: number }[]>;
+  publisherBookCount$!: Observable<{ publisher: string; bookCount: number }[]>;
 
   bookService = inject(BookService);
 
@@ -46,14 +49,15 @@ export class BookFilterComponent implements OnInit {
     if (this.entity$ && this.entityType$) {
       this.authorBookCount$ = this.getAuthorBookCountStream();
       this.categoryBookCount$ = this.getCategoryBookCountStream();
+      this.publisherBookCount$ = this.getPublisherBookCountStream();
     }
   }
 
   private getAuthorBookCountStream(): Observable<{ author: Author; bookCount: number }[]> {
     return combineLatest([
       this.bookService.bookState$,
-      this.entity$ ?? of(null),  // Fallback to an observable emitting null
-      this.entityType$ ?? of(EntityType.ALL_BOOKS)  // Fallback to a default entity type
+      this.entity$ ?? of(null),
+      this.entityType$ ?? of(EntityType.ALL_BOOKS)
     ]).pipe(
       map(([state, entity, entityType]) => {
         let filteredBooks = this.filterBooksByEntityType(state.books || [], entity, entityType);
@@ -62,7 +66,7 @@ export class BookFilterComponent implements OnInit {
         filteredBooks.forEach((book) => {
           book.metadata?.authors.forEach((author) => {
             if (!authorMap.has(author.id)) {
-              authorMap.set(author.id, { author, bookCount: 0 });
+              authorMap.set(author.id, {author, bookCount: 0});
             }
             const authorData = authorMap.get(author.id);
             if (authorData) {
@@ -85,8 +89,8 @@ export class BookFilterComponent implements OnInit {
   private getCategoryBookCountStream(): Observable<{ category: Category; bookCount: number }[]> {
     return combineLatest([
       this.bookService.bookState$,
-      this.entity$ ?? of(null),  // Fallback to an observable emitting null
-      this.entityType$ ?? of(EntityType.ALL_BOOKS)  // Fallback to a default entity type
+      this.entity$ ?? of(null),
+      this.entityType$ ?? of(EntityType.ALL_BOOKS)
     ]).pipe(
       map(([state, entity, entityType]) => {
         let filteredBooks = this.filterBooksByEntityType(state.books || [], entity, entityType);
@@ -95,7 +99,7 @@ export class BookFilterComponent implements OnInit {
         filteredBooks.forEach((book) => {
           book.metadata?.categories.forEach((category) => {
             if (!categoryMap.has(category.id)) {
-              categoryMap.set(category.id, { category, bookCount: 0 });
+              categoryMap.set(category.id, {category, bookCount: 0});
             }
             const categoryData = categoryMap.get(category.id);
             if (categoryData) {
@@ -109,6 +113,40 @@ export class BookFilterComponent implements OnInit {
             return b.bookCount - a.bookCount;
           }
           return a.category.name.localeCompare(b.category.name);
+        });
+      }),
+      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+    );
+  }
+
+  private getPublisherBookCountStream(): Observable<{ publisher: string; bookCount: number }[]> {
+    return combineLatest([
+      this.bookService.bookState$,
+      this.entity$ ?? of(null),
+      this.entityType$ ?? of(EntityType.ALL_BOOKS)
+    ]).pipe(
+      map(([state, entity, entityType]) => {
+        let filteredBooks = this.filterBooksByEntityType(state.books || [], entity, entityType);
+
+        const publisherMap = new Map<string, { publisher: string; bookCount: number }>();
+        filteredBooks.forEach((book) => {
+          if (book.metadata?.publisher) {
+            const publisherName = book.metadata.publisher;
+            if (!publisherMap.has(publisherName)) {
+              publisherMap.set(publisherName, {publisher: publisherName, bookCount: 0});
+            }
+            const publisherData = publisherMap.get(publisherName);
+            if (publisherData) {
+              publisherData.bookCount += 1;
+            }
+          }
+        });
+
+        return Array.from(publisherMap.values()).sort((a, b) => {
+          if (b.bookCount !== a.bookCount) {
+            return b.bookCount - a.bookCount;
+          }
+          return a.publisher.localeCompare(b.publisher);
         });
       }),
       distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
@@ -134,7 +172,9 @@ export class BookFilterComponent implements OnInit {
       this.activeAuthor = author.author.id;
     }
     this.activeCategory = null;
+    this.activePublisher = null;
     this.categorySelected.emit(null);
+    this.publisherSelected.emit(null);
     this.authorSelected.emit(this.activeAuthor);
   }
 
@@ -145,7 +185,22 @@ export class BookFilterComponent implements OnInit {
       this.activeCategory = category.category.id;
     }
     this.activeAuthor = null;
+    this.activePublisher = null;
     this.authorSelected.emit(null);
+    this.publisherSelected.emit(null);
     this.categorySelected.emit(this.activeCategory);
+  }
+
+  publisherClicked(publisher: { publisher: string; bookCount: number }) {
+    if (this.activePublisher === publisher.publisher) {
+      this.activePublisher = null;
+    } else {
+      this.activePublisher = publisher.publisher;
+    }
+    this.activeAuthor = null;
+    this.activeCategory = null;
+    this.authorSelected.emit(null);
+    this.categorySelected.emit(null);
+    this.publisherSelected.emit(this.activePublisher);
   }
 }

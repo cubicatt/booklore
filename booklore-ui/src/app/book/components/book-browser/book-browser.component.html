@@ -18,7 +18,7 @@
 
       <div class="flex items-center gap-8">
 
-        <div class="flex flex-row items-center gap-4">
+        <div class="flex flex-row items-center gap-6">
           <a *ngIf="isFilterActive" class="topbar-items topbar-item" (click)="clearFilter()">
             <i
               class="pi pi-filter-slash"
@@ -27,17 +27,24 @@
             </i>
           </a>
 
-          <a class="topbar-items topbar-item" (click)="sortMenu.toggle($event)">
-            <i class="pi pi-sort" pTooltip="Select sorting" tooltipPosition="top"></i>
-          </a>
-          <p-menu #sortMenu [popup]="true" [model]="sortOptions" appendTo="body">
-            <ng-template pTemplate="item" let-item>
-              <div class="flex justify-between items-center w-full px-4 py-2 cursor-pointer" (click)="sortBooks(item.field)">
-                <span>{{ item.label }}</span>
-                <i *ngIf="item.icon" [class]="item.icon"></i>
-              </div>
-            </ng-template>
-          </p-menu>
+          <div>
+            <a class="topbar-items topbar-item" (click)="sortMenu.toggle($event)">
+              <i
+                class="pi pi-sort"
+                pTooltip="Select sorting"
+                tooltipPosition="top">
+              </i>
+            </a>
+            <p-menu #sortMenu [popup]="true" [model]="sortOptions" appendTo="body">
+              <ng-template pTemplate="item" let-item>
+                <div class="flex justify-between items-center w-full px-4 py-2 cursor-pointer" (click)="sortBooks(item.field)">
+                  <span>{{ item.label }}</span>
+                  <i *ngIf="item.icon" [class]="item.icon"></i>
+                </div>
+              </ng-template>
+            </p-menu>
+          </div>
+
 
           <a class="topbar-items topbar-item" (click)="toggleTableGrid()">
             <i
@@ -46,7 +53,6 @@
               tooltipPosition="top">
             </i>
           </a>
-
         </div>
 
         <p-fluid>

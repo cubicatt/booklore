@@ -2,7 +2,7 @@ import {Component, inject, OnInit} from '@angular/core';
 import {LibraryCreatorComponent} from '../../../book/components/library-creator/library-creator.component';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {LibraryService} from '../../../book/service/library.service';
-import {Observable} from 'rxjs';
+import {filter, Observable, take} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {Button} from 'primeng/button';
 import {AsyncPipe, NgIf} from '@angular/common';
@@ -34,7 +34,7 @@ export class MainDashboardComponent implements OnInit {
 
   lastReadBooks$: Observable<Book[]> | undefined;
   latestAddedBooks$: Observable<Book[]> | undefined;
-  randomBooks$: Observable<Book[]> | undefined;
+  randomBooks!: Book[];
 
   isLibrariesEmpty$: Observable<boolean> = inject(LibraryService).libraryState$.pipe(
     map(state => !state.libraries || state.libraries.length === 0)
@@ -68,12 +68,16 @@ export class MainDashboardComponent implements OnInit {
       ))
     );
 
-    this.randomBooks$ = this.bookService.bookState$.pipe(
-      map((state: BookState) => {
+    this.bookService.bookState$.pipe(
+      filter((state): state is BookState => !!state && !!state.books && state.books.length > 0),
+      take(1),
+      map((state) => {
         const books = state.books || [];
-        return this.getRandomBooks(books, 10);
+        return this.getRandomBooks(books, 15);
       })
-    );
+    ).subscribe((randomBooks) => {
+      this.randomBooks = randomBooks;
+    });
   }
 
   private getRandomBooks(books: Book[], count: number): Book[] {

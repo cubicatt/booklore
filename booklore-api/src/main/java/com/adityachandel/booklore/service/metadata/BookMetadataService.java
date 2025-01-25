@@ -123,13 +123,8 @@ public class BookMetadataService {
 
     @Transactional
     protected List<MetadataProvider> prepareProviders(MetadataRefreshRequest request) {
-        if (request.getRefreshOptions().getFieldOptions() == null) {
-            return List.of(request.getRefreshOptions().getDefaultProvider());
-        } else {
-            Set<MetadataProvider> allProviders = new HashSet<>(getNonDefaultProviders(request));
-            allProviders.add(request.getRefreshOptions().getDefaultProvider());
-            return new ArrayList<>(allProviders);
-        }
+        Set<MetadataProvider> allProviders = new HashSet<>(getAllProvidersUsingIndividualFields(request));
+        return new ArrayList<>(allProviders);
     }
 
     @Transactional
@@ -157,7 +152,6 @@ public class BookMetadataService {
         metadata.setTitle(resolveFieldAsString(metadataMap, fieldOptions.getTitle(), FetchedBookMetadata::getTitle));
         metadata.setDescription(resolveFieldAsString(metadataMap, fieldOptions.getDescription(), FetchedBookMetadata::getDescription));
         metadata.setAuthors(resolveFieldAsList(metadataMap, fieldOptions.getAuthors(), FetchedBookMetadata::getAuthors));
-
         if (request.getRefreshOptions().isMergeCategories()) {
             metadata.setCategories(getAllCategories(metadataMap, fieldOptions.getCategories(), FetchedBookMetadata::getCategories));
         } else {
@@ -166,11 +160,15 @@ public class BookMetadataService {
         metadata.setThumbnailUrl(resolveFieldAsString(metadataMap, fieldOptions.getCover(), FetchedBookMetadata::getThumbnailUrl));
 
 
-        MetadataProvider defaultProvider = request.getRefreshOptions().getDefaultProvider();
-        Set<MetadataProvider> nonDefaultProviders = getNonDefaultProviders(request);
-
-        nonDefaultProviders.forEach(provider -> setOtherUnspecifiedMetadata(metadataMap, metadata, provider));
-        setOtherUnspecifiedMetadata(metadataMap, metadata, defaultProvider);
+        if(request.getRefreshOptions().getAllP3() != null) {
+            setOtherUnspecifiedMetadata(metadataMap, metadata, request.getRefreshOptions().getAllP3());
+        }
+        if(request.getRefreshOptions().getAllP2() != null) {
+            setOtherUnspecifiedMetadata(metadataMap, metadata, request.getRefreshOptions().getAllP2());
+        }
+        if(request.getRefreshOptions().getAllP1() != null) {
+            setOtherUnspecifiedMetadata(metadataMap, metadata, request.getRefreshOptions().getAllP1());
+        }
 
         return metadata;
     }
@@ -195,22 +193,31 @@ public class BookMetadataService {
     @Transactional
     protected String resolveFieldAsString(Map<MetadataProvider, FetchedBookMetadata> metadataMap, MetadataRefreshOptions.FieldProvider fieldProvider, FieldValueExtractor fieldValueExtractor) {
         String value = null;
-        if (fieldProvider.getDefaultProvider() != null && metadataMap.containsKey(fieldProvider.getDefaultProvider())) {
-            value = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getDefaultProvider()));
+        if (fieldProvider.getP3() != null && metadataMap.containsKey(fieldProvider.getP3())) {
+            String newValue = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP3()));
+            if (newValue != null) {
+                value = newValue;
+            }
         }
-        if (fieldProvider.getP2() != null && metadataMap.containsKey(fieldProvider.getP2())) {
-            value = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP2()));
+        if (value == null && fieldProvider.getP2() != null && metadataMap.containsKey(fieldProvider.getP2())) {
+            String newValue = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP2()));
+            if (newValue != null) {
+                value = newValue;
+            }
         }
-        if (fieldProvider.getP1() != null && metadataMap.containsKey(fieldProvider.getP1())) {
-            value = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP1()));
+        if (value == null && fieldProvider.getP1() != null && metadataMap.containsKey(fieldProvider.getP1())) {
+            String newValue = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP1()));
+            if (newValue != null) {
+                value = newValue;
+            }
         }
         return value;
     }
 
     List<String> getAllCategories(Map<MetadataProvider, FetchedBookMetadata> metadataMap, MetadataRefreshOptions.FieldProvider fieldProvider, FieldValueExtractorList fieldValueExtractor) {
         Set<String> uniqueCategories = new HashSet<>();
-        if (fieldProvider.getDefaultProvider() != null && metadataMap.containsKey(fieldProvider.getDefaultProvider())) {
-            List<String> extracted = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getDefaultProvider()));
+        if (fieldProvider.getP3() != null && metadataMap.containsKey(fieldProvider.getP3())) {
+            List<String> extracted = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP3()));
             if (extracted != null) {
                 uniqueCategories.addAll(extracted);
             }
@@ -233,14 +240,23 @@ public class BookMetadataService {
     @Transactional
     protected List<String> resolveFieldAsList(Map<MetadataProvider, FetchedBookMetadata> metadataMap, MetadataRefreshOptions.FieldProvider fieldProvider, FieldValueExtractorList fieldValueExtractor) {
         List<String> values = new ArrayList<>();
-        if (fieldProvider.getDefaultProvider() != null && metadataMap.containsKey(fieldProvider.getDefaultProvider())) {
-            values = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getDefaultProvider()));
+        if (fieldProvider.getP3() != null && metadataMap.containsKey(fieldProvider.getP3())) {
+            List<String> newValues = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP3()));
+            if (newValues != null && !newValues.isEmpty()) {
+                values = newValues;
+            }
         }
-        if (fieldProvider.getP2() != null && metadataMap.containsKey(fieldProvider.getP2())) {
-            values = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP2()));
+        if (values.isEmpty() && fieldProvider.getP2() != null && metadataMap.containsKey(fieldProvider.getP2())) {
+            List<String> newValues = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP2()));
+            if (newValues != null && !newValues.isEmpty()) {
+                values = newValues;
+            }
         }
-        if (fieldProvider.getP1() != null && metadataMap.containsKey(fieldProvider.getP1())) {
-            values = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP1()));
+        if (values.isEmpty() && fieldProvider.getP1() != null && metadataMap.containsKey(fieldProvider.getP1())) {
+            List<String> newValues = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP1()));
+            if (newValues != null && !newValues.isEmpty()) {
+                values = newValues;
+            }
         }
         return values;
     }
@@ -263,7 +279,7 @@ public class BookMetadataService {
     }
 
     @Transactional
-    protected Set<MetadataProvider> getNonDefaultProviders(MetadataRefreshRequest request) {
+    protected Set<MetadataProvider> getAllProvidersUsingIndividualFields(MetadataRefreshRequest request) {
         MetadataRefreshOptions.FieldOptions fieldOptions = request.getRefreshOptions().getFieldOptions();
         Set<MetadataProvider> uniqueProviders = new HashSet<>();
 
@@ -281,8 +297,8 @@ public class BookMetadataService {
     @Transactional
     protected void addProviderToSet(MetadataRefreshOptions.FieldProvider fieldProvider, Set<MetadataProvider> providerSet) {
         if (fieldProvider != null) {
-            if (fieldProvider.getDefaultProvider() != null) {
-                providerSet.add(fieldProvider.getDefaultProvider());
+            if (fieldProvider.getP3() != null) {
+                providerSet.add(fieldProvider.getP3());
             }
             if (fieldProvider.getP2() != null) {
                 providerSet.add(fieldProvider.getP2());

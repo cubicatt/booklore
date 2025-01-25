@@ -22,16 +22,16 @@ export class MetadataAdvancedFetchOptionsComponent implements OnChanges {
   refreshCovers: boolean = false;
   mergeCategories: boolean = false;
 
-  allDefault = {placeholder: 'Set All', value: ''};
+  allP3 = {placeholder: 'Set All', value: ''};
   allP2 = {placeholder: 'Set All', value: ''};
   allP1 = {placeholder: 'Set All', value: ''};
 
   fieldOptions: FieldOptions = {
-    title: {default: null, p2: null, p1: null},
-    description: {default: null, p2: null, p1: null},
-    authors: {default: null, p2: null, p1: null},
-    categories: {default: null, p2: null, p1: null},
-    cover: {default: null, p2: null, p1: null}
+    title: {p3: null, p2: null, p1: null},
+    description: {p3: null, p2: null, p1: null},
+    authors: {p3: null, p2: null, p1: null},
+    categories: {p3: null, p2: null, p1: null},
+    cover: {p3: null, p2: null, p1: null}
   };
 
   private messageService = inject(MessageService);
@@ -43,7 +43,9 @@ export class MetadataAdvancedFetchOptionsComponent implements OnChanges {
       this.refreshCovers = this.currentMetadataOptions.refreshCovers || false;
       this.mergeCategories = this.currentMetadataOptions.mergeCategories || false;
       this.fieldOptions = this.currentMetadataOptions.fieldOptions || this.fieldOptions;
-      this.allDefault.value = this.currentMetadataOptions.defaultProvider || '';
+      this.allP3.value = this.currentMetadataOptions.allP3 || '';
+      this.allP2.value = this.currentMetadataOptions.allP2 || '';
+      this.allP1.value = this.currentMetadataOptions.allP1 || '';
     }
   }
 
@@ -54,12 +56,15 @@ export class MetadataAdvancedFetchOptionsComponent implements OnChanges {
   }
 
   submit() {
-    const allProvidersSelected = Object.keys(this.fieldOptions).every(field => {
-      return this.fieldOptions[field as keyof FieldOptions].default !== null;
+    const allP3Selected = Object.keys(this.fieldOptions).every(field => {
+      return this.fieldOptions[field as keyof FieldOptions].p3 !== null;
     });
-    if (allProvidersSelected) {
+
+    if (allP3Selected) {
       const metadataRefreshOptions: MetadataRefreshOptions = {
-        defaultProvider: this.allDefault.value,
+        allP1: this.allP1.value,
+        allP2: this.allP2.value,
+        allP3: this.allP3.value,
         refreshCovers: this.refreshCovers,
         mergeCategories: this.mergeCategories,
         fieldOptions: this.fieldOptions
@@ -71,18 +76,18 @@ export class MetadataAdvancedFetchOptionsComponent implements OnChanges {
         severity: 'error',
         summary: 'Error',
         life: 5000,
-        detail: 'Base provider must be selected for all the book fields.'
+        detail: 'At least one provider must be selected for all the book fields.'
       });
     }
   }
 
   reset() {
-    this.allDefault.value = '';
+    this.allP3.value = '';
     this.allP2.value = '';
     this.allP1.value = '';
     for (const field of Object.keys(this.fieldOptions)) {
       this.fieldOptions[field as keyof FieldOptions] = {
-        default: null,
+        p3: null,
         p2: null,
         p1: null
       };

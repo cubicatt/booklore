@@ -14,7 +14,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class MetadataRefreshOptions {
     @NotNull(message = "Default Provider cannot be null")
-    private MetadataProvider defaultProvider;
+    private MetadataProvider allP1;
+    private MetadataProvider allP2;
+    private MetadataProvider allP3;
     private boolean refreshCovers;
     private boolean mergeCategories;
     private FieldOptions fieldOptions;
@@ -36,8 +38,7 @@ public class MetadataRefreshOptions {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class FieldProvider {
-        @JsonProperty("default")
-        private MetadataProvider defaultProvider;
+        private MetadataProvider p3;
         private MetadataProvider p2;
         private MetadataProvider p1;
     }

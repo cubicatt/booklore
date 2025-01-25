@@ -13,8 +13,8 @@
     <tr>
       <td class="px-4 py-2 text-gray-300"></td>
       <td class="px-4 py-2">
-        <p-select [options]="providers" [(ngModel)]="allDefault.value"
-                  (onChange)="syncProvider($event, 'default')"
+        <p-select [options]="providers" [(ngModel)]="allP3.value"
+                  (onChange)="syncProvider($event, 'p3')"
                   placeholder="Select All"
                   class="w-full">
         </p-select>
@@ -38,7 +38,7 @@
     <tr *ngFor="let field of fields" [hidden]="field === 'cover' && !refreshCovers">
       <td class="px-4 py-2 text-gray-300">{{ field | titlecase }}</td>
       <td class="px-4 py-2">
-        <p-select [options]="providers" [(ngModel)]="fieldOptions[field].default"
+        <p-select [options]="providers" [(ngModel)]="fieldOptions[field].p3"
                   placeholder="Unset"
                   class="w-full">
         </p-select>

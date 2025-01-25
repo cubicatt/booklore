@@ -1,12 +1,14 @@
 export interface MetadataRefreshOptions {
-  defaultProvider: string;
+  allP3: string;
+  allP2: string;
+  allP1: string;
   refreshCovers: boolean;
   mergeCategories: boolean;
   fieldOptions?: FieldOptions;
 }
 
 export interface FieldProvider {
-  default: string | null;
+  p3: string | null;
   p2: string | null;
   p1: string | null;
 }

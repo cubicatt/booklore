@@ -25,34 +25,36 @@ VALUES
         'quick_book_match',
         'all_books',
         '{
-            "defaultProvider": "Google",
+            "allP1": "Amazon",
+            "allP2": "GoodReads",
+            "allP3": "Google",
             "refreshCovers": true,
             "mergeCategories": true,
             "fieldOptions": {
                 "title": {
-                    "p2": "GoodReads",
                     "p1": "Amazon",
-                    "default": "Google"
+                    "p2": "GoodReads",
+                    "p3": "Google"
                 },
                 "description": {
-                    "p2": "GoodReads",
                     "p1": "Amazon",
-                    "default": "Google"
+                    "p2": "GoodReads",
+                    "p3": "Google"
                 },
                 "authors": {
-                    "p2": "GoodReads",
                     "p1": "Amazon",
-                    "default": "Google"
+                    "p2": "GoodReads",
+                    "p3": "Google"
                 },
                 "categories": {
-                    "p2": "Amazon",
                     "p1": "GoodReads",
-                    "default": "Google"
+                    "p2": "Amazon",
+                    "p3": "Google"
                 },
                 "cover": {
-                    "p2": "GoodReads",
                     "p1": "Amazon",
-                    "default": "Google"
+                    "p2": "GoodReads",
+                    "p3": "Google"
                 }
             }
         }'

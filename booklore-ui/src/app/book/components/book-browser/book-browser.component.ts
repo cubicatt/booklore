@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, inject, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {MenuItem, MessageService} from 'primeng/api';
+import {MenuItem, MessageService, PrimeTemplate} from 'primeng/api';
 import {LibraryService} from '../../service/library.service';
 import {BookService} from '../../service/book.service';
 import {map, switchMap} from 'rxjs/operators';
@@ -11,7 +11,7 @@ import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {Library} from '../../model/library.model';
 import {Shelf} from '../../model/shelf.model';
 import {SortService} from '../../service/sort.service';
-import {SortOption} from '../../model/sort.model';
+import {SortDirection, SortOption} from '../../model/sort.model';
 import {BookState} from '../../model/state/book-state.model';
 import {Book} from '../../model/book.model';
 import {LibraryShelfMenuService} from '../../service/library-shelf-menu.service';
@@ -24,7 +24,6 @@ import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {VirtualScrollerModule} from '@iharbeck/ngx-virtual-scroller';
 import {BookCardComponent} from './book-card/book-card.component';
 import {ProgressSpinner} from 'primeng/progressspinner';
-import {Select} from 'primeng/select';
 import {Menu} from 'primeng/menu';
 import {InputText} from 'primeng/inputtext';
 import {FormsModule} from '@angular/forms';
@@ -43,7 +42,7 @@ export enum EntityType {
   standalone: true,
   templateUrl: './book-browser.component.html',
   styleUrls: ['./book-browser.component.scss'],
-  imports: [Button, NgIf, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Select, Menu, NgForOf, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, Fluid],
+  imports: [Button, NgIf, VirtualScrollerModule, BookCardComponent, AsyncPipe, ProgressSpinner, Menu, NgForOf, InputText, FormsModule, BookTableComponent, BookFilterComponent, Tooltip, NgClass, Fluid, PrimeTemplate],
   animations: [
     trigger('slideInOut', [
       state('void', style({
@@ -72,8 +71,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   bookTitle: string = '';
   entityOptions: MenuItem[] | undefined;
   selectedBooks = new Set<number>();
-  selectedSort: SortOption | null = null;
-  sortOptions: SortOption[] = [];
   isDrawerVisible: boolean = false;
   dynamicDialogRef: DynamicDialogRef | undefined;
   EntityType = EntityType;
@@ -95,9 +92,24 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   private sortService = inject(SortService);
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
 
+  sortOptions: any[] = [
+    {label: 'Title', icon: '', field: 'title', command: () => this.sortBooks('title')},
+    {label: 'Publisher', icon: '', field: 'publisher', command: () => this.sortBooks('publisher')},
+    {label: 'Published', icon: '', field: 'publishedDate', command: () => this.sortBooks('publishedDate')},
+    {label: 'Pages', icon: '', field: 'pageCount', command: () => this.sortBooks('pageCount')},
+    {label: 'Rating', icon: '', field: 'rating', command: () => this.sortBooks('rating')},
+    {label: 'Reviews', icon: '', field: 'reviewCount', command: () => this.sortBooks('reviewCount')},
+  ];
+
+  selectedSort: SortOption = {
+    label: 'Title',
+    field: 'title',
+    direction: SortDirection.DESCENDING,
+  };
+
   ngOnInit(): void {
     this.bookService.loadBooks();
-    this.sortOptions = SortService.generateSortOptions();
+    this.sortBooks(this.selectedSort.field);
     const isAllBooksRoute = this.activatedRoute.snapshot.routeConfig?.path === 'all-books';
 
     if (isAllBooksRoute) {
@@ -324,8 +336,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     }
   }
 
-  updateSortOption(sortOption: SortOption): void {
-    this.selectedSort = sortOption;
+  applySortOption(sortOption: SortOption): void {
     if (this.entityType === EntityType.ALL_BOOKS) {
       this.bookState$ = this.fetchAllBooks();
     } else {
@@ -346,7 +357,11 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
       const {field, direction} = entity.sort;
       this.selectedSort = this.sortOptions.find(option => option.field === field && option.direction === direction) || null;
     } else {
-      this.selectedSort = null;
+      this.selectedSort = {
+        label: 'Title',
+        field: 'title',
+        direction: SortDirection.ASCENDING,
+      };
     }
   }
 
@@ -410,6 +425,25 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
     this.bookFilterComponent.activeCategory = null;
     this.bookFilterComponent.activeAuthor = null;
     this.clearSearch();
+  }
+
+  sortBooks(field: string) {
+    if (this.selectedSort?.field === field) {
+      this.selectedSort.direction = this.selectedSort.direction === SortDirection.ASCENDING ? SortDirection.DESCENDING : SortDirection.ASCENDING;
+    } else {
+      this.selectedSort.field = field;
+      this.selectedSort.direction = SortDirection.ASCENDING;
+    }
+    this.updateSortOptions();
+    this.applySortOption(this.selectedSort)
+  }
+
+  updateSortOptions() {
+    const directionIcon = this.selectedSort.direction === SortDirection.ASCENDING ? 'pi pi-arrow-up' : 'pi pi-arrow-down';
+    this.sortOptions = this.sortOptions.map((option) => ({
+      ...option,
+      icon: option.field === this.selectedSort.field ? directionIcon : '',
+    }));
   }
 
   ngAfterViewInit() {

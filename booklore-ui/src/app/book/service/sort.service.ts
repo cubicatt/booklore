@@ -38,21 +38,4 @@ export class SortService {
       }
     });
   }
-
-  static generateSortOptions(): SortOption[] {
-    return [
-      {label: '↑ Title', field: 'title', direction: SortDirection.ASCENDING},
-      {label: '↓ Title', field: 'title', direction: SortDirection.DESCENDING},
-      {label: '↑ Published', field: 'publishedDate', direction: SortDirection.ASCENDING},
-      {label: '↓ Published', field: 'publishedDate', direction: SortDirection.DESCENDING},
-      {label: '↑ Pages', field: 'pageCount', direction: SortDirection.ASCENDING},
-      {label: '↓ Pages', field: 'pageCount', direction: SortDirection.DESCENDING},
-      {label: '↑ Rating', field: 'rating', direction: SortDirection.ASCENDING},
-      {label: '↓ Rating', field: 'rating', direction: SortDirection.DESCENDING},
-      {label: '↑ Reviews', field: 'reviewCount', direction: SortDirection.ASCENDING},
-      {label: '↓ Reviews', field: 'reviewCount', direction: SortDirection.DESCENDING},
-      {label: '↑ Publisher', field: 'publisher', direction: SortDirection.ASCENDING},
-      {label: '↓ Publisher', field: 'publisher', direction: SortDirection.DESCENDING}
-    ];
-  }
 }

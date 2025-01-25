@@ -18,73 +18,56 @@
 
       <div class="flex items-center gap-8">
 
-        <a *ngIf="isFilterActive" class="topbar-items topbar-item" (click)="clearFilter()">
-          <i
-            class="pi pi-filter-slash"
-            pTooltip="Clear applied filters"
-            tooltipPosition="top">
-          </i>
-        </a>
+        <div class="flex flex-row items-center gap-4">
+          <a *ngIf="isFilterActive" class="topbar-items topbar-item" (click)="clearFilter()">
+            <i
+              class="pi pi-filter-slash"
+              pTooltip="Clear applied filters"
+              tooltipPosition="top">
+            </i>
+          </a>
 
-        <a class="topbar-items topbar-item">
-          <i
-            class="pi pi-sort"
-            pTooltip="Select sorting"
-            tooltipPosition="top">
-          </i>
-        </a>
+          <a class="topbar-items topbar-item" (click)="sortMenu.toggle($event)">
+            <i class="pi pi-sort" pTooltip="Select sorting" tooltipPosition="top"></i>
+          </a>
+          <p-menu #sortMenu [popup]="true" [model]="sortOptions" appendTo="body">
+            <ng-template pTemplate="item" let-item>
+              <div class="flex justify-between items-center w-full px-4 py-2 cursor-pointer" (click)="sortBooks(item.field)">
+                <span>{{ item.label }}</span>
+                <i *ngIf="item.icon" [class]="item.icon"></i>
+              </div>
+            </ng-template>
+          </p-menu>
 
-        <a class="topbar-items topbar-item" (click)="toggleTableGrid()">
-          <i
-            [ngClass]="viewIcon"
-            pTooltip="Toggle between Grid and Table view"
-            tooltipPosition="top">
-          </i>
-        </a>
+          <a class="topbar-items topbar-item" (click)="toggleTableGrid()">
+            <i
+              [ngClass]="viewIcon"
+              pTooltip="Toggle between Grid and Table view"
+              tooltipPosition="top">
+            </i>
+          </a>
+
+        </div>
 
         <p-fluid>
           <div class="relative">
-            <input type="text"
-                   pInputText
-                   placeholder="Search title or author..."
-                   [(ngModel)]="bookTitle"
-                   (ngModelChange)="onBookTitleChange($event)"/>
-            <p-button *ngIf="bookTitle"
-                      icon="pi pi-times"
-                      [text]="true"
-                      size="small"
-                      [rounded]="true"
-                      class="absolute right-2 top-1/2 transform -translate-y-1/2"
-                      (click)="clearSearch()">
+            <input
+              type="text"
+              pInputText
+              placeholder="Search title or author..."
+              [(ngModel)]="bookTitle"
+              (ngModelChange)="onBookTitleChange($event)"/>
+            <p-button
+              *ngIf="bookTitle"
+              icon="pi pi-times"
+              [text]="true"
+              size="small"
+              [rounded]="true"
+              class="absolute right-2 top-1/2 transform -translate-y-1/2"
+              (click)="clearSearch()">
             </p-button>
           </div>
         </p-fluid>
-
-        <p-select
-          [options]="sortOptions"
-          optionLabel="label"
-          placeholder="Select Sorting"
-          [(ngModel)]="selectedSort"
-          (onChange)="updateSortOption($event.value)"/>
-
-        <!--<p-button
-          [icon]="viewIcon"
-          size="large"
-          [rounded]="true"
-          text="true"
-          pTooltip="Toggle between Grid and Table view"
-          tooltipPosition="top"
-          (click)="toggleTableGrid()"/>-->
-
-        <!--<p-button
-          *ngIf="isFilterActive"
-          icon="pi pi-filter-slash"
-          size="large"
-          [rounded]="true"
-          text="true"
-          (click)="clearFilter()"
-          pTooltip="Clear applied filters"
-          tooltipPosition="top"/>-->
 
         <p-button
           class="pr-2"

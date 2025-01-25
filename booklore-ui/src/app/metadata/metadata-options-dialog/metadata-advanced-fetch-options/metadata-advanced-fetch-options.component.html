@@ -3,15 +3,15 @@
     <thead>
     <tr>
       <th class="px-4 py-2 text-left font-semibold text-gray-300">Book Field</th>
-      <th class="px-4 py-2 text-left font-semibold text-gray-300">Base</th>
-      <th class="px-4 py-2 text-left font-semibold text-gray-300">Higher Precedence</th>
-      <th class="px-4 py-2 text-left font-semibold text-gray-300">Highest Precedence</th>
+      <th class="px-4 py-2 text-left font-semibold text-gray-300">3rd Priority</th>
+      <th class="px-4 py-2 text-left font-semibold text-gray-300">2nd Priority</th>
+      <th class="px-4 py-2 text-left font-semibold text-gray-300">1st Priority</th>
     </tr>
     </thead>
     <tbody>
 
     <tr>
-      <td class="px-4 py-2 text-gray-300"></td>
+      <td class="px-4 py-2 text-gray-300">All Other Fields</td>
       <td class="px-4 py-2">
         <p-select [options]="providers" [(ngModel)]="allP3.value"
                   (onChange)="syncProvider($event, 'p3')"

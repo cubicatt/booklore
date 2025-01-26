@@ -96,6 +96,11 @@ public class BookMetadataService {
         List<BookEntity> books = getBookEntities(request);
         for (BookEntity bookEntity : books) {
             try {
+                Boolean allFieldsLocked = bookEntity.getMetadata().getAllFieldsLocked();
+                if (allFieldsLocked) {
+                    log.info("Skipping metadata refresh for locked book: {}", bookEntity.getFileName());
+                    continue;
+                }
                 Map<MetadataProvider, FetchedBookMetadata> metadataMap = fetchMetadataForBook(providers, bookEntity);
                 if (providers.contains(GoodReads)) {
                     Thread.sleep(ThreadLocalRandom.current().nextLong(500, 1500));

@@ -70,6 +70,9 @@ public class BookMetadataEntity {
     private Instant coverUpdatedOn;
 
     // Locking fields
+    @Column(name = "all_fields_locked")
+    private Boolean allFieldsLocked = Boolean.FALSE;
+
     @Column(name = "title_locked")
     private Boolean titleLocked = Boolean.FALSE;
 

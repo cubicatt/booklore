@@ -25,7 +25,8 @@ public enum ApiError {
     ANOTHER_METADATA_JOB_RUNNING(HttpStatus.CONFLICT, "A metadata refresh job is currently running. Please wait for it to complete before initiating a new one."),
     METADATA_SOURCE_NOT_IMPLEMENT_OR_DOES_NOT_EXIST(HttpStatus.BAD_REQUEST, "Metadata source not implement or does not exist"),
     FAILED_TO_DOWNLOAD_FILE(HttpStatus.INTERNAL_SERVER_ERROR, "Error while downloading file, bookId: %s"),
-    INVALID_REFRESH_TYPE(HttpStatus.BAD_REQUEST, "The refresh type is invalid");
+    INVALID_REFRESH_TYPE(HttpStatus.BAD_REQUEST, "The refresh type is invalid"),
+    METADATA_LOCKED(HttpStatus.FORBIDDEN, "Attempt to update locked metadata fields for book with ID: %d");
 
     private final HttpStatus status;
     private final String message;

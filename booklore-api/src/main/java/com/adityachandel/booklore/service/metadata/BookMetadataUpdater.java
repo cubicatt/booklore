@@ -44,6 +44,11 @@ public class BookMetadataUpdater {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         BookMetadataEntity metadata = bookEntity.getMetadata();
 
+        if (metadata.getAllFieldsLocked()) {
+            log.warn("Attempted to update metadata for book with ID {}, but all fields are locked. No update performed.", bookId);
+            return metadata;
+        }
+
         if (!metadata.getTitleLocked() && newMetadata.getTitle() != null && !newMetadata.getTitle().isBlank()) {
             metadata.setTitle(newMetadata.getTitle());
         }
@@ -166,53 +171,113 @@ public class BookMetadataUpdater {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         BookMetadataEntity metadata = bookEntity.getMetadata();
 
-        if (!metadata.getTitleLocked() && updatedMetadata.getTitle() != null) {
+        List<String> lockedFields = new ArrayList<>();
+
+        if (metadata.getAllFieldsLocked()) {
+            log.warn("Attempted to update metadata for book with ID {}, but all fields are locked. No update performed.", bookId);
+            throw ApiError.METADATA_LOCKED.createException(bookId);
+        }
+
+        if (metadata.getTitleLocked() && updatedMetadata.getTitle() != null) {
+            lockedFields.add("Title");
+        } else if (!metadata.getTitleLocked() && updatedMetadata.getTitle() != null) {
             metadata.setTitle(updatedMetadata.getTitle());
         }
-        if (!metadata.getSubtitleLocked() && updatedMetadata.getSubtitle() != null) {
+
+        if (metadata.getSubtitleLocked() && updatedMetadata.getSubtitle() != null) {
+            lockedFields.add("Subtitle");
+        } else if (!metadata.getSubtitleLocked() && updatedMetadata.getSubtitle() != null) {
             metadata.setSubtitle(updatedMetadata.getSubtitle());
         }
-        if (!metadata.getPublisherLocked() && updatedMetadata.getPublisher() != null) {
+
+        if (metadata.getPublisherLocked() && updatedMetadata.getPublisher() != null) {
+            lockedFields.add("Publisher");
+        } else if (!metadata.getPublisherLocked() && updatedMetadata.getPublisher() != null) {
             metadata.setPublisher(updatedMetadata.getPublisher());
         }
-        if (!metadata.getSeriesNameLocked() && updatedMetadata.getSeriesName() != null) {
+
+        if (metadata.getSeriesNameLocked() && updatedMetadata.getSeriesName() != null) {
+            lockedFields.add("Series Name");
+        } else if (!metadata.getSeriesNameLocked() && updatedMetadata.getSeriesName() != null) {
             metadata.setSeriesName(updatedMetadata.getSeriesName());
         }
-        if (!metadata.getSeriesNumberLocked() && updatedMetadata.getSeriesNumber() != null) {
+
+        if (metadata.getSeriesNumberLocked() && updatedMetadata.getSeriesNumber() != null) {
+            lockedFields.add("Series Number");
+        } else if (!metadata.getSeriesNumberLocked() && updatedMetadata.getSeriesNumber() != null) {
             metadata.setSeriesNumber(updatedMetadata.getSeriesNumber());
         }
-        if (!metadata.getSeriesTotalLocked() && updatedMetadata.getSeriesTotal() != null) {
+
+        if (metadata.getSeriesTotalLocked() && updatedMetadata.getSeriesTotal() != null) {
+            lockedFields.add("Series Total");
+        } else if (!metadata.getSeriesTotalLocked() && updatedMetadata.getSeriesTotal() != null) {
             metadata.setSeriesTotal(updatedMetadata.getSeriesTotal());
         }
-        if (!metadata.getPublishedDateLocked() && updatedMetadata.getPublishedDate() != null) {
+
+        if (metadata.getPublishedDateLocked() && updatedMetadata.getPublishedDate() != null) {
+            lockedFields.add("Published Date");
+        } else if (!metadata.getPublishedDateLocked() && updatedMetadata.getPublishedDate() != null) {
             metadata.setPublishedDate(updatedMetadata.getPublishedDate());
         }
-        if (!metadata.getDescriptionLocked() && updatedMetadata.getDescription() != null) {
+
+        if (metadata.getDescriptionLocked() && updatedMetadata.getDescription() != null) {
+            lockedFields.add("Description");
+        } else if (!metadata.getDescriptionLocked() && updatedMetadata.getDescription() != null) {
             metadata.setDescription(updatedMetadata.getDescription());
         }
-        if (!metadata.getIsbn13Locked() && updatedMetadata.getIsbn13() != null) {
+
+        if (metadata.getIsbn13Locked() && updatedMetadata.getIsbn13() != null) {
+            lockedFields.add("ISBN 13");
+        } else if (!metadata.getIsbn13Locked() && updatedMetadata.getIsbn13() != null) {
             metadata.setIsbn13(updatedMetadata.getIsbn13());
         }
-        if (!metadata.getIsbn10Locked() && updatedMetadata.getIsbn10() != null) {
+
+        if (metadata.getIsbn10Locked() && updatedMetadata.getIsbn10() != null) {
+            lockedFields.add("ISBN 10");
+        } else if (!metadata.getIsbn10Locked() && updatedMetadata.getIsbn10() != null) {
             metadata.setIsbn10(updatedMetadata.getIsbn10());
         }
-        if (!metadata.getPageCountLocked() && updatedMetadata.getPageCount() != null) {
+
+        if (metadata.getPageCountLocked() && updatedMetadata.getPageCount() != null) {
+            lockedFields.add("Page Count");
+        } else if (!metadata.getPageCountLocked() && updatedMetadata.getPageCount() != null) {
             metadata.setPageCount(updatedMetadata.getPageCount());
         }
-        if (!metadata.getLanguageLocked() && updatedMetadata.getLanguage() != null) {
+
+        if (metadata.getLanguageLocked() && updatedMetadata.getLanguage() != null) {
+            lockedFields.add("Language");
+        } else if (!metadata.getLanguageLocked() && updatedMetadata.getLanguage() != null) {
             metadata.setLanguage(updatedMetadata.getLanguage());
         }
-        if (!metadata.getRatingLocked() && updatedMetadata.getRating() != null) {
+
+        if (metadata.getRatingLocked() && updatedMetadata.getRating() != null) {
+            lockedFields.add("Rating");
+        } else if (!metadata.getRatingLocked() && updatedMetadata.getRating() != null) {
             metadata.setRating(updatedMetadata.getRating());
         }
-        if (!metadata.getReviewCountLocked() && updatedMetadata.getReviewCount() != null) {
+
+        if (metadata.getReviewCountLocked() && updatedMetadata.getReviewCount() != null) {
+            lockedFields.add("Review Count");
+        } else if (!metadata.getReviewCountLocked() && updatedMetadata.getReviewCount() != null) {
             metadata.setReviewCount(updatedMetadata.getReviewCount());
         }
-        if (!metadata.getAuthorsLocked() && updatedMetadata.getAuthors() != null) {
+
+        if (metadata.getAuthorsLocked() && updatedMetadata.getAuthors() != null) {
+            lockedFields.add("Authors");
+        } else if (!metadata.getAuthorsLocked() && updatedMetadata.getAuthors() != null) {
             metadata.setAuthors(authorMapper.toAuthorEntityList(updatedMetadata.getAuthors()));
         }
-        if (!metadata.getCategoriesLocked() && updatedMetadata.getCategories() != null) {
+
+        if (metadata.getCategoriesLocked() && updatedMetadata.getCategories() != null) {
+            lockedFields.add("Categories");
+        } else if (!metadata.getCategoriesLocked() && updatedMetadata.getCategories() != null) {
             metadata.setCategories(categoryMapper.toCategoryEntities(updatedMetadata.getCategories()));
+        }
+
+        if (!lockedFields.isEmpty()) {
+            String lockedFieldsMessage = String.join(", ", lockedFields);
+            log.error("Attempted to update the following locked fields for book with ID {}: {}", bookId, lockedFieldsMessage);
+            throw ApiError.METADATA_LOCKED.createException(bookId);
         }
 
         bookRepository.save(bookEntity);

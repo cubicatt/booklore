@@ -2,6 +2,7 @@ package com.adityachandel.booklore.model.dto;
 
 import lombok.Builder;
 import lombok.Data;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -29,6 +30,7 @@ public class BookMetadata {
     private List<Category> categories;
     private List<Award> awards;
 
+    private Boolean allFieldsLocked;
     private Boolean titleLocked;
     private Boolean subtitleLocked;
     private Boolean publisherLocked;

@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS book_metadata
     series_name           VARCHAR(255),
     series_number         INT,
     series_total          INT,
+    all_fields_locked     BOOLEAN DEFAULT FALSE,
     title_locked          BOOLEAN DEFAULT FALSE,
     authors_locked        BOOLEAN DEFAULT FALSE,
     categories_locked     BOOLEAN DEFAULT FALSE,

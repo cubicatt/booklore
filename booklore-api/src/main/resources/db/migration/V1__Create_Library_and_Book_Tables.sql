@@ -69,6 +69,8 @@ CREATE TABLE IF NOT EXISTS book_metadata
     thumbnail_locked      BOOLEAN DEFAULT FALSE,
     language_locked       BOOLEAN DEFAULT FALSE,
     cover_locked          BOOLEAN DEFAULT FALSE,
+    rating_locked         BOOLEAN DEFAULT FALSE,
+    review_count_locked   BOOLEAN DEFAULT FALSE,
     series_name_locked    BOOLEAN DEFAULT FALSE,
     series_number_locked  BOOLEAN DEFAULT FALSE,
     series_total_locked   BOOLEAN DEFAULT FALSE,

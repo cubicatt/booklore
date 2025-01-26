@@ -2,6 +2,7 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.mapper.BookMetadataMapper;
 import com.adityachandel.booklore.model.dto.BookMetadata;
+import com.adityachandel.booklore.model.dto.request.FieldLockRequest;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import com.adityachandel.booklore.quartz.JobSchedulerService;
 import com.adityachandel.booklore.service.metadata.BookMetadataService;
@@ -36,14 +37,22 @@ public class MetadataController {
         return ResponseEntity.ok(bookMetadata);
     }
 
-    @PutMapping("/update/{bookId}")
+    /*@PutMapping("/update/{bookId}")
     public ResponseEntity<BookMetadata> updateMetadata(@PathVariable long bookId, @RequestBody BookMetadata bookMetadata) {
         return ResponseEntity.ok(bookMetadataUpdater.updateMetadata(bookId, bookMetadata));
-    }
+    }*/
 
     @PutMapping(path = "/refreshV2")
     public ResponseEntity<String> scheduleRefreshV2(@Validated @RequestBody MetadataRefreshRequest request) {
         jobSchedulerService.scheduleMetadataRefreshV2(request);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/lock")
+    public ResponseEntity<BookMetadata> updateFieldLockState(@RequestBody FieldLockRequest request) {
+        long bookId = request.getBookId();
+        String field = request.getField();
+        boolean isLocked = request.getIsLocked();
+        return ResponseEntity.ok(bookMetadataService.updateFieldLockState(bookId, field, isLocked));
     }
 }

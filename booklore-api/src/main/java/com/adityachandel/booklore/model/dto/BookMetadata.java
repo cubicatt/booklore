@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.model.dto;
 
+import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Data;
 
@@ -32,6 +33,8 @@ public class BookMetadata {
 
     private Boolean allFieldsLocked;
     private Boolean titleLocked;
+    private Boolean authorsLocked;
+    private Boolean categoriesLocked;
     private Boolean subtitleLocked;
     private Boolean publisherLocked;
     private Boolean publishedDateLocked;

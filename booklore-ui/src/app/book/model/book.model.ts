@@ -36,6 +36,26 @@ export interface BookMetadata {
   categories: Category[];
   awards?: Award[];
 
+  titleLocked?: boolean;
+  subtitleLocked?: boolean;
+  publisherLocked?: boolean;
+  publishedDateLocked?: boolean;
+  descriptionLocked?: boolean;
+  seriesNameLocked?: boolean;
+  seriesNumberLocked?: boolean;
+  seriesTotalLocked?: boolean;
+  isbn13Locked?: boolean;
+  isbn10Locked?: boolean;
+  asinLocked?: boolean;
+  pageCountLocked?: boolean;
+  languageLocked?: boolean;
+  ratingLocked?: boolean;
+  reviewCountLocked?: boolean;
+  coverUpdatedOnLocked?: boolean;
+  authorsLocked?: boolean;
+  categoriesLocked?: boolean;
+  awardsLocked?: boolean;
+
   [key: string]: any;
 }
 

@@ -55,7 +55,7 @@ export class MetadataSearcherComponent implements OnInit {
         }));
       }
     }));
-    this.onSubmit();
+    //this.onSubmit();
   }
 
   get isSearchEnabled(): boolean {

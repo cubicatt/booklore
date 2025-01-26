@@ -33,4 +33,23 @@ public class FetchedBookMetadata {
     private List<String> authors;
     private List<String> categories;
     private List<Award> awards;
+
+    private Boolean allFieldsLocked;
+    private Boolean titleLocked;
+    private Boolean authorsLocked;
+    private Boolean categoriesLocked;
+    private Boolean subtitleLocked;
+    private Boolean publisherLocked;
+    private Boolean publishedDateLocked;
+    private Boolean descriptionLocked;
+    private Boolean isbn13Locked;
+    private Boolean isbn10Locked;
+    private Boolean pageCountLocked;
+    private Boolean languageLocked;
+    private Boolean ratingLocked;
+    private Boolean reviewCountLocked;
+    private Boolean coverLocked;
+    private Boolean seriesNameLocked;
+    private Boolean seriesNumberLocked;
+    private Boolean seriesTotalLocked;
 }

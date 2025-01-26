@@ -24,6 +24,20 @@ export class MetadataService {
     return this.http.post<FetchedMetadata[]>(`${this.url}/${bookId}`, request);
   }
 
+  updatedMetadataFieldLock(bookId: number, field: string, isLocked: boolean): Observable<any> {
+    const requestPayload = {
+      bookId: bookId,
+      field: field,
+      isLocked: isLocked
+    };
+    return this.http.put<BookMetadata>(`${this.url}/lock`, requestPayload).pipe(
+      map(updatedMetadata => {
+        this.bookService.handleBookMetadataUpdate(bookId, updatedMetadata);
+        return updatedMetadata;
+      })
+    );
+  }
+
   updateBookMetadata(bookId: number, bookMetadata: BookMetadata): Observable<BookMetadata> {
     return this.http.put<BookMetadata>(`${this.url}/${bookId}`, bookMetadata).pipe(
       map(updatedMetadata => {

@@ -203,4 +203,21 @@ export class BookService {
     const book = this.bookStateSubject.value.books?.find(book => book.id === bookId);
     return book?.metadata ?? null;
   }
+
+  updateLock(bookId: number, field: string, isLocked: boolean): void {
+    const currentState = this.bookStateSubject.value;
+    const updatedBooks = (currentState.books || []).map(book => {
+      if (book.id === bookId && book.metadata) {
+        return {
+          ...book,
+          metadata: {
+            ...book.metadata,
+            [`${field}Locked`]: isLocked
+          }
+        };
+      }
+      return book;
+    });
+    this.bookStateSubject.next({...currentState, books: updatedBooks});
+  }
 }

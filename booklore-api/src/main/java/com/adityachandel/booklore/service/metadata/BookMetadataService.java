@@ -2,8 +2,10 @@ package com.adityachandel.booklore.service.metadata;
 
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
+import com.adityachandel.booklore.mapper.BookMetadataMapper;
 import com.adityachandel.booklore.model.dto.Author;
 import com.adityachandel.booklore.model.dto.Book;
+import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshOptions;
 import com.adityachandel.booklore.model.dto.request.MetadataRefreshRequest;
 import com.adityachandel.booklore.model.dto.settings.AppSettings;
@@ -11,6 +13,7 @@ import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookMetadataEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.websocket.Topic;
+import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.service.AppSettingService;
@@ -40,9 +43,11 @@ public class BookMetadataService {
     private final BookRepository bookRepository;
     private final LibraryRepository libraryRepository;
     private final BookMapper bookMapper;
+    private final BookMetadataMapper bookMetadataMapper;
     private final BookMetadataUpdater bookMetadataUpdater;
     private final NotificationService notificationService;
     private final AppSettingService appSettingService;
+    private final BookMetadataRepository bookMetadataRepository;
     private final Map<MetadataProvider, BookParser> parserMap;
 
 
@@ -97,7 +102,7 @@ public class BookMetadataService {
         for (BookEntity bookEntity : books) {
             try {
                 Boolean allFieldsLocked = bookEntity.getMetadata().getAllFieldsLocked();
-                if (allFieldsLocked) {
+                if (Boolean.TRUE.equals(allFieldsLocked)) {
                     log.info("Skipping metadata refresh for locked book: {}", bookEntity.getFileName());
                     continue;
                 }
@@ -334,5 +339,53 @@ public class BookMetadataService {
             throw ApiError.METADATA_SOURCE_NOT_IMPLEMENT_OR_DOES_NOT_EXIST.createException();
         }
         return parser;
+    }
+
+    public BookMetadata updateFieldLockState(long bookId, String field, boolean isLocked) {
+        BookMetadataEntity existingMetadata = bookMetadataRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book metadata not found"));
+        switch (field) {
+            case "title":
+                existingMetadata.setTitleLocked(isLocked);
+                break;
+            case "subtitle":
+                existingMetadata.setSubtitleLocked(isLocked);
+                break;
+            case "authors":
+                existingMetadata.setAuthorsLocked(isLocked);
+                break;
+            case "categories":
+                existingMetadata.setCategoriesLocked(isLocked);
+                break;
+            case "publisher":
+                existingMetadata.setPublisherLocked(isLocked);
+                break;
+            case "publishedDate":
+                existingMetadata.setPublishedDateLocked(isLocked);
+                break;
+            case "isbn10":
+                existingMetadata.setIsbn10Locked(isLocked);
+                break;
+            case "isbn13":
+                existingMetadata.setIsbn13Locked(isLocked);
+                break;
+            case "description":
+                existingMetadata.setDescriptionLocked(isLocked);
+                break;
+            case "pageCount":
+                existingMetadata.setPageCountLocked(isLocked);
+                break;
+            case "language":
+                existingMetadata.setLanguageLocked(isLocked);
+                break;
+            case "rating":
+                existingMetadata.setRatingLocked(isLocked);
+                break;
+            case "reviewCount":
+                existingMetadata.setReviewCountLocked(isLocked);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid field name: " + field);
+        }
+        return bookMetadataMapper.toBookMetadata(bookMetadataRepository.save(existingMetadata), true);
     }
 }

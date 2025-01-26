@@ -1,71 +1,17 @@
-<div *ngIf="showFilters"
-     class="w-[225px] ml-4 h-[calc(100vh-6.5rem)] rounded-xl bg-[var(--card-background)] overflow-hidden">
-
+<div *ngIf="showFilters" class="w-[225px] ml-4 h-[calc(100vh-6.5rem)] rounded-xl bg-[var(--card-background)] overflow-hidden">
   <p class="text-xl p-4">Filters:</p>
-  <p-accordion value="0">
-
-    <p-accordion-panel value="0">
-      <p-accordion-header>Authors</p-accordion-header>
+  <p-accordion [value]="0">
+    <p-accordion-panel *ngFor="let filterType of ['author', 'category', 'award', 'publisher', 'series']; let i = index" [value]="i">
+      <p-accordion-header>{{ filterType | titlecase }}</p-accordion-header>
       <p-accordion-content class="h-[40rem] !overflow-y-auto">
-        <div *ngIf="authorBookCount$ | async as authors">
-          <div *ngFor="let author of authors">
+        <div *ngIf="filterStreams[filterType] | async as filters">
+          <div *ngFor="let filter of filters">
             <p
               class="cursor-pointer transition-colors duration-200 ease-in-out pb-1"
-              [ngClass]="{'text-[var(--primary-color)]': activeAuthor === author.author.id}"
-              (click)="authorClicked(author)">
-              <p-badge [value]="author.bookCount"></p-badge>
-              {{ author.author.name }}
-            </p>
-          </div>
-        </div>
-      </p-accordion-content>
-    </p-accordion-panel>
-
-    <p-accordion-panel value="1">
-      <p-accordion-header>Genres</p-accordion-header>
-      <p-accordion-content class="h-[40rem] !overflow-y-auto">
-        <div *ngIf="categoryBookCount$ | async as categories">
-          <div *ngFor="let category of categories">
-            <p
-              class="cursor-pointer transition-colors duration-200 ease-in-out pb-1"
-              [ngClass]="{'text-[var(--primary-color)]': activeCategory === category.category.id}"
-              (click)="categoryClicked(category)">
-              <p-badge [value]="category.bookCount"></p-badge>
-              {{ category.category.name }}
-            </p>
-          </div>
-        </div>
-      </p-accordion-content>
-    </p-accordion-panel>
-
-    <p-accordion-panel value="2">
-      <p-accordion-header>Awards</p-accordion-header>
-      <p-accordion-content class="h-[40rem] !overflow-y-auto">
-        <div *ngIf="awardBookCount$ | async as awards">
-          <div *ngFor="let award of awards">
-            <p
-              class="cursor-pointer transition-colors duration-200 ease-in-out pb-1"
-              [ngClass]="{'text-[var(--primary-color)]': activeAward === award.award}"
-              (click)="awardClicked(award)">
-              <p-badge [value]="award.bookCount"></p-badge>
-              {{ award.award }}
-            </p>
-          </div>
-        </div>
-      </p-accordion-content>
-    </p-accordion-panel>
-
-    <p-accordion-panel value="3">
-      <p-accordion-header>Publishers</p-accordion-header>
-      <p-accordion-content class="h-[40rem] !overflow-y-auto">
-        <div *ngIf="publisherBookCount$ | async as publishers">
-          <div *ngFor="let publisher of publishers">
-            <p
-              class="cursor-pointer transition-colors duration-200 ease-in-out pb-1"
-              [ngClass]="{'text-[var(--primary-color)]': activePublisher === publisher.publisher}"
-              (click)="publisherClicked(publisher)">
-              <p-badge [value]="publisher.bookCount"></p-badge>
-              {{ publisher.publisher }}
+              [ngClass]="{'text-[var(--primary-color)]': activeFilter.type === filterType && activeFilter.value === (filter.value?.id || filter.value)}"
+              (click)="handleFilterClick(filterType, filter.value?.id || filter.value)">
+              <p-badge [value]="filter.bookCount"></p-badge>
+              {{ filter.value.name || filter.value }}
             </p>
           </div>
         </div>

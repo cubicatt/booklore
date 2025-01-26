@@ -21,6 +21,9 @@ export interface BookMetadata {
   publisher?: string;
   publishedDate?: string;
   description?: string;
+  seriesName?: string;
+  seriesNumber?: number | null;
+  seriesTotal?: number | null;
   isbn13?: string;
   isbn10?: string;
   asin?: string;
@@ -45,6 +48,9 @@ export interface FetchedMetadata {
   publisher: string | null;
   publishedDate: string | null;
   description: string | null;
+  seriesName: string | null;
+  seriesNumber: number | null;
+  seriesTotal: number | null;
   isbn13: string | null;
   isbn10: string | null;
   asin: string | null;

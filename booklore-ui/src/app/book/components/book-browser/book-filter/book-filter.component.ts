@@ -1,195 +1,78 @@
 import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
-import {Accordion, AccordionContent, AccordionHeader, AccordionPanel} from 'primeng/accordion';
-import {AsyncPipe, NgClass, NgForOf, NgIf} from '@angular/common';
-import {Badge} from 'primeng/badge';
 import {combineLatest, Observable, of} from 'rxjs';
-import {Author, Book, Category} from '../../../model/book.model';
-import {distinctUntilChanged, map} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {BookService} from '../../../service/book.service';
 import {Library} from '../../../model/library.model';
 import {Shelf} from '../../../model/shelf.model';
 import {EntityType} from '../book-browser.component';
+import {Book} from '../../../model/book.model';
+import {Accordion, AccordionContent, AccordionHeader, AccordionPanel} from 'primeng/accordion';
+import {AsyncPipe, NgClass, NgForOf, NgIf, TitleCasePipe} from '@angular/common';
+import {Badge} from 'primeng/badge';
+
+
+type Filter<T> = { value: T; bookCount: number };
 
 @Component({
   selector: 'app-book-filter',
+  templateUrl: './book-filter.component.html',
+  styleUrls: ['./book-filter.component.scss'],
   imports: [
     Accordion,
-    AccordionContent,
-    AccordionHeader,
     AccordionPanel,
-    AsyncPipe,
-    Badge,
-    NgForOf,
+    AccordionHeader,
+    AccordionContent,
     NgIf,
-    NgClass
-  ],
-  templateUrl: './book-filter.component.html',
-  styleUrl: './book-filter.component.scss'
+    NgForOf,
+    NgClass,
+    Badge,
+    AsyncPipe,
+    TitleCasePipe
+  ]
 })
 export class BookFilterComponent implements OnInit {
-  @Output() authorSelected = new EventEmitter<number | null>();
-  @Output() categorySelected = new EventEmitter<number | null>();
-  @Output() publisherSelected = new EventEmitter<string | null>();
-  @Output() awardSelected = new EventEmitter<string | null>();
+  @Output() filterSelected = new EventEmitter<{ type: string; value: any } | null>();
 
   @Input() showFilters: boolean = true;
   @Input() entity$!: Observable<Library | Shelf | null> | undefined;
   @Input() entityType$!: Observable<EntityType> | undefined;
 
-  activeAuthor: number | null = null;
-  activeCategory: number | null = null;
-  activePublisher: string | null = null;
-  activeAward: string | null = null;
-
-  authorBookCount$!: Observable<{ author: Author; bookCount: number }[]>;
-  categoryBookCount$!: Observable<{ category: Category; bookCount: number }[]>;
-  publisherBookCount$!: Observable<{ publisher: string; bookCount: number }[]>;
-  awardBookCount$!: Observable<{ award: string; bookCount: number }[]>;
+  activeFilter: { type: string; value: any | null } = {type: '', value: null};
+  filterStreams: Record<string, Observable<Filter<any>[]>> = {};
 
   bookService = inject(BookService);
 
+
   ngOnInit(): void {
     if (this.entity$ && this.entityType$) {
-      this.authorBookCount$ = this.getAuthorBookCountStream();
-      this.categoryBookCount$ = this.getCategoryBookCountStream();
-      this.publisherBookCount$ = this.getPublisherBookCountStream();
-      this.awardBookCount$ = this.getAwardBookCountStream();
+      this.filterStreams = {
+        author: this.getFilterStream((book) => book.metadata?.authors, 'id', 'name'),
+        category: this.getFilterStream((book) => book.metadata?.categories, 'id', 'name'),
+        series: this.getFilterStream((book) => (book.metadata?.seriesName ? [{id: book.metadata.seriesName, name: book.metadata.seriesName}] : []), 'id', 'name'),
+        award: this.getFilterStream((book) => book.metadata?.awards?.filter((award) => award.designation === 'WINNER'), 'name', 'name'),
+        publisher: this.getFilterStream((book) => (book.metadata?.publisher ? [{id: book.metadata.publisher, name: book.metadata.publisher}] : []), 'id', 'name'),
+      };
     }
   }
 
-  private getAuthorBookCountStream(): Observable<{ author: Author; bookCount: number }[]> {
-    return combineLatest([
-      this.bookService.bookState$,
-      this.entity$ ?? of(null),
-      this.entityType$ ?? of(EntityType.ALL_BOOKS)
-    ]).pipe(
-      map(([state, entity, entityType]) => {
-        let filteredBooks = this.filterBooksByEntityType(state.books || [], entity, entityType);
-
-        const authorMap = new Map<number, { author: Author; bookCount: number }>();
-        filteredBooks.forEach((book) => {
-          book.metadata?.authors.forEach((author) => {
-            if (!authorMap.has(author.id)) {
-              authorMap.set(author.id, {author, bookCount: 0});
-            }
-            const authorData = authorMap.get(author.id);
-            if (authorData) {
-              authorData.bookCount += 1;
-            }
-          });
-        });
-
-        return Array.from(authorMap.values()).sort((a, b) => {
-          if (b.bookCount !== a.bookCount) {
-            return b.bookCount - a.bookCount;
-          }
-          return a.author.name.localeCompare(b.author.name);
-        });
-      }),
-      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
-    );
-  }
-
-  private getCategoryBookCountStream(): Observable<{ category: Category; bookCount: number }[]> {
-    return combineLatest([
-      this.bookService.bookState$,
-      this.entity$ ?? of(null),
-      this.entityType$ ?? of(EntityType.ALL_BOOKS)
-    ]).pipe(
-      map(([state, entity, entityType]) => {
-        let filteredBooks = this.filterBooksByEntityType(state.books || [], entity, entityType);
-
-        const categoryMap = new Map<number, { category: Category; bookCount: number }>();
-        filteredBooks.forEach((book) => {
-          book.metadata?.categories.forEach((category) => {
-            if (!categoryMap.has(category.id)) {
-              categoryMap.set(category.id, {category, bookCount: 0});
-            }
-            const categoryData = categoryMap.get(category.id);
-            if (categoryData) {
-              categoryData.bookCount += 1;
-            }
-          });
-        });
-
-        return Array.from(categoryMap.values()).sort((a, b) => {
-          if (b.bookCount !== a.bookCount) {
-            return b.bookCount - a.bookCount;
-          }
-          return a.category.name.localeCompare(b.category.name);
-        });
-      }),
-      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
-    );
-  }
-
-  private getPublisherBookCountStream(): Observable<{ publisher: string; bookCount: number }[]> {
-    return combineLatest([
-      this.bookService.bookState$,
-      this.entity$ ?? of(null),
-      this.entityType$ ?? of(EntityType.ALL_BOOKS)
-    ]).pipe(
-      map(([state, entity, entityType]) => {
-        let filteredBooks = this.filterBooksByEntityType(state.books || [], entity, entityType);
-
-        const publisherMap = new Map<string, { publisher: string; bookCount: number }>();
-        filteredBooks.forEach((book) => {
-          if (book.metadata?.publisher) {
-            const publisherName = book.metadata.publisher;
-            if (!publisherMap.has(publisherName)) {
-              publisherMap.set(publisherName, {publisher: publisherName, bookCount: 0});
-            }
-            const publisherData = publisherMap.get(publisherName);
-            if (publisherData) {
-              publisherData.bookCount += 1;
-            }
-          }
-        });
-
-        return Array.from(publisherMap.values()).sort((a, b) => {
-          if (b.bookCount !== a.bookCount) {
-            return b.bookCount - a.bookCount;
-          }
-          return a.publisher.localeCompare(b.publisher);
-        });
-      }),
-      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
-    );
-  }
-
-  private getAwardBookCountStream(): Observable<{ award: string; bookCount: number }[]> {
-    return combineLatest([
-      this.bookService.bookState$,
-      this.entity$ ?? of(null),
-      this.entityType$ ?? of(EntityType.ALL_BOOKS)
-    ]).pipe(
-      map(([state, entity, entityType]) => {
-        let filteredBooks = this.filterBooksByEntityType(state.books || [], entity, entityType);
-
-        const awardMap = new Map<string, { award: string; bookCount: number }>();
-        filteredBooks.forEach((book) => {
-          book.metadata?.awards
-            ?.filter((award) => award.designation === 'WINNER')
-            .forEach((award) => {
-              if (!awardMap.has(award.name)) {
-                awardMap.set(award.name, {award: award.name, bookCount: 0});
+  private getFilterStream<T>(extractor: (book: Book) => T[] | undefined, idKey: keyof T, nameKey: keyof T): Observable<Filter<T[keyof T]>[]> {
+    return combineLatest([this.bookService.bookState$, this.entity$ ?? of(null), this.entityType$ ?? of(EntityType.ALL_BOOKS)])
+      .pipe(
+        map(([state, entity, entityType]) => {
+          const filteredBooks = this.filterBooksByEntityType(state.books || [], entity, entityType);
+          const filterMap = new Map<any, Filter<any>>();
+          filteredBooks.forEach((book) => {
+            (extractor(book) || []).forEach((item) => {
+              const id = item[idKey];
+              if (!filterMap.has(id)) {
+                filterMap.set(id, {value: item, bookCount: 0});
               }
-              const awardData = awardMap.get(award.name);
-              if (awardData) {
-                awardData.bookCount += 1;
-              }
+              filterMap.get(id)!.bookCount += 1;
             });
-        });
-
-        return Array.from(awardMap.values()).sort((a, b) => {
-          if (b.bookCount !== a.bookCount) {
-            return b.bookCount - a.bookCount;
-          }
-          return a.award.localeCompare(b.award);
-        });
-      }),
-      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
-    );
+          });
+          return Array.from(filterMap.values()).sort((a, b) => b.bookCount - a.bookCount || a.value[nameKey].localeCompare(b.value[nameKey]));
+        })
+      );
   }
 
   private filterBooksByEntityType(books: Book[], entity: any, entityType: EntityType): Book[] {
@@ -197,70 +80,18 @@ export class BookFilterComponent implements OnInit {
       return books.filter((book) => book.libraryId === entity.id);
     }
     if (entityType === EntityType.SHELF && entity && 'id' in entity) {
-      return books.filter((book) =>
-        book.shelves?.some((shelf) => shelf.id === entity.id)
-      );
+      return books.filter((book) => book.shelves?.some((shelf) => shelf.id === entity.id));
     }
     return books;
   }
 
-  authorClicked(author: { author: Author; bookCount: number }) {
-    if (this.activeAuthor === author.author.id) {
-      this.activeAuthor = null;
+  handleFilterClick(filterType: string, value: any) {
+    if (this.activeFilter.type === filterType && this.activeFilter.value === value) {
+      this.activeFilter = {type: '', value: null};
+      this.filterSelected.emit(null);
     } else {
-      this.activeAuthor = author.author.id;
+      this.activeFilter = {type: filterType, value};
+      this.filterSelected.emit({type: filterType, value});
     }
-    this.activeCategory = null;
-    this.activeAward = null;
-    this.activePublisher = null;
-    this.categorySelected.emit(null);
-    this.publisherSelected.emit(null);
-    this.awardSelected.emit(null);
-    this.authorSelected.emit(this.activeAuthor);
-  }
-
-  categoryClicked(category: { category: Category; bookCount: number }) {
-    if (this.activeCategory === category.category.id) {
-      this.activeCategory = null;
-    } else {
-      this.activeCategory = category.category.id;
-    }
-    this.activeAuthor = null;
-    this.activeAward = null;
-    this.activePublisher = null;
-    this.authorSelected.emit(null);
-    this.publisherSelected.emit(null);
-    this.awardSelected.emit(null);
-    this.categorySelected.emit(this.activeCategory);
-  }
-
-  publisherClicked(publisher: { publisher: string; bookCount: number }) {
-    if (this.activePublisher === publisher.publisher) {
-      this.activePublisher = null;
-    } else {
-      this.activePublisher = publisher.publisher;
-    }
-    this.activeAuthor = null;
-    this.activeAward = null;
-    this.activeCategory = null;
-    this.authorSelected.emit(null);
-    this.categorySelected.emit(null);
-    this.awardSelected.emit(null);
-    this.publisherSelected.emit(this.activePublisher);
-  }
-
-  awardClicked(award: { award: string; bookCount: number }) {
-    if (this.activeAward === award.award) {
-      this.activeAward = null;
-    } else {
-      this.activeAward = award.award;
-    }
-    this.activeAuthor = null;
-    this.activeCategory = null;
-    this.activePublisher = null;
-    this.authorSelected.emit(null);
-    this.categorySelected.emit(null);
-    this.publisherSelected.emit(null);
-    this.awardSelected.emit(this.activeAward);
   }
 }

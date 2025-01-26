@@ -80,10 +80,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   @ViewChild(BookTableComponent) bookTableComponent!: BookTableComponent;
   @ViewChild(BookFilterComponent) bookFilterComponent!: BookFilterComponent;
 
-  selectedAuthor = new BehaviorSubject<number | null>(null);
-  selectedCategory = new BehaviorSubject<number | null>(null);
-  selectedPublisher = new BehaviorSubject<string | null>(null);
-  selectedAward = new BehaviorSubject<string | null>(null);
+  selectedFilter = new BehaviorSubject<{ type: string; value: any } | null>(null);
 
   private activatedRoute = inject(ActivatedRoute);
   private messageService = inject(MessageService);
@@ -213,30 +210,44 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   }
 
   private sideBarFilter(bookState: BookState): Observable<BookState> {
-    return combineLatest([this.selectedAuthor, this.selectedCategory, this.selectedPublisher, this.selectedAward]).pipe(
-      map(([authorId, categoryId, publisher, awardName]) => {
+    return this.selectedFilter.pipe(
+      map(selectedFilter => {
+        if (!selectedFilter) {
+          return bookState;
+        }
         let filteredBooks = bookState.books || [];
-        if (authorId !== null) {
-          filteredBooks = filteredBooks.filter(book =>
-            book.metadata?.authors.some(author => author.id === authorId)
-          );
+        switch (selectedFilter.type) {
+          case 'author':
+            filteredBooks = filteredBooks.filter(book =>
+              book.metadata?.authors?.some(author => author.id === selectedFilter.value)
+            );
+            break;
+          case 'category':
+            filteredBooks = filteredBooks.filter(book =>
+              book.metadata?.categories?.some(category => category.id === selectedFilter.value)
+            );
+            break;
+          case 'publisher':
+            filteredBooks = filteredBooks.filter(book =>
+              book.metadata?.publisher === selectedFilter.value
+            );
+            break;
+          case 'award':
+            filteredBooks = filteredBooks.filter(book =>
+              book.metadata?.awards?.some(
+                award => award.name === selectedFilter.value.name && award.designation === 'WINNER'
+              )
+            );
+            break;
+          case 'series':
+            filteredBooks = filteredBooks.filter(book =>
+              book.metadata?.seriesName === selectedFilter.value
+            );
+            break;
+          default:
+            break;
         }
-        if (categoryId !== null) {
-          filteredBooks = filteredBooks.filter(book =>
-            book.metadata?.categories?.some(category => category.id === categoryId)
-          );
-        }
-        if (publisher != null) {
-          filteredBooks = filteredBooks.filter(book =>
-            book.metadata?.publisher === publisher
-          );
-        }
-        if (awardName !== null) {
-          filteredBooks = filteredBooks.filter(book =>
-            book.metadata?.awards?.some(award => award.name === awardName && award.designation === 'WINNER')
-          );
-        }
-        return {...bookState, books: filteredBooks};
+        return { ...bookState, books: filteredBooks };
       })
     );
   }
@@ -419,29 +430,13 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   }
 
   get isFilterActive(): boolean {
-    return this.selectedAuthor.value !== null ||
-      this.selectedCategory.value !== null ||
-      this.selectedPublisher.value !== null ||
-      this.selectedAward.value !== null;
+    return this.selectedFilter.value !== null;
   }
 
   clearFilter() {
-    if (this.selectedAuthor.value !== null) {
-      this.selectedAuthor.next(null);
+    if (this.selectedFilter.value !== null) {
+      this.selectedFilter.next(null);
     }
-    if (this.selectedCategory.value !== null) {
-      this.selectedCategory.next(null);
-    }
-    if (this.selectedPublisher.value !== null) {
-      this.selectedPublisher.next(null);
-    }
-    if (this.selectedAward.value !== null) {
-      this.selectedAward.next(null);
-    }
-    this.bookFilterComponent.activeCategory = null;
-    this.bookFilterComponent.activeAuthor = null;
-    this.bookFilterComponent.activePublisher = null;
-    this.bookFilterComponent.activeAward = null;
     this.clearSearch();
   }
 
@@ -465,20 +460,8 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.bookFilterComponent.authorSelected.subscribe((authorId: number) => {
-      this.selectedAuthor.next(authorId);
-    });
-
-    this.bookFilterComponent.categorySelected.subscribe((categoryId: number) => {
-      this.selectedCategory.next(categoryId);
-    });
-
-    this.bookFilterComponent.publisherSelected.subscribe((publisher: string) => {
-      this.selectedPublisher.next(publisher);
-    });
-
-    this.bookFilterComponent.awardSelected.subscribe((award: string) => {
-      this.selectedAward.next(award);
+    this.bookFilterComponent.filterSelected.subscribe((item) => {
+      this.selectedFilter.next(item);
     });
   }
 }

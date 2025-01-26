@@ -144,14 +144,17 @@
     <div class="form-row">
       <label class="label"></label>
       <div class="input-container">
-        <img *ngIf="!updateThumbnailUrl" [src]="urlHelper.getCoverUrl(metadata.bookId, metadata.coverUpdatedOn)" alt="Book Thumbnail" class="thumbnail"/>
-        <img *ngIf="updateThumbnailUrl" [src]="fetchedMetadata.thumbnailUrl" alt="Fetched Thumbnail" class="thumbnail"/>
+        <p-button *ngIf="!metadata['coverLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('thumbnailUrl')" severity="success"></p-button>
+        <p-button *ngIf="metadata['coverLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('thumbnailUrl')" severity="warn"></p-button>
+        <img [src]="metadataForm.get('thumbnailUrl')?.value" alt="Book Thumbnail" class="thumbnail"/>
+        <input type="hidden" id="thumbnailUrl" formControlName="thumbnailUrl" class="input"/>
         <p-button
-          [icon]="thumbnailSaved ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [icon]="isValueSaved('thumbnailUrl') ? 'pi pi-check' : 'pi pi-arrow-left'"
           [outlined]="true"
-          [ngClass]="{'green-outlined-button': thumbnailSaved, 'yellow-outlined-button': updateThumbnailUrl}"
+          [ngClass]="{'green-outlined-button': isValueSaved('thumbnailUrl'), 'yellow-outlined-button': isValueCopied('thumbnailUrl')}"
           class="arrow-button"
-          (click)="shouldUpdateThumbnail()"/>
+          (click)="copyFetchedToCurrent('thumbnailUrl')"/>
+        <input type="hidden" [value]="fetchedMetadata.thumbnailUrl" class="input" readonly/>
         <img [src]="fetchedMetadata.thumbnailUrl" alt="Fetched Thumbnail" class="thumbnail"/>
       </div>
     </div>
@@ -288,8 +291,11 @@
     <div class="flex justify-between">
       <p-button label="Back" icon="pi pi-arrow-left" severity="info" (onClick)="goBackClick()"></p-button>
       <div class="flex gap-x-4 justify-end">
+        <p-button label="Unlock All" icon="pi pi-lock-open" [outlined]="true" severity="success" (onClick)="unlockAll()"></p-button>
+        <p-button label="Lock All" icon="pi pi-lock" [outlined]="true" severity="warn" (onClick)="lockAll()"></p-button>
+        <p-divider layout="vertical"/>
         <p-button label="Close" icon="pi pi-times" severity="secondary" (onClick)="closeDialog()"></p-button>
-        <p-button label="Save" icon="pi pi-check" severity="primary" type="submit"></p-button>
+        <p-button label="Save" icon="pi pi-check" type="submit"></p-button>
       </div>
     </div>
   </div>

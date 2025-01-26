@@ -55,6 +55,7 @@ export interface BookMetadata {
   authorsLocked?: boolean;
   categoriesLocked?: boolean;
   awardsLocked?: boolean;
+  coverLocked?: boolean;
 
   [key: string]: any;
 }

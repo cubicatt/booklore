@@ -37,8 +37,6 @@ export class MetadataPickerComponent implements OnInit {
 
   metadataForm: FormGroup;
   currentBookId!: number;
-  updateThumbnailUrl: boolean = false;
-  thumbnailSaved: boolean = false;
   copiedFields: Record<string, boolean> = {};
   savedFields: Record<string, boolean> = {};
 
@@ -67,6 +65,7 @@ export class MetadataPickerComponent implements OnInit {
       seriesName: new FormControl(''),
       seriesNumber: new FormControl(''),
       seriesTotal: new FormControl(''),
+      thumbnailUrl: new FormControl(''),
 
       titleLocked: new FormControl(false),
       subtitleLocked: new FormControl(false),
@@ -84,6 +83,7 @@ export class MetadataPickerComponent implements OnInit {
       seriesNameLocked: new FormControl(false),
       seriesNumberLocked: new FormControl(false),
       seriesTotalLocked: new FormControl(false),
+      thumbnailUrlLocked: new FormControl(false),
     });
   }
 
@@ -108,6 +108,7 @@ export class MetadataPickerComponent implements OnInit {
           seriesName: metadata.seriesName,
           seriesNumber: metadata.seriesNumber,
           seriesTotal: metadata.seriesTotal,
+          thumbnailUrl: this.urlHelper.getCoverUrl(metadata.bookId, metadata.coverUpdatedOn),
 
           titleLocked: metadata.titleLocked || false,
           subtitleLocked: metadata.subtitleLocked || false,
@@ -125,6 +126,7 @@ export class MetadataPickerComponent implements OnInit {
           seriesNameLocked: metadata.seriesNameLocked || false,
           seriesNumberLocked: metadata.seriesNumberLocked || false,
           seriesTotalLocked: metadata.seriesTotalLocked || false,
+          thumbnailUrlLocked: metadata.coverLocked || false,
         });
 
         if (metadata.titleLocked) this.metadataForm.get('title')?.disable();
@@ -164,9 +166,6 @@ export class MetadataPickerComponent implements OnInit {
             this.savedFields[field] = true;
           }
         });
-        if (this.updateThumbnailUrl) {
-          this.thumbnailSaved = true;
-        }
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
         this.metadataCenterService.emit(bookMetadata);
       },
@@ -195,7 +194,7 @@ export class MetadataPickerComponent implements OnInit {
       seriesName: this.metadataForm.get('seriesName')?.value || this.copiedFields['seriesName'] ? this.getValueOrCopied('seriesName') : '',
       seriesNumber: this.metadataForm.get('seriesNumber')?.value || this.copiedFields['seriesNumber'] ? this.getNumberOrCopied('seriesNumber') : null,
       seriesTotal: this.metadataForm.get('seriesTotal')?.value || this.copiedFields['seriesTotal'] ? this.getNumberOrCopied('seriesTotal') : null,
-      thumbnailUrl: this.updateThumbnailUrl ? this.fetchedMetadata.thumbnailUrl : '',
+      thumbnailUrl: this.getThumbnail(),
 
       titleLocked: this.metadataForm.get('titleLocked')?.value,
       subtitleLocked: this.metadataForm.get('subtitleLocked')?.value,
@@ -213,8 +212,17 @@ export class MetadataPickerComponent implements OnInit {
       seriesNameLocked: this.metadataForm.get('seriesNameLocked')?.value,
       seriesNumberLocked: this.metadataForm.get('seriesNumberLocked')?.value,
       seriesTotalLocked: this.metadataForm.get('seriesTotalLocked')?.value,
+      coverLocked: this.metadataForm.get('thumbnailUrlLocked')?.value,
     };
     return updatedBookMetadata;
+  }
+
+  getThumbnail() {
+    const thumbnailUrl = this.metadataForm.get('thumbnailUrl')?.value;
+    if (thumbnailUrl?.includes('api/v1')) {
+      return null;
+    }
+    return this.copiedFields['thumbnailUrl'] ? this.getValueOrCopied('thumbnailUrl') : null;
   }
 
   private updateMetadata(): void {
@@ -287,10 +295,6 @@ export class MetadataPickerComponent implements OnInit {
     return Array.isArray(fieldValue) ? fieldValue : [];
   }
 
-  shouldUpdateThumbnail() {
-    this.updateThumbnailUrl = true;
-  }
-
   copyFetchedToCurrent(field: string): void {
     const isLocked = this.metadataForm.get(`${field}Locked`)?.value;
     if (isLocked) {
@@ -307,6 +311,28 @@ export class MetadataPickerComponent implements OnInit {
       this.copiedFields[field] = true;
       this.highlightCopiedInput(field);
     }
+  }
+
+  lockAll(): void {
+    Object.keys(this.metadataForm.controls).forEach((key) => {
+      if (key.endsWith('Locked')) {
+        this.metadataForm.get(key)?.setValue(true);
+        const fieldName = key.replace('Locked', '');
+        this.metadataForm.get(fieldName)?.disable();
+      }
+    });
+    this.updateMetadata();
+  }
+
+  unlockAll(): void {
+    Object.keys(this.metadataForm.controls).forEach((key) => {
+      if (key.endsWith('Locked')) {
+        this.metadataForm.get(key)?.setValue(false);
+        const fieldName = key.replace('Locked', '');
+        this.metadataForm.get(fieldName)?.enable();
+      }
+    });
+    this.updateMetadata();
   }
 
   highlightCopiedInput(field: string): void {

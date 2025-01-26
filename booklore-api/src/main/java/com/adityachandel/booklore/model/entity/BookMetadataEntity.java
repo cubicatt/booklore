@@ -69,6 +69,61 @@ public class BookMetadataEntity {
     @Column(name = "cover_updated_on")
     private Instant coverUpdatedOn;
 
+    // Locking fields
+    @Column(name = "title_locked")
+    private Boolean titleLocked = Boolean.FALSE;
+
+    @Column(name = "subtitle_locked")
+    private Boolean subtitleLocked = Boolean.FALSE;
+
+    @Column(name = "publisher_locked")
+    private Boolean publisherLocked = Boolean.FALSE;
+
+    @Column(name = "published_date_locked")
+    private Boolean publishedDateLocked = Boolean.FALSE;
+
+    @Column(name = "description_locked")
+    private Boolean descriptionLocked = Boolean.FALSE;
+
+    @Column(name = "isbn_13_locked")
+    private Boolean isbn13Locked = Boolean.FALSE;
+
+    @Column(name = "isbn_10_locked")
+    private Boolean isbn10Locked = Boolean.FALSE;
+
+    @Column(name = "page_count_locked")
+    private Boolean pageCountLocked = Boolean.FALSE;
+
+    @Column(name = "thumbnail_locked")
+    private Boolean thumbnailLocked = Boolean.FALSE;
+
+    @Column(name = "language_locked")
+    private Boolean languageLocked = Boolean.FALSE;
+
+    @Column(name = "rating_locked")
+    private Boolean ratingLocked = Boolean.FALSE;
+
+    @Column(name = "review_count_locked")
+    private Boolean reviewCountLocked = Boolean.FALSE;
+
+    @Column(name = "cover_locked")
+    private Boolean coverLocked = Boolean.FALSE;
+
+    @Column(name = "series_name_locked")
+    private Boolean seriesNameLocked = Boolean.FALSE;
+
+    @Column(name = "series_number_locked")
+    private Boolean seriesNumberLocked = Boolean.FALSE;
+
+    @Column(name = "series_total_locked")
+    private Boolean seriesTotalLocked = Boolean.FALSE;
+
+    @Column(name = "authors_locked")
+    private Boolean authorsLocked = Boolean.FALSE;
+
+    @Column(name = "categories_locked")
+    private Boolean categoriesLocked = Boolean.FALSE;
+
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "book_id")

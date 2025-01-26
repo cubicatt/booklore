@@ -1,4 +1,4 @@
-<form [formGroup]="bookMetadataForm" (ngSubmit)="onSave('saveButton')" *ngIf="bookMetadata$ | async as metadata" class="pt-2 flex flex-col h-full">
+<form [formGroup]="bookMetadataForm" (ngSubmit)="onSave()" *ngIf="bookMetadata$ | async as metadata" class="pt-2 flex flex-col h-full">
 
   <div class="overflow-y-scroll flex-1">
 

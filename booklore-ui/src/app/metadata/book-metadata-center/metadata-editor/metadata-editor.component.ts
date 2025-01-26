@@ -123,7 +123,38 @@ export class MetadataEditorComponent implements OnInit {
     });
   }
 
-  onSave(source: string): void {
+  onSave(): void {
+    this.metadataService.updateBookMetadata(this.currentBookId, this.buildMetadata()).subscribe({
+      next: (response) => {
+        this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
+        this.metadataCenterService.emit(response);
+      },
+      error: () => {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book metadata'});
+      }
+    });
+  }
+
+  toggleLock(field: string): void {
+    const isLocked = this.bookMetadataForm.get(field + 'Locked')?.value;
+    const updatedLockedState = !isLocked;
+    this.bookMetadataForm.get(field + 'Locked')?.setValue(updatedLockedState);
+    if (updatedLockedState) {
+      this.bookMetadataForm.get(field)?.disable();
+    } else {
+      this.bookMetadataForm.get(field)?.enable();
+    }
+    this.metadataService.updateBookMetadata(this.currentBookId, this.buildMetadata()).subscribe({
+      next: (response) => {
+        this.metadataCenterService.emit(response);
+      },
+      error: () => {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update lock'});
+      }
+    });
+  }
+
+  private buildMetadata() {
     const updatedBookMetadata: BookMetadata = {
       bookId: this.currentBookId,
       title: this.bookMetadataForm.get('title')?.value,
@@ -154,30 +185,7 @@ export class MetadataEditorComponent implements OnInit {
       ratingLocked: this.bookMetadataForm.get('ratingLocked')?.value,
       reviewCountLocked: this.bookMetadataForm.get('reviewCountLocked')?.value,
     };
-
-    this.metadataService.updateBookMetadata(this.currentBookId, updatedBookMetadata).subscribe({
-      next: (response) => {
-        if (source === 'saveButton') {
-          this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
-        }
-        this.metadataCenterService.emit(response);
-      },
-      error: () => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update book metadata'});
-      }
-    });
-  }
-
-  toggleLock(field: string): void {
-    const isLocked = this.bookMetadataForm.get(field + 'Locked')?.value;
-    const updatedLockedState = !isLocked;
-    this.bookMetadataForm.get(field + 'Locked')?.setValue(updatedLockedState);
-    if (updatedLockedState) {
-      this.bookMetadataForm.get(field)?.disable();
-    } else {
-      this.bookMetadataForm.get(field)?.enable();
-    }
-    this.onSave('lock');
+    return updatedBookMetadata;
   }
 
   closeDialog() {

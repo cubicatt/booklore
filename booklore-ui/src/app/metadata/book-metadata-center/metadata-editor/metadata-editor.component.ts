@@ -15,6 +15,8 @@ import {FileUpload, FileUploadErrorEvent, FileUploadEvent} from 'primeng/fileupl
 import {HttpResponse} from '@angular/common/http';
 import {BookService} from '../../../book/service/book.service';
 import {ProgressSpinner} from 'primeng/progressspinner';
+import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
+import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
 
 @Component({
   selector: 'app-metadata-editor',
@@ -279,5 +281,14 @@ export class MetadataEditorComponent implements OnInit {
     this.messageService.add({
       severity: 'error', summary: 'Upload Error', detail: 'An error occurred while uploading the cover', life: 3000
     });
+  }
+
+  quickRefresh() {
+    const metadataRefreshRequest: MetadataRefreshRequest = {
+      quick: true,
+      refreshType: MetadataRefreshType.BOOKS,
+      bookIds: [this.currentBookId]
+    };
+    this.metadataService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
   }
 }

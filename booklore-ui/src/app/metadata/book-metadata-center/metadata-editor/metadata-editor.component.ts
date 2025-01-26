@@ -54,6 +54,9 @@ export class MetadataEditorComponent implements OnInit {
       language: new FormControl(''),
       rating: new FormControl(''),
       reviewCount: new FormControl(''),
+      seriesName: new FormControl(''),
+      seriesNumber: new FormControl(''),
+      seriesTotal: new FormControl(''),
 
       titleLocked: new FormControl(false),
       subtitleLocked: new FormControl(false),
@@ -68,6 +71,9 @@ export class MetadataEditorComponent implements OnInit {
       languageLocked: new FormControl(false),
       ratingLocked: new FormControl(false),
       reviewCountLocked: new FormControl(false),
+      seriesNameLocked: new FormControl(false),
+      seriesNumberLocked: new FormControl(false),
+      seriesTotalLocked: new FormControl(false),
     });
   }
 
@@ -90,6 +96,9 @@ export class MetadataEditorComponent implements OnInit {
           language: metadata.language,
           rating: metadata.rating,
           reviewCount: metadata.reviewCount,
+          seriesName: metadata.seriesName,
+          seriesNumber: metadata.seriesNumber,
+          seriesTotal: metadata.seriesTotal,
 
           titleLocked: metadata.titleLocked || false,
           subtitleLocked: metadata.subtitleLocked || false,
@@ -104,6 +113,9 @@ export class MetadataEditorComponent implements OnInit {
           languageLocked: metadata.languageLocked || false,
           ratingLocked: metadata.ratingLocked || false,
           reviewCountLocked: metadata.reviewCountLocked || false,
+          seriesNameLocked: metadata.seriesNameLocked || false,
+          seriesNumberLocked: metadata.seriesNumberLocked || false,
+          seriesTotalLocked: metadata.seriesTotalLocked || false,
         });
 
         if (metadata.titleLocked) this.bookMetadataForm.get('title')?.disable();
@@ -119,6 +131,9 @@ export class MetadataEditorComponent implements OnInit {
         if (metadata.ratingLocked) this.bookMetadataForm.get('rating')?.disable();
         if (metadata.pageCountLocked) this.bookMetadataForm.get('pageCount')?.disable();
         if (metadata.descriptionLocked) this.bookMetadataForm.get('description')?.disable();
+        if (metadata.seriesNameLocked) this.bookMetadataForm.get('seriesName')?.disable();
+        if (metadata.seriesNumberLocked) this.bookMetadataForm.get('seriesNumber')?.disable();
+        if (metadata.seriesTotalLocked) this.bookMetadataForm.get('seriesTotal')?.disable();
       }
     });
   }
@@ -170,6 +185,9 @@ export class MetadataEditorComponent implements OnInit {
       rating: this.bookMetadataForm.get('rating')?.value,
       reviewCount: this.bookMetadataForm.get('reviewCount')?.value,
       language: this.bookMetadataForm.get('language')?.value,
+      seriesName: this.bookMetadataForm.get('seriesName')?.value,
+      seriesNumber: this.bookMetadataForm.get('seriesNumber')?.value,
+      seriesTotal: this.bookMetadataForm.get('seriesTotal')?.value,
 
       titleLocked: this.bookMetadataForm.get('titleLocked')?.value,
       subtitleLocked: this.bookMetadataForm.get('subtitleLocked')?.value,
@@ -184,6 +202,10 @@ export class MetadataEditorComponent implements OnInit {
       languageLocked: this.bookMetadataForm.get('languageLocked')?.value,
       ratingLocked: this.bookMetadataForm.get('ratingLocked')?.value,
       reviewCountLocked: this.bookMetadataForm.get('reviewCountLocked')?.value,
+      seriesNameLocked: this.bookMetadataForm.get('seriesNameLocked')?.value,
+      seriesNumberLocked: this.bookMetadataForm.get('seriesNumberLocked')?.value,
+      seriesTotalLocked: this.bookMetadataForm.get('seriesTotalLocked')?.value,
+
     };
     return updatedBookMetadata;
   }

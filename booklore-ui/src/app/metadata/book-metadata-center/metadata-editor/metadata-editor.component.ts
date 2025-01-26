@@ -159,14 +159,29 @@ export class MetadataEditorComponent implements OnInit {
     } else {
       this.bookMetadataForm.get(field)?.enable();
     }
-    this.metadataService.updateBookMetadata(this.currentBookId, this.buildMetadata()).subscribe({
-      next: (response) => {
-        this.metadataCenterService.emit(response);
-      },
-      error: () => {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update lock'});
+    this.updateMetadata();
+  }
+
+  lockAll(): void {
+    Object.keys(this.bookMetadataForm.controls).forEach((key) => {
+      if (key.endsWith('Locked')) {
+        this.bookMetadataForm.get(key)?.setValue(true);
+        const fieldName = key.replace('Locked', '');
+        this.bookMetadataForm.get(fieldName)?.disable();
       }
     });
+    this.updateMetadata();
+  }
+
+  unlockAll(): void {
+    Object.keys(this.bookMetadataForm.controls).forEach((key) => {
+      if (key.endsWith('Locked')) {
+        this.bookMetadataForm.get(key)?.setValue(false);
+        const fieldName = key.replace('Locked', '');
+        this.bookMetadataForm.get(fieldName)?.enable();
+      }
+    });
+    this.updateMetadata();
   }
 
   private buildMetadata() {
@@ -208,6 +223,17 @@ export class MetadataEditorComponent implements OnInit {
 
     };
     return updatedBookMetadata;
+  }
+
+  private updateMetadata(): void {
+    this.metadataService.updateBookMetadata(this.currentBookId, this.buildMetadata()).subscribe({
+      next: (response) => {
+        this.metadataCenterService.emit(response);
+      },
+      error: () => {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update lock state'});
+      }
+    });
   }
 
   closeDialog() {

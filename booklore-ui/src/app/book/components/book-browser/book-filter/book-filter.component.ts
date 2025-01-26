@@ -39,6 +39,7 @@ export class BookFilterComponent implements OnInit {
 
   activeFilter: { type: string; value: any | null } = {type: '', value: null};
   filterStreams: Record<string, Observable<Filter<any>[]>> = {};
+  filterTypes: string[] = [];
 
   bookService = inject(BookService);
 
@@ -52,6 +53,7 @@ export class BookFilterComponent implements OnInit {
         award: this.getFilterStream((book) => book.metadata?.awards?.filter((award) => award.designation === 'WINNER'), 'name', 'name'),
         publisher: this.getFilterStream((book) => (book.metadata?.publisher ? [{id: book.metadata.publisher, name: book.metadata.publisher}] : []), 'id', 'name'),
       };
+      this.filterTypes = Object.keys(this.filterStreams);
     }
   }
 

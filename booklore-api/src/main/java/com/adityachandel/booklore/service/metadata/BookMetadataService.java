@@ -212,13 +212,13 @@ public class BookMetadataService {
                 value = newValue;
             }
         }
-        if (value == null && fieldProvider.getP2() != null && metadataMap.containsKey(fieldProvider.getP2())) {
+        if (fieldProvider.getP2() != null && metadataMap.containsKey(fieldProvider.getP2())) {
             String newValue = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP2()));
             if (newValue != null) {
                 value = newValue;
             }
         }
-        if (value == null && fieldProvider.getP1() != null && metadataMap.containsKey(fieldProvider.getP1())) {
+        if (fieldProvider.getP1() != null && metadataMap.containsKey(fieldProvider.getP1())) {
             String newValue = fieldValueExtractor.extract(metadataMap.get(fieldProvider.getP1()));
             if (newValue != null) {
                 value = newValue;

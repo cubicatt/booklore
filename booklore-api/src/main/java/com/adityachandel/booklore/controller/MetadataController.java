@@ -37,11 +37,6 @@ public class MetadataController {
         return ResponseEntity.ok(bookMetadata);
     }
 
-    /*@PutMapping("/update/{bookId}")
-    public ResponseEntity<BookMetadata> updateMetadata(@PathVariable long bookId, @RequestBody BookMetadata bookMetadata) {
-        return ResponseEntity.ok(bookMetadataUpdater.updateMetadata(bookId, bookMetadata));
-    }*/
-
     @PutMapping(path = "/refreshV2")
     public ResponseEntity<String> scheduleRefreshV2(@Validated @RequestBody MetadataRefreshRequest request) {
         jobSchedulerService.scheduleMetadataRefreshV2(request);

@@ -22,9 +22,9 @@ export class MetadataAdvancedFetchOptionsComponent implements OnChanges {
   refreshCovers: boolean = false;
   mergeCategories: boolean = false;
 
-  allP3 = {placeholder: 'Set All', value: ''};
-  allP2 = {placeholder: 'Set All', value: ''};
-  allP1 = {placeholder: 'Set All', value: ''};
+  allP3 = {placeholder: 'Set All', value: null as string | null};
+  allP2 = {placeholder: 'Set All', value: null as string | null};
+  allP1 = {placeholder: 'Set All', value: null as string | null};
 
   fieldOptions: FieldOptions = {
     title: {p3: null, p2: null, p1: null},
@@ -43,9 +43,9 @@ export class MetadataAdvancedFetchOptionsComponent implements OnChanges {
       this.refreshCovers = this.currentMetadataOptions.refreshCovers || false;
       this.mergeCategories = this.currentMetadataOptions.mergeCategories || false;
       this.fieldOptions = this.currentMetadataOptions.fieldOptions || this.fieldOptions;
-      this.allP3.value = this.currentMetadataOptions.allP3 || '';
-      this.allP2.value = this.currentMetadataOptions.allP2 || '';
-      this.allP1.value = this.currentMetadataOptions.allP1 || '';
+      this.allP3.value = this.currentMetadataOptions.allP3 || null;
+      this.allP2.value = this.currentMetadataOptions.allP2 || null;
+      this.allP1.value = this.currentMetadataOptions.allP1 || null;
     }
   }
 
@@ -82,9 +82,9 @@ export class MetadataAdvancedFetchOptionsComponent implements OnChanges {
   }
 
   reset() {
-    this.allP3.value = '';
-    this.allP2.value = '';
-    this.allP1.value = '';
+    this.allP3.value = null;
+    this.allP2.value = null;
+    this.allP1.value = null;
     for (const field of Object.keys(this.fieldOptions)) {
       this.fieldOptions[field as keyof FieldOptions] = {
         p3: null,

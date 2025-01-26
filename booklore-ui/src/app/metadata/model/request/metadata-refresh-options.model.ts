@@ -1,7 +1,7 @@
 export interface MetadataRefreshOptions {
-  allP3: string;
-  allP2: string;
-  allP1: string;
+  allP3: string | null;
+  allP2: string | null;
+  allP1: string | null;
   refreshCovers: boolean;
   mergeCategories: boolean;
   fieldOptions?: FieldOptions;

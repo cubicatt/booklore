@@ -1,4 +1,4 @@
-<form [formGroup]="metadataForm" (ngSubmit)="onSave()" class="h-full flex pt-1 flex-col">
+<form [formGroup]="metadataForm" (ngSubmit)="onSave()" *ngIf="bookMetadata$ | async as metadata" class="h-full flex pt-1 flex-col">
   <div class="overflow-y-scroll flex-1">
 
     <div class="flex justify-center items-center" [ngStyle]="{'padding-bottom': '0.75rem', 'padding-left': '4.95rem'}">
@@ -16,6 +16,8 @@
     <div class="form-row">
       <label for="title" class="label">Title</label>
       <div class="input-container">
+        <p-button *ngIf="!metadata['titleLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('title')" severity="success"></p-button>
+        <p-button *ngIf="metadata['titleLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('title')" severity="warn"></p-button>
         <input pInputText id="title" formControlName="title" class="input"/>
         <p-button
           [icon]="isValueSaved('title') ? 'pi pi-check' : 'pi pi-arrow-left'"
@@ -30,6 +32,8 @@
     <div class="form-row">
       <label for="authors" class="label">Authors</label>
       <div class="input-container">
+        <p-button *ngIf="!metadata['authorsLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('authors')" severity="success"></p-button>
+        <p-button *ngIf="metadata['authorsLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('authors')" severity="warn"></p-button>
         <input pInputText id="authors" formControlName="authors" class="input"/>
         <p-button
           [icon]="isValueSaved('authors') ? 'pi pi-check' : 'pi pi-arrow-left'"
@@ -44,6 +48,8 @@
     <div class="form-row">
       <label for="categories" class="label">Categories</label>
       <div class="input-container">
+        <p-button *ngIf="!metadata['categoriesLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('categories')" severity="success"></p-button>
+        <p-button *ngIf="metadata['categoriesLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('categories')" severity="warn"></p-button>
         <input pInputText id="categories" formControlName="categories" class="input"/>
         <p-button
           [icon]="isValueSaved('categories') ? 'pi pi-check' : 'pi pi-arrow-left'"
@@ -58,6 +64,8 @@
     <div class="form-row">
       <label for="publisher" class="label">Publisher</label>
       <div class="input-container">
+        <p-button *ngIf="!metadata['publisherLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('publisher')" severity="success"></p-button>
+        <p-button *ngIf="metadata['publisherLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('publisher')" severity="warn"></p-button>
         <input pInputText id="publisher" formControlName="publisher" class="input"/>
         <p-button
           [icon]="isValueSaved('publisher') ? 'pi pi-check' : 'pi pi-arrow-left'"
@@ -72,6 +80,8 @@
     <div class="form-row">
       <label for="publishedDate" class="label">Published</label>
       <div class="input-container">
+        <p-button *ngIf="!metadata['publishedDateLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('publishedDate')" severity="success"></p-button>
+        <p-button *ngIf="metadata['publishedDateLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('publishedDate')" severity="warn"></p-button>
         <input pInputText id="publishedDate" formControlName="publishedDate" class="input"/>
         <p-button
           [icon]="isValueSaved('publishedDate') ? 'pi pi-check' : 'pi pi-arrow-left'"
@@ -86,6 +96,8 @@
     <div class="form-row">
       <label for="isbn10" class="label">ISBN-10</label>
       <div class="input-container">
+        <p-button *ngIf="!metadata['isbn10Locked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('isbn10')" severity="success"></p-button>
+        <p-button *ngIf="metadata['isbn10Locked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('isbn10')" severity="warn"></p-button>
         <input pInputText id="isbn10" formControlName="isbn10" class="input"/>
         <p-button
           [icon]="isValueSaved('isbn10') ? 'pi pi-check' : 'pi pi-arrow-left'"
@@ -100,6 +112,8 @@
     <div class="form-row">
       <label for="language" class="label">Language</label>
       <div class="input-container">
+        <p-button *ngIf="!metadata['languageLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('language')" severity="success"></p-button>
+        <p-button *ngIf="metadata['languageLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('language')" severity="warn"></p-button>
         <input pInputText id="language" formControlName="language" class="input"/>
         <p-button
           [icon]="isValueSaved('language') ? 'pi pi-check' : 'pi pi-arrow-left'"
@@ -114,6 +128,8 @@
     <div class="form-row">
       <label for="description" class="label">Description</label>
       <div class="input-container">
+        <p-button *ngIf="!metadata['descriptionLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('description')" severity="success"></p-button>
+        <p-button *ngIf="metadata['descriptionLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('description')" severity="warn"></p-button>
         <textarea id="description" formControlName="description" class="input"></textarea>
         <p-button
           [icon]="isValueSaved('description') ? 'pi pi-check' : 'pi pi-arrow-left'"
@@ -140,9 +156,60 @@
       </div>
     </div>
 
+
+    <div class="form-row">
+      <label for="seriesName" class="label">Series</label>
+      <div class="input-container">
+        <p-button *ngIf="!metadata['seriesNameLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('seriesName')" severity="success"></p-button>
+        <p-button *ngIf="metadata['seriesNameLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('seriesName')" severity="warn"></p-button>
+        <input pInputText id="seriesName" formControlName="seriesName" class="input"/>
+        <p-button
+          [icon]="isValueSaved('seriesName') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueSaved('seriesName'), 'yellow-outlined-button': isValueCopied('seriesName')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('seriesName')"/>
+        <input pInputText [value]="fetchedMetadata.seriesName" class="input" readonly/>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="seriesNumber" class="label">Book #</label>
+      <div class="input-container">
+        <p-button *ngIf="!metadata['seriesNumberLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('seriesNumber')" severity="success"></p-button>
+        <p-button *ngIf="metadata['seriesNumberLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('seriesNumber')" severity="warn"></p-button>
+        <input pInputText id="seriesNumber" formControlName="seriesNumber" class="input"/>
+        <p-button
+          [icon]="isValueSaved('seriesNumber') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueSaved('seriesNumber'), 'yellow-outlined-button': isValueCopied('seriesNumber')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('seriesNumber')"/>
+        <input pInputText [value]="fetchedMetadata.seriesNumber" class="input" readonly/>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="seriesTotal" class="label">Total Books</label>
+      <div class="input-container">
+        <p-button *ngIf="!metadata['seriesTotalLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('seriesTotal')" severity="success"></p-button>
+        <p-button *ngIf="metadata['seriesTotalLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('seriesTotal')" severity="warn"></p-button>
+        <input pInputText id="seriesTotal" formControlName="seriesTotal" class="input"/>
+        <p-button
+          [icon]="isValueSaved('seriesTotal') ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueSaved('seriesTotal'), 'yellow-outlined-button': isValueCopied('seriesTotal')}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent('seriesTotal')"/>
+        <input pInputText [value]="fetchedMetadata.seriesTotal" class="input" readonly/>
+      </div>
+    </div>
+
     <div class="form-row">
       <label for="isbn13" class="label">ISBN-13</label>
       <div class="input-container">
+        <p-button *ngIf="!metadata['isbn13Locked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('isbn13')" severity="success"></p-button>
+        <p-button *ngIf="metadata['isbn13Locked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('isbn13')" severity="warn"></p-button>
         <input pInputText id="isbn13" formControlName="isbn13" class="input"/>
         <p-button
           [icon]="isValueSaved('isbn13') ? 'pi pi-check' : 'pi pi-arrow-left'"
@@ -157,6 +224,8 @@
     <div class="form-row">
       <label for="rating" class="label">Rating</label>
       <div class="input-container">
+        <p-button *ngIf="!metadata['ratingLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('rating')" severity="success"></p-button>
+        <p-button *ngIf="metadata['ratingLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('rating')" severity="warn"></p-button>
         <input pInputText id="rating" formControlName="rating" class="input"/>
         <p-button
           [icon]="isValueSaved('pageCount') ? 'pi pi-check' : 'pi pi-arrow-left'"
@@ -169,8 +238,10 @@
     </div>
 
     <div class="form-row">
-      <label for="reviewCount" class="label">Rating</label>
+      <label for="reviewCount" class="label">Reviews</label>
       <div class="input-container">
+        <p-button *ngIf="!metadata['reviewCountLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('reviewCount')" severity="success"></p-button>
+        <p-button *ngIf="metadata['reviewCountLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('reviewCount')" severity="warn"></p-button>
         <input pInputText id="reviewCount" formControlName="reviewCount" class="input"/>
         <p-button
           [icon]="isValueSaved('reviewCount') ? 'pi pi-check' : 'pi pi-arrow-left'"
@@ -185,6 +256,8 @@
     <div class="form-row">
       <label for="pageCount" class="label">Pages</label>
       <div class="input-container">
+        <p-button *ngIf="!metadata['pageCountLocked']" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock('pageCount')" severity="success"></p-button>
+        <p-button *ngIf="metadata['pageCountLocked']" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock('pageCount')" severity="warn"></p-button>
         <input pInputText id="pageCount" formControlName="pageCount" class="input"/>
         <p-button
           [icon]="isValueSaved('pageCount') ? 'pi pi-check' : 'pi pi-arrow-left'"

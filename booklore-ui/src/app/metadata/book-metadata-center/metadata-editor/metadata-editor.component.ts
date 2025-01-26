@@ -36,11 +36,11 @@ export class MetadataEditorComponent implements OnInit {
   protected urlHelper = inject(UrlHelperService);
 
   bookMetadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
-  bookMetadataForm: FormGroup;
+  metadataForm: FormGroup;
   currentBookId!: number;
 
   constructor() {
-    this.bookMetadataForm = new FormGroup({
+    this.metadataForm = new FormGroup({
       title: new FormControl(''),
       subtitle: new FormControl(''),
       authors: new FormControl(''),
@@ -82,7 +82,7 @@ export class MetadataEditorComponent implements OnInit {
       if (metadata) {
         this.currentBookId = metadata.bookId;
 
-        this.bookMetadataForm.setValue({
+        this.metadataForm.setValue({
           title: metadata.title,
           subtitle: metadata.subtitle,
           authors: metadata.authors.map((author) => author.name).sort().join(', '),
@@ -118,22 +118,22 @@ export class MetadataEditorComponent implements OnInit {
           seriesTotalLocked: metadata.seriesTotalLocked || false,
         });
 
-        if (metadata.titleLocked) this.bookMetadataForm.get('title')?.disable();
-        if (metadata.subtitleLocked) this.bookMetadataForm.get('subtitle')?.disable();
-        if (metadata.authorsLocked) this.bookMetadataForm.get('authors')?.disable();
-        if (metadata.categoriesLocked) this.bookMetadataForm.get('categories')?.disable();
-        if (metadata.publisherLocked) this.bookMetadataForm.get('publisher')?.disable();
-        if (metadata.publishedDateLocked) this.bookMetadataForm.get('publishedDate')?.disable();
-        if (metadata.languageLocked) this.bookMetadataForm.get('language')?.disable();
-        if (metadata.isbn10Locked) this.bookMetadataForm.get('isbn10')?.disable();
-        if (metadata.isbn13Locked) this.bookMetadataForm.get('isbn13')?.disable();
-        if (metadata.reviewCountLocked) this.bookMetadataForm.get('reviewCount')?.disable();
-        if (metadata.ratingLocked) this.bookMetadataForm.get('rating')?.disable();
-        if (metadata.pageCountLocked) this.bookMetadataForm.get('pageCount')?.disable();
-        if (metadata.descriptionLocked) this.bookMetadataForm.get('description')?.disable();
-        if (metadata.seriesNameLocked) this.bookMetadataForm.get('seriesName')?.disable();
-        if (metadata.seriesNumberLocked) this.bookMetadataForm.get('seriesNumber')?.disable();
-        if (metadata.seriesTotalLocked) this.bookMetadataForm.get('seriesTotal')?.disable();
+        if (metadata.titleLocked) this.metadataForm.get('title')?.disable();
+        if (metadata.subtitleLocked) this.metadataForm.get('subtitle')?.disable();
+        if (metadata.authorsLocked) this.metadataForm.get('authors')?.disable();
+        if (metadata.categoriesLocked) this.metadataForm.get('categories')?.disable();
+        if (metadata.publisherLocked) this.metadataForm.get('publisher')?.disable();
+        if (metadata.publishedDateLocked) this.metadataForm.get('publishedDate')?.disable();
+        if (metadata.languageLocked) this.metadataForm.get('language')?.disable();
+        if (metadata.isbn10Locked) this.metadataForm.get('isbn10')?.disable();
+        if (metadata.isbn13Locked) this.metadataForm.get('isbn13')?.disable();
+        if (metadata.reviewCountLocked) this.metadataForm.get('reviewCount')?.disable();
+        if (metadata.ratingLocked) this.metadataForm.get('rating')?.disable();
+        if (metadata.pageCountLocked) this.metadataForm.get('pageCount')?.disable();
+        if (metadata.descriptionLocked) this.metadataForm.get('description')?.disable();
+        if (metadata.seriesNameLocked) this.metadataForm.get('seriesName')?.disable();
+        if (metadata.seriesNumberLocked) this.metadataForm.get('seriesNumber')?.disable();
+        if (metadata.seriesTotalLocked) this.metadataForm.get('seriesTotal')?.disable();
       }
     });
   }
@@ -151,34 +151,34 @@ export class MetadataEditorComponent implements OnInit {
   }
 
   toggleLock(field: string): void {
-    const isLocked = this.bookMetadataForm.get(field + 'Locked')?.value;
+    const isLocked = this.metadataForm.get(field + 'Locked')?.value;
     const updatedLockedState = !isLocked;
-    this.bookMetadataForm.get(field + 'Locked')?.setValue(updatedLockedState);
+    this.metadataForm.get(field + 'Locked')?.setValue(updatedLockedState);
     if (updatedLockedState) {
-      this.bookMetadataForm.get(field)?.disable();
+      this.metadataForm.get(field)?.disable();
     } else {
-      this.bookMetadataForm.get(field)?.enable();
+      this.metadataForm.get(field)?.enable();
     }
     this.updateMetadata();
   }
 
   lockAll(): void {
-    Object.keys(this.bookMetadataForm.controls).forEach((key) => {
+    Object.keys(this.metadataForm.controls).forEach((key) => {
       if (key.endsWith('Locked')) {
-        this.bookMetadataForm.get(key)?.setValue(true);
+        this.metadataForm.get(key)?.setValue(true);
         const fieldName = key.replace('Locked', '');
-        this.bookMetadataForm.get(fieldName)?.disable();
+        this.metadataForm.get(fieldName)?.disable();
       }
     });
     this.updateMetadata();
   }
 
   unlockAll(): void {
-    Object.keys(this.bookMetadataForm.controls).forEach((key) => {
+    Object.keys(this.metadataForm.controls).forEach((key) => {
       if (key.endsWith('Locked')) {
-        this.bookMetadataForm.get(key)?.setValue(false);
+        this.metadataForm.get(key)?.setValue(false);
         const fieldName = key.replace('Locked', '');
-        this.bookMetadataForm.get(fieldName)?.enable();
+        this.metadataForm.get(fieldName)?.enable();
       }
     });
     this.updateMetadata();
@@ -187,39 +187,39 @@ export class MetadataEditorComponent implements OnInit {
   private buildMetadata() {
     const updatedBookMetadata: BookMetadata = {
       bookId: this.currentBookId,
-      title: this.bookMetadataForm.get('title')?.value,
-      subtitle: this.bookMetadataForm.get('subtitle')?.value,
-      authors: this.bookMetadataForm.get('authors')?.value.split(',').map((author: string) => author.trim()),
-      categories: this.bookMetadataForm.get('categories')?.value.split(',').map((category: string) => category.trim()),
-      publisher: this.bookMetadataForm.get('publisher')?.value,
-      publishedDate: this.bookMetadataForm.get('publishedDate')?.value,
-      isbn10: this.bookMetadataForm.get('isbn10')?.value,
-      isbn13: this.bookMetadataForm.get('isbn13')?.value,
-      description: this.bookMetadataForm.get('description')?.value,
-      pageCount: this.bookMetadataForm.get('pageCount')?.value,
-      rating: this.bookMetadataForm.get('rating')?.value,
-      reviewCount: this.bookMetadataForm.get('reviewCount')?.value,
-      language: this.bookMetadataForm.get('language')?.value,
-      seriesName: this.bookMetadataForm.get('seriesName')?.value,
-      seriesNumber: this.bookMetadataForm.get('seriesNumber')?.value,
-      seriesTotal: this.bookMetadataForm.get('seriesTotal')?.value,
+      title: this.metadataForm.get('title')?.value,
+      subtitle: this.metadataForm.get('subtitle')?.value,
+      authors: this.metadataForm.get('authors')?.value.split(',').map((author: string) => author.trim()),
+      categories: this.metadataForm.get('categories')?.value.split(',').map((category: string) => category.trim()),
+      publisher: this.metadataForm.get('publisher')?.value,
+      publishedDate: this.metadataForm.get('publishedDate')?.value,
+      isbn10: this.metadataForm.get('isbn10')?.value,
+      isbn13: this.metadataForm.get('isbn13')?.value,
+      description: this.metadataForm.get('description')?.value,
+      pageCount: this.metadataForm.get('pageCount')?.value,
+      rating: this.metadataForm.get('rating')?.value,
+      reviewCount: this.metadataForm.get('reviewCount')?.value,
+      language: this.metadataForm.get('language')?.value,
+      seriesName: this.metadataForm.get('seriesName')?.value,
+      seriesNumber: this.metadataForm.get('seriesNumber')?.value,
+      seriesTotal: this.metadataForm.get('seriesTotal')?.value,
 
-      titleLocked: this.bookMetadataForm.get('titleLocked')?.value,
-      subtitleLocked: this.bookMetadataForm.get('subtitleLocked')?.value,
-      authorsLocked: this.bookMetadataForm.get('authorsLocked')?.value,
-      categoriesLocked: this.bookMetadataForm.get('categoriesLocked')?.value,
-      publisherLocked: this.bookMetadataForm.get('publisherLocked')?.value,
-      publishedDateLocked: this.bookMetadataForm.get('publishedDateLocked')?.value,
-      isbn10Locked: this.bookMetadataForm.get('isbn10Locked')?.value,
-      isbn13Locked: this.bookMetadataForm.get('isbn13Locked')?.value,
-      descriptionLocked: this.bookMetadataForm.get('descriptionLocked')?.value,
-      pageCountLocked: this.bookMetadataForm.get('pageCountLocked')?.value,
-      languageLocked: this.bookMetadataForm.get('languageLocked')?.value,
-      ratingLocked: this.bookMetadataForm.get('ratingLocked')?.value,
-      reviewCountLocked: this.bookMetadataForm.get('reviewCountLocked')?.value,
-      seriesNameLocked: this.bookMetadataForm.get('seriesNameLocked')?.value,
-      seriesNumberLocked: this.bookMetadataForm.get('seriesNumberLocked')?.value,
-      seriesTotalLocked: this.bookMetadataForm.get('seriesTotalLocked')?.value,
+      titleLocked: this.metadataForm.get('titleLocked')?.value,
+      subtitleLocked: this.metadataForm.get('subtitleLocked')?.value,
+      authorsLocked: this.metadataForm.get('authorsLocked')?.value,
+      categoriesLocked: this.metadataForm.get('categoriesLocked')?.value,
+      publisherLocked: this.metadataForm.get('publisherLocked')?.value,
+      publishedDateLocked: this.metadataForm.get('publishedDateLocked')?.value,
+      isbn10Locked: this.metadataForm.get('isbn10Locked')?.value,
+      isbn13Locked: this.metadataForm.get('isbn13Locked')?.value,
+      descriptionLocked: this.metadataForm.get('descriptionLocked')?.value,
+      pageCountLocked: this.metadataForm.get('pageCountLocked')?.value,
+      languageLocked: this.metadataForm.get('languageLocked')?.value,
+      ratingLocked: this.metadataForm.get('ratingLocked')?.value,
+      reviewCountLocked: this.metadataForm.get('reviewCountLocked')?.value,
+      seriesNameLocked: this.metadataForm.get('seriesNameLocked')?.value,
+      seriesNumberLocked: this.metadataForm.get('seriesNumberLocked')?.value,
+      seriesTotalLocked: this.metadataForm.get('seriesTotalLocked')?.value,
 
     };
     return updatedBookMetadata;

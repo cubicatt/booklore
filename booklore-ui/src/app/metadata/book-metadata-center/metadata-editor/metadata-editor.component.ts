@@ -6,11 +6,15 @@ import {Divider} from 'primeng/divider';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Observable} from 'rxjs';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
-import {AsyncPipe, NgIf} from '@angular/common';
+import {AsyncPipe, NgClass, NgIf} from '@angular/common';
 import {MessageService} from 'primeng/api';
 import {MetadataService} from '../../service/metadata.service';
 import {BookMetadata} from '../../../book/model/book.model';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
+import {FileUpload, FileUploadErrorEvent, FileUploadEvent} from 'primeng/fileupload';
+import {HttpResponse} from '@angular/common/http';
+import {BookService} from '../../../book/service/book.service';
+import {ProgressSpinner} from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-metadata-editor',
@@ -25,7 +29,10 @@ import {UrlHelperService} from '../../../utilities/service/url-helper.service';
     FormsModule,
     AsyncPipe,
     NgIf,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FileUpload,
+    ProgressSpinner,
+    NgClass
   ]
 })
 export class MetadataEditorComponent implements OnInit {
@@ -33,11 +40,13 @@ export class MetadataEditorComponent implements OnInit {
   private metadataCenterService = inject(BookMetadataCenterService);
   private messageService = inject(MessageService);
   private metadataService = inject(MetadataService);
+  private bookService = inject(BookService);
   protected urlHelper = inject(UrlHelperService);
 
   bookMetadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
   metadataForm: FormGroup;
   currentBookId!: number;
+  isUploading = false;
 
   constructor() {
     this.metadataForm = new FormGroup({
@@ -240,5 +249,35 @@ export class MetadataEditorComponent implements OnInit {
 
   closeDialog() {
     this.metadataCenterService.closeDialog(true);
+  }
+
+  getUploadCoverUrl(): string {
+    return this.metadataService.getUploadCoverUrl(this.currentBookId);
+  }
+
+  onBeforeSend(): void {
+    this.isUploading = true;
+  }
+
+  onUpload(event: FileUploadEvent): void {
+    const response: HttpResponse<any> = event.originalEvent as HttpResponse<any>;
+    if (response && response.status === 200) {
+      const bookMetadata: BookMetadata = response.body as BookMetadata;
+      this.bookService.handleBookMetadataUpdate(this.currentBookId, bookMetadata);
+      this.metadataCenterService.emit(bookMetadata);
+      this.isUploading = false;
+    } else {
+      this.isUploading = false;
+      this.messageService.add({
+        severity: 'error', summary: 'Upload Failed', detail: 'An error occurred while uploading the cover', life: 3000
+      });
+    }
+  }
+
+  onUploadError($event: FileUploadErrorEvent) {
+    this.isUploading = false;
+    this.messageService.add({
+      severity: 'error', summary: 'Upload Error', detail: 'An error occurred while uploading the cover', life: 3000
+    });
   }
 }

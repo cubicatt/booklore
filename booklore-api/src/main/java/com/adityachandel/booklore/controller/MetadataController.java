@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -41,6 +42,12 @@ public class MetadataController {
     public ResponseEntity<String> scheduleRefreshV2(@Validated @RequestBody MetadataRefreshRequest request) {
         jobSchedulerService.scheduleMetadataRefreshV2(request);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{bookId}/upload-cover")
+    public ResponseEntity<BookMetadata> uploadCover(@PathVariable Long bookId, @RequestParam("file") MultipartFile file) {
+        BookMetadata updatedMetadata = bookMetadataService.handleCoverUpload(bookId, file);
+        return ResponseEntity.ok(updatedMetadata);
     }
 
     @PutMapping("/lock")

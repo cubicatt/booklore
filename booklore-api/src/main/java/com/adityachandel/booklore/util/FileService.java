@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -25,6 +26,42 @@ import java.nio.file.Paths;
 public class FileService {
 
     private final AppProperties appProperties;
+
+    public void createThumbnailFromFile(long bookId, MultipartFile file) {
+        try {
+            validateCoverFile(file);
+            String outputFolder = getThumbnailPath(bookId);
+            File folder = new File(outputFolder);
+            if (!folder.exists() && !folder.mkdirs()) {
+                throw ApiError.DIRECTORY_CREATION_FAILED.createException(folder.getAbsolutePath());
+            }
+            BufferedImage originalImage = ImageIO.read(file.getInputStream());
+            if (originalImage == null) {
+                throw ApiError.IMAGE_NOT_FOUND.createException();
+            }
+            BufferedImage resizedImage = resizeImage(originalImage);
+            File outputFile = new File(folder, "f.jpg");
+            ImageIO.write(resizedImage, "JPEG", outputFile);
+            log.info("Thumbnail created and saved at: {}", outputFile.getAbsolutePath());
+        } catch (Exception e) {
+            log.error("An error occurred while creating the thumbnail: {}", e.getMessage(), e);
+            throw ApiError.FILE_READ_ERROR.createException(e.getMessage());
+        }
+    }
+
+    private void validateCoverFile(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("Uploaded file is empty");
+        }
+        String contentType = file.getContentType();
+        if (!("image/jpeg".equalsIgnoreCase(contentType) || "image/png".equalsIgnoreCase(contentType))) {
+            throw new IllegalArgumentException("Only JPEG and PNG files are allowed");
+        }
+        long maxFileSize = 5 * 1024 * 1024;
+        if (file.getSize() > maxFileSize) {
+            throw new IllegalArgumentException("File size must not exceed 5 MB");
+        }
+    }
 
     public Resource getBookCover(String thumbnailPath) {
         Path thumbPath;
@@ -46,7 +83,7 @@ public class FileService {
     }
 
     public String createThumbnail(long bookId, String thumbnailUrl) throws IOException {
-        String newFilename = "c.jpg";
+        String newFilename = "f.jpg";
         resizeAndSaveImage(thumbnailUrl, new File(getThumbnailPath(bookId)), newFilename);
         return getThumbnailPath(bookId) + newFilename;
     }

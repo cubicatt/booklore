@@ -22,11 +22,15 @@ import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
 import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import com.adityachandel.booklore.service.metadata.parser.BookParser;
+import com.adityachandel.booklore.util.FileService;
+import com.adityachandel.booklore.util.FileUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
@@ -48,6 +52,7 @@ public class BookMetadataService {
     private final NotificationService notificationService;
     private final AppSettingService appSettingService;
     private final BookMetadataRepository bookMetadataRepository;
+    private final FileService fileService;
     private final Map<MetadataProvider, BookParser> parserMap;
 
 
@@ -387,5 +392,13 @@ public class BookMetadataService {
                 throw new IllegalArgumentException("Invalid field name: " + field);
         }
         return bookMetadataMapper.toBookMetadata(bookMetadataRepository.save(existingMetadata), true);
+    }
+
+    public BookMetadata handleCoverUpload(Long bookId, MultipartFile file) {
+        fileService.createThumbnailFromFile(bookId, file);
+        BookMetadataEntity metadata = bookMetadataRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + bookId));
+        metadata.setCoverUpdatedOn(Instant.now());
+        bookMetadataRepository.save(metadata);
+        return bookMetadataMapper.toBookMetadata(metadata, true);
     }
 }

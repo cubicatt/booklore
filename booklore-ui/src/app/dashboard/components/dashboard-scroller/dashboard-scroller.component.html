@@ -19,10 +19,6 @@
 
 </div>
 
-<div *ngIf="!books || books.length === 0">
-  <p-progressSpinner></p-progressSpinner>
-</div>
-
 <div *ngIf="books === null">
   <p class="text-sm">Failed to load books! :(</p>
 </div>

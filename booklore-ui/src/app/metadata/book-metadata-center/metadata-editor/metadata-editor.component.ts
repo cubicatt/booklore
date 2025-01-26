@@ -74,6 +74,7 @@ export class MetadataEditorComponent implements OnInit {
       seriesNameLocked: new FormControl(false),
       seriesNumberLocked: new FormControl(false),
       seriesTotalLocked: new FormControl(false),
+      thumbnailUrlLocked: new FormControl(false),
     });
   }
 
@@ -116,6 +117,7 @@ export class MetadataEditorComponent implements OnInit {
           seriesNameLocked: metadata.seriesNameLocked || false,
           seriesNumberLocked: metadata.seriesNumberLocked || false,
           seriesTotalLocked: metadata.seriesTotalLocked || false,
+          thumbnailUrlLocked: metadata.coverLocked || false,
         });
 
         if (metadata.titleLocked) this.metadataForm.get('title')?.disable();
@@ -220,7 +222,7 @@ export class MetadataEditorComponent implements OnInit {
       seriesNameLocked: this.metadataForm.get('seriesNameLocked')?.value,
       seriesNumberLocked: this.metadataForm.get('seriesNumberLocked')?.value,
       seriesTotalLocked: this.metadataForm.get('seriesTotalLocked')?.value,
-
+      coverLocked: this.metadataForm.get('thumbnailUrlLocked')?.value,
     };
     return updatedBookMetadata;
   }

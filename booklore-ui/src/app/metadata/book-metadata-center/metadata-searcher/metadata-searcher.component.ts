@@ -6,13 +6,12 @@ import {Divider} from 'primeng/divider';
 import {NgForOf, NgIf} from '@angular/common';
 import {MetadataProvider} from '../../model/provider.model';
 import {FetchMetadataRequest} from '../../model/request/fetch-metadata-request.model';
-import {FetchedMetadata} from '../../../book/model/book.model';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {MetadataPickerComponent} from '../metadata-picker/metadata-picker.component';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {MultiSelect} from 'primeng/multiselect';
 import {MetadataService} from '../../service/metadata.service';
-import {info} from 'autoprefixer';
+import {BookMetadata} from '../../../book/model/book.model';
 
 @Component({
   selector: 'app-metadata-searcher',
@@ -25,8 +24,8 @@ export class MetadataSearcherComponent implements OnInit {
 
   form: FormGroup;
   providers = Object.values(MetadataProvider);
-  allFetchedMetadata: FetchedMetadata[] = [];
-  selectedFetchedMetadata!: FetchedMetadata | null;
+  allFetchedMetadata: BookMetadata[] = [];
+  selectedFetchedMetadata!: BookMetadata | null;
   bookId!: number;
   loading: boolean = false;
 
@@ -51,7 +50,7 @@ export class MetadataSearcherComponent implements OnInit {
           provider: Object.values(MetadataProvider),
           isbn: metadata.isbn10,
           title: metadata.title,
-          author: metadata.authors?.length! > 0 ? metadata.authors[0].name : ''
+          author: metadata.authors?.length! > 0 ? metadata.authors[0] : ''
         }));
       }
     }));
@@ -99,7 +98,7 @@ export class MetadataSearcherComponent implements OnInit {
     }
   }
 
-  buildProviderLink(metadata: { provider: string; providerBookId: string }): string {
+  buildProviderLink(metadata: BookMetadata): string {
     if (!metadata.provider || !metadata.providerBookId) {
       throw new Error("Invalid metadata: 'provider' or 'providerBookId' is missing.");
     }
@@ -120,7 +119,7 @@ export class MetadataSearcherComponent implements OnInit {
     return safeText.length > length ? safeText.substring(0, length) + '...' : safeText;
   }
 
-  onBookClick(fetchedMetadata: FetchedMetadata) {
+  onBookClick(fetchedMetadata: BookMetadata) {
     this.selectedFetchedMetadata = fetchedMetadata;
   }
 

@@ -50,10 +50,4 @@ public class ShelfController {
         shelfService.deleteShelf(shelfId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
-    @PutMapping("/{shelfId}/sort")
-    public ResponseEntity<Shelf> updateShelf(@PathVariable long shelfId, @RequestBody Sort sort) {
-        return ResponseEntity.ok(shelfService.updateSort(shelfId, sort));
-    }
-
 }

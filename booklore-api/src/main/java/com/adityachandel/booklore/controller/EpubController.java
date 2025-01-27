@@ -17,7 +17,6 @@ public class EpubController {
         this.epubService = epubService;
     }
 
-    // New endpoint to serve the entire EPUB file
     @GetMapping("/{bookId}/download")
     public ResponseEntity<ByteArrayResource> downloadEpub(@PathVariable Long bookId) throws IOException {
         ByteArrayResource epubFile = epubService.getEpubFile(bookId);

@@ -219,12 +219,12 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         switch (selectedFilter.type) {
           case 'author':
             filteredBooks = filteredBooks.filter(book =>
-              book.metadata?.authors?.some(author => author.id === selectedFilter.value)
+              book.metadata?.authors?.some(author => author === selectedFilter.value)
             );
             break;
           case 'category':
             filteredBooks = filteredBooks.filter(book =>
-              book.metadata?.categories?.some(category => category.id === selectedFilter.value)
+              book.metadata?.categories?.some(category => category === selectedFilter.value)
             );
             break;
           case 'publisher':
@@ -259,7 +259,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
           const filteredBooks = bookState.books?.filter(book => {
             const matchesTitle = book.metadata?.title?.toLowerCase().includes(title.toLowerCase());
             const matchesAuthor = book.metadata?.authors.some(author =>
-              author.name.toLowerCase().includes(title.toLowerCase())
+              author.toLowerCase().includes(title.toLowerCase())
             );
             return matchesTitle || matchesAuthor;
           }) || null;

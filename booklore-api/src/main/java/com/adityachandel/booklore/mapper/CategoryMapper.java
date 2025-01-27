@@ -1,6 +1,5 @@
 package com.adityachandel.booklore.mapper;
 
-import com.adityachandel.booklore.model.dto.Category;
 import com.adityachandel.booklore.model.entity.CategoryEntity;
 import org.mapstruct.Mapper;
 
@@ -9,11 +8,16 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
 
-    Category toCategory(CategoryEntity entity);
+    default String toCategoryName(CategoryEntity categoryEntity) {
+        return categoryEntity != null ? categoryEntity.getName() : null;
+    }
 
-    List<Category> toCategoryList(List<CategoryEntity> entities);
-
-    CategoryEntity toCategoryEntity(Category category);
-
-    List<CategoryEntity> toCategoryEntities(List<Category> categories);
+    default List<String> toCategoryNamesList(List<CategoryEntity> categoryEntities) {
+        if (categoryEntities == null || categoryEntities.isEmpty()) {
+            return List.of();
+        }
+        return categoryEntities.stream()
+                .map(this::toCategoryName)
+                .toList();
+    }
 }

@@ -1,8 +1,8 @@
 package com.adityachandel.booklore.service.metadata;
 
-import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
+import com.adityachandel.booklore.model.dto.BookMetadata;
 
 @FunctionalInterface
 interface FieldValueExtractor {
-    String extract(FetchedBookMetadata metadata);
+    String extract(BookMetadata metadata);
 }

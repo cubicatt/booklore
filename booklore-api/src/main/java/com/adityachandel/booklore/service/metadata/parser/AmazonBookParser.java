@@ -1,7 +1,7 @@
 package com.adityachandel.booklore.service.metadata.parser;
 
 import com.adityachandel.booklore.model.dto.Book;
-import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
+import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
 import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import com.adityachandel.booklore.util.BookUtils;
@@ -30,7 +30,7 @@ public class AmazonBookParser implements BookParser {
     private static final String BASE_BOOK_URL = "https://www.amazon.com/dp/";
 
     @Override
-    public FetchedBookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
+    public BookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
         LinkedList<String> amazonBookIds = getAmazonBookIds(book, fetchMetadataRequest);
         if (amazonBookIds == null || amazonBookIds.isEmpty()) {
             return null;
@@ -39,7 +39,7 @@ public class AmazonBookParser implements BookParser {
     }
 
     @Override
-    public List<FetchedBookMetadata> fetchMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
+    public List<BookMetadata> fetchMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
         LinkedList<String> amazonBookIds = Optional.ofNullable(getAmazonBookIds(book, fetchMetadataRequest))
                 .map(list -> list.stream()
                         .limit(COUNT_DETAILED_METADATA_TO_GET)
@@ -48,7 +48,7 @@ public class AmazonBookParser implements BookParser {
         if (amazonBookIds.isEmpty()) {
             return null;
         }
-        List<FetchedBookMetadata> fetchedBookMetadata = new ArrayList<>();
+        List<BookMetadata> fetchedBookMetadata = new ArrayList<>();
         for (String amazonBookId : amazonBookIds) {
             fetchedBookMetadata.add(getBookMetadata(amazonBookId));
         }
@@ -116,10 +116,10 @@ public class AmazonBookParser implements BookParser {
         return null;
     }
 
-    private FetchedBookMetadata getBookMetadata(String amazonBookId) {
+    private BookMetadata getBookMetadata(String amazonBookId) {
         log.info("Amazon: Fetching metadata for: {}", amazonBookId);
         Document doc = fetchDocument(BASE_BOOK_URL + amazonBookId);
-        return FetchedBookMetadata.builder()
+        return BookMetadata.builder()
                 .providerBookId(amazonBookId)
                 .provider(MetadataProvider.Amazon)
                 .title(getTitle(doc))

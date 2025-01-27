@@ -1,7 +1,7 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {of, Subject, Subscription} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
-import {Author, Book} from '../../model/book.model';
+import {Book} from '../../model/book.model';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {BookService} from '../../service/book.service';
@@ -58,8 +58,8 @@ export class BookSearcherComponent implements OnInit, OnDestroy {
     });
   }
 
-  getAuthorNames(authors: Author[] | undefined): string {
-    return authors?.map(author => author.name).join(', ') || 'Unknown Author';
+  getAuthorNames(authors: string[] | undefined): string {
+    return authors?.join(', ') || 'Unknown Author';
   }
 
   onSearchInputChange(): void {

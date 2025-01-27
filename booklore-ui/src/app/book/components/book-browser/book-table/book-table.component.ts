@@ -3,7 +3,7 @@ import {TableEditCompleteEvent, TableModule} from 'primeng/table';
 import {NgIf} from '@angular/common';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
-import {Author, Book, Category} from '../../../model/book.model';
+import {Book} from '../../../model/book.model';
 import {SortOption} from '../../../model/sort.model';
 import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
@@ -100,11 +100,11 @@ export class BookTableComponent implements OnChanges {
     }*/
   }
 
-  getAuthorNames(authors: Author[]): string {
-    return authors?.map(author => author.name).join(', ') || 'No authors available';
+  getAuthorNames(authors: string[]): string {
+    return authors?.join(', ') || '';
   }
 
-  getGenres(genres: Category[]) {
-    return genres?.map(g => g.name).join(', ') || 'No genres available';
+  getGenres(genres: string[]) {
+    return genres?.join(', ') || '';
   }
 }

@@ -1,16 +1,24 @@
 package com.adityachandel.booklore.mapper;
 
-import com.adityachandel.booklore.model.dto.Author;
 import com.adityachandel.booklore.model.entity.AuthorEntity;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface AuthorMapper {
-    Author toAuthor(AuthorEntity authorEntity);
-    List<Author> toAuthorList(List<AuthorEntity> authorEntities);
 
-    AuthorEntity toAuthorEntity(Author author);
-    List<AuthorEntity> toAuthorEntityList(List<Author> authors);
+    default String toAuthorEntityName(AuthorEntity authorEntity) {
+        return authorEntity != null ? authorEntity.getName() : null;
+    }
+
+    default List<String> toAuthorNamesList(List<AuthorEntity> authorEntities) {
+        if (authorEntities == null || authorEntities.isEmpty()) {
+            return List.of();
+        }
+        return authorEntities.stream()
+                .map(this::toAuthorEntityName)
+                .toList();
+    }
 }

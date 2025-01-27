@@ -2,8 +2,8 @@ import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable, of} from "rxjs";
 import {FetchMetadataRequest} from "../model/request/fetch-metadata-request.model";
-import {Book, BookMetadata, FetchedMetadata} from "../../book/model/book.model";
-import {catchError, map, tap} from "rxjs/operators";
+import {BookMetadata} from "../../book/model/book.model";
+import {catchError, map} from "rxjs/operators";
 import {BookService} from "../../book/service/book.service";
 import {MetadataRefreshRequest} from '../model/request/metadata-refresh-request.model';
 import {MessageService} from 'primeng/api';
@@ -20,8 +20,8 @@ export class MetadataService {
   private bookService = inject(BookService);
   private messageService = inject(MessageService);
 
-  fetchBookMetadata(bookId: number, request: FetchMetadataRequest): Observable<FetchedMetadata[]> {
-    return this.http.post<FetchedMetadata[]>(`${this.url}/${bookId}`, request);
+  fetchBookMetadata(bookId: number, request: FetchMetadataRequest): Observable<BookMetadata[]> {
+    return this.http.post<BookMetadata[]>(`${this.url}/${bookId}`, request);
   }
 
   quickUpdateBookMetadataSynchronous(bookId: number): Observable<BookMetadata> {

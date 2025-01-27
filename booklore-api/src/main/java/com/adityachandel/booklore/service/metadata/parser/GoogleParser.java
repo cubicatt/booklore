@@ -1,9 +1,9 @@
 package com.adityachandel.booklore.service.metadata.parser;
 
 import com.adityachandel.booklore.model.dto.Book;
+import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.dto.response.GoogleBooksApiResponse;
 import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
-import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import com.adityachandel.booklore.util.BookUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +19,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,18 +33,18 @@ public class GoogleParser implements BookParser {
     private static final String GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes";
 
     @Override
-    public FetchedBookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
-        List<FetchedBookMetadata> fetchedBookMetadata = fetchMetadata(book, fetchMetadataRequest);
+    public BookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
+        List<BookMetadata> fetchedBookMetadata = fetchMetadata(book, fetchMetadataRequest);
         return fetchedBookMetadata.isEmpty() ? null : fetchedBookMetadata.getFirst();
     }
 
     @Override
-    public List<FetchedBookMetadata> fetchMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
+    public List<BookMetadata> fetchMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
         String searchTerm = getSearchTerm(book, fetchMetadataRequest);
         return searchTerm != null ? getMetadataListByTerm(searchTerm) : List.of();
     }
 
-    public List<FetchedBookMetadata> getMetadataListByTerm(String term) {
+    public List<BookMetadata> getMetadataListByTerm(String term) {
         log.info("Google Books: Fetching metadata for: {}", term);
         try {
             URI uri = UriComponentsBuilder.fromUriString(GOOGLE_BOOKS_API_URL)
@@ -73,7 +72,7 @@ public class GoogleParser implements BookParser {
         }
     }
 
-    private List<FetchedBookMetadata> parseGoogleBooksApiResponse(String responseBody) throws IOException {
+    private List<BookMetadata> parseGoogleBooksApiResponse(String responseBody) throws IOException {
         GoogleBooksApiResponse googleBooksApiResponse = objectMapper.readValue(responseBody, GoogleBooksApiResponse.class);
         if (googleBooksApiResponse != null && googleBooksApiResponse.getItems() != null) {
             return googleBooksApiResponse.getItems().stream()
@@ -83,11 +82,11 @@ public class GoogleParser implements BookParser {
         return List.of();
     }
 
-    private FetchedBookMetadata convertToFetchedBookMetadata(GoogleBooksApiResponse.Item item) {
+    private BookMetadata convertToFetchedBookMetadata(GoogleBooksApiResponse.Item item) {
         GoogleBooksApiResponse.Item.VolumeInfo volumeInfo = item.getVolumeInfo();
         Map<String, String> isbns = extractISBNs(volumeInfo.getIndustryIdentifiers());
 
-        return FetchedBookMetadata.builder()
+        return BookMetadata.builder()
                 .provider(MetadataProvider.Google)
                 .providerBookId(item.getId())
                 .title(volumeInfo.getTitle())

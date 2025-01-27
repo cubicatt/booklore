@@ -32,9 +32,12 @@ export interface BookMetadata {
   rating?: number | null;
   reviewCount?: number | null;
   coverUpdatedOn?: string;
-  authors: Author[];
-  categories: Category[];
+  authors: string[];
+  categories: string[];
   awards?: Award[];
+  provider?: string;
+  providerBookId?: string;
+  thumbnailUrl?: string | null;
 
   titleLocked?: boolean;
   subtitleLocked?: boolean;
@@ -58,42 +61,6 @@ export interface BookMetadata {
   coverLocked?: boolean;
 
   [key: string]: any;
-}
-
-export interface FetchedMetadata {
-  bookId: number | null;
-  provider: string;
-  providerBookId: string;
-  title: string | null;
-  subtitle?: string | null;
-  publisher: string | null;
-  publishedDate: string | null;
-  description: string | null;
-  seriesName: string | null;
-  seriesNumber: number | null;
-  seriesTotal: number | null;
-  isbn13: string | null;
-  isbn10: string | null;
-  asin: string | null;
-  pageCount: number | null;
-  thumbnailUrl: string | undefined;
-  language: string | null;
-  rating: number | null;
-  reviewCount: number | null;
-  authors: string[];
-  categories: string[];
-
-  [key: string]: any;
-}
-
-export interface Author {
-  id: number;
-  name: string;
-}
-
-export interface Category {
-  id: number;
-  name: string;
 }
 
 export interface Award {

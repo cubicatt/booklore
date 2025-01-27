@@ -1,9 +1,9 @@
 package com.adityachandel.booklore.service.metadata;
 
 import com.adityachandel.booklore.exception.ApiError;
+import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.model.entity.*;
 import com.adityachandel.booklore.repository.*;
-import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.util.FileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class BookMetadataUpdater {
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public BookMetadataEntity setBookMetadata(long bookId, FetchedBookMetadata newMetadata, boolean setThumbnail, boolean mergeCategories) {
+    public BookMetadataEntity setBookMetadata(long bookId, BookMetadata newMetadata, boolean setThumbnail, boolean mergeCategories) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         BookMetadataEntity metadata = bookEntity.getMetadata();
 
@@ -187,7 +187,7 @@ public class BookMetadataUpdater {
         return metadata;
     }
 
-    private void updateLocks(FetchedBookMetadata newMetadata, BookMetadataEntity metadata) {
+    private void updateLocks(BookMetadata newMetadata, BookMetadataEntity metadata) {
         if (newMetadata.getTitleLocked() != null) {
             metadata.setTitleLocked(newMetadata.getTitleLocked());
         }

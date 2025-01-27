@@ -7,7 +7,7 @@ import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
-import {Author, BookMetadata} from '../../../book/model/book.model';
+import {BookMetadata} from '../../../book/model/book.model';
 import {FileService} from '../../../book/service/file.service';
 import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
@@ -36,8 +36,8 @@ export class MetadataViewerComponent {
     this.metadataCenterService.closeDialog(true);
   }
 
-  getAuthorNames(authors: Author[]): string {
-    return authors.map(author => author.name).join(', ');
+  getAuthorNames(authors: string[]): string {
+    return authors.join(', ');
   }
 
   download(bookId: number) {

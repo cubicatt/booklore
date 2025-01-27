@@ -1,5 +1,5 @@
 import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
-import {BookMetadata, FetchedMetadata} from '../../../book/model/book.model';
+import {BookMetadata} from '../../../book/model/book.model';
 import {MessageService} from 'primeng/api';
 import {Button} from 'primeng/button';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -32,7 +32,7 @@ import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 })
 export class MetadataPickerComponent implements OnInit {
 
-  @Input() fetchedMetadata!: FetchedMetadata;
+  @Input() fetchedMetadata!: BookMetadata;
   @Output() goBack = new EventEmitter<boolean>();
 
   metadataForm: FormGroup;
@@ -94,8 +94,8 @@ export class MetadataPickerComponent implements OnInit {
         this.metadataForm.setValue({
           title: metadata.title,
           subtitle: metadata.subtitle,
-          authors: metadata.authors.map((author) => author.name).sort().join(', '),
-          categories: metadata.categories.map((category) => category.name).sort().join(', '),
+          authors: metadata.authors.sort().join(', '),
+          categories: metadata.categories.sort().join(', '),
           publisher: metadata.publisher,
           publishedDate: metadata.publishedDate,
           isbn10: metadata.isbn10,
@@ -150,11 +150,11 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   fetchedAuthorsString(): string {
-    return this.fetchedMetadata.authors ? this.fetchedMetadata.authors.map(author => author).join(', ') : '';
+    return this.fetchedMetadata.authors ? this.fetchedMetadata.authors.join(', ') : '';
   }
 
   fetchedCategoriesString(): string {
-    return this.fetchedMetadata.categories ? this.fetchedMetadata.categories.map(category => category).join(', ') : '';
+    return this.fetchedMetadata.categories ? this.fetchedMetadata.categories.join(', ') : '';
   }
 
   onSave(): void {

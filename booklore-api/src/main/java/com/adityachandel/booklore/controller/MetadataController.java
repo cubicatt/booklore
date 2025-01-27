@@ -8,7 +8,6 @@ import com.adityachandel.booklore.quartz.JobSchedulerService;
 import com.adityachandel.booklore.service.metadata.BookMetadataService;
 import com.adityachandel.booklore.service.metadata.BookMetadataUpdater;
 import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
-import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -28,12 +27,12 @@ public class MetadataController {
     private BookMetadataMapper bookMetadataMapper;
 
     @PostMapping("/{bookId}")
-    public ResponseEntity<List<FetchedBookMetadata>> getProspectiveMetadataList(@RequestBody(required = false) FetchMetadataRequest fetchMetadataRequest, @PathVariable Long bookId) {
+    public ResponseEntity<List<BookMetadata>> getProspectiveMetadataList(@RequestBody(required = false) FetchMetadataRequest fetchMetadataRequest, @PathVariable Long bookId) {
         return ResponseEntity.ok(bookMetadataService.getProspectiveMetadataListForBookId(bookId, fetchMetadataRequest));
     }
 
     @PutMapping("/{bookId}")
-    public ResponseEntity<BookMetadata> updateMetadataFromFetch(@RequestBody FetchedBookMetadata setMetadataRequest, @PathVariable long bookId) {
+    public ResponseEntity<BookMetadata> updateMetadataFromFetch(@RequestBody BookMetadata setMetadataRequest, @PathVariable long bookId) {
         BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true, true), true);
         return ResponseEntity.ok(bookMetadata);
     }

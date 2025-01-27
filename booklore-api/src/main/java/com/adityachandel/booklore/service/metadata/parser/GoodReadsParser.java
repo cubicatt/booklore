@@ -2,8 +2,8 @@ package com.adityachandel.booklore.service.metadata.parser;
 
 import com.adityachandel.booklore.model.dto.Award;
 import com.adityachandel.booklore.model.dto.Book;
+import com.adityachandel.booklore.model.dto.BookMetadata;
 import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
-import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import com.adityachandel.booklore.util.BookUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -36,30 +36,30 @@ public class GoodReadsParser implements BookParser {
     private static final int COUNT_DETAILED_METADATA_TO_GET = 3;
 
     @Override
-    public FetchedBookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
-        Optional<FetchedBookMetadata> preview = fetchMetadataPreviews(book, fetchMetadataRequest).stream().findFirst();
+    public BookMetadata fetchTopMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
+        Optional<BookMetadata> preview = fetchMetadataPreviews(book, fetchMetadataRequest).stream().findFirst();
         if (preview.isEmpty()) {
             return null;
         }
-        List<FetchedBookMetadata> fetchedMetadata = fetchMetadataUsingPreviews(List.of(preview.get()));
+        List<BookMetadata> fetchedMetadata = fetchMetadataUsingPreviews(List.of(preview.get()));
         return fetchedMetadata.isEmpty() ? null : fetchedMetadata.getFirst();
     }
 
     @Override
-    public List<FetchedBookMetadata> fetchMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
-        List<FetchedBookMetadata> previews = fetchMetadataPreviews(book, fetchMetadataRequest).stream()
+    public List<BookMetadata> fetchMetadata(Book book, FetchMetadataRequest fetchMetadataRequest) {
+        List<BookMetadata> previews = fetchMetadataPreviews(book, fetchMetadataRequest).stream()
                 .limit(COUNT_DETAILED_METADATA_TO_GET)
                 .toList();
         return fetchMetadataUsingPreviews(previews);
     }
 
-    private List<FetchedBookMetadata> fetchMetadataUsingPreviews(List<FetchedBookMetadata> previews) {
-        List<FetchedBookMetadata> fetchedMetadata = new ArrayList<>();
-        for (FetchedBookMetadata preview : previews) {
+    private List<BookMetadata> fetchMetadataUsingPreviews(List<BookMetadata> previews) {
+        List<BookMetadata> fetchedMetadata = new ArrayList<>();
+        for (BookMetadata preview : previews) {
             log.info("GoodReads: Fetching metadata for: {}", preview.getTitle());
             try {
                 Document document = fetchDoc(BASE_BOOK_URL + preview.getProviderBookId());
-                FetchedBookMetadata detailedMetadata = parseBookDetails(document, preview.getProviderBookId());
+                BookMetadata detailedMetadata = parseBookDetails(document, preview.getProviderBookId());
                 if (detailedMetadata != null) {
                     fetchedMetadata.add(detailedMetadata);
                 }
@@ -71,8 +71,8 @@ public class GoodReadsParser implements BookParser {
         return fetchedMetadata;
     }
 
-    private FetchedBookMetadata parseBookDetails(Document document, String providerBookId) {
-        FetchedBookMetadata.FetchedBookMetadataBuilder builder = FetchedBookMetadata.builder().providerBookId(providerBookId);
+    private BookMetadata parseBookDetails(Document document, String providerBookId) {
+        BookMetadata.BookMetadataBuilder builder = BookMetadata.builder().providerBookId(providerBookId);
         builder.provider(MetadataProvider.GoodReads);
         try {
             JSONObject apolloStateJson = getJson(document)
@@ -94,7 +94,7 @@ public class GoodReadsParser implements BookParser {
         return builder.build();
     }
 
-    private void extractContributorDetails(JSONObject apolloStateJson, LinkedHashSet<String> keySet, FetchedBookMetadata.FetchedBookMetadataBuilder builder) {
+    private void extractContributorDetails(JSONObject apolloStateJson, LinkedHashSet<String> keySet, BookMetadata.BookMetadataBuilder builder) {
         String contributorKey = findKeyByPrefix(keySet, "Contributor:kca");
         if (contributorKey != null) {
             String contributorName = getContributorName(apolloStateJson, contributorKey);
@@ -104,7 +104,7 @@ public class GoodReadsParser implements BookParser {
         }
     }
 
-    private void extractSeriesDetails(JSONObject apolloStateJson, LinkedHashSet<String> keySet, FetchedBookMetadata.FetchedBookMetadataBuilder builder) {
+    private void extractSeriesDetails(JSONObject apolloStateJson, LinkedHashSet<String> keySet, BookMetadata.BookMetadataBuilder builder) {
         String seriesKey = findKeyByPrefix(keySet, "Series:kca");
         if (seriesKey != null) {
             String seriesName = getSeriesName(apolloStateJson, seriesKey);
@@ -114,7 +114,7 @@ public class GoodReadsParser implements BookParser {
         }
     }
 
-    private void extractBookDetails(JSONObject apolloStateJson, LinkedHashSet<String> keySet, FetchedBookMetadata.FetchedBookMetadataBuilder builder) {
+    private void extractBookDetails(JSONObject apolloStateJson, LinkedHashSet<String> keySet, BookMetadata.BookMetadataBuilder builder) {
         JSONObject bookJson = getValidBookJson(apolloStateJson, keySet, "Book:kca:");
         if (bookJson != null) {
             builder.title(handleStringNull(bookJson.optString("title")))
@@ -124,8 +124,7 @@ public class GoodReadsParser implements BookParser {
 
             JSONObject detailsJson = bookJson.optJSONObject("details");
             if (detailsJson != null) {
-                builder.asin(handleStringNull(detailsJson.optString("asin")))
-                        .pageCount(parseInteger(detailsJson.optString("numPages")))
+                builder.pageCount(parseInteger(detailsJson.optString("numPages")))
                         .publishedDate(convertToLocalDate(detailsJson.optString("publicationTime")))
                         .publisher(handleStringNull(detailsJson.optString("publisher")))
                         .isbn10(handleStringNull(detailsJson.optString("isbn")))
@@ -147,7 +146,7 @@ public class GoodReadsParser implements BookParser {
         }
     }
 
-    private void extractWorkDetails(JSONObject apolloStateJson, LinkedHashSet<String> keySet, FetchedBookMetadata.FetchedBookMetadataBuilder builder) {
+    private void extractWorkDetails(JSONObject apolloStateJson, LinkedHashSet<String> keySet, BookMetadata.BookMetadataBuilder builder) {
         String workKey = findKeyByPrefix(keySet, "Work:kca:");
         if (workKey != null) {
             JSONObject workJson = apolloStateJson.optJSONObject(workKey);
@@ -320,16 +319,16 @@ public class GoodReadsParser implements BookParser {
         return BASE_SEARCH_URL + encodedSearchTerm;
     }
 
-    public List<FetchedBookMetadata> fetchMetadataPreviews(Book book, FetchMetadataRequest request) {
+    public List<BookMetadata> fetchMetadataPreviews(Book book, FetchMetadataRequest request) {
         String searchTerm = getSearchTerm(book, request);
         if (searchTerm != null) {
             log.info("GoodReads: Fetching metadata previews for: {}", searchTerm);
             try {
                 String searchUrl = generateSearchUrl(searchTerm);
                 Elements previewBooks = fetchDoc(searchUrl).select("table.tableList").first().select("tr[itemtype=http://schema.org/Book]");
-                List<FetchedBookMetadata> metadataPreviews = new ArrayList<>();
+                List<BookMetadata> metadataPreviews = new ArrayList<>();
                 for (Element previewBook : previewBooks) {
-                    FetchedBookMetadata previewMetadata = FetchedBookMetadata.builder()
+                    BookMetadata previewMetadata = BookMetadata.builder()
                             .providerBookId(String.valueOf(extractGoodReadsIdPreview(previewBook)))
                             .title(extractTitlePreview(previewBook))
                             .authors(extractAuthorsPreview(previewBook))

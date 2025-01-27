@@ -1,8 +1,8 @@
 import {inject, Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import {catchError, distinctUntilChanged, map, tap} from 'rxjs/operators';
-import {Author, Book, BookMetadata, BookSetting, Category} from '../model/book.model';
+import {catchError, map, tap} from 'rxjs/operators';
+import {Book, BookMetadata, BookSetting} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 import {API_CONFIG} from '../../config/api-config';
 
@@ -135,7 +135,7 @@ export class BookService {
     const state = this.bookStateSubject.value;
     return (state.books || []).filter(book =>
       book.metadata?.title?.toLowerCase().includes(query.toLowerCase()) ||
-      book.metadata?.authors.some(author => author.name.toLowerCase().includes(query.toLowerCase()))
+      book.metadata?.authors.some(author => author.toLowerCase().includes(query.toLowerCase()))
     );
   }
 

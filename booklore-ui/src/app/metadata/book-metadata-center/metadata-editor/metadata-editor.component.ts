@@ -96,8 +96,8 @@ export class MetadataEditorComponent implements OnInit {
         this.metadataForm.setValue({
           title: metadata.title,
           subtitle: metadata.subtitle,
-          authors: metadata.authors.map((author) => author.name).sort().join(', '),
-          categories: metadata.categories.map((category) => category.name).sort().join(', '),
+          authors: metadata.authors.sort().join(', '),
+          categories: metadata.categories.sort().join(', '),
           publisher: metadata.publisher,
           publishedDate: metadata.publishedDate,
           isbn10: metadata.isbn10,

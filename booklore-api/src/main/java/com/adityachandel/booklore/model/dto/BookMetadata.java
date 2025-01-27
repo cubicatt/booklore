@@ -1,6 +1,7 @@
 package com.adityachandel.booklore.model.dto;
 
 import com.adityachandel.booklore.model.enums.MetadataProvider;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,14 +11,9 @@ import java.util.List;
 
 @Data
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BookMetadata {
-    // Identifiers
     private Long bookId;
-    private MetadataProvider provider;
-    private String providerBookId;
-    private String thumbnailUrl;
-
-    // Book Information
     private String title;
     private String subtitle;
     private String publisher;
@@ -30,21 +26,18 @@ public class BookMetadata {
     private String isbn10;
     private Integer pageCount;
     private String language;
-
-    // Rating & Reviews
     private Double rating;
     private Integer ratingCount;
     private Integer reviewCount;
-
-    // Cover Information
     private Instant coverUpdatedOn;
-
-    // Content
     private List<String> authors;
     private List<String> categories;
     private List<Award> awards;
 
-    // Locking Information
+    private MetadataProvider provider;
+    private String providerBookId;
+    private String thumbnailUrl;
+
     private Boolean allFieldsLocked;
     private Boolean titleLocked;
     private Boolean subtitleLocked;

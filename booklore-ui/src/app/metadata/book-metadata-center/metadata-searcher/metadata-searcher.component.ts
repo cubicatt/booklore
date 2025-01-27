@@ -46,10 +46,10 @@ export class MetadataSearcherComponent implements OnInit {
     this.metadataCenterService.currentMetadata$.subscribe((metadata => {
       if (metadata) {
         this.bookId = metadata.bookId;
-        this.form.setValue(({
+        this.form.patchValue(({
           provider: Object.values(MetadataProvider),
-          isbn: metadata.isbn10,
-          title: metadata.title,
+          isbn: metadata.isbn10 || null,
+          title: metadata.title || null,
           author: metadata.authors?.length! > 0 ? metadata.authors[0] : ''
         }));
       }

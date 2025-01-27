@@ -13,6 +13,7 @@ import {AppSettingsService} from './core/service/app-settings.service';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
+  standalone: true,
   imports: [ConfirmDialog, Toast, RouterOutlet]
 })
 export class AppComponent implements OnInit {

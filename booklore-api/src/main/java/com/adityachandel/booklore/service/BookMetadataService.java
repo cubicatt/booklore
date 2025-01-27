@@ -94,11 +94,8 @@ public class BookMetadataService {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         AppSettings appSettings = appSettingService.getAppSettings();
         MetadataRefreshRequest refreshRequest = MetadataRefreshRequest.builder().refreshOptions(appSettings.getMetadataRefreshOptions()).build();
-        List<MetadataProvider> providers = prepareProviders(refreshRequest);
-        Map<MetadataProvider, BookMetadata> metadataMap = fetchMetadataForBook(providers, bookEntity);
-        BookMetadata fetchedBookMetadata = buildFetchMetadata(refreshRequest, metadataMap);
-        BookMetadataEntity bookMetadataEntity = updateBookMetadata(bookEntity, fetchedBookMetadata, refreshRequest.getRefreshOptions().isRefreshCovers(), refreshRequest.getRefreshOptions().isMergeCategories());
-        return bookMetadataMapper.toBookMetadata(bookMetadataEntity, true);
+        Map<MetadataProvider, BookMetadata> metadataMap = fetchMetadataForBook(prepareProviders(refreshRequest), bookEntity);
+        return buildFetchMetadata(bookId, refreshRequest, metadataMap);
     }
 
     @Transactional
@@ -123,7 +120,7 @@ public class BookMetadataService {
                 if (providers.contains(GoodReads)) {
                     Thread.sleep(ThreadLocalRandom.current().nextLong(500, 1500));
                 }
-                BookMetadata fetchedBookMetadata = buildFetchMetadata(request, metadataMap);
+                BookMetadata fetchedBookMetadata = buildFetchMetadata(bookEntity.getId(), request, metadataMap);
                 updateBookMetadata(bookEntity, fetchedBookMetadata, request.getRefreshOptions().isRefreshCovers(), request.getRefreshOptions().isMergeCategories());
             } catch (Exception e) {
                 log.error("Error while updating book metadata, book: {}", bookEntity.getFileName(), e);
@@ -170,8 +167,8 @@ public class BookMetadataService {
     }
 
     @Transactional
-    protected BookMetadata buildFetchMetadata(MetadataRefreshRequest request, Map<MetadataProvider, BookMetadata> metadataMap) {
-        BookMetadata metadata = BookMetadata.builder().build();
+    protected BookMetadata buildFetchMetadata(Long bookId, MetadataRefreshRequest request, Map<MetadataProvider, BookMetadata> metadataMap) {
+        BookMetadata metadata = BookMetadata.builder().bookId(bookId).build();
         MetadataRefreshOptions.FieldOptions fieldOptions = request.getRefreshOptions().getFieldOptions();
 
         metadata.setTitle(resolveFieldAsString(metadataMap, fieldOptions.getTitle(), BookMetadata::getTitle));

@@ -23,6 +23,7 @@ import {NgIf} from '@angular/common';
   templateUrl: './book-card.component.html',
   styleUrls: ['./book-card.component.scss'],
   imports: [Button, MenuModule, CheckboxModule, FormsModule, NgIf],
+  standalone: true
 })
 export class BookCardComponent implements OnInit {
   @Input() book!: Book;

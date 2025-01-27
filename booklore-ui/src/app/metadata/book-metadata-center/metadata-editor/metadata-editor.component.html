@@ -10,11 +10,19 @@
       <div class="flex flex-col items-center gap-2 relative">
 
         <img
+          *ngIf="!metadata['thumbnailUrl']"
           [src]="urlHelper.getCoverUrl(metadata.bookId, metadata?.coverUpdatedOn)"
           alt="Image"
           width="250"
           [ngClass]="{ 'brightness-50': isUploading }"
           class="transition-all duration-300 ease-in-out"/>
+
+        <img
+          *ngIf="metadata['thumbnailUrl']"
+          [src]="metadata['thumbnailUrl']"
+          alt="Image"
+          height="350"
+          width="250"/>
 
         <p-progressSpinner
           *ngIf="isUploading"

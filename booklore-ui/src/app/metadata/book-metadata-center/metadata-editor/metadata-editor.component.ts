@@ -67,6 +67,7 @@ export class MetadataEditorComponent implements OnInit {
       seriesName: new FormControl(''),
       seriesNumber: new FormControl(''),
       seriesTotal: new FormControl(''),
+      thumbnailUrl: new FormControl(''),
 
       titleLocked: new FormControl(false),
       subtitleLocked: new FormControl(false),
@@ -93,23 +94,24 @@ export class MetadataEditorComponent implements OnInit {
       if (metadata) {
         this.currentBookId = metadata.bookId;
 
-        this.metadataForm.setValue({
-          title: metadata.title,
-          subtitle: metadata.subtitle,
-          authors: metadata.authors.sort().join(', '),
-          categories: metadata.categories.sort().join(', '),
-          publisher: metadata.publisher,
-          publishedDate: metadata.publishedDate,
-          isbn10: metadata.isbn10,
-          isbn13: metadata.isbn13,
-          description: metadata.description,
-          pageCount: metadata.pageCount == 0 ? null : metadata.pageCount,
-          language: metadata.language,
-          rating: metadata.rating,
-          reviewCount: metadata.reviewCount,
-          seriesName: metadata.seriesName,
-          seriesNumber: metadata.seriesNumber,
-          seriesTotal: metadata.seriesTotal,
+        this.metadataForm.patchValue({
+          title: metadata.title || null,
+          subtitle: metadata.subtitle || null,
+          authors: (metadata.authors || []).sort().join(', '),
+          categories: (metadata.categories || []).sort().join(', '),
+          publisher: metadata.publisher || null,
+          publishedDate: metadata.publishedDate || null,
+          isbn10: metadata.isbn10 || null,
+          isbn13: metadata.isbn13 || null,
+          description: metadata.description || null,
+          pageCount: metadata.pageCount || null,
+          language: metadata.language || null,
+          rating: metadata.rating || null,
+          reviewCount: metadata.reviewCount || null,
+          seriesName: metadata.seriesName || null,
+          seriesNumber: metadata.seriesNumber || null,
+          seriesTotal: metadata.seriesTotal || null,
+          thumbnailUrl: metadata.thumbnailUrl || null,
 
           titleLocked: metadata.titleLocked || false,
           subtitleLocked: metadata.subtitleLocked || false,
@@ -215,6 +217,7 @@ export class MetadataEditorComponent implements OnInit {
       seriesName: this.metadataForm.get('seriesName')?.value,
       seriesNumber: this.metadataForm.get('seriesNumber')?.value,
       seriesTotal: this.metadataForm.get('seriesTotal')?.value,
+      thumbnailUrl: this.metadataForm.get('thumbnailUrl')?.value,
 
       titleLocked: this.metadataForm.get('titleLocked')?.value,
       subtitleLocked: this.metadataForm.get('subtitleLocked')?.value,

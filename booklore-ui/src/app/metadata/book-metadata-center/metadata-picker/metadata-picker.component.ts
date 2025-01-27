@@ -4,7 +4,7 @@ import {MessageService} from 'primeng/api';
 import {Button} from 'primeng/button';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
-import {AsyncPipe, NgClass, NgIf, NgStyle} from '@angular/common';
+import {AsyncPipe, NgClass, NgForOf, NgIf, NgStyle} from '@angular/common';
 import {Divider} from 'primeng/divider';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Observable} from 'rxjs';
@@ -27,10 +27,30 @@ import {BookService} from '../../../book/service/book.service';
     NgClass,
     NgStyle,
     Tooltip,
-    AsyncPipe
+    AsyncPipe,
+    NgForOf
   ]
 })
 export class MetadataPickerComponent implements OnInit {
+
+  metadataFields = [
+    {label: 'Title', controlName: 'title', lockedKey: 'titleLocked', fetchedKey: 'title'},
+    {label: 'Authors', controlName: 'authors', lockedKey: 'authorsLocked', fetchedKey: 'authors'},
+    {label: 'Categories', controlName: 'categories', lockedKey: 'categoriesLocked', fetchedKey: 'categories'},
+    {label: 'Publisher', controlName: 'publisher', lockedKey: 'publisherLocked', fetchedKey: 'publisher'},
+    {label: 'Published', controlName: 'publishedDate', lockedKey: 'publishedDateLocked', fetchedKey: 'publishedDate'},
+    {label: 'ISBN-10', controlName: 'isbn10', lockedKey: 'isbn10Locked', fetchedKey: 'isbn10'},
+    {label: 'Language', controlName: 'language', lockedKey: 'languageLocked', fetchedKey: 'language'},
+    {label: 'Description', controlName: 'description', lockedKey: 'descriptionLocked', fetchedKey: 'description'},
+    {label: 'Series', controlName: 'seriesName', lockedKey: 'seriesNameLocked', fetchedKey: 'seriesName'},
+    {label: 'Book #', controlName: 'seriesNumber', lockedKey: 'seriesNumberLocked', fetchedKey: 'seriesNumber'},
+    {label: 'Total Books', controlName: 'seriesTotal', lockedKey: 'seriesTotalLocked', fetchedKey: 'seriesTotal'},
+    {label: 'ISBN-13', controlName: 'isbn13', lockedKey: 'isbn13Locked', fetchedKey: 'isbn13'},
+    {label: 'Rating', controlName: 'rating', lockedKey: 'ratingLocked', fetchedKey: 'rating'},
+    {label: 'Reviews', controlName: 'reviewCount', lockedKey: 'reviewCountLocked', fetchedKey: 'reviewCount'},
+    {label: 'Pages', controlName: 'pageCount', lockedKey: 'pageCountLocked', fetchedKey: 'pageCount'}
+  ];
+
 
   @Input() fetchedMetadata!: BookMetadata;
   @Output() goBack = new EventEmitter<boolean>();

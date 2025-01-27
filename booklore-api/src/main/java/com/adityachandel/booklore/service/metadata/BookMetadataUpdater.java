@@ -28,6 +28,7 @@ public class BookMetadataUpdater {
     private AuthorRepository authorRepository;
     private BookMetadataRepository bookMetadataRepository;
     private CategoryRepository categoryRepository;
+    private BookAwardRepository awardRepository;
     private FileService fileService;
     private BookAwardRepository bookAwardRepository;
 
@@ -179,7 +180,9 @@ public class BookMetadataUpdater {
         if (!metadata.getCategories().isEmpty()) {
             categoryRepository.saveAll(metadata.getCategories());
         }
-
+        if (!metadata.getAwards().isEmpty()) {
+            awardRepository.saveAll(metadata.getAwards());
+        }
         bookMetadataRepository.save(metadata);
         return metadata;
     }

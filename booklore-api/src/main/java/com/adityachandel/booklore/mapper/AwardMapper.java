@@ -9,5 +9,5 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface AwardMapper {
     Award toAward(BookAwardEntity awardEntity);
-    List<Award> toAuthorList(List<BookAwardEntity> awardEntities);
+    List<Award> toAwardList(List<BookAwardEntity> awardEntities);
 }

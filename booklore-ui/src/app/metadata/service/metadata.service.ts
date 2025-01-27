@@ -24,6 +24,15 @@ export class MetadataService {
     return this.http.post<FetchedMetadata[]>(`${this.url}/${bookId}`, request);
   }
 
+  quickUpdateBookMetadataSynchronous(bookId: number): Observable<BookMetadata> {
+    return this.http.put<BookMetadata>(`${this.url}/${bookId}/refresh-book-sync`, {}).pipe(
+      map(updatedMetadata => {
+        this.bookService.handleBookMetadataUpdate(bookId, updatedMetadata);
+        return updatedMetadata;
+      })
+    );
+  }
+
   updateBookMetadata(bookId: number, bookMetadata: BookMetadata): Observable<BookMetadata> {
     return this.http.put<BookMetadata>(`${this.url}/${bookId}`, bookMetadata).pipe(
       map(updatedMetadata => {

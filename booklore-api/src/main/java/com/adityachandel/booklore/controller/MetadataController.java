@@ -28,14 +28,19 @@ public class MetadataController {
     private BookMetadataMapper bookMetadataMapper;
 
     @PostMapping("/{bookId}")
-    public ResponseEntity<List<FetchedBookMetadata>> getBookMetadata(@RequestBody(required = false) FetchMetadataRequest fetchMetadataRequest, @PathVariable Long bookId) {
-        return ResponseEntity.ok(bookMetadataService.fetchMetadataForRequest(bookId, fetchMetadataRequest));
+    public ResponseEntity<List<FetchedBookMetadata>> getProspectiveMetadataList(@RequestBody(required = false) FetchMetadataRequest fetchMetadataRequest, @PathVariable Long bookId) {
+        return ResponseEntity.ok(bookMetadataService.getProspectiveMetadataListForBookId(bookId, fetchMetadataRequest));
     }
 
     @PutMapping("/{bookId}")
     public ResponseEntity<BookMetadata> updateMetadataFromFetch(@RequestBody FetchedBookMetadata setMetadataRequest, @PathVariable long bookId) {
         BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true, true), true);
         return ResponseEntity.ok(bookMetadata);
+    }
+
+    @PutMapping(path = "/{bookId}/refresh-book-sync")
+    public ResponseEntity<BookMetadata> quickRefreshBookSynchronized(@PathVariable Long bookId) {
+        return ResponseEntity.ok(bookMetadataService.quickRefreshBookSynchronized(bookId));
     }
 
     @PutMapping(path = "/refreshV2")

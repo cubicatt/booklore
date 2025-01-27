@@ -23,7 +23,6 @@ import com.adityachandel.booklore.service.metadata.model.FetchedBookMetadata;
 import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
 import com.adityachandel.booklore.service.metadata.parser.BookParser;
 import com.adityachandel.booklore.util.FileService;
-import com.adityachandel.booklore.util.FileUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -56,7 +55,7 @@ public class BookMetadataService {
     private final Map<MetadataProvider, BookParser> parserMap;
 
 
-    public List<FetchedBookMetadata> fetchMetadataForRequest(long bookId, FetchMetadataRequest request) {
+    public List<FetchedBookMetadata> getProspectiveMetadataListForBookId(long bookId, FetchMetadataRequest request) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         Book book = bookMapper.toBook(bookEntity);
         List<List<FetchedBookMetadata>> allMetadata = request.getProviders().stream()
@@ -93,6 +92,19 @@ public class BookMetadataService {
         return getParser(provider).fetchTopMetadata(book, buildFetchMetadataRequestFromBook(book));
     }
 
+
+    @Transactional
+    public BookMetadata quickRefreshBookSynchronized(Long bookId) {
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        AppSettings appSettings = appSettingService.getAppSettings();
+        MetadataRefreshRequest refreshRequest = MetadataRefreshRequest.builder().refreshOptions(appSettings.getMetadataRefreshOptions()).build();
+        List<MetadataProvider> providers = prepareProviders(refreshRequest);
+        Map<MetadataProvider, FetchedBookMetadata> metadataMap = fetchMetadataForBook(providers, bookEntity);
+        FetchedBookMetadata fetchedBookMetadata = buildFetchMetadata(refreshRequest, metadataMap);
+        BookMetadataEntity bookMetadataEntity = updateBookMetadata(bookEntity, fetchedBookMetadata, refreshRequest.getRefreshOptions().isRefreshCovers(), refreshRequest.getRefreshOptions().isMergeCategories());
+        return bookMetadataMapper.toBookMetadata(bookMetadataEntity, true);
+    }
+
     @Transactional
     public void refreshMetadata(MetadataRefreshRequest request) {
         log.info("Refresh Metadata task started!");
@@ -125,7 +137,7 @@ public class BookMetadataService {
     }
 
     @Transactional
-    protected void updateBookMetadata(BookEntity bookEntity, FetchedBookMetadata metadata, boolean replaceCover, boolean mergeCategories) {
+    protected BookMetadataEntity updateBookMetadata(BookEntity bookEntity, FetchedBookMetadata metadata, boolean replaceCover, boolean mergeCategories) {
         if (metadata != null) {
             BookMetadataEntity bookMetadata = bookMetadataUpdater.setBookMetadata(bookEntity.getId(), metadata, replaceCover, mergeCategories);
             bookEntity.setMetadata(bookMetadata);
@@ -133,7 +145,9 @@ public class BookMetadataService {
             Book book = bookMapper.toBook(bookEntity);
             notificationService.sendMessage(Topic.BOOK_METADATA_UPDATE, book);
             notificationService.sendMessage(Topic.LOG, createLogNotification("Book metadata updated: " + book.getMetadata().getTitle()));
+            return bookMetadata;
         }
+        return bookEntity.getMetadata();
     }
 
     @Transactional

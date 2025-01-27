@@ -15,8 +15,6 @@ import {FileUpload, FileUploadErrorEvent, FileUploadEvent} from 'primeng/fileupl
 import {HttpResponse} from '@angular/common/http';
 import {BookService} from '../../../book/service/book.service';
 import {ProgressSpinner} from 'primeng/progressspinner';
-import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
-import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
 
 @Component({
   selector: 'app-metadata-editor',
@@ -49,6 +47,7 @@ export class MetadataEditorComponent implements OnInit {
   metadataForm: FormGroup;
   currentBookId!: number;
   isUploading = false;
+  isLoading = false;
 
   constructor() {
     this.metadataForm = new FormGroup({
@@ -284,11 +283,16 @@ export class MetadataEditorComponent implements OnInit {
   }
 
   quickRefresh() {
-    const metadataRefreshRequest: MetadataRefreshRequest = {
-      quick: true,
-      refreshType: MetadataRefreshType.BOOKS,
-      bookIds: [this.currentBookId]
-    };
-    this.metadataService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
+    this.isLoading = true;
+    this.metadataService.quickUpdateBookMetadataSynchronous(this.currentBookId).subscribe({
+      next: (bookMetadata) => {
+        this.isLoading = false;
+        this.metadataCenterService.emit(bookMetadata);
+      },
+      error: () => {
+        this.isLoading = false;
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update metadata'});
+      }
+    });
   }
 }

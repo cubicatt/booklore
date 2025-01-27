@@ -25,6 +25,7 @@ import {Divider} from 'primeng/divider';
     Divider
   ],
   providers: [DialogService],
+  standalone: true
 })
 export class MainDashboardComponent implements OnInit {
   ref: DynamicDialogRef | undefined;

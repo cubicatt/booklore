@@ -7,7 +7,6 @@ import {Book} from '../../../model/book.model';
 import {SortOption} from '../../../model/sort.model';
 import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
-import {BookService} from '../../../service/book.service';
 
 @Component({
   selector: 'app-book-table',

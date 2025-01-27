@@ -20,6 +20,7 @@ import {MessageService} from 'primeng/api';
     FormsModule
   ],
   templateUrl: './shelf-edit-dialog.component.html',
+  standalone: true,
   styleUrl: './shelf-edit-dialog.component.scss'
 })
 export class ShelfEditDialogComponent implements OnInit{

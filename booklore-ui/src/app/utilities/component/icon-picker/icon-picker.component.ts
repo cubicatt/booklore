@@ -12,6 +12,7 @@ import {FormsModule} from '@angular/forms';
     NgForOf,
     FormsModule
   ],
+  standalone: true
 })
 export class IconPickerComponent {
   iconCategories: string[] = [

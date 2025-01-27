@@ -17,6 +17,7 @@ import {MetadataRefreshOptions} from '../../../metadata/model/request/metadata-r
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   imports: [Select, FormsModule, NgForOf, ToggleSwitch, RadioButton, Divider, Button, Tooltip, MetadataAdvancedFetchOptionsComponent],
+  standalone: true,
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent implements OnInit {

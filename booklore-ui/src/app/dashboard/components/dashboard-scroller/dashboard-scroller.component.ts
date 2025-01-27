@@ -16,6 +16,7 @@ import {Book} from '../../../book/model/book.model';
     BookCardComponent,
     ProgressSpinnerModule
   ],
+  standalone: true
 })
 export class DashboardScrollerComponent implements OnInit {
 

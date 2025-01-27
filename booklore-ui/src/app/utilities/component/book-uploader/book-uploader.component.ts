@@ -23,6 +23,7 @@ import {API_CONFIG} from '../../../config/api-config';
     Select
   ],
   templateUrl: './book-uploader.component.html',
+  standalone: true,
   styleUrl: './book-uploader.component.scss'
 })
 export class BookUploaderComponent {

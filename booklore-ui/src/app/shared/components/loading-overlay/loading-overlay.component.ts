@@ -11,6 +11,7 @@ import {NgIf} from '@angular/common';
     ProgressSpinner,
     NgIf
   ],
+  standalone: true,
   styleUrls: ['./loading-overlay.component.scss']
 })
 export class LoadingOverlayComponent implements OnInit, OnDestroy {

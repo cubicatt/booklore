@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.service.metadata;
+package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.model.dto.BookMetadata;

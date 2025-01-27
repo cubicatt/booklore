@@ -2,7 +2,7 @@ package com.adityachandel.booklore.service.metadata.parser;
 
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
-import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
+import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
 
 import java.util.List;
 

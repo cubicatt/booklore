@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.service.metadata;
+package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
@@ -15,10 +15,8 @@ import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookMetadataRepository;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
-import com.adityachandel.booklore.service.AppSettingService;
-import com.adityachandel.booklore.service.NotificationService;
-import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
-import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
+import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
+import com.adityachandel.booklore.model.enums.MetadataProvider;
 import com.adityachandel.booklore.service.metadata.parser.BookParser;
 import com.adityachandel.booklore.util.FileService;
 import lombok.AllArgsConstructor;
@@ -34,7 +32,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import static com.adityachandel.booklore.model.websocket.LogNotification.createLogNotification;
-import static com.adityachandel.booklore.service.metadata.model.MetadataProvider.*;
+import static com.adityachandel.booklore.model.enums.MetadataProvider.*;
 
 @Slf4j
 @Service

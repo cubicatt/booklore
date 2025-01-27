@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.config;
 
-import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
+import com.adityachandel.booklore.model.enums.MetadataProvider;
 import com.adityachandel.booklore.service.metadata.parser.AmazonBookParser;
 import com.adityachandel.booklore.service.metadata.parser.BookParser;
 import com.adityachandel.booklore.service.metadata.parser.GoodReadsParser;

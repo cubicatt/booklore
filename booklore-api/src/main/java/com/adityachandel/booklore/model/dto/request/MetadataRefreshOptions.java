@@ -1,7 +1,6 @@
 package com.adityachandel.booklore.model.dto.request;
 
-import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.adityachandel.booklore.model.enums.MetadataProvider;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;

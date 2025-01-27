@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.model.dto.request;
 
-import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
+import com.adityachandel.booklore.model.enums.MetadataProvider;
 import lombok.Data;
 
 import java.util.Set;

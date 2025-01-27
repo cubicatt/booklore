@@ -2,8 +2,8 @@ package com.adityachandel.booklore.service.metadata.parser;
 
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.BookMetadata;
-import com.adityachandel.booklore.service.metadata.model.FetchMetadataRequest;
-import com.adityachandel.booklore.service.metadata.model.MetadataProvider;
+import com.adityachandel.booklore.model.dto.request.FetchMetadataRequest;
+import com.adityachandel.booklore.model.enums.MetadataProvider;
 import com.adityachandel.booklore.util.BookUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

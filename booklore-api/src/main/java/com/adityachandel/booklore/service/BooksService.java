@@ -98,7 +98,7 @@ public class BooksService {
                 .collect(Collectors.toList());
     }
 
-    public ResponseEntity<byte[]> getBookData(long bookId) throws IOException {
+    public ResponseEntity<byte[]> getBookContent(long bookId) throws IOException {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         byte[] pdfBytes = Files.readAllBytes(new File(FileUtils.getBookFullPath(bookEntity)).toPath());
         return ResponseEntity.ok()

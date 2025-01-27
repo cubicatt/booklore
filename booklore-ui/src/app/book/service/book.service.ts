@@ -11,7 +11,7 @@ import {API_CONFIG} from '../../config/api-config';
 })
 export class BookService {
 
-  private readonly url = `${API_CONFIG.BASE_URL}/api/v1/book`;
+  private readonly url = `${API_CONFIG.BASE_URL}/api/v1/books`;
 
   private bookStateSubject = new BehaviorSubject<BookState>({
     books: null,
@@ -53,7 +53,7 @@ export class BookService {
       shelvesToAssign: Array.from(shelvesToAssign),
       shelvesToUnassign: Array.from(shelvesToUnassign),
     };
-    return this.http.post<Book[]>(`${this.url}/assign-shelves`, requestPayload).pipe(
+    return this.http.post<Book[]>(`${this.url}/shelves`, requestPayload).pipe(
       map(updatedBooks => {
         const currentState = this.bookStateSubject.value;
         const currentBooks = currentState.books || [];
@@ -92,11 +92,11 @@ export class BookService {
   }
 
   getBookSetting(bookId: number): Observable<BookSetting> {
-    return this.http.get<BookSetting>(`${this.url}/${bookId}/book-viewer-setting`);
+    return this.http.get<BookSetting>(`${this.url}/${bookId}/viewer-settings`);
   }
 
   updateViewerSetting(bookSetting: BookSetting, bookId: number): Observable<void> {
-    return this.http.put<void>(`${this.url}/${bookId}/book-viewer-setting`, bookSetting);
+    return this.http.put<void>(`${this.url}/${bookId}/viewer-setting`, bookSetting);
   }
 
   updateLastReadTime(bookId: number) {
@@ -140,11 +140,7 @@ export class BookService {
   }
 
   getPdfData(bookId: number): Observable<Blob> {
-    return this.http.get<Blob>(`${this.url}/${bookId}/data`, {responseType: 'blob' as 'json'});
-  }
-
-  getBookCoverUrl(bookId: number): string {
-    return `${this.url}/${bookId}/cover`;
+    return this.http.get<Blob>(`${this.url}/${bookId}/content`, {responseType: 'blob' as 'json'});
   }
 
   getBookByIdFromAPI(bookId: number, withDescription: boolean) {
@@ -202,22 +198,5 @@ export class BookService {
   getBookMetadata(bookId: number): BookMetadata | null {
     const book = this.bookStateSubject.value.books?.find(book => book.id === bookId);
     return book?.metadata ?? null;
-  }
-
-  updateLock(bookId: number, field: string, isLocked: boolean): void {
-    const currentState = this.bookStateSubject.value;
-    const updatedBooks = (currentState.books || []).map(book => {
-      if (book.id === bookId && book.metadata) {
-        return {
-          ...book,
-          metadata: {
-            ...book.metadata,
-            [`${field}Locked`]: isLocked
-          }
-        };
-      }
-      return book;
-    });
-    this.bookStateSubject.next({...currentState, books: updatedBooks});
   }
 }

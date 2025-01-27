@@ -25,7 +25,7 @@
           [ngClass]="{'green-outlined-button': isValueSaved('title'), 'yellow-outlined-button': isValueCopied('title')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('title')"/>
-        <input pInputText [value]="fetchedMetadata.title ?? null" class="input" readonly/>
+        <input pInputText [value]="fetchedMetadata.title" class="input" readonly/>
       </div>
     </div>
 

@@ -67,7 +67,6 @@ export class MetadataEditorComponent implements OnInit {
       seriesName: new FormControl(''),
       seriesNumber: new FormControl(''),
       seriesTotal: new FormControl(''),
-      thumbnailUrl: new FormControl(''),
 
       titleLocked: new FormControl(false),
       subtitleLocked: new FormControl(false),
@@ -111,7 +110,6 @@ export class MetadataEditorComponent implements OnInit {
           seriesName: metadata.seriesName || null,
           seriesNumber: metadata.seriesNumber || null,
           seriesTotal: metadata.seriesTotal || null,
-          thumbnailUrl: metadata.thumbnailUrl || null,
 
           titleLocked: metadata.titleLocked || false,
           subtitleLocked: metadata.subtitleLocked || false,
@@ -217,7 +215,6 @@ export class MetadataEditorComponent implements OnInit {
       seriesName: this.metadataForm.get('seriesName')?.value,
       seriesNumber: this.metadataForm.get('seriesNumber')?.value,
       seriesTotal: this.metadataForm.get('seriesTotal')?.value,
-      thumbnailUrl: this.metadataForm.get('thumbnailUrl')?.value,
 
       titleLocked: this.metadataForm.get('titleLocked')?.value,
       subtitleLocked: this.metadataForm.get('subtitleLocked')?.value,

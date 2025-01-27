@@ -25,7 +25,7 @@
           [ngClass]="{'green-outlined-button': isValueSaved('title'), 'yellow-outlined-button': isValueCopied('title')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('title')"/>
-        <input pInputText [value]="fetchedMetadata.title" class="input" readonly/>
+        <input pInputText [value]="fetchedMetadata.title ?? null" class="input" readonly/>
       </div>
     </div>
 
@@ -73,7 +73,7 @@
           [ngClass]="{'green-outlined-button': isValueSaved('publisher'), 'yellow-outlined-button': isValueCopied('publisher')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('publisher')"/>
-        <input pInputText [value]="fetchedMetadata.publisher" class="input" readonly/>
+        <input pInputText [value]="fetchedMetadata.publisher ?? null" class="input" readonly/>
       </div>
     </div>
 
@@ -89,7 +89,7 @@
           [ngClass]="{'green-outlined-button': isValueSaved('publishedDate'), 'yellow-outlined-button': isValueCopied('publishedDate')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('publishedDate')"/>
-        <input pInputText [value]="fetchedMetadata.publishedDate" class="input" readonly/>
+        <input pInputText [value]="fetchedMetadata.publishedDate ?? null" class="input" readonly/>
       </div>
     </div>
 
@@ -105,7 +105,7 @@
           [ngClass]="{'green-outlined-button': isValueSaved('isbn10'), 'yellow-outlined-button': isValueCopied('isbn10')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('isbn10')"/>
-        <input pInputText [value]="fetchedMetadata.isbn10" class="input" readonly/>
+        <input pInputText [value]="fetchedMetadata.isbn10 ?? null" class="input" readonly/>
       </div>
     </div>
 
@@ -121,7 +121,7 @@
           [ngClass]="{'green-outlined-button': isValueSaved('language'), 'yellow-outlined-button': isValueCopied('language')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('language')"/>
-        <input pInputText [value]="fetchedMetadata.language" class="input" readonly/>
+        <input pInputText [value]="fetchedMetadata.language ?? null" class="input" readonly/>
       </div>
     </div>
 
@@ -137,7 +137,7 @@
           [ngClass]="{'green-outlined-button': isValueSaved('description'), 'yellow-outlined-button': isValueCopied('description')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('description')"/>
-        <textarea [value]="fetchedMetadata.description" class="input" readonly></textarea>
+        <textarea [value]="fetchedMetadata.description ?? null" class="input" readonly></textarea>
       </div>
     </div>
 
@@ -155,7 +155,7 @@
           class="arrow-button"
           (click)="copyFetchedToCurrent('thumbnailUrl')"/>
         <input type="hidden" [value]="fetchedMetadata.thumbnailUrl" class="input" readonly/>
-        <img [src]="fetchedMetadata.thumbnailUrl" alt="Fetched Thumbnail" class="thumbnail"/>
+        <img [src]="fetchedMetadata.thumbnailUrl ?? null" alt="Fetched Thumbnail" class="thumbnail"/>
       </div>
     </div>
 
@@ -172,7 +172,7 @@
           [ngClass]="{'green-outlined-button': isValueSaved('seriesName'), 'yellow-outlined-button': isValueCopied('seriesName')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('seriesName')"/>
-        <input pInputText [value]="fetchedMetadata.seriesName" class="input" readonly/>
+        <input pInputText [value]="fetchedMetadata.seriesName ?? null" class="input" readonly/>
       </div>
     </div>
 
@@ -188,7 +188,7 @@
           [ngClass]="{'green-outlined-button': isValueSaved('seriesNumber'), 'yellow-outlined-button': isValueCopied('seriesNumber')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('seriesNumber')"/>
-        <input pInputText [value]="fetchedMetadata.seriesNumber" class="input" readonly/>
+        <input pInputText [value]="fetchedMetadata.seriesNumber ?? null" class="input" readonly/>
       </div>
     </div>
 
@@ -204,7 +204,7 @@
           [ngClass]="{'green-outlined-button': isValueSaved('seriesTotal'), 'yellow-outlined-button': isValueCopied('seriesTotal')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('seriesTotal')"/>
-        <input pInputText [value]="fetchedMetadata.seriesTotal" class="input" readonly/>
+        <input pInputText [value]="fetchedMetadata.seriesTotal ?? null" class="input" readonly/>
       </div>
     </div>
 
@@ -220,7 +220,7 @@
           [ngClass]="{'green-outlined-button': isValueSaved('isbn13'), 'yellow-outlined-button': isValueCopied('isbn13')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('isbn13')"/>
-        <input pInputText [value]="fetchedMetadata.isbn13" class="input" readonly/>
+        <input pInputText [value]="fetchedMetadata.isbn13 ?? null" class="input" readonly/>
       </div>
     </div>
 
@@ -236,7 +236,7 @@
           [ngClass]="{'green-outlined-button': isValueSaved('rating'), 'yellow-outlined-button': isValueCopied('rating')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('rating')"/>
-        <input pInputText [value]="fetchedMetadata.rating" class="input" readonly/>
+        <input pInputText [value]="fetchedMetadata.rating ?? null" class="input" readonly/>
       </div>
     </div>
 
@@ -252,7 +252,7 @@
           [ngClass]="{'green-outlined-button': isValueSaved('reviewCount'), 'yellow-outlined-button': isValueCopied('reviewCount')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('reviewCount')"/>
-        <input pInputText [value]="fetchedMetadata.reviewCount" class="input" readonly/>
+        <input pInputText [value]="fetchedMetadata.reviewCount ?? null" class="input" readonly/>
       </div>
     </div>
 
@@ -268,7 +268,7 @@
           [ngClass]="{'green-outlined-button': isValueSaved('pageCount'), 'yellow-outlined-button': isValueCopied('pageCount')}"
           class="arrow-button"
           (click)="copyFetchedToCurrent('pageCount')"/>
-        <input pInputText [value]="fetchedMetadata.pageCount" class="input" readonly/>
+        <input pInputText [value]="fetchedMetadata.pageCount ?? null" class="input" readonly/>
       </div>
     </div>
 

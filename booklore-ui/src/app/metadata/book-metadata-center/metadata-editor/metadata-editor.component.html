@@ -10,19 +10,11 @@
       <div class="flex flex-col items-center gap-2 relative">
 
         <img
-          *ngIf="!metadata['thumbnailUrl']"
           [src]="urlHelper.getCoverUrl(metadata.bookId, metadata?.coverUpdatedOn)"
           alt="Image"
           width="250"
           [ngClass]="{ 'brightness-50': isUploading }"
           class="transition-all duration-300 ease-in-out"/>
-
-        <img
-          *ngIf="metadata['thumbnailUrl']"
-          [src]="metadata['thumbnailUrl']"
-          alt="Image"
-          height="350"
-          width="250"/>
 
         <p-progressSpinner
           *ngIf="isUploading"
@@ -215,8 +207,6 @@
     <p-divider></p-divider>
 
     <div class="flex gap-x-4 justify-end">
-      <p-button label="Quick Refresh" icon="pi pi-bolt" [outlined]="true" severity="info" (onClick)="quickRefresh()"></p-button>
-      <p-divider layout="vertical"/>
       <p-button label="Unlock All" icon="pi pi-lock-open" [outlined]="true" severity="success" (onClick)="unlockAll()"></p-button>
       <p-button label="Lock All" icon="pi pi-lock" [outlined]="true" severity="warn" (onClick)="lockAll()"></p-button>
       <p-divider layout="vertical"/>

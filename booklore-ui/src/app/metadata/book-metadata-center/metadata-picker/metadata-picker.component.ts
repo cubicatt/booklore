@@ -51,7 +51,6 @@ export class MetadataPickerComponent implements OnInit {
     {label: 'Pages', controlName: 'pageCount', lockedKey: 'pageCountLocked', fetchedKey: 'pageCount'}
   ];
 
-
   @Input() fetchedMetadata!: BookMetadata;
   @Output() goBack = new EventEmitter<boolean>();
 
@@ -167,14 +166,6 @@ export class MetadataPickerComponent implements OnInit {
         if (metadata.seriesTotalLocked) this.metadataForm.get('seriesTotal')?.disable();
       }
     });
-  }
-
-  fetchedAuthorsString(): string {
-    return this.fetchedMetadata.authors ? this.fetchedMetadata.authors.join(', ') : '';
-  }
-
-  fetchedCategoriesString(): string {
-    return this.fetchedMetadata.categories ? this.fetchedMetadata.categories.join(', ') : '';
   }
 
   onSave(): void {

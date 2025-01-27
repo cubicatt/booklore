@@ -1,5 +1,5 @@
 import {Component, EventEmitter, inject, Input, OnChanges, Output} from '@angular/core';
-import {TableEditCompleteEvent, TableModule} from 'primeng/table';
+import {TableModule} from 'primeng/table';
 import {NgIf} from '@angular/common';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
@@ -7,8 +7,7 @@ import {Book} from '../../../model/book.model';
 import {SortOption} from '../../../model/sort.model';
 import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
-import {InputText} from 'primeng/inputtext';
-import {MetadataService} from '../../../../metadata/service/metadata.service';
+import {BookService} from '../../../service/book.service';
 
 @Component({
   selector: 'app-book-table',
@@ -18,8 +17,7 @@ import {MetadataService} from '../../../../metadata/service/metadata.service';
     TableModule,
     NgIf,
     Rating,
-    FormsModule,
-    InputText
+    FormsModule
   ],
   styleUrl: './book-table.component.scss'
 })
@@ -33,7 +31,6 @@ export class BookTableComponent implements OnChanges {
 
   protected urlHelper = inject(UrlHelperService);
   private metadataDialogService = inject(MetadataDialogService);
-  private metadataService = inject(MetadataService)
 
   // Hack to set virtual-scroller height
   ngOnChanges() {
@@ -85,19 +82,6 @@ export class BookTableComponent implements OnChanges {
     } else {
       return 'rgb(239, 68, 68)';
     }
-  }
-
-  onEditComplete($event: TableEditCompleteEvent) {
-    const field = $event.field?.replace(/^metadata\./, '');
-    this.metadataService.updateMetadataField($event.index, field, $event.data).subscribe();
-  }
-
-  removeAuthor(authorToRemove: { name: string }) {
-    /*const authors = this.books[0].metadata.authors; // Adjust this to get the correct book metadata
-    const index = authors.findIndex(author => author.name === authorToRemove.name);
-    if (index !== -1) {
-      authors.splice(index, 1); // Remove the author from the array
-    }*/
   }
 
   getAuthorNames(authors: string[]): string {

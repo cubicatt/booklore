@@ -2,9 +2,7 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.Library;
-import com.adityachandel.booklore.model.dto.Sort;
 import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
-import com.adityachandel.booklore.service.BooksService;
 import com.adityachandel.booklore.service.LibraryService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,25 +11,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/library")
+@RequestMapping("/api/v1/libraries")
 @AllArgsConstructor
 public class LibraryController {
 
     private LibraryService libraryService;
-    private BooksService booksService;
-
-    @GetMapping("/{libraryId}")
-    public ResponseEntity<Library> getLibrary(@PathVariable long libraryId) {
-        return ResponseEntity.ok(libraryService.getLibrary(libraryId));
-    }
 
     @GetMapping
     public ResponseEntity<List<Library>> getLibraries() {
         return ResponseEntity.ok(libraryService.getLibraries());
     }
 
+    @GetMapping("/{libraryId}")
+    public ResponseEntity<Library> getLibrary(@PathVariable long libraryId) {
+        return ResponseEntity.ok(libraryService.getLibrary(libraryId));
+    }
+
     @PostMapping
-    public ResponseEntity<Library> createLibraryNew(@RequestBody CreateLibraryRequest request) {
+    public ResponseEntity<Library> createLibrary(@RequestBody CreateLibraryRequest request) {
         return ResponseEntity.ok(libraryService.createLibrary(request));
     }
 

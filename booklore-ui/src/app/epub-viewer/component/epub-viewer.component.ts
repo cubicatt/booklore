@@ -1,13 +1,12 @@
 import {Component, ElementRef, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import ePub from 'epubjs';
-import {EpubService} from '../service/epub.service';
 import {Drawer} from 'primeng/drawer';
 import {Button} from 'primeng/button';
 import {NgForOf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Divider} from 'primeng/divider';
 import {ActivatedRoute} from '@angular/router';
-import {Book, BookSetting, EpubViewerSetting} from '../../book/model/book.model';
+import {Book, BookSetting} from '../../book/model/book.model';
 import {BookService} from '../../book/service/book.service';
 import {filter, forkJoin, take} from 'rxjs';
 import {AppSettingsService} from '../../core/service/app-settings.service';
@@ -26,6 +25,7 @@ const FALLBACK_EPUB_SETTINGS = {
   templateUrl: './epub-viewer.component.html',
   styleUrls: ['./epub-viewer.component.scss'],
   imports: [Drawer, Button, NgForOf, FormsModule, Divider, Select],
+  standalone: true
 })
 export class EpubViewerComponent implements OnInit, OnDestroy {
   @ViewChild('epubContainer', {static: true}) epubContainer!: ElementRef;
@@ -58,7 +58,6 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
     {label: 'Sepia', value: 'sepia'},
   ];
 
-  private epubService = inject(EpubService);
   private route = inject(ActivatedRoute);
   private bookService = inject(BookService);
   private appSettingsService = inject(AppSettingsService);
@@ -72,7 +71,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
         .pipe(filter((appSettings) => appSettings !== null), take(1))
         .subscribe((appSettings) => {
           const epub$ = this.bookService.getBookByIdFromAPI(bookId, false);
-          const epubData$ = this.epubService.downloadEpub(bookId);
+          const epubData$ = this.bookService.getFileContent(bookId);
           const bookSetting$ = this.bookService.getBookSetting(bookId);
 
           forkJoin([epub$, epubData$, bookSetting$]).subscribe((results) => {

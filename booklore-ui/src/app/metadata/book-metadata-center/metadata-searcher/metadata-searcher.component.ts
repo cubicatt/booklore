@@ -10,8 +10,8 @@ import {ProgressSpinner} from 'primeng/progressspinner';
 import {MetadataPickerComponent} from '../metadata-picker/metadata-picker.component';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {MultiSelect} from 'primeng/multiselect';
-import {MetadataService} from '../../service/metadata.service';
 import {BookMetadata} from '../../../book/model/book.model';
+import {BookService} from '../../../book/service/book.service';
 
 @Component({
   selector: 'app-metadata-searcher',
@@ -31,7 +31,7 @@ export class MetadataSearcherComponent implements OnInit {
 
   private formBuilder = inject(FormBuilder);
   private metadataCenterService = inject(BookMetadataCenterService);
-  private metadataService = inject(MetadataService);
+  private bookService = inject(BookService);
 
   constructor() {
     this.form = this.formBuilder.group({
@@ -80,7 +80,7 @@ export class MetadataSearcherComponent implements OnInit {
         author: this.form.get('author')?.value
       };
       this.loading = true;
-      this.metadataService.fetchBookMetadata(fetchRequest.bookId, fetchRequest)
+      this.bookService.fetchBookMetadata(fetchRequest.bookId, fetchRequest)
         .subscribe({
           next: (fetchedMetadata) => {
             this.loading = false;

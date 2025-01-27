@@ -8,7 +8,6 @@ import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Tag} from 'primeng/tag';
 import {BookMetadata} from '../../../book/model/book.model';
-import {FileService} from '../../../book/service/file.service';
 import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 
@@ -22,7 +21,6 @@ import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 export class MetadataViewerComponent {
 
   private bookService = inject(BookService);
-  private fileService = inject(FileService);
   private metadataCenterService = inject(BookMetadataCenterService);
   protected urlHelper = inject(UrlHelperService);
 
@@ -41,6 +39,6 @@ export class MetadataViewerComponent {
   }
 
   download(bookId: number) {
-    this.fileService.downloadFile(bookId);
+    this.bookService.downloadFile(bookId);
   }
 }

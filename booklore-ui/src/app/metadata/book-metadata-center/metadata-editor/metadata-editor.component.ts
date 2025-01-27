@@ -8,7 +8,6 @@ import {Observable} from 'rxjs';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {AsyncPipe, NgClass, NgIf} from '@angular/common';
 import {MessageService} from 'primeng/api';
-import {MetadataService} from '../../service/metadata.service';
 import {BookMetadata} from '../../../book/model/book.model';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 import {FileUpload, FileUploadErrorEvent, FileUploadEvent} from 'primeng/fileupload';
@@ -39,7 +38,6 @@ export class MetadataEditorComponent implements OnInit {
 
   private metadataCenterService = inject(BookMetadataCenterService);
   private messageService = inject(MessageService);
-  private metadataService = inject(MetadataService);
   private bookService = inject(BookService);
   protected urlHelper = inject(UrlHelperService);
 
@@ -151,7 +149,7 @@ export class MetadataEditorComponent implements OnInit {
   }
 
   onSave(): void {
-    this.metadataService.updateBookMetadata(this.currentBookId, this.buildMetadata()).subscribe({
+    this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata()).subscribe({
       next: (response) => {
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
         this.metadataCenterService.emit(response);
@@ -238,7 +236,7 @@ export class MetadataEditorComponent implements OnInit {
   }
 
   private updateMetadata(): void {
-    this.metadataService.updateBookMetadata(this.currentBookId, this.buildMetadata()).subscribe({
+    this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata()).subscribe({
       next: (response) => {
         this.metadataCenterService.emit(response);
       },
@@ -253,7 +251,7 @@ export class MetadataEditorComponent implements OnInit {
   }
 
   getUploadCoverUrl(): string {
-    return this.metadataService.getUploadCoverUrl(this.currentBookId);
+    return this.bookService.getUploadCoverUrl(this.currentBookId);
   }
 
   onBeforeSend(): void {
@@ -279,20 +277,6 @@ export class MetadataEditorComponent implements OnInit {
     this.isUploading = false;
     this.messageService.add({
       severity: 'error', summary: 'Upload Error', detail: 'An error occurred while uploading the cover', life: 3000
-    });
-  }
-
-  quickRefresh() {
-    this.isLoading = true;
-    this.metadataService.quickUpdateBookMetadataSynchronous(this.currentBookId).subscribe({
-      next: (bookMetadata) => {
-        this.isLoading = false;
-        this.metadataCenterService.emit(bookMetadata);
-      },
-      error: () => {
-        this.isLoading = false;
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to update metadata'});
-      }
     });
   }
 }

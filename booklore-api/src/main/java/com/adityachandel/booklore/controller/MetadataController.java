@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/metadata")
+@RequestMapping("/api/v1/books")
 @AllArgsConstructor
 public class MetadataController {
 
@@ -26,35 +26,30 @@ public class MetadataController {
     private JobSchedulerService jobSchedulerService;
     private BookMetadataMapper bookMetadataMapper;
 
-    @PostMapping("/{bookId}")
-    public ResponseEntity<List<BookMetadata>> getProspectiveMetadataList(@RequestBody(required = false) FetchMetadataRequest fetchMetadataRequest, @PathVariable Long bookId) {
+    @PostMapping("/{bookId}/metadata/prospective")
+    public ResponseEntity<List<BookMetadata>> getMetadataList(@RequestBody(required = false) FetchMetadataRequest fetchMetadataRequest, @PathVariable Long bookId) {
         return ResponseEntity.ok(bookMetadataService.getProspectiveMetadataListForBookId(bookId, fetchMetadataRequest));
     }
 
-    @PutMapping("/{bookId}")
-    public ResponseEntity<BookMetadata> updateMetadataFromFetch(@RequestBody BookMetadata setMetadataRequest, @PathVariable long bookId) {
+    @PutMapping("/{bookId}/metadata")
+    public ResponseEntity<BookMetadata> updateMetadata(@RequestBody BookMetadata setMetadataRequest, @PathVariable long bookId) {
         BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true, true), true);
         return ResponseEntity.ok(bookMetadata);
     }
 
-    @PutMapping(path = "/{bookId}/refresh-book-sync")
-    public ResponseEntity<BookMetadata> quickRefreshBookSynchronized(@PathVariable Long bookId) {
-        return ResponseEntity.ok(bookMetadataService.quickRefreshBookSynchronized(bookId));
-    }
-
-    @PutMapping(path = "/refreshV2")
+    @PutMapping(path = "/metadata/refresh")
     public ResponseEntity<String> scheduleRefreshV2(@Validated @RequestBody MetadataRefreshRequest request) {
-        jobSchedulerService.scheduleMetadataRefreshV2(request);
+        jobSchedulerService.scheduleMetadataRefresh(request);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{bookId}/upload-cover")
+    @PostMapping("/{bookId}/metadata/cover")
     public ResponseEntity<BookMetadata> uploadCover(@PathVariable Long bookId, @RequestParam("file") MultipartFile file) {
         BookMetadata updatedMetadata = bookMetadataService.handleCoverUpload(bookId, file);
         return ResponseEntity.ok(updatedMetadata);
     }
 
-    @PutMapping("/lock")
+    @PutMapping("/{bookId}/metadata/lock")
     public ResponseEntity<BookMetadata> updateFieldLockState(@RequestBody FieldLockRequest request) {
         long bookId = request.getBookId();
         String field = request.getField();

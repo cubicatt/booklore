@@ -1,10 +1,10 @@
 import {Component, inject} from '@angular/core';
 import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 import {MetadataAdvancedFetchOptionsComponent} from '../metadata-advanced-fetch-options/metadata-advanced-fetch-options.component';
-import {MetadataService} from '../../service/metadata.service';
 import {MetadataRefreshRequest} from '../../model/request/metadata-refresh-request.model';
 import {MetadataRefreshType} from '../../model/request/metadata-refresh-type.enum';
 import {MetadataRefreshOptions} from '../../model/request/metadata-refresh-options.model';
+import {BookService} from '../../../book/service/book.service';
 
 @Component({
   selector: 'app-metadata-fetch-options',
@@ -22,7 +22,7 @@ export class MetadataFetchOptionsComponent {
 
   private dynamicDialogConfig = inject(DynamicDialogConfig);
   private dynamicDialogRef = inject(DynamicDialogRef);
-  private metadataService = inject(MetadataService);
+  private bookService = inject(BookService);
 
   constructor() {
     this.libraryId = this.dynamicDialogConfig.data.libraryId;
@@ -37,7 +37,7 @@ export class MetadataFetchOptionsComponent {
       bookIds: this.bookIds,
       libraryId: this.libraryId
     };
-    this.metadataService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
+    this.bookService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
     this.dynamicDialogRef.close();
   }
 }

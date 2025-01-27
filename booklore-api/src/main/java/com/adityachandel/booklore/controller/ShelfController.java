@@ -15,24 +15,19 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping(("/api/v1/shelf"))
+@RequestMapping(("/api/v1/shelves"))
 public class ShelfController {
 
     private final ShelfService shelfService;
 
     @GetMapping
-    public ResponseEntity<List<Shelf>> findAll() {
+    public ResponseEntity<List<Shelf>> getAllShelves() {
         return ResponseEntity.ok(shelfService.getShelves());
     }
 
     @GetMapping("/{shelfId}")
-    public ResponseEntity<Shelf> findById(@PathVariable Long shelfId) {
+    public ResponseEntity<Shelf> getShelf(@PathVariable Long shelfId) {
         return ResponseEntity.ok(shelfService.getShelf(shelfId));
-    }
-
-    @GetMapping("/{shelfId}/books")
-    public ResponseEntity<List<Book>> getShelfBooks(@PathVariable Long shelfId) {
-        return ResponseEntity.ok(shelfService.getShelfBooks(shelfId));
     }
 
     @PostMapping
@@ -40,14 +35,19 @@ public class ShelfController {
         return ResponseEntity.status(HttpStatus.CREATED).body(shelfService.createShelf(request));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Shelf> updateShelf(@PathVariable Long id, @Valid @RequestBody ShelfCreateRequest request) {
-        return ResponseEntity.ok(shelfService.updateShelf(id, request));
+    @PutMapping("/{shelfId}")
+    public ResponseEntity<Shelf> updateShelf(@Valid @RequestBody ShelfCreateRequest request, @PathVariable Long shelfId) {
+        return ResponseEntity.ok(shelfService.updateShelf(shelfId, request));
     }
 
     @DeleteMapping("/{shelfId}")
     public ResponseEntity<Void> deleteShelf(@PathVariable Long shelfId) {
         shelfService.deleteShelf(shelfId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/{shelfId}/books")
+    public ResponseEntity<List<Book>> getShelfBooks(@PathVariable Long shelfId) {
+        return ResponseEntity.ok(shelfService.getShelfBooks(shelfId));
     }
 }

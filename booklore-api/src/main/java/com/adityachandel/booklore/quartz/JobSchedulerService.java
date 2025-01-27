@@ -20,7 +20,7 @@ public class JobSchedulerService {
     private final BlockingQueue<MetadataRefreshRequest> jobQueue = new LinkedBlockingQueue<>();
     private boolean isJobRunning = false;
 
-    public synchronized void scheduleMetadataRefreshV2(MetadataRefreshRequest request) {
+    public synchronized void scheduleMetadataRefresh(MetadataRefreshRequest request) {
         log.info("Received request to schedule metadata refresh: {}", request);
         jobQueue.offer(request);
         log.debug("Added request to job queue. Queue size: {}", jobQueue.size());

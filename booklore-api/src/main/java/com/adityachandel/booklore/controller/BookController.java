@@ -7,6 +7,7 @@ import com.adityachandel.booklore.model.dto.request.ShelvesAssignmentRequest;
 import com.adityachandel.booklore.service.BooksService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,13 +38,13 @@ public class BookController {
     }
 
     @GetMapping("/{bookId}/content")
-    public ResponseEntity<byte[]> getBookContent(@PathVariable long bookId) throws IOException {
+    public ResponseEntity<ByteArrayResource> getBookContent(@PathVariable long bookId) throws IOException {
         return booksService.getBookContent(bookId);
     }
 
     @GetMapping("/{bookId}/download")
-    public ResponseEntity<Resource> downloadFile(@PathVariable("bookId") Long bookId) {
-        return booksService.prepareFileForDownload(bookId);
+    public ResponseEntity<Resource> downloadBook(@PathVariable("bookId") Long bookId) {
+        return booksService.downloadBook(bookId);
     }
 
     @GetMapping("/{bookId}/viewer-settings")

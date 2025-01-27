@@ -12,7 +12,7 @@ import {API_CONFIG} from '../../config/api-config';
   providedIn: 'root',
 })
 export class LibraryService {
-  private readonly url = `${API_CONFIG.BASE_URL}/api/v1/library`;
+  private readonly url = `${API_CONFIG.BASE_URL}/api/v1/libraries`;
 
   private libraryStateSubject = new BehaviorSubject<LibraryState>({
     libraries: null,

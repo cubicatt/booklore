@@ -9,11 +9,9 @@ import {BookService} from '../../../service/book.service';
 import {CheckboxModule} from 'primeng/checkbox';
 import {FormsModule} from '@angular/forms';
 import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
-import {FileService} from '../../../service/file.service';
 import {MetadataFetchOptionsComponent} from '../../../../metadata/metadata-options-dialog/metadata-fetch-options/metadata-fetch-options.component';
 import {MetadataRefreshType} from '../../../../metadata/model/request/metadata-refresh-type.enum';
 import {MetadataRefreshRequest} from '../../../../metadata/model/request/metadata-refresh-request.model';
-import {MetadataService} from '../../../../metadata/service/metadata.service';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
 import {NgIf} from '@angular/common';
 
@@ -34,10 +32,8 @@ export class BookCardComponent implements OnInit {
   items: MenuItem[] | undefined;
   isHovered: boolean = false;
 
-  private fileService = inject(FileService);
   private bookService = inject(BookService);
   private dialogService = inject(DialogService);
-  private metadataService = inject(MetadataService);
   private metadataDialogService = inject(MetadataDialogService);
   protected urlHelper = inject(UrlHelperService);
 
@@ -87,7 +83,7 @@ export class BookCardComponent implements OnInit {
                 refreshType: MetadataRefreshType.BOOKS,
                 bookIds: [this.book.id]
               };
-              this.metadataService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
+              this.bookService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
             },
           },
           {
@@ -109,7 +105,7 @@ export class BookCardComponent implements OnInit {
             label: 'Download',
             icon: 'pi pi-download',
             command: () => {
-              this.fileService.downloadFile(this.book.id)
+              this.bookService.downloadFile(this.book.id)
             },
           },
         ],

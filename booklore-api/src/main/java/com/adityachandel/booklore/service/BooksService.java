@@ -19,6 +19,7 @@ import com.adityachandel.booklore.util.FileService;
 import com.adityachandel.booklore.util.FileUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -27,9 +28,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -98,19 +98,6 @@ public class BooksService {
                 .collect(Collectors.toList());
     }
 
-    public ResponseEntity<byte[]> getBookContent(long bookId) throws IOException {
-        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        byte[] pdfBytes = Files.readAllBytes(new File(FileUtils.getBookFullPath(bookEntity)).toPath());
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, "text/plain")
-                .body(pdfBytes);
-    }
-
-    public List<Book> search(String title) {
-        List<BookEntity> bookEntities = bookRepository.findByTitleContainingIgnoreCase(title);
-        return bookEntities.stream().map(bookMapper::toBook).toList();
-    }
-
     @Transactional
     public List<Book> assignShelvesToBooks(Set<Long> bookIds, Set<Long> shelfIdsToAssign, Set<Long> shelfIdsToUnassign) {
         List<BookEntity> bookEntities = bookRepository.findAllById(bookIds);
@@ -150,21 +137,26 @@ public class BooksService {
         bookRepository.save(book);
     }
 
-    public ResponseEntity<Resource> prepareFileForDownload(Long bookId) {
+    public ResponseEntity<Resource> downloadBook(Long bookId) {
         try {
             BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
             Path file = Paths.get(FileUtils.getBookFullPath(bookEntity)).toAbsolutePath().normalize();
             Resource resource = new UrlResource(file.toUri());
-            String contentType = Files.probeContentType(file);
-            if (contentType == null) {
-                contentType = "application/octet-stream";
-            }
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFileName() + "\"")
                     .body(resource);
         } catch (Exception e) {
             throw ApiError.FAILED_TO_DOWNLOAD_FILE.createException(bookId);
+        }
+    }
+
+    public ResponseEntity<ByteArrayResource> getBookContent(long bookId) throws IOException {
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        try (FileInputStream inputStream = new FileInputStream(FileUtils.getBookFullPath(bookEntity))) {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(new ByteArrayResource(inputStream.readAllBytes()));
         }
     }
 }

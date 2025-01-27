@@ -5,6 +5,9 @@ import {catchError, map, tap} from 'rxjs/operators';
 import {Book, BookMetadata, BookSetting} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
 import {API_CONFIG} from '../../config/api-config';
+import {FetchMetadataRequest} from '../../metadata/model/request/fetch-metadata-request.model';
+import {MetadataRefreshRequest} from '../../metadata/model/request/metadata-refresh-request.model';
+import {MessageService} from 'primeng/api';
 
 @Injectable({
   providedIn: 'root',
@@ -22,6 +25,7 @@ export class BookService {
 
 
   private http = inject(HttpClient);
+  private messageService = inject(MessageService);
 
   loadBooks(): void {
     const currentState = this.bookStateSubject.value;
@@ -139,7 +143,7 @@ export class BookService {
     );
   }
 
-  getPdfData(bookId: number): Observable<Blob> {
+  getFileContent(bookId: number): Observable<Blob> {
     return this.http.get<Blob>(`${this.url}/${bookId}/content`, {responseType: 'blob' as 'json'});
   }
 
@@ -151,6 +155,32 @@ export class BookService {
     });
   }
 
+  downloadFile(bookId: number): void {
+    const downloadUrl = `${this.url}/${bookId}/download`;
+    this.http.get(downloadUrl, {responseType: 'blob', observe: 'response'})
+      .subscribe({
+        next: (response) => {
+          const contentDisposition = response.headers.get('Content-Disposition');
+          const filename = contentDisposition
+            ? contentDisposition.match(/filename="(.+?)"/)?.[1] || `book_${bookId}.pdf`
+            : `book_${bookId}.pdf`;
+          this.saveFile(response.body as Blob, filename);
+        },
+        error: (err) => console.error('Error downloading file:', err),
+      });
+  }
+
+  private saveFile(blob: Blob, filename: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+
   savePdfProgress(bookId: number, progress: number): Observable<void> {
     return this.http.post<void>(`${this.url}/progress`, {bookId: bookId, pdfProgress: progress});
   }
@@ -158,6 +188,58 @@ export class BookService {
   saveEpubProgress(bookId: number, progress: string): Observable<void> {
     return this.http.post<void>(`${this.url}/progress`, {bookId: bookId, epubProgress: progress});
   }
+
+
+  /*------------------ All the metadata related calls go here ------------------*/
+
+  fetchBookMetadata(bookId: number, request: FetchMetadataRequest): Observable<BookMetadata[]> {
+    return this.http.post<BookMetadata[]>(`${this.url}/${bookId}/metadata/prospective`, request);
+  }
+
+  updateBookMetadata(bookId: number, bookMetadata: BookMetadata): Observable<BookMetadata> {
+    return this.http.put<BookMetadata>(`${this.url}/${bookId}/metadata`, bookMetadata).pipe(
+      map(updatedMetadata => {
+        this.handleBookMetadataUpdate(bookId, updatedMetadata);
+        return updatedMetadata;
+      })
+    );
+  }
+
+  autoRefreshMetadata(metadataRefreshRequest: MetadataRefreshRequest): Observable<any> {
+    return this.http.put<void>(`${this.url}/metadata/refresh`, metadataRefreshRequest).pipe(
+      map(() => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Metadata Update Scheduled',
+          detail: 'The metadata update for the selected books has been successfully scheduled.'
+        });
+        return {success: true};
+      }),
+      catchError((e) => {
+        if (e.status === 409) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Task Already Running',
+            life: 5000,
+            detail: 'A metadata refresh task is already in progress. Please wait for it to complete before starting another one.'
+          });
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Metadata Update Failed',
+            life: 5000,
+            detail: 'An unexpected error occurred while scheduling the metadata update. Please try again later or contact support if the issue persists.'
+          });
+        }
+        return of({success: false});
+      })
+    );
+  }
+
+  getUploadCoverUrl(bookId: number): string {
+    return this.url + '/' + bookId + "/metadata/cover"
+  }
+
 
   /*------------------ All the websocket handlers go below ------------------*/
 
@@ -193,10 +275,5 @@ export class BookService {
       return book.id == bookId ? {...book, metadata: updatedMetadata} : book
     });
     this.bookStateSubject.next({...currentState, books: updatedBooks})
-  }
-
-  getBookMetadata(bookId: number): BookMetadata | null {
-    const book = this.bookStateSubject.value.books?.find(book => book.id === bookId);
-    return book?.metadata ?? null;
   }
 }

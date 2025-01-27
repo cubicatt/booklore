@@ -47,7 +47,7 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
         )
         .subscribe((appSettings) => {
           const book$ = this.bookService.getBookByIdFromAPI(this.bookId, false);
-          const pdf$ = this.bookService.getPdfData(this.bookId);
+          const pdf$ = this.bookService.getFileContent(this.bookId);
           const bookSetting$ = this.bookService.getBookSetting(this.bookId);
 
           forkJoin([book$, pdf$, bookSetting$]).subscribe((results) => {

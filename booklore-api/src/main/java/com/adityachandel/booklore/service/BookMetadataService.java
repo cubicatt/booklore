@@ -88,16 +88,6 @@ public class BookMetadataService {
         return getParser(provider).fetchTopMetadata(book, buildFetchMetadataRequestFromBook(book));
     }
 
-
-    @Transactional
-    public BookMetadata quickRefreshBookSynchronized(Long bookId) {
-        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        AppSettings appSettings = appSettingService.getAppSettings();
-        MetadataRefreshRequest refreshRequest = MetadataRefreshRequest.builder().refreshOptions(appSettings.getMetadataRefreshOptions()).build();
-        Map<MetadataProvider, BookMetadata> metadataMap = fetchMetadataForBook(prepareProviders(refreshRequest), bookEntity);
-        return buildFetchMetadata(bookId, refreshRequest, metadataMap);
-    }
-
     @Transactional
     public void refreshMetadata(MetadataRefreshRequest request) {
         log.info("Refresh Metadata task started!");

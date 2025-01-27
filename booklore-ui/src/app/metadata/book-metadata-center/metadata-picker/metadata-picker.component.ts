@@ -9,8 +9,8 @@ import {Divider} from 'primeng/divider';
 import {BookMetadataCenterService} from '../book-metadata-center.service';
 import {Observable} from 'rxjs';
 import {Tooltip} from 'primeng/tooltip';
-import {MetadataService} from '../../service/metadata.service';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
+import {BookService} from '../../../book/service/book.service';
 
 @Component({
   selector: 'app-metadata-picker',
@@ -42,7 +42,7 @@ export class MetadataPickerComponent implements OnInit {
 
   private metadataCenterService = inject(BookMetadataCenterService);
   private messageService = inject(MessageService);
-  private metadataService = inject(MetadataService);
+  private bookService = inject(BookService);
   protected urlHelper = inject(UrlHelperService);
 
   bookMetadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
@@ -159,7 +159,7 @@ export class MetadataPickerComponent implements OnInit {
 
   onSave(): void {
     const updatedBookMetadata = this.buildMetadata();
-    this.metadataService.updateBookMetadata(this.currentBookId, updatedBookMetadata).subscribe({
+    this.bookService.updateBookMetadata(this.currentBookId, updatedBookMetadata).subscribe({
       next: (bookMetadata) => {
         Object.keys(this.copiedFields).forEach((field) => {
           if (this.copiedFields[field]) {
@@ -226,7 +226,7 @@ export class MetadataPickerComponent implements OnInit {
   }
 
   private updateMetadata(): void {
-    this.metadataService.updateBookMetadata(this.currentBookId, this.buildMetadata()).subscribe({
+    this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata()).subscribe({
       next: (response) => {
         this.metadataCenterService.emit(response);
       },

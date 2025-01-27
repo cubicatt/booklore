@@ -11,6 +11,6 @@ export class UrlHelperService {
     if (!coverUpdatedOn) {
       return 'assets/images/missing-cover.jpg';
     }
-    return `${this.baseUrl}/api/v1/book/${bookId}/cover?${coverUpdatedOn}`;
+    return `${this.baseUrl}/api/v1/books/${bookId}/cover?${coverUpdatedOn}`;
   }
 }

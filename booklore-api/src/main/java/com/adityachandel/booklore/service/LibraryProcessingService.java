@@ -13,14 +13,17 @@ import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.service.fileprocessor.EpubProcessor;
 import com.adityachandel.booklore.service.fileprocessor.PdfProcessor;
 import com.adityachandel.booklore.util.FileUtils;
+import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +41,7 @@ public class LibraryProcessingService {
     private final PdfProcessor pdfProcessor;
     private final EpubProcessor epubProcessor;
     private final BookRepository bookRepository;
+    private final EntityManager entityManager;
 
 
     @Transactional
@@ -47,6 +51,48 @@ public class LibraryProcessingService {
         List<LibraryFile> libraryFiles = getLibraryFiles(libraryEntity);
         processLibraryFiles(libraryFiles);
         notificationService.sendMessage(Topic.LOG, createLogNotification("Finished processing library: " + libraryEntity.getName()));
+    }
+
+    @Transactional
+    public void processFile(long libraryId, String libraryPath, String filePath) {
+        LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+        notificationService.sendMessage(Topic.LOG, createLogNotification("Started processing file: " + filePath));
+        Path path = Paths.get(filePath);
+        String fileName = path.getFileName().toString();
+
+        LibraryPathEntity libraryPathEntity = getLibraryPathEntityForFile(libraryEntity, libraryPath);
+
+        libraryPathEntity = entityManager.merge(libraryPathEntity);
+
+        String fileSubPath = FileUtils.getRelativeSubPath(libraryPathEntity.getPath(), path);
+        BookFileType bookFileType = getBookFileType(fileName);
+
+        LibraryFile libraryFile = LibraryFile.builder()
+                .libraryEntity(libraryEntity)
+                .libraryPathEntity(libraryPathEntity)
+                .fileSubPath(fileSubPath)
+                .fileName(fileName)
+                .bookFileType(bookFileType)
+                .build();
+
+        processLibraryFiles(List.of(libraryFile));
+        notificationService.sendMessage(Topic.LOG, createLogNotification("Finished processing file: " + filePath));
+    }
+
+    @Transactional
+    protected LibraryPathEntity getLibraryPathEntityForFile(LibraryEntity libraryEntity, String libraryPath) {
+        return libraryEntity.getLibraryPaths().stream().filter(l -> l.getPath().equals(libraryPath))
+                .findFirst()
+                .orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(libraryPath));
+    }
+
+    @Transactional
+    protected BookFileType getBookFileType(String fileName) {
+        if (fileName.endsWith(".pdf")) {
+            return BookFileType.PDF;
+        } else {
+            return BookFileType.EPUB;
+        }
     }
 
     /*@Transactional

@@ -1,9 +1,10 @@
 CREATE TABLE IF NOT EXISTS library
 (
-    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) UNIQUE NOT NULL,
-    sort VARCHAR(255)        NULL,
-    icon VARCHAR(64)         NOT NULL
+    id    BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name  VARCHAR(255) UNIQUE NOT NULL,
+    sort  VARCHAR(255)        NULL,
+    icon  VARCHAR(64)         NOT NULL,
+    watch BOOLEAN             NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS library_path

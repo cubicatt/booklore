@@ -31,5 +31,8 @@ public class LibraryEntity {
     @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LibraryPathEntity> libraryPaths;
 
+    private boolean watch;
+
     private String icon;
+
 }

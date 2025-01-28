@@ -16,6 +16,7 @@ import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryPathRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.service.fileprocessor.FileProcessingUtils;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -26,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -52,7 +54,7 @@ public class LibraryService {
         Set<String> deletedPaths = currentPaths.stream().filter(path -> !updatedPaths.contains(path)).collect(Collectors.toSet());
         Set<String> newPaths = updatedPaths.stream().filter(path -> !currentPaths.contains(path)).collect(Collectors.toSet());
 
-        if(newPaths.isEmpty() && deletedPaths.isEmpty()) {
+        if (newPaths.isEmpty() && deletedPaths.isEmpty()) {
             return libraryMapper.toLibrary(libraryRepository.save(library));
         } else {
             if (!deletedPaths.isEmpty()) {
@@ -164,9 +166,9 @@ public class LibraryService {
         return bookEntities.stream().map(bookMapper::toBook).toList();
     }
 
-    public Library updateSort(long libraryId, Sort sort) {
-        LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
-        libraryEntity.setSort(sort);
-        return libraryMapper.toLibrary(libraryRepository.save(libraryEntity));
+    @Transactional
+    public List<Library> getAllLibraries() {
+        return libraryRepository.findAll().stream().map(libraryMapper::toLibrary).collect(Collectors.toList());
     }
+
 }

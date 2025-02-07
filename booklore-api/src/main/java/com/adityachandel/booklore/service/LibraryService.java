@@ -50,6 +50,7 @@ public class LibraryService {
         LibraryEntity library = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         library.setName(request.getName());
         library.setIcon(request.getIcon());
+        library.setWatch(request.isWatch());
 
         Set<String> currentPaths = library.getLibraryPaths().stream().map(LibraryPathEntity::getPath).collect(Collectors.toSet());
         Set<String> updatedPaths = request.getPaths().stream().map(LibraryPath::getPath).collect(Collectors.toSet());
@@ -110,6 +111,7 @@ public class LibraryService {
                                         .collect(Collectors.toList())
                 )
                 .icon(request.getIcon())
+                .watch(request.isWatch())
                 .build();
 
         libraryEntity = libraryRepository.save(libraryEntity);

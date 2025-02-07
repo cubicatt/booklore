@@ -9,11 +9,11 @@
         <div class="flex flex-col w-[40rem] h-[25rem]">
           <div class="flex flex-auto justify-center items-center font-medium border-[var(--border-color)] border-2 border-dashed">
             <div class="flex flex-col gap-10">
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-8">
                 <p>Library Name: </p>
                 <input type="text" pInputText [(ngModel)]="chosenLibraryName" placeholder="Enter library name..."/>
               </div>
-              <div class="flex items-center gap-5">
+              <div class="flex items-center gap-11">
                 <p>Library Icon:</p>
                 <div *ngIf="!selectedIcon">
                   <p-button label="Select Icon" icon="pi pi-search" (onClick)="openIconPicker()"></p-button>
@@ -22,6 +22,10 @@
                   <i [class]="selectedIcon" class="text-xl mr-3"></i>
                   <p-button icon="pi pi-times" (onClick)="clearSelectedIcon()" [rounded]="true" [text]="true" [outlined]="true" severity="danger"></p-button>
                 </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <p>Monitor Folders: </p>
+                <p-toggleswitch [(ngModel)]="watch" />
               </div>
             </div>
             <app-icon-picker (iconSelected)="onIconSelected($event)"></app-icon-picker>

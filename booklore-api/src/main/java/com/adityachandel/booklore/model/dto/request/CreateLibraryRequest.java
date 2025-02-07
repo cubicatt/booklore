@@ -19,4 +19,5 @@ public class CreateLibraryRequest {
     private String icon;
     @NotEmpty
     private List<LibraryPath> paths;
+    private boolean watch;
 }

@@ -4,6 +4,7 @@ export interface Library {
   id?: number;
   name: string;
   icon: string;
+  watch: boolean;
   sort?: SortOption;
   paths: LibraryPath[];
 }

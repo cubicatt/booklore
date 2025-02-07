@@ -12,12 +12,13 @@ import {NgIf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
 import {Library} from '../../model/library.model';
+import {ToggleSwitch} from 'primeng/toggleswitch';
 
 @Component({
   selector: 'app-library-creator',
   standalone: true,
   templateUrl: './library-creator.component.html',
-  imports: [Button, TableModule, StepPanel, IconPickerComponent, NgIf, FormsModule, InputText, Stepper, StepList, Step, StepPanels],
+  imports: [Button, TableModule, StepPanel, IconPickerComponent, NgIf, FormsModule, InputText, Stepper, StepList, Step, StepPanels, ToggleSwitch],
   styleUrl: './library-creator.component.scss'
 })
 export class LibraryCreatorComponent implements OnInit {
@@ -32,6 +33,7 @@ export class LibraryCreatorComponent implements OnInit {
   library!: Library | undefined;
   editModeLibraryName: string = '';
   directoryPickerDialogRef!: DynamicDialogRef<DirectoryPickerComponent>;
+  watch: boolean = false;
 
   private dialogService = inject(DialogService);
   private dynamicDialogRef = inject(DynamicDialogRef);
@@ -47,10 +49,11 @@ export class LibraryCreatorComponent implements OnInit {
       this.mode = data.mode;
       this.library = this.libraryService.findLibraryById(data.libraryId);
       if (this.library) {
-        const {name, icon, paths} = this.library;
+        const {name, icon, paths, watch} = this.library;
         this.chosenLibraryName = name;
         this.editModeLibraryName = name;
         this.selectedIcon = `pi pi-${icon}`;
+        this.watch = watch;
         this.folders = paths.map(path => path.path);
       }
     }
@@ -106,7 +109,8 @@ export class LibraryCreatorComponent implements OnInit {
       const library: Library = {
         name: this.chosenLibraryName,
         icon: this.selectedIcon?.replace('pi pi-', '') || 'heart',
-        paths: this.folders.map(folder => ({path: folder}))
+        paths: this.folders.map(folder => ({path: folder})),
+        watch: this.watch
       };
       this.libraryService.updateLibrary(library, this.library?.id).subscribe({
         next: () => {
@@ -122,7 +126,8 @@ export class LibraryCreatorComponent implements OnInit {
       const library: Library = {
         name: this.chosenLibraryName,
         icon: this.selectedIcon?.replace('pi pi-', '') || 'heart',
-        paths: this.folders.map(folder => ({path: folder}))
+        paths: this.folders.map(folder => ({path: folder})),
+        watch: this.watch
       };
       this.libraryService.createLibrary(library).subscribe({
         next: (createdLibrary) => {

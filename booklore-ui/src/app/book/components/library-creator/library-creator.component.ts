@@ -13,12 +13,13 @@ import {FormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
 import {Library} from '../../model/library.model';
 import {ToggleSwitch} from 'primeng/toggleswitch';
+import {Tooltip} from 'primeng/tooltip';
 
 @Component({
   selector: 'app-library-creator',
   standalone: true,
   templateUrl: './library-creator.component.html',
-  imports: [Button, TableModule, StepPanel, IconPickerComponent, NgIf, FormsModule, InputText, Stepper, StepList, Step, StepPanels, ToggleSwitch],
+  imports: [Button, TableModule, StepPanel, IconPickerComponent, NgIf, FormsModule, InputText, Stepper, StepList, Step, StepPanels, ToggleSwitch, Tooltip],
   styleUrl: './library-creator.component.scss'
 })
 export class LibraryCreatorComponent implements OnInit {

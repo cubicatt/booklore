@@ -24,8 +24,13 @@
                 </div>
               </div>
               <div class="flex items-center gap-3">
-                <p>Monitor Folders: </p>
+                <p>Monitor Folders:</p>
                 <p-toggleswitch [(ngModel)]="watch" />
+                <i class="pi pi-info-circle text-sky-600"
+                   pTooltip="Toggle this to enable or disable folder monitoring. When enabled, the system will watch specified folders for file changes. Books are added and removed automatically based on files added or removed in the library folders."
+                   tooltipPosition="right"
+                   style="cursor: pointer;">
+                </i>
               </div>
             </div>
             <app-icon-picker (iconSelected)="onIconSelected($event)"></app-icon-picker>

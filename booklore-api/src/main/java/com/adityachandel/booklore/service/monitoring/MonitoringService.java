@@ -5,9 +5,9 @@ import com.adityachandel.booklore.service.LibraryProcessingService;
 import com.adityachandel.booklore.service.LibraryService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 @Slf4j
 @Service
@@ -27,14 +27,19 @@ public class MonitoringService {
     private final WatchService watchService;
     private final LibraryService libraryService;
     private final MonitoringTask monitoringTask;
+
     private final Set<Path> monitoredPaths = ConcurrentHashMap.newKeySet();
     private final Map<Path, Long> pathToLibraryIdMap = new ConcurrentHashMap<>();
+
+    private final BlockingQueue<FileChangeEvent> eventQueue = new LinkedBlockingQueue<>();
+    private final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
 
     @PostConstruct
     public void initializeMonitoring() {
         log.info("Initializing monitoring service...");
         loadInitialPaths();
         monitoringTask.monitor();
+        startProcessingThread();
     }
 
     private void loadInitialPaths() {
@@ -45,23 +50,22 @@ public class MonitoringService {
                     library.getPaths().forEach(libraryPath -> {
                         Path path = Paths.get(libraryPath.getPath());
                         if (Files.isDirectory(path)) {
-                            pathToLibraryIdMap.put(path, library.getId()); // Map path to libraryId
-                            registerPathWithLibraryId(path);
+                            registerPathWithLibraryId(path, library.getId());
                         }
                     });
                 });
-
         log.info("Loaded initial monitored folders: {}", pathToLibraryIdMap);
     }
 
-    public synchronized void registerPathWithLibraryId(Path path) {
+    public synchronized void registerPathWithLibraryId(Path path, Long libraryId) {
         try {
             if (monitoredPaths.add(path)) {
                 path.register(watchService,
                         StandardWatchEventKinds.ENTRY_CREATE,
                         StandardWatchEventKinds.ENTRY_MODIFY,
                         StandardWatchEventKinds.ENTRY_DELETE);
-                log.info("Registered folder for monitoring: {}", path);
+                pathToLibraryIdMap.put(path, libraryId);
+                log.info("Registered folder for monitoring: {} (Library ID: {})", path, libraryId);
             } else {
                 log.warn("Path is already registered: {}", path);
             }
@@ -73,7 +77,7 @@ public class MonitoringService {
     public synchronized void unregisterPath(String folderPath) {
         Path path = Paths.get(folderPath);
         if (monitoredPaths.remove(path)) {
-            pathToLibraryIdMap.remove(path); // Remove the path-to-libraryId mapping
+            pathToLibraryIdMap.remove(path);
             log.info("Unregistered folder from monitoring: {}", folderPath);
         } else {
             log.warn("Folder not found in monitored paths: {}", folderPath);
@@ -82,19 +86,40 @@ public class MonitoringService {
 
     @EventListener
     public void handleFileChangeEvent(FileChangeEvent event) {
+        if (!eventQueue.offer(event)) {
+            log.warn("Event queue is full, dropping event: {}", event.getFilePath());
+        } else {
+            log.info("Queued file change event: {} ({} in queue)", event.getFilePath(), eventQueue.size());
+        }
+    }
+
+    private void startProcessingThread() {
+        singleThreadExecutor.submit(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    FileChangeEvent event = eventQueue.take();
+                    processFileChangeEvent(event);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        });
+    }
+
+    private void processFileChangeEvent(FileChangeEvent event) {
         Path filePath = event.getFilePath();
         Path watchedFolder = event.getWatchedFolder();
         Long libraryId = pathToLibraryIdMap.get(watchedFolder);
+
         if (libraryId != null) {
-            Thread.startVirtualThread(() -> {
-                try {
-                    libraryProcessingService.processFile(libraryId, watchedFolder.toString(), filePath.toString());
-                } catch (InvalidDataAccessApiUsageException e) {
-                    log.warn("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
-                }
-                log.info("Parsing task completed!");
-            });
-            log.info("Handling file change event for library {}: {} (from folder: {}) with kind: {}", libraryId, filePath, watchedFolder, event.getEventKind());
+            try {
+                libraryProcessingService.processFile(event.getEventKind(), libraryId, watchedFolder.toString(), filePath.toString());
+            } catch (InvalidDataAccessApiUsageException e) {
+                log.debug("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
+            }
+            log.info("Processed file change event for library {}: {} (from folder: {}) with kind: {}",
+                    libraryId, filePath, watchedFolder, event.getEventKind());
         } else {
             log.warn("No libraryId found for watched folder: {}", watchedFolder);
         }
@@ -103,6 +128,7 @@ public class MonitoringService {
     @PreDestroy
     public void stopMonitoring() {
         log.info("Shutting down monitoring service...");
+        singleThreadExecutor.shutdownNow();
         if (watchService != null) {
             try {
                 watchService.close();

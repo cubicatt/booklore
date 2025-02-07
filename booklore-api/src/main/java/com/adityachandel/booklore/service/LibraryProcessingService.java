@@ -17,15 +17,13 @@ import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,29 +52,37 @@ public class LibraryProcessingService {
     }
 
     @Transactional
-    public void processFile(long libraryId, String libraryPath, String filePath) {
-        LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
-        notificationService.sendMessage(Topic.LOG, createLogNotification("Started processing file: " + filePath));
+    public void processFile(WatchEvent.Kind<?> eventKind, long libraryId, String libraryPath, String filePath) {
+        LibraryEntity libraryEntity = libraryRepository.findById(libraryId)
+                .orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+
         Path path = Paths.get(filePath);
         String fileName = path.getFileName().toString();
 
-        LibraryPathEntity libraryPathEntity = getLibraryPathEntityForFile(libraryEntity, libraryPath);
+        if (eventKind == StandardWatchEventKinds.ENTRY_CREATE) {
+            notificationService.sendMessage(Topic.LOG, createLogNotification("Started processing file: " + filePath));
 
-        libraryPathEntity = entityManager.merge(libraryPathEntity);
+            LibraryPathEntity libraryPathEntity = getLibraryPathEntityForFile(libraryEntity, libraryPath);
+            libraryPathEntity = entityManager.merge(libraryPathEntity);
 
-        String fileSubPath = FileUtils.getRelativeSubPath(libraryPathEntity.getPath(), path);
-        BookFileType bookFileType = getBookFileType(fileName);
+            LibraryFile libraryFile = LibraryFile.builder()
+                    .libraryEntity(libraryEntity)
+                    .libraryPathEntity(libraryPathEntity)
+                    .fileSubPath(FileUtils.getRelativeSubPath(libraryPathEntity.getPath(), path))
+                    .fileName(fileName)
+                    .bookFileType(getBookFileType(fileName))
+                    .build();
 
-        LibraryFile libraryFile = LibraryFile.builder()
-                .libraryEntity(libraryEntity)
-                .libraryPathEntity(libraryPathEntity)
-                .fileSubPath(fileSubPath)
-                .fileName(fileName)
-                .bookFileType(bookFileType)
-                .build();
+            processLibraryFiles(List.of(libraryFile));
+            notificationService.sendMessage(Topic.LOG, createLogNotification("Finished processing file: " + filePath));
 
-        processLibraryFiles(List.of(libraryFile));
-        notificationService.sendMessage(Topic.LOG, createLogNotification("Finished processing file: " + filePath));
+        } else if (eventKind == StandardWatchEventKinds.ENTRY_DELETE) {
+            bookRepository.findBookByFileNameAndLibraryId(fileName, libraryId)
+                .ifPresent(bookEntity -> {
+                    deleteRemovedBooks(List.of(bookEntity));
+                    notificationService.sendMessage(Topic.BOOKS_REMOVE, Set.of(bookEntity.getId()));
+                });
+        }
     }
 
     @Transactional

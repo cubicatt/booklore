@@ -6,10 +6,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Path;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
+import java.nio.file.*;
 
 @Slf4j
 @Service
@@ -26,23 +23,33 @@ public class MonitoringTask {
     public void monitor() {
         log.info("START_MONITORING");
         try {
-            WatchKey key;
-            while ((key = watchService.take()) != null) {
+            while (!Thread.currentThread().isInterrupted()) {
+                WatchKey key;
+                try {
+                    key = watchService.take();
+                } catch (ClosedWatchServiceException e) {
+                    log.warn("WatchService has been closed. Stopping monitoring.");
+                    break;
+                }
+                if (key == null) {
+                    continue;
+                }
                 for (WatchEvent<?> event : key.pollEvents()) {
                     WatchEvent.Kind<?> kind = event.kind();
                     Path fileName = (Path) event.context();
                     Path directory = (Path) key.watchable();
                     Path fullPath = directory.resolve(fileName);
+
                     if (isPdfOrEpub(fileName)) {
-                        log.info("Event kind: {}; File affected: {}; Full path: {}; Watched folder: {}",
-                                kind,
-                                fileName,
-                                fullPath,
-                                directory);
+                        log.info("Event kind: {}; File affected: {}; Full path: {}; Watched folder: {}", kind, fileName, fullPath, directory);
                         eventPublisher.publishEvent(new FileChangeEvent(this, fullPath, kind, directory));
                     }
                 }
-                key.reset();
+                boolean valid = key.reset();
+                if (!valid) {
+                    log.warn("WatchKey is no longer valid. Stopping monitoring for {}", key.watchable());
+                    break;
+                }
             }
         } catch (InterruptedException e) {
             log.warn("Monitoring task interrupted", e);

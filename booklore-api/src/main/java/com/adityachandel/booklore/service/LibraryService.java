@@ -16,6 +16,7 @@ import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryPathRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.service.fileprocessor.FileProcessingUtils;
+import com.adityachandel.booklore.service.monitoring.MonitoringService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,8 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -108,8 +111,15 @@ public class LibraryService {
                 )
                 .icon(request.getIcon())
                 .build();
+
         libraryEntity = libraryRepository.save(libraryEntity);
         Long libraryId = libraryEntity.getId();
+
+        /*for (LibraryPathEntity pathEntity : libraryEntity.getLibraryPaths()) {
+            Path path = Paths.get(pathEntity.getPath());
+            monitoringService.registerPathWithLibraryId(path, libraryId);
+        }*/
+
         Thread.startVirtualThread(() -> {
             try {
                 libraryProcessingService.processLibrary(libraryId);
@@ -120,6 +130,7 @@ public class LibraryService {
             }
             log.info("Parsing task completed!");
         });
+
         return libraryMapper.toLibrary(libraryEntity);
     }
 
@@ -149,9 +160,14 @@ public class LibraryService {
 
     public void deleteLibrary(long id) {
         LibraryEntity library = libraryRepository.findById(id).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(id));
+        /*library.getLibraryPaths().forEach(libraryPath -> {
+            Path path = Paths.get(libraryPath.getPath());
+            monitoringService.unregisterPath(path.toString());
+        });*/
         Set<Long> bookIds = library.getBookEntities().stream().map(BookEntity::getId).collect(Collectors.toSet());
         fileProcessingUtils.deleteBookCovers(bookIds);
         libraryRepository.deleteById(id);
+        log.info("Library deleted successfully: {}", id);
     }
 
     public Book getBook(long libraryId, long bookId) {

@@ -54,9 +54,9 @@ public class LibraryController {
         return ResponseEntity.ok(books);
     }
 
-    /*@PutMapping("/{libraryId}/refresh")
+    @PutMapping("/{libraryId}/refresh")
     public ResponseEntity<?> refreshLibrary(@PathVariable long libraryId) {
         libraryService.refreshLibrary(libraryId);
         return ResponseEntity.noContent().build();
-    }*/
+    }
 }

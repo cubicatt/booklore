@@ -170,7 +170,7 @@ public class LibraryService {
         return libraryMapper.toLibrary(libraryEntity);
     }
 
-    /*public void refreshLibrary(long libraryId) {
+    public void refreshLibrary(long libraryId) {
         libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         Thread.startVirtualThread(() -> {
             try {
@@ -182,7 +182,7 @@ public class LibraryService {
             }
             log.info("Parsing task completed!");
         });
-    }*/
+    }
 
     public Library getLibrary(long libraryId) {
         LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));

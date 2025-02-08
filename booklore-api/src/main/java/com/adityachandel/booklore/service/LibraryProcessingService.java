@@ -101,14 +101,14 @@ public class LibraryProcessingService {
         }
     }
 
-    /*@Transactional
+    @Transactional
     public void refreshLibrary(long libraryId) throws IOException {
         LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         notificationService.sendMessage(Topic.LOG, createLogNotification("Started refreshing library: " + libraryEntity.getName()));
         processLibraryFiles(getUnProcessedFiles(libraryEntity));
         deleteRemovedBooks(getRemovedBooks(libraryEntity));
         notificationService.sendMessage(Topic.LOG, createLogNotification("Finished refreshing library: " + libraryEntity.getName()));
-    }*/
+    }
 
     @Transactional
     protected void deleteRemovedBooks(List<BookEntity> removedBookEntities) {
@@ -143,7 +143,7 @@ public class LibraryProcessingService {
         return null;
     }
 
-    /*@Transactional
+    @Transactional
     protected List<BookEntity> getRemovedBooks(LibraryEntity libraryEntity) throws IOException {
         List<LibraryFile> libraryFiles = getLibraryFiles(libraryEntity);
         List<BookEntity> bookEntities = libraryEntity.getBookEntities();
@@ -151,21 +151,21 @@ public class LibraryProcessingService {
                 .map(LibraryFile::getFileName)
                 .collect(Collectors.toSet());
         return bookEntities.stream()
-                .filter(book -> !libraryFilePaths.contains(book.getPath()))
+                .filter(book -> !libraryFilePaths.contains(book.getFileName()))
                 .collect(Collectors.toList());
-    }*/
+    }
 
-    /*@Transactional
+    @Transactional
     protected List<LibraryFile> getUnProcessedFiles(LibraryEntity libraryEntity) throws IOException {
         List<LibraryFile> libraryFiles = getLibraryFiles(libraryEntity);
         List<BookEntity> bookEntities = libraryEntity.getBookEntities();
         Set<String> processedPaths = bookEntities.stream()
-                .map(BookEntity::getPath)
+                .map(BookEntity::getFileName)
                 .collect(Collectors.toSet());
         return libraryFiles.stream()
                 .filter(libraryFile -> !processedPaths.contains(libraryFile.getFileName()))
                 .collect(Collectors.toList());
-    }*/
+    }
 
     private List<LibraryFile> getLibraryFiles(LibraryEntity libraryEntity) throws IOException {
         List<LibraryFile> libraryFiles = new ArrayList<>();

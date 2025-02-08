@@ -161,8 +161,10 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         const libraryId = Number(params.get('libraryId') || NaN);
         const shelfId = Number(params.get('shelfId') || NaN);
         if (!isNaN(libraryId)) {
+          this.entityType = EntityType.LIBRARY;
           return {entityId: libraryId, entityType: EntityType.LIBRARY};
         } else if (!isNaN(shelfId)) {
+          this.entityType = EntityType.SHELF;
           return {entityId: shelfId, entityType: EntityType.SHELF};
         } else {
           return {entityId: NaN, entityType: EntityType.ALL_BOOKS};

@@ -21,7 +21,6 @@ public class MonitoringTask {
 
     @Async
     public void monitor() {
-        log.info("START_MONITORING");
         try {
             while (!Thread.currentThread().isInterrupted()) {
                 WatchKey key;

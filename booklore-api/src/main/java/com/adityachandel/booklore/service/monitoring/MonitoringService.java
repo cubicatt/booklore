@@ -2,18 +2,17 @@ package com.adityachandel.booklore.service.monitoring;
 
 import com.adityachandel.booklore.model.dto.Library;
 import com.adityachandel.booklore.service.LibraryProcessingService;
-import com.adityachandel.booklore.service.LibraryService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -25,7 +24,6 @@ public class MonitoringService {
 
     private final LibraryProcessingService libraryProcessingService;
     private final WatchService watchService;
-    private final LibraryService libraryService;
     private final MonitoringTask monitoringTask;
 
     private final Set<Path> monitoredPaths = ConcurrentHashMap.newKeySet();
@@ -36,15 +34,12 @@ public class MonitoringService {
 
     @PostConstruct
     public void initializeMonitoring() {
-        log.info("Initializing monitoring service...");
-        loadInitialPaths();
         monitoringTask.monitor();
         startProcessingThread();
     }
 
-    private void loadInitialPaths() {
-        libraryService.getAllLibraries()
-                .stream()
+    public void registerLibrariesForMonitoring(List<Library> libraries) {
+        libraries.stream()
                 .filter(Library::isWatch)
                 .forEach(library -> {
                     library.getPaths().forEach(libraryPath -> {
@@ -54,7 +49,7 @@ public class MonitoringService {
                         }
                     });
                 });
-        log.info("Loaded initial monitored folders: {}", pathToLibraryIdMap);
+        log.info("Registered libraries for monitoring: {}", libraries.size());
     }
 
     public synchronized void registerPathWithLibraryId(Path path, Long libraryId) {

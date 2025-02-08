@@ -17,6 +17,7 @@ import com.adityachandel.booklore.repository.LibraryPathRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.service.fileprocessor.FileProcessingUtils;
 import com.adityachandel.booklore.service.monitoring.MonitoringService;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,59 +46,90 @@ public class LibraryService {
     private final LibraryMapper libraryMapper;
     private final NotificationService notificationService;
     private final FileProcessingUtils fileProcessingUtils;
+    private final MonitoringService monitoringService;
+
+    @Transactional
+    @PostConstruct
+    public void initializeMonitoring() {
+        List<Library> libraries = libraryRepository.findAll().stream().map(libraryMapper::toLibrary).collect(Collectors.toList());
+        monitoringService.registerLibrariesForMonitoring(libraries);
+        log.info("Monitoring initialized with {} libraries", libraries.size());
+    }
 
     public Library updateLibrary(CreateLibraryRequest request, Long libraryId) {
-        LibraryEntity library = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+        LibraryEntity library = libraryRepository.findById(libraryId)
+                .orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
+
         library.setName(request.getName());
         library.setIcon(request.getIcon());
         library.setWatch(request.isWatch());
 
-        Set<String> currentPaths = library.getLibraryPaths().stream().map(LibraryPathEntity::getPath).collect(Collectors.toSet());
-        Set<String> updatedPaths = request.getPaths().stream().map(LibraryPath::getPath).collect(Collectors.toSet());
+        Set<String> currentPaths = library.getLibraryPaths().stream()
+                .map(LibraryPathEntity::getPath)
+                .collect(Collectors.toSet());
+        Set<String> updatedPaths = request.getPaths().stream()
+                .map(LibraryPath::getPath)
+                .collect(Collectors.toSet());
 
-        Set<String> deletedPaths = currentPaths.stream().filter(path -> !updatedPaths.contains(path)).collect(Collectors.toSet());
-        Set<String> newPaths = updatedPaths.stream().filter(path -> !currentPaths.contains(path)).collect(Collectors.toSet());
+        Set<String> deletedPaths = currentPaths.stream()
+                .filter(path -> !updatedPaths.contains(path))
+                .collect(Collectors.toSet());
+        Set<String> newPaths = updatedPaths.stream()
+                .filter(path -> !currentPaths.contains(path))
+                .collect(Collectors.toSet());
 
-        if (newPaths.isEmpty() && deletedPaths.isEmpty()) {
-            return libraryMapper.toLibrary(libraryRepository.save(library));
-        } else {
-            if (!deletedPaths.isEmpty()) {
-                Set<LibraryPathEntity> pathsToRemove = library.getLibraryPaths().stream()
-                        .filter(pathEntity -> deletedPaths.contains(pathEntity.getPath()))
-                        .collect(Collectors.toSet());
-                library.getLibraryPaths().removeAll(pathsToRemove);
+        if (!deletedPaths.isEmpty()) {
+            Set<LibraryPathEntity> pathsToRemove = library.getLibraryPaths().stream()
+                    .filter(pathEntity -> deletedPaths.contains(pathEntity.getPath()))
+                    .collect(Collectors.toSet());
 
-                List<Long> books = bookRepository.findAllBookIdsByLibraryPathIdIn(pathsToRemove.stream().map(LibraryPathEntity::getId).collect(Collectors.toSet()));
-                if (!books.isEmpty()) {
-                    notificationService.sendMessage(Topic.BOOKS_REMOVE, books);
-                }
+            library.getLibraryPaths().removeAll(pathsToRemove);
+            List<Long> books = bookRepository.findAllBookIdsByLibraryPathIdIn(
+                    pathsToRemove.stream().map(LibraryPathEntity::getId).collect(Collectors.toSet()));
 
-                libraryPathRepository.deleteAll(pathsToRemove);
-                libraryPathRepository.saveAll(library.getLibraryPaths());
-                libraryRepository.save(library);
+            if (!books.isEmpty()) {
+                notificationService.sendMessage(Topic.BOOKS_REMOVE, books);
             }
 
-            if (!newPaths.isEmpty()) {
-                Set<LibraryPathEntity> newPathEntities = newPaths.stream()
-                        .map(path -> LibraryPathEntity.builder().path(path).library(library).build())
-                        .collect(Collectors.toSet());
-                library.getLibraryPaths().addAll(newPathEntities);
-                libraryPathRepository.saveAll(library.getLibraryPaths());
-                libraryRepository.save(library);
-
-                Thread.startVirtualThread(() -> {
-                    try {
-                        libraryProcessingService.processLibrary(libraryId);
-                    } catch (InvalidDataAccessApiUsageException e) {
-                        log.warn("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
-                    } catch (IOException e) {
-                        log.error("Error while parsing library books", e);
-                    }
-                    log.info("Parsing task completed!");
-                });
-            }
-            return libraryMapper.toLibrary(libraryRepository.save(library));
+            libraryPathRepository.deleteAll(pathsToRemove);
         }
+
+        if (!newPaths.isEmpty()) {
+            Set<LibraryPathEntity> newPathEntities = newPaths.stream()
+                    .map(path -> LibraryPathEntity.builder().path(path).library(library).build())
+                    .collect(Collectors.toSet());
+
+            library.getLibraryPaths().addAll(newPathEntities);
+            libraryPathRepository.saveAll(library.getLibraryPaths());
+        }
+
+        LibraryEntity savedLibrary = libraryRepository.save(library);
+
+        if (request.isWatch()) {
+            for (LibraryPathEntity pathEntity : savedLibrary.getLibraryPaths()) {
+                Path path = Paths.get(pathEntity.getPath());
+                monitoringService.registerPathWithLibraryId(path, libraryId);
+            }
+        } else {
+            for (LibraryPathEntity pathEntity : savedLibrary.getLibraryPaths()) {
+                monitoringService.unregisterPath(pathEntity.getPath());
+            }
+        }
+
+        if (!newPaths.isEmpty()) {
+            Thread.startVirtualThread(() -> {
+                try {
+                    libraryProcessingService.processLibrary(libraryId);
+                } catch (InvalidDataAccessApiUsageException e) {
+                    log.warn("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
+                } catch (IOException e) {
+                    log.error("Error while parsing library books", e);
+                }
+                log.info("Parsing task completed!");
+            });
+        }
+
+        return libraryMapper.toLibrary(savedLibrary);
     }
 
     public Library createLibrary(CreateLibraryRequest request) {
@@ -117,10 +149,12 @@ public class LibraryService {
         libraryEntity = libraryRepository.save(libraryEntity);
         Long libraryId = libraryEntity.getId();
 
-        /*for (LibraryPathEntity pathEntity : libraryEntity.getLibraryPaths()) {
-            Path path = Paths.get(pathEntity.getPath());
-            monitoringService.registerPathWithLibraryId(path, libraryId);
-        }*/
+        if (request.isWatch()) {
+            for (LibraryPathEntity pathEntity : libraryEntity.getLibraryPaths()) {
+                Path path = Paths.get(pathEntity.getPath());
+                monitoringService.registerPathWithLibraryId(path, libraryId);
+            }
+        }
 
         Thread.startVirtualThread(() -> {
             try {
@@ -183,10 +217,4 @@ public class LibraryService {
         List<BookEntity> bookEntities = bookRepository.findBooksByLibraryId(libraryId);
         return bookEntities.stream().map(bookMapper::toBook).toList();
     }
-
-    @Transactional
-    public List<Library> getAllLibraries() {
-        return libraryRepository.findAll().stream().map(libraryMapper::toLibrary).collect(Collectors.toList());
-    }
-
 }

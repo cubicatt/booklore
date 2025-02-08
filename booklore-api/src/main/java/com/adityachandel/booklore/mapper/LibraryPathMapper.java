@@ -13,6 +13,4 @@ import java.util.List;
 public interface LibraryPathMapper {
 
     LibraryPath toLibraryPath(LibraryPathEntity libraryPathEntity);
-
-    List<LibraryPath> toLibraryPathList(List<LibraryPathEntity> libraryPathEntities);
 }

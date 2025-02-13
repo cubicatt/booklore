@@ -47,12 +47,12 @@ public class BookController {
         return booksService.downloadBook(bookId);
     }
 
-    @GetMapping("/{bookId}/viewer-settings")
+    @GetMapping("/{bookId}/viewer-setting")
     public ResponseEntity<BookViewerSettings> getBookViewerSettings(@PathVariable long bookId) {
         return ResponseEntity.ok(booksService.getBookViewerSetting(bookId));
     }
 
-    @PutMapping("/{bookId}/viewer-settings")
+    @PutMapping("/{bookId}/viewer-setting")
     public ResponseEntity<Void> updateBookViewerSettings(@RequestBody BookViewerSettings bookViewerSettings, @PathVariable long bookId) {
         booksService.updateBookViewerSetting(bookId, bookViewerSettings);
         return ResponseEntity.noContent().build();

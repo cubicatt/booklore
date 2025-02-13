@@ -1,3 +1,5 @@
+
+
 app:
   path-book: '/Users/aditya.chandel/my-library-temp/books'
   path-config: '/Users/aditya.chandel/my-library-temp/config/local'
@@ -15,7 +17,7 @@ spring:
     name: booklore-api
   datasource:
     driver-class-name: org.h2.Driver
-    url: 'jdbc:h2:tcp://localhost:9092/~/my-library-temp/config/local/db/booklore'
+    url: 'jdbc:h2:tcp://localhost:8040/~/my-library-temp/config/local/db/booklore'
     username: sa
     password: password
   jpa:
@@ -38,3 +40,6 @@ logging:
     root: INFO
     org.apache.fontbox: ERROR
     org.apache.pdfbox: ERROR
+
+server:
+  port: 7050

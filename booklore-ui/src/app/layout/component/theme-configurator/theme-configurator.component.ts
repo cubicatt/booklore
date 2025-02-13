@@ -1,16 +1,12 @@
 import {CommonModule, isPlatformBrowser} from '@angular/common';
-import {Component, computed, inject, PLATFORM_ID, OnInit} from '@angular/core';
+import {Component, computed, inject, OnInit, PLATFORM_ID} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {$t, updatePreset, updateSurfacePalette} from '@primeng/themes';
 import Aura from '@primeng/themes/aura';
-import Lara from '@primeng/themes/lara';
-import Material from '@primeng/themes/material';
-import Nora from '@primeng/themes/nora';
 import {ButtonModule} from 'primeng/button';
 import {PrimeNG} from 'primeng/config';
 import {InputSwitchModule} from 'primeng/inputswitch';
 import {RadioButtonModule} from 'primeng/radiobutton';
-import {SelectButton} from 'primeng/selectbutton';
 import {ToggleSwitchModule} from 'primeng/toggleswitch';
 import {AppConfigService} from '../../../core/service/app-config.service';
 
@@ -21,13 +17,6 @@ interface Palette {
   palette: ColorPalette;
 }
 
-const presets = {
-  Aura,
-  Material,
-  Lara,
-  Nora
-};
-
 @Component({
   selector: 'app-theme-configurator',
   standalone: true,
@@ -35,21 +24,12 @@ const presets = {
   host: {
     class: 'config-panel hidden'
   },
-  imports: [CommonModule, FormsModule, InputSwitchModule, ButtonModule, RadioButtonModule, SelectButton, ToggleSwitchModule]
+  imports: [CommonModule, FormsModule, InputSwitchModule, ButtonModule, RadioButtonModule, ToggleSwitchModule]
 })
 export class ThemeConfiguratorComponent implements OnInit {
 
-  get ripple() {
-    return this.config.ripple();
-  }
-
-  set ripple(value: boolean) {
-    this.config.ripple.set(value);
-  }
-
   config: PrimeNG = inject(PrimeNG);
   configService: AppConfigService = inject(AppConfigService);
-  presets = Object.keys(presets);
   platformId = inject(PLATFORM_ID);
 
   surfaces = [
@@ -197,51 +177,32 @@ export class ThemeConfiguratorComponent implements OnInit {
 
   selectedSurfaceColor = computed(() => this.configService.appState().surface);
 
-  selectedPreset = computed(() => this.configService.appState().preset);
-
-  primaryColors = computed(() => {
-    // @ts-ignore
-    const presetPalette = presets[this.configService.appState().preset].primitive;
+  primaryColors = computed<Palette[]>(() => {
+    const presetPalette = Aura.primitive ?? {};
     const colors = ['emerald', 'green', 'lime', 'orange', 'amber', 'yellow', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'];
-    const palettes: Palette[] = [{ name: 'noir', palette: {} }];
-
-    colors.forEach((color) => {
-      palettes.push({
+    return [{ name: 'noir', palette: {} }].concat(
+      colors.map((color) => ({
         name: color,
-        palette: presetPalette[color] || {}, // Fallback to an empty object
-      });
-    });
-
-    return palettes;
+        palette: presetPalette[color] ?? {}
+      }))
+    );
   });
 
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      this.onPresetChange(this.configService.appState().preset);
+      this.onPresetChange();
     }
   }
 
-
-  getPresetExt() {
+  getPresetExt(): object {
     const color = this.primaryColors().find((c) => c.name === this.selectedPrimaryColor());
+    if (!color) return {}; // Safe fallback
 
-    if (color!.name === 'noir') {
+    if (color.name === 'noir') {
       return {
         semantic: {
-          primary: {
-            50: '{surface.50}',
-            100: '{surface.100}',
-            200: '{surface.200}',
-            300: '{surface.300}',
-            400: '{surface.400}',
-            500: '{surface.500}',
-            600: '{surface.600}',
-            700: '{surface.700}',
-            800: '{surface.800}',
-            900: '{surface.900}',
-            950: '{surface.950}'
-          },
+          primary: {...this.surfaces.find((s) => s.name === this.selectedSurfaceColor())?.palette},
           colorScheme: {
             dark: {
               primary: {
@@ -260,85 +221,37 @@ export class ThemeConfiguratorComponent implements OnInit {
           }
         }
       };
-    } else {
-      if (this.configService.appState().preset === 'Nora') {
-        return {
-          semantic: {
-            primary: color!.palette,
-            colorScheme: {
-              dark: {
-                primary: {
-                  color: '{primary.500}',
-                  contrastColor: '{surface.900}',
-                  hoverColor: '{primary.400}',
-                  activeColor: '{primary.300}'
-                },
-                highlight: {
-                  background: '{primary.500}',
-                  focusBackground: '{primary.400}',
-                  color: '{surface.900}',
-                  focusColor: '{surface.900}'
-                }
-              }
-            }
-          }
-        };
-      } else if (this.configService.appState().preset === 'Material') {
-        return {
-          semantic: {
-            primary: color!.palette,
-            colorScheme: {
-              dark: {
-                primary: {
-                  color: '{primary.400}',
-                  contrastColor: '{surface.900}',
-                  hoverColor: '{primary.300}',
-                  activeColor: '{primary.200}'
-                },
-                highlight: {
-                  background: 'color-mix(in srgb, {primary.400}, transparent 84%)',
-                  focusBackground: 'color-mix(in srgb, {primary.400}, transparent 76%)',
-                  color: 'rgba(255,255,255,.87)',
-                  focusColor: 'rgba(255,255,255,.87)'
-                }
-              }
-            }
-          }
-        };
-      } else {
-        return {
-          semantic: {
-            primary: color!.palette,
-            colorScheme: {
-              dark: {
-                primary: {
-                  color: '{primary.400}',
-                  contrastColor: '{surface.900}',
-                  hoverColor: '{primary.300}',
-                  activeColor: '{primary.200}'
-                },
-                highlight: {
-                  background: 'color-mix(in srgb, {primary.400}, transparent 84%)',
-                  focusBackground: 'color-mix(in srgb, {primary.400}, transparent 76%)',
-                  color: 'rgba(255,255,255,.87)',
-                  focusColor: 'rgba(255,255,255,.87)'
-                }
-              }
-            }
-          }
-        };
-      }
     }
+
+    return {
+      semantic: {
+        primary: color.palette,
+        colorScheme: {
+          dark: {
+            primary: {
+              color: '{primary.400}',
+              contrastColor: '{surface.900}',
+              hoverColor: '{primary.300}',
+              activeColor: '{primary.200}'
+            },
+            highlight: {
+              background: 'color-mix(in srgb, {primary.400}, transparent 84%)',
+              focusBackground: 'color-mix(in srgb, {primary.400}, transparent 76%)',
+              color: 'rgba(255,255,255,.87)',
+              focusColor: 'rgba(255,255,255,.87)'
+            }
+          }
+        }
+      }
+    };
   }
 
-  updateColors(event: any, type: string, color: any) {
-    if (type === 'primary') {
-      this.configService.appState.update((state) => ({...state, primary: color.name}));
-    } else if (type === 'surface') {
-      this.configService.appState.update((state) => ({...state, surface: color.name}));
-    }
+  updateColors(event: Event, type: 'primary' | 'surface', color: { name: string; palette?: ColorPalette }) {
+    this.configService.appState.update((state) => ({
+      ...state,
+      [type]: color.name
+    }));
     this.applyTheme(type, color);
-
     event.stopPropagation();
   }
 
@@ -350,18 +263,8 @@ export class ThemeConfiguratorComponent implements OnInit {
     }
   }
 
-  onPresetChange(event: any) {
-    this.configService.appState.update((state) => ({...state, preset: event}));
-    // @ts-ignore
-    const preset = presets[event];
-    const surfacePalette = this.surfaces.find((s) => s.name === this.selectedSurfaceColor())?.palette;
-    if (this.configService.appState().preset === 'Material') {
-      document.body.classList.add('material');
-      this.config.ripple.set(true);
-    } else {
-      document.body.classList.remove('material');
-      this.config.ripple.set(false);
-    }
-    $t().preset(preset).preset(this.getPresetExt()).surfacePalette(surfacePalette).use({useDefaultOptions: true});
+  onPresetChange() {
+    const surfacePalette = this.primaryColors().find(c => c.name === this.selectedSurfaceColor())?.palette;
+    $t().preset(Aura).preset(this.getPresetExt()).surfacePalette(surfacePalette).use({useDefaultOptions: true});
   }
 }

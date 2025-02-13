@@ -32,8 +32,11 @@ public class MetadataController {
     }
 
     @PutMapping("/{bookId}/metadata")
-    public ResponseEntity<BookMetadata> updateMetadata(@RequestBody BookMetadata setMetadataRequest, @PathVariable long bookId) {
-        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true, true), true);
+    public ResponseEntity<BookMetadata> updateMetadata(
+            @RequestBody BookMetadata setMetadataRequest, @PathVariable long bookId,
+            @RequestParam(defaultValue = "true") boolean mergeCategories) {
+        BookMetadata bookMetadata = bookMetadataMapper.toBookMetadata(
+                bookMetadataUpdater.setBookMetadata(bookId, setMetadataRequest, true, mergeCategories), true);
         return ResponseEntity.ok(bookMetadata);
     }
 

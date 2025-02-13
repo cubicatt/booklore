@@ -1,6 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {catchError, map, tap} from 'rxjs/operators';
 import {Book, BookMetadata, BookSetting} from '../model/book.model';
 import {BookState} from '../model/state/book-state.model';
@@ -196,8 +196,9 @@ export class BookService {
     return this.http.post<BookMetadata[]>(`${this.url}/${bookId}/metadata/prospective`, request);
   }
 
-  updateBookMetadata(bookId: number, bookMetadata: BookMetadata): Observable<BookMetadata> {
-    return this.http.put<BookMetadata>(`${this.url}/${bookId}/metadata`, bookMetadata).pipe(
+  updateBookMetadata(bookId: number, bookMetadata: BookMetadata, mergeCategories: boolean): Observable<BookMetadata> {
+    const params = new HttpParams().set('mergeCategories', mergeCategories.toString());
+    return this.http.put<BookMetadata>(`${this.url}/${bookId}/metadata`, bookMetadata, { params }).pipe(
       map(updatedMetadata => {
         this.handleBookMetadataUpdate(bookId, updatedMetadata);
         return updatedMetadata;

@@ -149,7 +149,7 @@ export class MetadataEditorComponent implements OnInit {
   }
 
   onSave(): void {
-    this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata()).subscribe({
+    this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(), false).subscribe({
       next: (response) => {
         this.messageService.add({severity: 'info', summary: 'Success', detail: 'Book metadata updated'});
         this.metadataCenterService.emit(response);
@@ -236,7 +236,7 @@ export class MetadataEditorComponent implements OnInit {
   }
 
   private updateMetadata(): void {
-    this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata()).subscribe({
+    this.bookService.updateBookMetadata(this.currentBookId, this.buildMetadata(), false).subscribe({
       next: (response) => {
         this.metadataCenterService.emit(response);
       },

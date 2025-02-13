@@ -6,7 +6,6 @@ import com.adityachandel.booklore.mapper.LibraryMapper;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.dto.Library;
 import com.adityachandel.booklore.model.dto.LibraryPath;
-import com.adityachandel.booklore.model.dto.Sort;
 import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
@@ -31,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -108,7 +106,7 @@ public class LibraryService {
         if (request.isWatch()) {
             for (LibraryPathEntity pathEntity : savedLibrary.getLibraryPaths()) {
                 Path path = Paths.get(pathEntity.getPath());
-                monitoringService.registerPathWithLibraryId(path, libraryId);
+                monitoringService.registerPath(path, libraryId);
             }
         } else {
             for (LibraryPathEntity pathEntity : savedLibrary.getLibraryPaths()) {
@@ -152,7 +150,7 @@ public class LibraryService {
         if (request.isWatch()) {
             for (LibraryPathEntity pathEntity : libraryEntity.getLibraryPaths()) {
                 Path path = Paths.get(pathEntity.getPath());
-                monitoringService.registerPathWithLibraryId(path, libraryId);
+                monitoringService.registerPath(path, libraryId);
             }
         }
 
@@ -196,10 +194,10 @@ public class LibraryService {
 
     public void deleteLibrary(long id) {
         LibraryEntity library = libraryRepository.findById(id).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(id));
-        /*library.getLibraryPaths().forEach(libraryPath -> {
+        library.getLibraryPaths().forEach(libraryPath -> {
             Path path = Paths.get(libraryPath.getPath());
             monitoringService.unregisterPath(path.toString());
-        });*/
+        });
         Set<Long> bookIds = library.getBookEntities().stream().map(BookEntity::getId).collect(Collectors.toSet());
         fileProcessingUtils.deleteBookCovers(bookIds);
         libraryRepository.deleteById(id);

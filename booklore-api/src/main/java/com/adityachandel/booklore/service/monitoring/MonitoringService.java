@@ -45,14 +45,14 @@ public class MonitoringService {
                     library.getPaths().forEach(libraryPath -> {
                         Path path = Paths.get(libraryPath.getPath());
                         if (Files.isDirectory(path)) {
-                            registerPathWithLibraryId(path, library.getId());
+                            registerPath(path, library.getId());
                         }
                     });
                 });
         log.info("Registered libraries for monitoring: {}", libraries.size());
     }
 
-    public synchronized void registerPathWithLibraryId(Path path, Long libraryId) {
+    public synchronized void registerPath(Path path, Long libraryId) {
         try {
             if (monitoredPaths.add(path)) {
                 path.register(watchService,

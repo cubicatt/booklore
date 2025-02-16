@@ -1,6 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {InputText} from 'primeng/inputtext';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Checkbox} from 'primeng/checkbox';
 import {MultiSelectModule} from 'primeng/multiselect';
 import {Library} from '../../../../../book/model/library.model';
@@ -9,6 +9,7 @@ import {LibraryService} from '../../../../../book/service/library.service';
 import {UserService} from '../../../../../user.service';
 import {MessageService} from 'primeng/api';
 import {DynamicDialogRef} from 'primeng/dynamicdialog';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-create-user-dialog',
@@ -19,23 +20,17 @@ import {DynamicDialogRef} from 'primeng/dynamicdialog';
     FormsModule,
     Checkbox,
     MultiSelectModule,
-    Button
+    Button,
+    NgIf
   ],
   templateUrl: './create-user-dialog.component.html',
   styleUrl: './create-user-dialog.component.scss'
 })
 export class CreateUserDialogComponent implements OnInit {
+  userForm!: FormGroup;
   libraries: Library[] = [];
-  selectedLibraries: Library[] = [];
 
-  username: string = '';
-  password: string = '';
-  name: string = '';
-  email: string = '';
-  canUpload: boolean = false;
-  canDownload: boolean = false;
-  canEditMetadata: boolean = false;
-
+  private fb = inject(FormBuilder);
   private libraryService = inject(LibraryService);
   private userService = inject(UserService);
   private messageService = inject(MessageService);
@@ -43,27 +38,30 @@ export class CreateUserDialogComponent implements OnInit {
 
   ngOnInit() {
     this.libraries = this.libraryService.getLibrariesFromState();
+
+    this.userForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
+      username: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      selectedLibraries: [[], Validators.required],
+      canUpload: [false],
+      canDownload: [false],
+      canEditMetadata: [false]
+    });
   }
 
   createUser() {
-    if (!this.username || this.password.length < 6 || !this.name || !this.email || this.selectedLibraries.length === 0) {
+    if (this.userForm.invalid) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Validation Error',
-        detail: 'Please fill all required fields correctly.'
+        detail: 'Please correct errors before submitting.'
       });
       return;
     }
 
-    const userData = {
-      username: this.username,
-      password: this.password,
-      name: this.name,
-      email: this.email,
-      permissionUpload: this.canUpload,
-      permissionDownload: this.canDownload,
-      permissionEditMetadata: this.canEditMetadata
-    };
+    const userData = this.userForm.value;
 
     this.userService.createUser(userData).subscribe({
       next: response => {

@@ -18,7 +18,7 @@ public class UserPermissionsEntity {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private UserEntity user;
+    private BookLoreUserEntity user;
 
     @Column(name = "permission_upload", nullable = false)
     private boolean permissionUpload = false;

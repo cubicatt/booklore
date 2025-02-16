@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.config.security;
 
-import com.adityachandel.booklore.model.entity.UserEntity;
+import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
 import com.adityachandel.booklore.model.entity.UserPermissionsEntity;
 import com.adityachandel.booklore.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -20,7 +20,7 @@ public class ApplicationStartupRunner implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (userRepository.findByUsername("admin").isEmpty()) {
-            UserEntity admin = new UserEntity();
+            BookLoreUserEntity admin = new BookLoreUserEntity();
             admin.setUsername("admin");
             admin.setPasswordHash(passwordEncoder.encode("admin123"));
             admin.setName("Administrator");

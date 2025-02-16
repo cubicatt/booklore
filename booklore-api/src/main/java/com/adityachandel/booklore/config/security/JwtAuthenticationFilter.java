@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.config.security;
 
-import com.adityachandel.booklore.model.entity.UserEntity;
+import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
 import com.adityachandel.booklore.model.entity.UserPermissionsEntity;
 import com.adityachandel.booklore.repository.UserRepository;
 import jakarta.servlet.FilterChain;
@@ -39,8 +39,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (token != null && jwtUtils.validateToken(token)) {
             String username = jwtUtils.extractUsername(token);
-            UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            List<GrantedAuthority> authorities = getAuthorities(userEntity.getPermissions());
+            BookLoreUserEntity bookLoreUserEntity = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            List<GrantedAuthority> authorities = getAuthorities(bookLoreUserEntity.getPermissions());
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);

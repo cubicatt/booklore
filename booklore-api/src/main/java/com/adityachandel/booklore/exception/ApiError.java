@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ApiError {
     BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "Book not found with ID: %d"),
+    USER_NOT_FOUNDD(HttpStatus.NOT_FOUND, "User with ID %s not found"),
     UNSUPPORTED_BOOK_TYPE(HttpStatus.BAD_REQUEST, "Unsupported book type for viewer settings"),
     INVALID_VIEWER_SETTING(HttpStatus.BAD_REQUEST, "Invalid viewer setting for the book"),
     FILE_READ_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Error reading files from path"),
@@ -28,6 +29,8 @@ public enum ApiError {
     METADATA_LOCKED(HttpStatus.FORBIDDEN, "Attempt to update locked metadata fields for book with ID: %d"),
     USERNAME_ALREADY_TAKEN(HttpStatus.BAD_REQUEST, "Username already taken: %s"),
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "User not found: %s"),
+    CANNOT_DELETE_ADMIN(HttpStatus.FORBIDDEN, "Admin user cannot be deleted"),
+    UNAUTHORIZED(HttpStatus.FORBIDDEN, "You do not have permission to perform this action"),
     INVALID_CREDENTIALS(HttpStatus.BAD_REQUEST, "Invalid credentials");
 
     private final HttpStatus status;

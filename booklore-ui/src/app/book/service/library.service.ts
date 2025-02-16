@@ -134,4 +134,8 @@ export class LibraryService {
       map(state => (state.books || []).filter(book => book.libraryId === libraryId).length)
     );
   }
+
+  getLibrariesFromState(): Library[] {
+    return this.libraryStateSubject.value.libraries || [];
+  }
 }

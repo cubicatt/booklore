@@ -1,15 +1,15 @@
 package com.adityachandel.booklore.repository;
 
-import com.adityachandel.booklore.model.entity.UserEntity;
+import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity, Long> {
+public interface UserRepository extends JpaRepository<BookLoreUserEntity, Long> {
 
-    Optional<UserEntity> findByUsername(String username);
+    Optional<BookLoreUserEntity> findByUsername(String username);
 
-    Optional<UserEntity> findByEmail(String email);
+    Optional<BookLoreUserEntity> findByEmail(String email);
 }

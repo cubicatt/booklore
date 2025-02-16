@@ -1,7 +1,7 @@
 package com.adityachandel.booklore.config.security;
 
 import io.jsonwebtoken.*;
-import com.adityachandel.booklore.model.entity.UserEntity;
+import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ import java.util.Date;
 public class JwtUtils {
     private final String secretKey = "G6u4m3g7M/b93k7m9a1h1Kw4l3D+5WqXldpl4nTjl4s=";
 
-    public String generateToken(UserEntity user) {
+    public String generateToken(BookLoreUserEntity user) {
         SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + 1000 * 60 * 60 * 10);

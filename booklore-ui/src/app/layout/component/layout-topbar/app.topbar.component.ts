@@ -16,6 +16,7 @@ import {Divider} from 'primeng/divider';
 import {ThemeConfiguratorComponent} from '../theme-configurator/theme-configurator.component';
 import {LiveNotificationBoxComponent} from '../../../core/component/live-notification-box/live-notification-box.component';
 import {BookUploaderComponent} from '../../../utilities/component/book-uploader/book-uploader.component';
+import {AuthService} from '../../../core/service/auth.service';
 
 @Component({
   selector: 'app-topbar',
@@ -49,7 +50,7 @@ export class AppTopBarComponent implements OnDestroy {
   @ViewChild('topbarmenu') menu!: ElementRef;
 
   constructor(public layoutService: LayoutService, public dialogService: PrimeDialogService,
-              private eventService: EventService, private router: Router) {
+              private eventService: EventService, private router: Router, private authService: AuthService) {
     this.eventService.eventHighlight$.subscribe(highlight => {
       this.eventHighlight = highlight;
     });
@@ -115,7 +116,7 @@ export class AppTopBarComponent implements OnDestroy {
   }
 
   logout() {
-    localStorage.removeItem('token');
+    this.authService.logout();
     window.location.href = '/login';
   }
 }

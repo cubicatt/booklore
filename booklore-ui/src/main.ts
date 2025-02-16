@@ -12,6 +12,7 @@ import { AppComponent } from './app/app.component';
 import Aura from '@primeng/themes/aura';
 import { routes } from './app/app.routes';
 import {AuthInterceptorService} from './app/auth-interceptor.service';
+import {AuthService} from './app/core/service/auth.service';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -23,6 +24,7 @@ bootstrapApplication(AppComponent, {
     {
       provide: RxStompService,
       useFactory: rxStompServiceFactory,
+      deps: [AuthService],
     },
     {
       provide: RouteReuseStrategy,

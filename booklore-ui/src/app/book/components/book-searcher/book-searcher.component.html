@@ -17,7 +17,7 @@
     <ng-container *ngIf="books.length > 0; else noResults">
       <div class="search-dropdown-item flex flex-col" *ngFor="let book of books" (click)="onBookClick(book)">
         <div class="flex flex-row w-full px-2">
-          <img [src]="urlHelper.getCoverUrl(book.id, book.metadata?.coverUpdatedOn)" alt="Book Cover" class="search-book-cover"/>
+          <img [attr.src]="urlHelper.getCoverUrl(book.id, book.metadata?.coverUpdatedOn) | secure | async" alt="Book Cover" class="search-book-cover"/>
           <div class="search-book-details">
             <div class="flex items-center">
               <p class="search-book-name text-lg font-medium truncate">{{ book.metadata?.title | slice:0:70 }}</p>

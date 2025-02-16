@@ -10,7 +10,7 @@
       <div class="flex flex-col items-center gap-2 relative">
 
         <img
-          [src]="urlHelper.getCoverUrl(metadata.bookId, metadata?.coverUpdatedOn)"
+          [attr.src]="urlHelper.getCoverUrl(metadata.bookId, metadata?.coverUpdatedOn) | secure | async"
           alt="Image"
           width="250"
           [ngClass]="{ 'brightness-50': isUploading }"

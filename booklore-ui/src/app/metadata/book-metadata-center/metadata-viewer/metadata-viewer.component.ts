@@ -10,13 +10,14 @@ import {Tag} from 'primeng/tag';
 import {BookMetadata} from '../../../book/model/book.model';
 import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
+import {SecurePipe} from '../../../secure-pipe';
 
 @Component({
   selector: 'app-metadata-viewer',
   standalone: true,
   templateUrl: './metadata-viewer.component.html',
   styleUrl: './metadata-viewer.component.scss',
-  imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Divider]
+  imports: [Button, NgForOf, NgIf, AsyncPipe, Rating, FormsModule, Tag, Divider, SecurePipe]
 })
 export class MetadataViewerComponent {
 

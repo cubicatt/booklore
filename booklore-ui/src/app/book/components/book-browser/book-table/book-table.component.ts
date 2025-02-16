@@ -1,12 +1,13 @@
 import {Component, EventEmitter, inject, Input, OnChanges, Output} from '@angular/core';
 import {TableModule} from 'primeng/table';
-import {NgIf} from '@angular/common';
+import {AsyncPipe, NgIf} from '@angular/common';
 import {Rating} from 'primeng/rating';
 import {FormsModule} from '@angular/forms';
 import {Book} from '../../../model/book.model';
 import {SortOption} from '../../../model/sort.model';
 import {MetadataDialogService} from '../../../../metadata/service/metadata-dialog.service';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
+import {SecurePipe} from '../../../../secure-pipe';
 
 @Component({
   selector: 'app-book-table',
@@ -16,7 +17,9 @@ import {UrlHelperService} from '../../../../utilities/service/url-helper.service
     TableModule,
     NgIf,
     Rating,
-    FormsModule
+    FormsModule,
+    SecurePipe,
+    AsyncPipe
   ],
   styleUrl: './book-table.component.scss'
 })

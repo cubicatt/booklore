@@ -4,7 +4,7 @@
      (mouseout)="isHovered = false">
   <div class="cover-container">
     <img
-      [src]="urlHelper.getCoverUrl(book.id, book.metadata?.coverUpdatedOn)"
+      [attr.src]="urlHelper.getCoverUrl(book.id, book.metadata?.coverUpdatedOn) | secure | async"
       class="book-cover placeholder"
       alt="Cover of {{ book.metadata?.title }}"
       loading="lazy"/>

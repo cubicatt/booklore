@@ -1,9 +1,10 @@
 import { RxStompService } from './rx-stomp.service';
-import { rxStompConfig } from './rx-stomp.config';
+import { createRxStompConfig } from './rx-stomp.config';
+import {AuthService} from '../../core/service/auth.service';
 
-export function rxStompServiceFactory() {
-  const rxStomp = new RxStompService();
-  rxStomp.configure(rxStompConfig);
-  rxStomp.activate();
+export function rxStompServiceFactory(authService: AuthService) {
+  const rxStomp = new RxStompService(authService);
+  const stompConfig = createRxStompConfig(authService);
+  rxStomp.configure(stompConfig);
   return rxStomp;
 }

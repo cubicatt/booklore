@@ -3,12 +3,24 @@ import {AuthService} from '../core/service/auth.service';
 import {Router} from '@angular/router';
 import {FormsModule} from '@angular/forms';
 import {NgIf} from '@angular/common';
+import {Card} from 'primeng/card';
+import {Password} from 'primeng/password';
+import {Button} from 'primeng/button';
+import {Message} from 'primeng/message';
+import {PrimeTemplate} from 'primeng/api';
+import {InputText} from 'primeng/inputtext';
 
 @Component({
   selector: 'app-login',
   imports: [
     FormsModule,
-    NgIf
+    NgIf,
+    Card,
+    Password,
+    Button,
+    Message,
+    PrimeTemplate,
+    InputText
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'

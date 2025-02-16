@@ -1,13 +1,25 @@
 <div class="login-container">
-  <h2>Login</h2>
-  <form (submit)="login()">
-    <label>Username</label>
-    <input type="text" [(ngModel)]="username" name="username" required />
+  <p-card class="login-card p-fluid">
+    <ng-template pTemplate="title">Login</ng-template>
 
-    <label>Password</label>
-    <input type="password" [(ngModel)]="password" name="password" required />
+    <ng-template pTemplate="content">
+      <form #loginForm="ngForm">
+        <div class="p-field">
+          <label for="username">Username</label>
+          <input pInputText id="username" [(ngModel)]="username" name="username" required fluid/>
+        </div>
 
-    <button type="submit">Login</button>
-    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
-  </form>
+        <div class="p-field">
+          <label for="password">Password</label>
+          <p-password id="password" [(ngModel)]="password" name="password" [feedback]="false" fluid required></p-password>
+        </div>
+
+        <div class="p-mt-3">
+          <p-button label="Login" icon="pi pi-sign-in" (click)="login()" class="p-fluid"></p-button>
+        </div>
+
+        <p-message *ngIf="errorMessage" severity="error" text="{{ errorMessage }}"></p-message>
+      </form>
+    </ng-template>
+  </p-card>
 </div>

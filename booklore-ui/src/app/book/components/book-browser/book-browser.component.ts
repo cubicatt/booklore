@@ -30,6 +30,7 @@ import {FormsModule} from '@angular/forms';
 import {BookFilterComponent} from './book-filter/book-filter.component';
 import {Tooltip} from 'primeng/tooltip';
 import {Fluid} from 'primeng/fluid';
+import {UserService} from '../../../user.service';
 
 export enum EntityType {
   LIBRARY = 'Library',
@@ -89,6 +90,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   private shelfService = inject(ShelfService);
   private dialogService = inject(DialogService);
   private sortService = inject(SortService);
+  protected userService = inject(UserService);
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
 
   sortOptions: any[] = [
@@ -249,7 +251,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
           default:
             break;
         }
-        return { ...bookState, books: filteredBooks };
+        return {...bookState, books: filteredBooks};
       })
     );
   }

@@ -15,13 +15,13 @@ import {MetadataRefreshRequest} from '../../../../metadata/model/request/metadat
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {SecurePipe} from '../../../../secure-pipe';
-
+import {UserService} from '../../../../user.service';
 
 @Component({
   selector: 'app-book-card',
   templateUrl: './book-card.component.html',
   styleUrls: ['./book-card.component.scss'],
-  imports: [Button, MenuModule, CheckboxModule, FormsModule, NgIf, AsyncPipe, SecurePipe],
+  imports: [Button, MenuModule, CheckboxModule, FormsModule, NgIf, SecurePipe, AsyncPipe],
   standalone: true
 })
 export class BookCardComponent implements OnInit {
@@ -37,9 +37,15 @@ export class BookCardComponent implements OnInit {
   private dialogService = inject(DialogService);
   private metadataDialogService = inject(MetadataDialogService);
   protected urlHelper = inject(UrlHelperService);
+  private userService = inject(UserService);
+
+  private userPermissions: any;
 
   ngOnInit(): void {
     this.initMenu();
+    this.userService.userData$.subscribe((userData) => {
+      this.userPermissions = userData?.permissions;
+    });
   }
 
   readBook(book: Book): void {
@@ -63,7 +69,7 @@ export class BookCardComponent implements OnInit {
           {
             label: 'Assign Shelves',
             icon: 'pi pi-folder',
-            command: () => this.openShelfDialog(this.book),
+            command: () => this.openShelfDialog()
           },
           {
             label: 'View Details',
@@ -74,6 +80,7 @@ export class BookCardComponent implements OnInit {
             label: 'Match Book',
             icon: 'pi pi-sparkles',
             command: () => this.metadataDialogService.openBookMetadataCenterDialog(this.book.id, 'match'),
+            disabled: !this.hasEditMetadataPermission()
           },
           {
             label: 'Quick Refresh',
@@ -82,10 +89,11 @@ export class BookCardComponent implements OnInit {
               const metadataRefreshRequest: MetadataRefreshRequest = {
                 quick: true,
                 refreshType: MetadataRefreshType.BOOKS,
-                bookIds: [this.book.id]
+                bookIds: [this.book.id],
               };
               this.bookService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
             },
+            disabled: !this.hasEditMetadataPermission()
           },
           {
             label: 'Granular Refresh',
@@ -97,24 +105,26 @@ export class BookCardComponent implements OnInit {
                 closable: true,
                 data: {
                   bookIds: [this.book!.id],
-                  metadataRefreshType: MetadataRefreshType.BOOKS
-                }
-              })
+                  metadataRefreshType: MetadataRefreshType.BOOKS,
+                },
+              });
             },
+            disabled: !this.hasEditMetadataPermission()
           },
           {
             label: 'Download',
             icon: 'pi pi-download',
             command: () => {
-              this.bookService.downloadFile(this.book.id)
+              this.bookService.downloadFile(this.book.id);
             },
+            disabled: !this.hasDownloadPermission()
           },
         ],
       },
     ];
   }
 
-  private openShelfDialog(book: Book): void {
+  private openShelfDialog(): void {
     this.dialogService.open(ShelfAssignerComponent, {
       header: `Update Book's Shelves`,
       modal: true,
@@ -126,12 +136,20 @@ export class BookCardComponent implements OnInit {
         top: '15%',
       },
       data: {
-        book: this.book
+        book: this.book,
       },
     });
   }
 
   openBookInfo(book: Book): void {
     this.metadataDialogService.openBookMetadataCenterDialog(book.id, 'view');
+  }
+
+  private hasEditMetadataPermission(): boolean {
+    return this.userPermissions?.canEditMetadata ?? false;
+  }
+
+  private hasDownloadPermission(): boolean {
+    return this.userPermissions?.canDownload ?? false;
   }
 }

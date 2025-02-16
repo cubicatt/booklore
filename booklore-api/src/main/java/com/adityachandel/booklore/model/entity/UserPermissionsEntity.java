@@ -29,6 +29,9 @@ public class UserPermissionsEntity {
     @Column(name = "permission_edit_metadata", nullable = false)
     private boolean permissionEditMetadata = false;
 
+    @Column(name = "permission_manipulate_library", nullable = false)
+    private boolean permissionManipulateLibrary = false;
+
     @Column(name = "permission_admin", nullable = false)
     private boolean permissionAdmin;
 }

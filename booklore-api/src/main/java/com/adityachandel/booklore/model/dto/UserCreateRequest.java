@@ -12,4 +12,5 @@ public class UserCreateRequest {
     private boolean permissionUpload;
     private boolean permissionDownload;
     private boolean permissionEditMetadata;
+    private boolean permissionManipulateLibrary;
 }

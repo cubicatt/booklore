@@ -181,12 +181,13 @@ CREATE TABLE IF NOT EXISTS users
 
 CREATE TABLE IF NOT EXISTS user_permissions
 (
-    id                       BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id                  BIGINT  NOT NULL,
-    permission_upload        BOOLEAN NOT NULL DEFAULT FALSE,
-    permission_download      BOOLEAN NOT NULL DEFAULT FALSE,
-    permission_edit_metadata BOOLEAN NOT NULL DEFAULT FALSE,
-    permission_admin         BOOLEAN NOT NULL DEFAULT FALSE,
+    id                            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id                       BIGINT  NOT NULL,
+    permission_upload             BOOLEAN NOT NULL DEFAULT FALSE,
+    permission_download           BOOLEAN NOT NULL DEFAULT FALSE,
+    permission_edit_metadata      BOOLEAN NOT NULL DEFAULT FALSE,
+    permission_manipulate_library BOOLEAN NOT NULL DEFAULT FALSE,
+    permission_admin              BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT fk_user_permissions_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 

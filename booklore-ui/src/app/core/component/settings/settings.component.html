@@ -1,17 +1,22 @@
-<div class="card">
+<div class="card" *ngIf="userService.userData$ | async as userData">
   <p-tabs value="0">
     <p-tablist>
       <p-tab value="0">Book Preferences</p-tab>
-      <p-tab value="1">Admin</p-tab>
+      <ng-container *ngIf="userData.permissions.isAdmin">
+        <p-tab value="1">Admin</p-tab>
+      </ng-container>
+
     </p-tablist>
 
     <p-tabpanels>
       <p-tabpanel value="0">
         <app-book-preferences></app-book-preferences>
       </p-tabpanel>
-      <p-tabpanel value="1">
-        <app-admin></app-admin>
-      </p-tabpanel>
+      <ng-container *ngIf="userData.permissions.isAdmin">
+        <p-tabpanel value="1">
+          <app-admin></app-admin>
+        </p-tabpanel>
+      </ng-container>
     </p-tabpanels>
   </p-tabs>
 </div>

@@ -8,7 +8,7 @@ import {TooltipModule} from 'primeng/tooltip';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {BookSearcherComponent} from '../../../book/components/book-searcher/book-searcher.component';
-import {NgClass, NgIf} from '@angular/common';
+import {AsyncPipe, NgClass, NgIf} from '@angular/common';
 import {EventService} from '../../../shared/websocket/event.service';
 import {Button} from 'primeng/button';
 import {StyleClass} from 'primeng/styleclass';
@@ -17,6 +17,7 @@ import {ThemeConfiguratorComponent} from '../theme-configurator/theme-configurat
 import {LiveNotificationBoxComponent} from '../../../core/component/live-notification-box/live-notification-box.component';
 import {BookUploaderComponent} from '../../../utilities/component/book-uploader/book-uploader.component';
 import {AuthService} from '../../../core/service/auth.service';
+import {UserService} from '../../../user.service';
 
 @Component({
   selector: 'app-topbar',
@@ -34,7 +35,8 @@ import {AuthService} from '../../../core/service/auth.service';
     NgClass,
     Divider,
     LiveNotificationBoxComponent,
-    NgIf
+    NgIf,
+    AsyncPipe
   ],
 })
 export class AppTopBarComponent implements OnDestroy {
@@ -50,7 +52,8 @@ export class AppTopBarComponent implements OnDestroy {
   @ViewChild('topbarmenu') menu!: ElementRef;
 
   constructor(public layoutService: LayoutService, public dialogService: PrimeDialogService,
-              private eventService: EventService, private router: Router, private authService: AuthService) {
+              private eventService: EventService, private router: Router, private authService: AuthService,
+              protected userService: UserService) {
     this.eventService.eventHighlight$.subscribe(highlight => {
       this.eventHighlight = highlight;
     });

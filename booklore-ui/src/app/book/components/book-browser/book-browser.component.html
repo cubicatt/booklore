@@ -9,9 +9,11 @@
           <p *ngIf="entityType === EntityType.ALL_BOOKS" class="text-2xl whitespace-nowrap overflow-hidden text-ellipsis">
             All Books
           </p>
-          <div *ngIf="entityType !== EntityType.ALL_BOOKS">
-            <p-button icon="pi pi-ellipsis-v" [rounded]="true" [text]="true" severity="info" (click)="entitymenu.toggle($event)"></p-button>
-            <p-menu #entitymenu [model]="entityOptions" [popup]="true" appendTo="body"></p-menu>
+          <div *ngIf="userService.userData$ | async as userData">
+            <div *ngIf="entityType !== EntityType.ALL_BOOKS && userData.permissions.canManipulateLibrary">
+              <p-button icon="pi pi-ellipsis-v" [rounded]="true" [text]="true" severity="info" (click)="entitymenu.toggle($event)"></p-button>
+              <p-menu #entitymenu [model]="entityOptions" [popup]="true" appendTo="body"></p-menu>
+            </div>
           </div>
         </ng-container>
       </div>
@@ -134,11 +136,13 @@
                         severity="info"
                         (click)="unshelfBooks()">
               </p-button>
-              <p-button
-                label="Refresh Metadata"
-                severity="info"
-                (click)="updateMetadata()">
-              </p-button>
+              <div *ngIf="userService.userData$ | async as userData">
+                <p-button *ngIf="userData.permissions.canEditMetadata"
+                          label="Refresh Metadata"
+                          severity="info"
+                          (click)="updateMetadata()">
+                </p-button>
+              </div>
               <p-button
                 label="Deselect All"
                 severity="warn"

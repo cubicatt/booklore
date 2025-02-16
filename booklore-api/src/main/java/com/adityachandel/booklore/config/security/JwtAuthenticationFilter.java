@@ -68,6 +68,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (permissions.isPermissionEditMetadata()) {
             authorities.add(new SimpleGrantedAuthority("ROLE_EDIT_METADATA"));
         }
+        if (permissions.isPermissionManipulateLibrary()) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_MANIPULATE_LIBRARY"));
+        }
+        if (permissions.isPermissionAdmin()) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
         return authorities;
     }
 }

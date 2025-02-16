@@ -12,8 +12,10 @@ public class BookLoreUser {
 
     @Data
     public static class UserPermissions {
+        private boolean isAdmin;
         private boolean canUpload;
         private boolean canDownload;
         private boolean canEditMetadata;
+        private boolean canManipulateLibrary;
     }
 }

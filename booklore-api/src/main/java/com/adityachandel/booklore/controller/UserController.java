@@ -22,12 +22,19 @@ public class UserController {
 
     private final UserService userService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<BookLoreUser> getUser(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getBookLoreUser(id));
+    }
+
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<BookLoreUser>> getAllUsers() {
         return ResponseEntity.ok(userService.getBookLoreUsers());
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookLoreUser> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateRequest updateRequest) {
         BookLoreUser updatedUser = userService.updateUser(id, updateRequest);
         return ResponseEntity.ok(updatedUser);

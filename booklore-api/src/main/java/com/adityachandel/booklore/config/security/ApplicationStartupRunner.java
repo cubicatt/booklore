@@ -30,6 +30,7 @@ public class ApplicationStartupRunner implements CommandLineRunner {
             permissions.setUser(admin);
             permissions.setPermissionUpload(true);
             permissions.setPermissionDownload(true);
+            permissions.setPermissionManipulateLibrary(true);
             permissions.setPermissionEditMetadata(true);
             permissions.setPermissionAdmin(true);
 

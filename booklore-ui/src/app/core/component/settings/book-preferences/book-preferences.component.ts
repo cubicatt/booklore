@@ -65,7 +65,6 @@ export class BookPreferences implements OnInit {
       if (settings) {
         this.populateSettings(settings);
         this.currentMetadataOptions = settings.metadataRefreshOptions;
-        console.log(this.currentMetadataOptions)
       }
     });
   }

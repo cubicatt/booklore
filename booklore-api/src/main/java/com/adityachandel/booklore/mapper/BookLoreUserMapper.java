@@ -17,8 +17,11 @@ public interface BookLoreUserMapper {
             return null;
         }
         BookLoreUser.UserPermissions dto = new BookLoreUser.UserPermissions();
+        dto.setAdmin(permissions.isPermissionAdmin());
         dto.setCanUpload(permissions.isPermissionUpload());
         dto.setCanDownload(permissions.isPermissionDownload());
+        dto.setCanManipulateLibrary(permissions.isPermissionManipulateLibrary());
+        dto.setCanEditMetadata(permissions.isPermissionEditMetadata());
         dto.setCanEditMetadata(permissions.isPermissionEditMetadata());
         return dto;
     }

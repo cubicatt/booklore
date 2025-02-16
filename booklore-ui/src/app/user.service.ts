@@ -1,27 +1,9 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, Injector} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {API_CONFIG} from './config/api-config';
-
-interface UserCreateRequest {
-  username: string;
-  password: string;
-  name: string;
-  email: string;
-  permissionUpload: boolean;
-  permissionDownload: boolean;
-  permissionEditMetadata: boolean;
-}
-
-interface UserUpdateRequest {
-  name: string;
-  email: string;
-  permissions: {
-    canUpload: boolean;
-    canDownload: boolean;
-    canEditMetadata: boolean;
-  };
-}
+import {jwtDecode} from 'jwt-decode';
+import {RxStompService} from './shared/websocket/rx-stomp.service';
 
 export interface User {
   id: number;
@@ -29,23 +11,54 @@ export interface User {
   name: string;
   email: string;
   permissions: {
+    isAdmin: boolean;
     canUpload: boolean;
     canDownload: boolean;
     canEditMetadata: boolean;
+    canManipulateLibrary: boolean;
   };
-  isEditing?: boolean;
+}
+
+interface JwtPayload {
+  sub: string;
+  userId: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-
-  private http = inject(HttpClient);
   private readonly apiUrl = `${API_CONFIG.BASE_URL}/api/v1/auth/register`;
   private readonly userUrl = `${API_CONFIG.BASE_URL}/api/v1/users`;
 
-  createUser(userData: UserCreateRequest): Observable<{ message: string }> {
+  private http = inject(HttpClient);
+  private injector = inject(Injector);
+
+  private rxStompService?: RxStompService;
+
+  private userDataSubject = new BehaviorSubject<User | null>(null);
+  userData$ = this.userDataSubject.asObservable();
+
+  constructor() {
+    this.loadUserFromToken();
+  }
+
+  private loadUserFromToken(): void {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded: JwtPayload = jwtDecode(token);
+      this.fetchUser(decoded.userId);
+    }
+  }
+
+  fetchUser(userId: number): void {
+    this.http.get<User>(`${this.userUrl}/${userId}`).subscribe(user => {
+      this.userDataSubject.next(user);
+      this.startWebSocket();  // Start WebSocket after user data is loaded
+    });
+  }
+
+  createUser(userData: Omit<User, 'id'>): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(this.apiUrl, userData);
   }
 
@@ -53,7 +66,7 @@ export class UserService {
     return this.http.get<User[]>(this.userUrl);
   }
 
-  updateUser(userId: number, updateData: UserUpdateRequest): Observable<{ message: string }> {
+  updateUser(userId: number, updateData: Partial<User>): Observable<{ message: string }> {
     return this.http.put<{ message: string }>(`${this.userUrl}/${userId}`, updateData);
   }
 
@@ -61,4 +74,22 @@ export class UserService {
     return this.http.delete<void>(`${this.userUrl}/${userId}`);
   }
 
+  private startWebSocket(): void {
+    const token = this.getToken();
+    if (token) {
+      const rxStompService = this.getRxStompService();
+      rxStompService.activate();
+    }
+  }
+
+  private getRxStompService(): RxStompService {
+    if (!this.rxStompService) {
+      this.rxStompService = this.injector.get(RxStompService);
+    }
+    return this.rxStompService;
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
 }

@@ -50,6 +50,7 @@ public class UserService {
         permissions.setPermissionUpload(request.isPermissionUpload());
         permissions.setPermissionDownload(request.isPermissionDownload());
         permissions.setPermissionEditMetadata(request.isPermissionEditMetadata());
+        permissions.setPermissionEditMetadata(request.isPermissionManipulateLibrary());
 
         bookLoreUserEntity.setPermissions(permissions);
 
@@ -64,8 +65,7 @@ public class UserService {
     }
 
     public ResponseEntity<Map<String, String>> loginUser(UserLoginRequest loginRequest) {
-        BookLoreUserEntity user = userRepository.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(loginRequest.getUsername()));
+        BookLoreUserEntity user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(loginRequest.getUsername()));
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())) {
             throw ApiError.INVALID_CREDENTIALS.createException();
@@ -111,4 +111,8 @@ public class UserService {
     }
 
 
+    public BookLoreUser getBookLoreUser(Long id) {
+        BookLoreUserEntity user = userRepository.findById(id).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(id));
+        return bookLoreUserMapper.toDto(user);
+    }
 }

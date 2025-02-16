@@ -9,11 +9,12 @@ import {Ripple} from 'primeng/ripple';
 import {Button} from 'primeng/button';
 import {Menu} from 'primeng/menu';
 import {MenuItem} from 'primeng/api';
+import {UserService} from '../../../user.service';
 
 @Component({
   selector: '[app-menuitem]',
   templateUrl: './app.menuitem.component.html',
-  styleUrl: './app.menuitem.component.scss',
+  styleUrls: ['./app.menuitem.component.scss'],
   imports: [
     RouterLink,
     RouterLinkActive,
@@ -44,13 +45,20 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
   @Input() parentKey!: string;
 
   hovered = false;
-
   active = false;
-  menuSourceSubscription: Subscription;
-  menuResetSubscription: Subscription;
   key: string = "";
 
-  constructor(public router: Router, private menuService: MenuService) {
+  canManipulateLibrary: boolean = false;
+
+  menuSourceSubscription: Subscription;
+  menuResetSubscription: Subscription;
+
+  constructor(public router: Router, private menuService: MenuService, private userService: UserService) {
+    this.userService.userData$.subscribe(userData => {
+      if (userData) {
+        this.canManipulateLibrary = userData.permissions.canManipulateLibrary;
+      }
+    });
     this.menuSourceSubscription = this.menuService.menuSource$.subscribe(value => {
       Promise.resolve(null).then(() => {
         if (value.routeEvent) {

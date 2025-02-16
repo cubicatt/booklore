@@ -31,30 +31,24 @@ public class UserService {
             throw ApiError.USERNAME_ALREADY_TAKEN.createException(request.getUsername());
         }
 
-        // Create new user entity
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(request.getUsername());
         userEntity.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         userEntity.setName(request.getName());
         userEntity.setEmail(request.getEmail());
 
-        // Create permissions entity with values from the user request
         UserPermissionsEntity permissions = new UserPermissionsEntity();
         permissions.setUser(userEntity);
         permissions.setPermissionUpload(request.isPermissionUpload());
         permissions.setPermissionDownload(request.isPermissionDownload());
         permissions.setPermissionEditMetadata(request.isPermissionEditMetadata());
 
-        // Associate permissions with user
         userEntity.setPermissions(permissions);
 
-        // Save user (CascadeType.ALL ensures permissions are also saved)
         userRepository.save(userEntity);
 
-        // Generate JWT token
         String token = jwtUtils.generateToken(userEntity);
 
-        // Prepare response
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
 

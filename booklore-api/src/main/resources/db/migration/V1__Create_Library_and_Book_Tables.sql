@@ -167,3 +167,27 @@ CREATE TABLE app_settings
     val      TEXT         NOT NULL,
     UNIQUE (category, name)
 );
+
+CREATE TABLE IF NOT EXISTS users
+(
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username      VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    name          VARCHAR(255) NOT NULL,
+    email         VARCHAR(255) UNIQUE,
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS user_permissions
+(
+    id                       BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id                  BIGINT  NOT NULL,
+    permission_upload        BOOLEAN NOT NULL DEFAULT FALSE,
+    permission_download      BOOLEAN NOT NULL DEFAULT FALSE,
+    permission_edit_metadata BOOLEAN NOT NULL DEFAULT FALSE,
+    permission_admin         BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT fk_user_permissions_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_user_permissions_user ON user_permissions (user_id);

@@ -113,4 +113,9 @@ export class AppTopBarComponent implements OnDestroy {
   navigateToSettings() {
     this.router.navigate(['/settings']);
   }
+
+  logout() {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+  }
 }

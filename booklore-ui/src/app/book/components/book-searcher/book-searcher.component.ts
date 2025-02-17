@@ -6,11 +6,10 @@ import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {BookService} from '../../service/book.service';
 import {Button} from 'primeng/button';
-import {AsyncPipe, NgForOf, NgIf, SlicePipe} from '@angular/common';
+import {NgForOf, NgIf, SlicePipe} from '@angular/common';
 import {MetadataDialogService} from '../../../metadata/service/metadata-dialog.service';
 import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
-import {SecurePipe} from '../../../secure-pipe';
 
 @Component({
   selector: 'app-book-searcher',
@@ -22,9 +21,7 @@ import {SecurePipe} from '../../../secure-pipe';
     NgIf,
     NgForOf,
     SlicePipe,
-    Divider,
-    AsyncPipe,
-    SecurePipe
+    Divider
   ],
   styleUrls: ['./book-searcher.component.scss'],
   standalone: true

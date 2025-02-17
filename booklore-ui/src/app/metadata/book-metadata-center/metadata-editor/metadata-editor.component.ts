@@ -14,7 +14,6 @@ import {FileUpload, FileUploadErrorEvent, FileUploadEvent} from 'primeng/fileupl
 import {HttpResponse} from '@angular/common/http';
 import {BookService} from '../../../book/service/book.service';
 import {ProgressSpinner} from 'primeng/progressspinner';
-import {SecurePipe} from '../../../secure-pipe';
 
 @Component({
   selector: 'app-metadata-editor',
@@ -32,8 +31,7 @@ import {SecurePipe} from '../../../secure-pipe';
     ReactiveFormsModule,
     FileUpload,
     ProgressSpinner,
-    NgClass,
-    SecurePipe
+    NgClass
   ]
 })
 export class MetadataEditorComponent implements OnInit {

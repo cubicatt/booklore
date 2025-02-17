@@ -13,15 +13,14 @@ import {MetadataFetchOptionsComponent} from '../../../../metadata/metadata-optio
 import {MetadataRefreshType} from '../../../../metadata/model/request/metadata-refresh-type.enum';
 import {MetadataRefreshRequest} from '../../../../metadata/model/request/metadata-refresh-request.model';
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
-import {AsyncPipe, NgIf} from '@angular/common';
-import {SecurePipe} from '../../../../secure-pipe';
+import {NgIf} from '@angular/common';
 import {UserService} from '../../../../user.service';
 
 @Component({
   selector: 'app-book-card',
   templateUrl: './book-card.component.html',
   styleUrls: ['./book-card.component.scss'],
-  imports: [Button, MenuModule, CheckboxModule, FormsModule, NgIf, SecurePipe, AsyncPipe],
+  imports: [Button, MenuModule, CheckboxModule, FormsModule, NgIf],
   standalone: true
 })
 export class BookCardComponent implements OnInit {

@@ -1,6 +1,7 @@
 package com.adityachandel.booklore.config.security;
 
 import lombok.AllArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -49,7 +50,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200")); // Allow frontend origin
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
         configuration.setExposedHeaders(List.of("Content-Disposition"));
@@ -58,5 +59,13 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public FilterRegistrationBean<ImageCachingFilter> loggingFilter() {
+        FilterRegistrationBean<ImageCachingFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new ImageCachingFilter());
+        registrationBean.addUrlPatterns("/api/v1/books/*/cover");
+        return registrationBean;
     }
 }

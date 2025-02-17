@@ -19,6 +19,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,10 +98,25 @@ public class BooksService {
 
     @Transactional
     public List<Book> assignShelvesToBooks(Set<Long> bookIds, Set<Long> shelfIdsToAssign, Set<Long> shelfIdsToUnassign) {
+        BookLoreUser user = authenticationService.getAuthenticatedUser();
+        BookLoreUserEntity userEntity = userRepository.findById(user.getId()).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(user.getId()));
+
+        Set<Long> userShelfIds = userEntity.getShelves().stream()
+                .map(ShelfEntity::getId)
+                .collect(Collectors.toSet());
+
+        if (!userShelfIds.containsAll(shelfIdsToAssign)) {
+            throw ApiError.UNAUTHORIZED.createException("Cannot assign shelves that do not belong to the user.");
+        }
+        if (!userShelfIds.containsAll(shelfIdsToUnassign)) {
+            throw ApiError.UNAUTHORIZED.createException("Cannot unassign shelves that do not belong to the user.");
+        }
+
         List<BookEntity> bookEntities = bookRepository.findAllById(bookIds);
         List<ShelfEntity> shelvesToAssign = shelfRepository.findAllById(shelfIdsToAssign);
         for (BookEntity bookEntity : bookEntities) {
             bookEntity.getShelves().removeIf(shelf -> shelfIdsToUnassign.contains(shelf.getId()));
+
             for (ShelfEntity shelf : shelvesToAssign) {
                 if (!bookEntity.getShelves().contains(shelf)) {
                     bookEntity.getShelves().add(shelf);

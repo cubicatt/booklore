@@ -15,6 +15,7 @@ import {MetadataRefreshRequest} from '../../../../metadata/model/request/metadat
 import {UrlHelperService} from '../../../../utilities/service/url-helper.service';
 import {NgIf} from '@angular/common';
 import {UserService} from '../../../../user.service';
+import {filter} from 'rxjs';
 
 @Component({
   selector: 'app-book-card',
@@ -41,10 +42,12 @@ export class BookCardComponent implements OnInit {
   private userPermissions: any;
 
   ngOnInit(): void {
-    this.initMenu();
-    this.userService.userData$.subscribe((userData) => {
-      this.userPermissions = userData?.permissions;
-    });
+    this.userService.userData$
+      .pipe(filter(userData => !!userData))
+      .subscribe((userData) => {
+        this.userPermissions = userData.permissions;
+        this.initMenu();
+      });
   }
 
   readBook(book: Book): void {
@@ -75,52 +78,63 @@ export class BookCardComponent implements OnInit {
             icon: 'pi pi-info-circle',
             command: () => this.metadataDialogService.openBookMetadataCenterDialog(this.book.id, 'view'),
           },
-          {
-            label: 'Match Book',
-            icon: 'pi pi-sparkles',
-            command: () => this.metadataDialogService.openBookMetadataCenterDialog(this.book.id, 'match'),
-            disabled: !this.hasEditMetadataPermission()
-          },
-          {
-            label: 'Quick Refresh',
-            icon: 'pi pi-bolt',
-            command: () => {
-              const metadataRefreshRequest: MetadataRefreshRequest = {
-                quick: true,
-                refreshType: MetadataRefreshType.BOOKS,
-                bookIds: [this.book.id],
-              };
-              this.bookService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
-            },
-            disabled: !this.hasEditMetadataPermission()
-          },
-          {
-            label: 'Granular Refresh',
-            icon: 'pi pi-database',
-            command: () => {
-              this.dialogService.open(MetadataFetchOptionsComponent, {
-                header: 'Metadata Refresh Options',
-                modal: true,
-                closable: true,
-                data: {
-                  bookIds: [this.book!.id],
-                  metadataRefreshType: MetadataRefreshType.BOOKS,
-                },
-              });
-            },
-            disabled: !this.hasEditMetadataPermission()
-          },
-          {
-            label: 'Download',
-            icon: 'pi pi-download',
-            command: () => {
-              this.bookService.downloadFile(this.book.id);
-            },
-            disabled: !this.hasDownloadPermission()
-          },
+          ...this.getPermissionBasedMenuItems(),
         ],
       },
     ];
+  }
+
+  private getPermissionBasedMenuItems(): MenuItem[] {
+    const items: MenuItem[] = [];
+
+    if (this.hasEditMetadataPermission()) {
+      items.push(
+        {
+          label: 'Match Book',
+          icon: 'pi pi-sparkles',
+          command: () => this.metadataDialogService.openBookMetadataCenterDialog(this.book.id, 'match'),
+        },
+        {
+          label: 'Quick Refresh',
+          icon: 'pi pi-bolt',
+          command: () => {
+            const metadataRefreshRequest: MetadataRefreshRequest = {
+              quick: true,
+              refreshType: MetadataRefreshType.BOOKS,
+              bookIds: [this.book.id],
+            };
+            this.bookService.autoRefreshMetadata(metadataRefreshRequest).subscribe();
+          },
+        },
+        {
+          label: 'Granular Refresh',
+          icon: 'pi pi-database',
+          command: () => {
+            this.dialogService.open(MetadataFetchOptionsComponent, {
+              header: 'Metadata Refresh Options',
+              modal: true,
+              closable: true,
+              data: {
+                bookIds: [this.book!.id],
+                metadataRefreshType: MetadataRefreshType.BOOKS,
+              },
+            });
+          },
+        }
+      );
+    }
+
+    if (this.hasDownloadPermission()) {
+      items.push({
+        label: 'Download',
+        icon: 'pi pi-download',
+        command: () => {
+          this.bookService.downloadFile(this.book.id);
+        },
+      });
+    }
+
+    return items;
   }
 
   private openShelfDialog(): void {

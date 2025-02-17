@@ -97,68 +97,18 @@ public class BooksService {
 
     @Transactional
     public List<Book> assignShelvesToBooks(Set<Long> bookIds, Set<Long> shelfIdsToAssign, Set<Long> shelfIdsToUnassign) {
-        BookLoreUser user = authenticationService.getAuthenticatedUser();
-        Optional<BookLoreUserEntity> bookLoreUserEntity = userRepository.findById(user.getId());
-
-        if (bookLoreUserEntity.isEmpty()) {
-            throw ApiError.USER_NOT_FOUND.createException(user.getId());
-        }
-
-        // Fetch books by their IDs
         List<BookEntity> bookEntities = bookRepository.findAllById(bookIds);
-
-        // Fetch shelves to assign and unassign
         List<ShelfEntity> shelvesToAssign = shelfRepository.findAllById(shelfIdsToAssign);
-        List<ShelfEntity> shelvesToUnassign = shelfRepository.findAllById(shelfIdsToUnassign);
-
-        // Validate that the shelves belong to the authenticated user
-        validateShelfOwnership(shelvesToAssign, user);
-        validateShelfOwnership(shelvesToUnassign, user);
-
-        // Explicitly set user on the shelves
-        shelvesToAssign.forEach(shelf -> {
-            if (shelf.getUser() == null) {
-                shelf.setUser(bookLoreUserEntity.get());
-            }
-        });
-        shelvesToUnassign.forEach(shelf -> {
-            if (shelf.getUser() == null) {
-                shelf.setUser(bookLoreUserEntity.get());
-            }
-        });
-
-        // Ensure user_id is correctly set on book_shelf_mapping table by setting user_id explicitly when managing many-to-many relationships
         for (BookEntity bookEntity : bookEntities) {
-            // Unassign shelves
             bookEntity.getShelves().removeIf(shelf -> shelfIdsToUnassign.contains(shelf.getId()));
-            shelvesToUnassign.forEach(shelf -> shelf.getBookEntities().remove(bookEntity));
-
-            // Assign new shelves and add user_id
-            shelvesToAssign.forEach(shelf -> {
+            for (ShelfEntity shelf : shelvesToAssign) {
                 if (!bookEntity.getShelves().contains(shelf)) {
                     bookEntity.getShelves().add(shelf);
                 }
-                if (!shelf.getBookEntities().contains(bookEntity)) {
-                    shelf.getBookEntities().add(bookEntity);
-                }
-
-                // Ensure the user_id is set correctly in the relationship table
-                bookRepository.save(bookEntity);
-                shelfRepository.save(shelf); // Explicit save after associating user
-            });
-        }
-
-        // Return the updated books
-        return bookEntities.stream().map(bookMapper::toBook).collect(Collectors.toList());
-    }
-
-    @Transactional
-    protected void validateShelfOwnership(List<ShelfEntity> shelves, BookLoreUser user) {
-        for (ShelfEntity shelf : shelves) {
-            if (!shelf.getUser().getId().equals(user.getId())) {
-                throw ApiError.UNAUTHORIZED.createException("You are not authorized to modify the shelf: " + shelf.getName());
             }
         }
+        bookRepository.saveAll(bookEntities);
+        return bookEntities.stream().map(bookMapper::toBook).collect(Collectors.toList());
     }
 
     public Resource getBookCover(long bookId) {

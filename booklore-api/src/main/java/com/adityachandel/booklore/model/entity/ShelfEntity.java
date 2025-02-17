@@ -14,10 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(
-        name = "shelf",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "name"})
-)
+@Table(name = "shelf")
 public class ShelfEntity {
 
     @Id

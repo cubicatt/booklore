@@ -54,7 +54,7 @@ export class UserService {
   fetchUser(userId: number): void {
     this.http.get<User>(`${this.userUrl}/${userId}`).subscribe(user => {
       this.userDataSubject.next(user);
-      this.startWebSocket();  // Start WebSocket after user data is loaded
+      this.startWebSocket();
     });
   }
 

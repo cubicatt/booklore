@@ -11,7 +11,7 @@ export interface User {
   name: string;
   email: string;
   permissions: {
-    isAdmin: boolean;
+    admin: boolean;
     canUpload: boolean;
     canDownload: boolean;
     canEditMetadata: boolean;

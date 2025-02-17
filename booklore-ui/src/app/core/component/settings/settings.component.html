@@ -2,17 +2,16 @@
   <p-tabs value="0">
     <p-tablist>
       <p-tab value="0">Book Preferences</p-tab>
-      <ng-container *ngIf="userData.permissions.isAdmin">
+      <ng-container *ngIf="userData.permissions.admin">
         <p-tab value="1">Admin</p-tab>
       </ng-container>
-
     </p-tablist>
 
     <p-tabpanels>
       <p-tabpanel value="0">
         <app-book-preferences></app-book-preferences>
       </p-tabpanel>
-      <ng-container *ngIf="userData.permissions.isAdmin">
+      <ng-container *ngIf="userData.permissions.admin">
         <p-tabpanel value="1">
           <app-admin></app-admin>
         </p-tabpanel>

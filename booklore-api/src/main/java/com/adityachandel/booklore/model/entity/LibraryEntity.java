@@ -31,6 +31,9 @@ public class LibraryEntity {
     @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<LibraryPathEntity> libraryPaths;
 
+    @ManyToMany(mappedBy = "libraries")
+    private List<BookLoreUserEntity> users;
+
     private boolean watch;
 
     private String icon;

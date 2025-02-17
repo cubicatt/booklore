@@ -1,6 +1,7 @@
 package com.adityachandel.booklore.repository;
 
 import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.entity.LibraryPathEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpecificationExecutor<BookEntity> {
@@ -29,14 +31,16 @@ public interface BookRepository extends JpaRepository<BookEntity, Long>, JpaSpec
 
     Optional<BookEntity> findBookByFileNameAndLibraryId(String fileName, long libraryId);
 
-    @Query("SELECT b FROM BookEntity b JOIN b.metadata bm WHERE LOWER(bm.title) LIKE LOWER(CONCAT('%', :title, '%'))")
-    List<BookEntity> findByTitleContainingIgnoreCase(@Param("title") String title);
-
     @Query("SELECT b FROM BookEntity b JOIN b.shelves s WHERE s.id = :shelfId")
     List<BookEntity> findByShelfId(@Param("shelfId") Long shelfId);
 
     @Modifying
     @Query("DELETE FROM BookEntity b WHERE b.id IN (:ids)")
     void deleteByIdIn(Collection<Long> ids);
+
+    @Query("SELECT b FROM BookEntity b WHERE b.library IN (SELECT l FROM LibraryEntity l WHERE l IN :userLibraries)")
+    List<BookEntity> findBooksByUserLibraries(@Param("userLibraries") List<LibraryEntity> userLibraries);
+
+    List<BookEntity> findByLibraryIdIn(Set<Long> userLibraryIds);
 }
 

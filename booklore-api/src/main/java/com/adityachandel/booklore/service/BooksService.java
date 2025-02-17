@@ -97,8 +97,29 @@ public class BooksService {
     }
 
     public List<Book> getBooks(boolean withDescription) {
-        return bookRepository.findAll().stream()
-                .map(bookEntity -> bookMapper.toBookWithDescription(bookEntity, withDescription))
+        BookLoreUser user = authenticationService.getAuthenticatedUser();
+        BookLoreUserEntity userEntity = userRepository.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        List<BookEntity> books;
+        if (userEntity.getPermissions().isPermissionAdmin()) {
+            books = bookRepository.findAll();
+        } else {
+            Set<Long> userLibraryIds = userEntity.getLibraries().stream()
+                    .map(LibraryEntity::getId)
+                    .collect(Collectors.toSet());
+            books = bookRepository.findByLibraryIdIn(userLibraryIds);
+        }
+
+        return books.stream()
+                .map(bookEntity -> {
+                    UserBookProgressEntity userProgress = userBookProgressRepository.findByUserIdAndBookId(user.getId(), bookEntity.getId())
+                            .orElse(new UserBookProgressEntity());
+                    Book book = bookMapper.toBookWithDescription(bookEntity, withDescription);
+                    book.setLastReadTime(userProgress.getLastReadTime());
+                    book.setPdfProgress(userProgress.getPdfProgress());
+                    book.setEpubProgress(userProgress.getEpubProgress());
+                    return book;
+                })
                 .collect(Collectors.toList());
     }
 

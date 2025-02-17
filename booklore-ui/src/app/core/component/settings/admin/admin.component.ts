@@ -8,23 +8,37 @@ import {NgIf, NgStyle} from '@angular/common';
 import {User, UserService} from '../../../../user.service';
 import {MessageService} from 'primeng/api';
 import {Checkbox} from 'primeng/checkbox';
+import {MultiSelect} from 'primeng/multiselect';
+import {Library} from '../../../../book/model/library.model';
+import {LibraryService} from '../../../../book/service/library.service';
 
 @Component({
   selector: 'app-admin',
-  imports: [FormsModule, Button, TableModule, NgIf, Checkbox, NgStyle],
+  imports: [FormsModule, Button, TableModule, NgIf, Checkbox, NgStyle, MultiSelect],
   templateUrl: './admin.component.html',
-  styleUrl: './admin.component.scss',
+  styleUrls: ['./admin.component.scss'],
 })
 export class AdminComponent implements OnInit {
   ref: DynamicDialogRef | undefined;
   private dialogService = inject(DialogService);
   private userService = inject(UserService);
+  private libraryService = inject(LibraryService);
   private messageService = inject(MessageService);
 
-  users: any[] = [];
+  users: User[] = [];
+  editingLibraryIds: number[] = [];
+  allLibraries: Library[] = [];
 
   ngOnInit() {
     this.loadUsers();
+    this.libraryService.getAllLibrariesFromAPI().subscribe({
+      next: (libraries) => {
+        this.allLibraries = libraries;
+      },
+      error: () => {
+        this.messageService.add({severity: 'error', summary: 'Error', detail: 'Failed to load libraries'});
+      }
+    });
   }
 
   loadUsers() {
@@ -33,6 +47,8 @@ export class AdminComponent implements OnInit {
         this.users = data.map(user => ({
           ...user,
           isEditing: false,
+          selectedLibraryIds: user.assignedLibraries?.map(lib => lib.id) || [],
+          libraryNames: user.assignedLibraries?.map(lib => lib.name).join(', ') || ''
         }));
       },
       error: () => {
@@ -57,19 +73,24 @@ export class AdminComponent implements OnInit {
 
   toggleEdit(user: any) {
     user.isEditing = !user.isEditing;
-    if (!user.isEditing) {
-      this.loadUsers();
+    if (user.isEditing) {
+      this.editingLibraryIds = [...user.selectedLibraryIds];
+    } else {
+      user.libraryNames = user.assignedLibraries?.map((lib: Library) => lib.name).join(', ') || '';
     }
   }
 
   saveUser(user: any) {
+    user.selectedLibraryIds = [...this.editingLibraryIds];
     this.userService.updateUser(user.id, {
       name: user.name,
       email: user.email,
       permissions: user.permissions,
+      assignedLibraries: user.selectedLibraryIds
     }).subscribe({
       next: () => {
         user.isEditing = false;
+        this.loadUsers();
         this.messageService.add({severity: 'success', summary: 'Success', detail: 'User updated successfully'});
       },
       error: () => {

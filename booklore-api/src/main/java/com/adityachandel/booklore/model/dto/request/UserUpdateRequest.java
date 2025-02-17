@@ -2,11 +2,14 @@ package com.adityachandel.booklore.model.dto.request;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class UserUpdateRequest {
     private String name;
     private String email;
     private Permissions permissions;
+    private List<Long> assignedLibraries;
 
     @Data
     public static class Permissions {

@@ -7,6 +7,7 @@
         <th>Username</th>
         <th>Full Name</th>
         <th>Email</th>
+        <th>Assigned Libraries</th>
         <th style="width: 100px;">Can Upload</th>
         <th style="width: 100px;">Can Download</th>
         <th style="width: 100px;">Can Edit Metadata</th>
@@ -25,6 +26,20 @@
         <td>
           <input *ngIf="user.isEditing" type="email" [(ngModel)]="user.email" class="p-inputtext w-full"/>
           <span *ngIf="!user.isEditing">{{ user.email }}</span>
+        </td>
+        <td>
+          <p-multiSelect
+            *ngIf="user.isEditing"
+            [options]="allLibraries"
+            optionLabel="name"
+            optionValue="id"
+            [(ngModel)]="editingLibraryIds"
+            placeholder="Select Libraries"
+            appendTo="body">
+          </p-multiSelect>
+          <span *ngIf="!user.isEditing">
+            {{ user.libraryNames }}
+          </span>
         </td>
         <td class="text-center">
           <p-checkbox [binary]="true" [(ngModel)]="user.permissions.canUpload" *ngIf="user.isEditing"></p-checkbox>

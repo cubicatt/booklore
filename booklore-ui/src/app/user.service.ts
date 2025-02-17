@@ -4,12 +4,14 @@ import {BehaviorSubject, Observable} from 'rxjs';
 import {API_CONFIG} from './config/api-config';
 import {jwtDecode} from 'jwt-decode';
 import {RxStompService} from './shared/websocket/rx-stomp.service';
+import {Library} from './book/model/library.model';
 
 export interface User {
   id: number;
   username: string;
   name: string;
   email: string;
+  assignedLibraries: Library[];
   permissions: {
     admin: boolean;
     canUpload: boolean;

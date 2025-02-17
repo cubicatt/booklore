@@ -2,6 +2,8 @@ package com.adityachandel.booklore.model.dto;
 
 import lombok.Data;
 
+import java.util.Set;
+
 @Data
 public class UserCreateRequest {
     private String username;
@@ -13,4 +15,6 @@ public class UserCreateRequest {
     private boolean permissionDownload;
     private boolean permissionEditMetadata;
     private boolean permissionManipulateLibrary;
+
+    private Set<Long> selectedLibraries;
 }

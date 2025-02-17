@@ -2,12 +2,15 @@ package com.adityachandel.booklore.model.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class BookLoreUser {
     private Long id;
     private String username;
     private String name;
     private String email;
+    private List<Library> assignedLibraries;
     private UserPermissions permissions;
 
     @Data

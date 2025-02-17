@@ -4,16 +4,19 @@ import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.mapper.LibraryMapper;
 import com.adityachandel.booklore.model.dto.Book;
+import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.model.dto.Library;
 import com.adityachandel.booklore.model.dto.LibraryPath;
 import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
 import com.adityachandel.booklore.model.entity.BookEntity;
+import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.entity.LibraryPathEntity;
 import com.adityachandel.booklore.model.websocket.Topic;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.LibraryPathRepository;
 import com.adityachandel.booklore.repository.LibraryRepository;
+import com.adityachandel.booklore.repository.UserRepository;
 import com.adityachandel.booklore.service.fileprocessor.FileProcessingUtils;
 import com.adityachandel.booklore.service.monitoring.MonitoringService;
 import jakarta.annotation.PostConstruct;
@@ -21,6 +24,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -45,6 +49,8 @@ public class LibraryService {
     private final NotificationService notificationService;
     private final FileProcessingUtils fileProcessingUtils;
     private final MonitoringService monitoringService;
+    private final AuthenticationService authenticationService;
+    private final UserRepository userRepository;
 
     @Transactional
     @PostConstruct
@@ -188,7 +194,15 @@ public class LibraryService {
     }
 
     public List<Library> getLibraries() {
-        List<LibraryEntity> libraries = libraryRepository.findAll();
+        BookLoreUser user = authenticationService.getAuthenticatedUser();
+        BookLoreUserEntity userEntity = userRepository.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        List<LibraryEntity> libraries;
+        if (userEntity.getPermissions().isPermissionAdmin()) {
+            libraries = libraryRepository.findAll();
+        } else {
+            List<Long> libraryIds = userEntity.getLibraries().stream().map(LibraryEntity::getId).toList();
+            libraries = libraryRepository.findByIdIn(libraryIds);
+        }
         return libraries.stream().map(libraryMapper::toLibrary).toList();
     }
 

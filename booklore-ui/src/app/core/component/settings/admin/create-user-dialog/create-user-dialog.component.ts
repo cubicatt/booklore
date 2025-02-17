@@ -61,7 +61,10 @@ export class CreateUserDialogComponent implements OnInit {
       return;
     }
 
-    const userData = this.userForm.value;
+    const userData = {
+      ...this.userForm.value,
+      selectedLibraries: this.userForm.value.selectedLibraries.map((lib: Library) => lib.id)
+    };
 
     this.userService.createUser(userData).subscribe({
       next: response => {

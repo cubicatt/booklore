@@ -8,8 +8,11 @@ import com.adityachandel.booklore.model.dto.UserCreateRequest;
 import com.adityachandel.booklore.model.dto.request.UserLoginRequest;
 import com.adityachandel.booklore.model.dto.request.UserUpdateRequest;
 import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
+import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.entity.UserPermissionsEntity;
+import com.adityachandel.booklore.repository.LibraryRepository;
 import com.adityachandel.booklore.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,8 +31,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final BookLoreUserMapper bookLoreUserMapper;
     private final PasswordEncoder passwordEncoder;
+    private final LibraryRepository libraryRepository;
     private final JwtUtils jwtUtils;
 
+    @Transactional
     public ResponseEntity<Map<String, String>> registerUser(UserCreateRequest request) {
         Optional<BookLoreUserEntity> existingUser = userRepository.findByUsername(request.getUsername());
         if (existingUser.isPresent()) {
@@ -50,9 +52,13 @@ public class UserService {
         permissions.setPermissionUpload(request.isPermissionUpload());
         permissions.setPermissionDownload(request.isPermissionDownload());
         permissions.setPermissionEditMetadata(request.isPermissionEditMetadata());
-        permissions.setPermissionEditMetadata(request.isPermissionManipulateLibrary());
-
+        permissions.setPermissionManipulateLibrary(request.isPermissionManipulateLibrary());
         bookLoreUserEntity.setPermissions(permissions);
+
+        if (request.getSelectedLibraries() != null && !request.getSelectedLibraries().isEmpty()) {
+            List<LibraryEntity> libraries = libraryRepository.findAllById(request.getSelectedLibraries());
+            bookLoreUserEntity.setLibraries(new ArrayList<>(libraries));
+        }
 
         userRepository.save(bookLoreUserEntity);
 
@@ -84,11 +90,19 @@ public class UserService {
 
     public BookLoreUser updateUser(Long id, UserUpdateRequest updateRequest) {
         BookLoreUserEntity user = userRepository.findById(id).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(id));
+
         user.setName(updateRequest.getName());
         user.setEmail(updateRequest.getEmail());
         user.getPermissions().setPermissionUpload(updateRequest.getPermissions().isCanUpload());
         user.getPermissions().setPermissionDownload(updateRequest.getPermissions().isCanDownload());
         user.getPermissions().setPermissionEditMetadata(updateRequest.getPermissions().isCanEditMetadata());
+
+        List<Long> libraryIds = updateRequest.getAssignedLibraries();
+        if (libraryIds != null) {
+            List<LibraryEntity> updatedLibraries = libraryRepository.findAllById(libraryIds);
+            user.setLibraries(updatedLibraries);
+        }
+
         userRepository.save(user);
         return bookLoreUserMapper.toDto(user);
     }

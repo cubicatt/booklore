@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -43,6 +44,14 @@ public class BookLoreUserEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<ShelfEntity> shelves = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_library_mapping",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "library_id")
+    )
+    private List<LibraryEntity> libraries;
 
     @PrePersist
     public void prePersist() {

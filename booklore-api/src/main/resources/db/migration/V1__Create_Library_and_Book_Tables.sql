@@ -207,3 +207,13 @@ CREATE TABLE IF NOT EXISTS user_book_progress
 
 CREATE INDEX IF NOT EXISTS idx_user_book_progress_user ON user_book_progress (user_id);
 CREATE INDEX IF NOT EXISTS idx_user_book_progress_book ON user_book_progress (book_id);
+
+
+CREATE TABLE IF NOT EXISTS user_library_mapping
+(
+    user_id    BIGINT NOT NULL,
+    library_id BIGINT NOT NULL,
+    PRIMARY KEY (user_id, library_id),
+    CONSTRAINT fk_user_library_mapping_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_library_mapping_library FOREIGN KEY (library_id) REFERENCES library (id) ON DELETE CASCADE
+);

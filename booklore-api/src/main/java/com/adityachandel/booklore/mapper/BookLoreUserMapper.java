@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 public interface BookLoreUserMapper {
 
     @Mapping(source = "permissions", target = "permissions")
+    @Mapping(source = "libraries", target = "assignedLibraries")
     BookLoreUser toDto(BookLoreUserEntity entity);
 
     default BookLoreUser.UserPermissions mapPermissions(UserPermissionsEntity permissions) {
@@ -21,7 +22,6 @@ public interface BookLoreUserMapper {
         dto.setCanUpload(permissions.isPermissionUpload());
         dto.setCanDownload(permissions.isPermissionDownload());
         dto.setCanManipulateLibrary(permissions.isPermissionManipulateLibrary());
-        dto.setCanEditMetadata(permissions.isPermissionEditMetadata());
         dto.setCanEditMetadata(permissions.isPermissionEditMetadata());
         return dto;
     }

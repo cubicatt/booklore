@@ -46,17 +46,8 @@ public class BookEntity {
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private EpubViewerPreferencesEntity epubViewerPrefs;
 
-    @Column(name = "last_read_time")
-    private Instant lastReadTime;
-
     @Column(name = "added_on")
     private Instant addedOn;
-
-    @Column(name = "epub_progress")
-    private String epubProgress;
-
-    @Column(name = "pdf_progress")
-    private Integer pdfProgress;
 
     @ManyToMany
     @JoinTable(

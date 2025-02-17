@@ -45,6 +45,7 @@ public class BooksService {
     private final FileService fileService;
     private final BookMapper bookMapper;
     private final UserRepository userRepository;
+    private final UserBookProgressRepository userBookProgressRepository;
     private final AuthenticationService authenticationService;
     private final PdfViewerPreferencesMapper pdfViewerPreferencesMapper;
     private final EpubViewerPreferencesMapper epubViewerPreferencesMapper;
@@ -82,8 +83,13 @@ public class BooksService {
     }
 
     public Book getBook(long bookId, boolean withDescription) {
+        BookLoreUser user = authenticationService.getAuthenticatedUser();
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        UserBookProgressEntity userProgress = userBookProgressRepository.findByUserIdAndBookId(user.getId(), bookId).orElse(new UserBookProgressEntity());
         Book book = bookMapper.toBook(bookEntity);
+        book.setLastReadTime(userProgress.getLastReadTime());
+        book.setPdfProgress(userProgress.getPdfProgress());
+        book.setEpubProgress(userProgress.getEpubProgress());
         if (!withDescription) {
             book.getMetadata().setDescription(null);
         }
@@ -132,15 +138,20 @@ public class BooksService {
         return fileService.getBookCover(bookEntity.getMetadata().getThumbnail());
     }
 
+    @Transactional
     public void updateReadProgress(ReadProgressRequest request) {
         BookEntity book = bookRepository.findById(request.getBookId()).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(request.getBookId()));
-        book.setLastReadTime(Instant.now());
-        if (book.getBookType() == BookFileType.EPUB) {
-            book.setEpubProgress(request.getEpubProgress());
-        } else if (book.getBookType() == BookFileType.PDF) {
-            book.setPdfProgress(request.getPdfProgress());
+        BookLoreUser user = authenticationService.getAuthenticatedUser();
+        UserBookProgressEntity userBookProgress = userBookProgressRepository.findByUserIdAndBookId(user.getId(), book.getId()).orElse(new UserBookProgressEntity());
+        userBookProgress.setUser(userRepository.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("User not found")));
+        userBookProgress.setBook(book);
+        userBookProgress.setLastReadTime(Instant.now());
+        if (book.getBookType() == BookFileType.EPUB && request.getEpubProgress() != null) {
+            userBookProgress.setEpubProgress(request.getEpubProgress());
+        } else if (book.getBookType() == BookFileType.PDF && request.getPdfProgress() != null) {
+            userBookProgress.setPdfProgress(request.getPdfProgress());
         }
-        bookRepository.save(book);
+        userBookProgressRepository.save(userBookProgress);
     }
 
     public ResponseEntity<Resource> downloadBook(Long bookId) {

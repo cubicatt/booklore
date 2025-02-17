@@ -18,15 +18,12 @@ CREATE TABLE IF NOT EXISTS library_path
 CREATE TABLE IF NOT EXISTS book
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
-    file_name       VARCHAR(255)  NOT NULL,
-    file_sub_path   VARCHAR(512)  NOT NULL,
-    book_type       VARCHAR(6)    NOT NULL,
-    library_id      BIGINT        NOT NULL,
-    library_path_id BIGINT        NOT NULL,
+    file_name       VARCHAR(255) NOT NULL,
+    file_sub_path   VARCHAR(512) NOT NULL,
+    book_type       VARCHAR(6)   NOT NULL,
+    library_id      BIGINT       NOT NULL,
+    library_path_id BIGINT       NOT NULL,
     added_on        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_read_time  TIMESTAMP     NULL,
-    pdf_progress    INT           NULL,
-    epub_progress   VARCHAR(1000) NULL,
 
     CONSTRAINT fk_library FOREIGN KEY (library_id) REFERENCES library (id) ON DELETE CASCADE,
     CONSTRAINT fk_library_path_id FOREIGN KEY (library_path_id) REFERENCES library_path (id) ON DELETE CASCADE,
@@ -34,7 +31,6 @@ CREATE TABLE IF NOT EXISTS book
 );
 
 CREATE INDEX IF NOT EXISTS idx_library_id ON book (library_id);
-CREATE INDEX IF NOT EXISTS idx_last_read_time ON book (last_read_time);
 
 CREATE TABLE IF NOT EXISTS book_metadata
 (
@@ -195,3 +191,19 @@ CREATE TABLE app_settings
     val      TEXT         NOT NULL,
     UNIQUE (category, name)
 );
+
+CREATE TABLE IF NOT EXISTS user_book_progress
+(
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id        BIGINT        NOT NULL,
+    book_id        BIGINT        NOT NULL,
+    last_read_time TIMESTAMP     NULL,
+    pdf_progress   INT           NULL,
+    epub_progress  VARCHAR(1000) NULL,
+    CONSTRAINT fk_user_book_progress_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_book_progress_book FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE,
+    CONSTRAINT unique_user_book_progress UNIQUE (user_id, book_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_book_progress_user ON user_book_progress (user_id);
+CREATE INDEX IF NOT EXISTS idx_user_book_progress_book ON user_book_progress (book_id);

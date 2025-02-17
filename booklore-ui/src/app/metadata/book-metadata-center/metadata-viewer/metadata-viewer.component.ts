@@ -10,6 +10,7 @@ import {Tag} from 'primeng/tag';
 import {BookMetadata} from '../../../book/model/book.model';
 import {Divider} from 'primeng/divider';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
+import {UserService} from '../../../user.service';
 
 @Component({
   selector: 'app-metadata-viewer',
@@ -23,6 +24,7 @@ export class MetadataViewerComponent {
   private bookService = inject(BookService);
   private metadataCenterService = inject(BookMetadataCenterService);
   protected urlHelper = inject(UrlHelperService);
+  protected userService = inject(UserService);
 
   metadata$: Observable<BookMetadata | null> = this.metadataCenterService.currentMetadata$;
 

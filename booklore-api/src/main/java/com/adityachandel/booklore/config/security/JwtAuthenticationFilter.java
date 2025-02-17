@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.config.security;
 
+import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
 import com.adityachandel.booklore.model.entity.UserPermissionsEntity;
 import com.adityachandel.booklore.repository.UserRepository;
@@ -8,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,18 +36,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-
         String token = getJwtFromRequest(request);
-
         if (token != null && jwtUtils.validateToken(token)) {
-            String username = jwtUtils.extractUsername(token);
-            BookLoreUserEntity bookLoreUserEntity = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            Long userId = jwtUtils.extractUserId(token);
+            BookLoreUserEntity bookLoreUserEntity = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            BookLoreUser bookLoreUser = mapToDTO(bookLoreUserEntity);
             List<GrantedAuthority> authorities = getAuthorities(bookLoreUserEntity.getPermissions());
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(bookLoreUser, null, authorities);
+            authentication.setDetails(new UserAuthenticationDetails(request, bookLoreUser.getId()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-
         chain.doFilter(request, response);
     }
 
@@ -75,5 +75,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         }
         return authorities;
+    }
+
+    private BookLoreUser mapToDTO(BookLoreUserEntity userEntity) {
+        BookLoreUser.UserPermissions permissions = new BookLoreUser.UserPermissions();
+        permissions.setAdmin(userEntity.getPermissions().isPermissionAdmin());
+        permissions.setCanUpload(userEntity.getPermissions().isPermissionUpload());
+        permissions.setCanDownload(userEntity.getPermissions().isPermissionDownload());
+        permissions.setCanEditMetadata(userEntity.getPermissions().isPermissionEditMetadata());
+        permissions.setCanManipulateLibrary(userEntity.getPermissions().isPermissionManipulateLibrary());
+
+        BookLoreUser bookLoreUser = new BookLoreUser();
+        bookLoreUser.setId(userEntity.getId());
+        bookLoreUser.setUsername(userEntity.getUsername());
+        bookLoreUser.setName(userEntity.getName());
+        bookLoreUser.setEmail(userEntity.getEmail());
+        bookLoreUser.setPermissions(permissions);
+
+        return bookLoreUser;
     }
 }

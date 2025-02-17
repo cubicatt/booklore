@@ -30,7 +30,7 @@ public enum ApiError {
     USERNAME_ALREADY_TAKEN(HttpStatus.BAD_REQUEST, "Username already taken: %s"),
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "User not found: %s"),
     CANNOT_DELETE_ADMIN(HttpStatus.FORBIDDEN, "Admin user cannot be deleted"),
-    UNAUTHORIZED(HttpStatus.FORBIDDEN, "You do not have permission to perform this action"),
+    UNAUTHORIZED(HttpStatus.FORBIDDEN, "%s"),
     INVALID_CREDENTIALS(HttpStatus.BAD_REQUEST, "Invalid credentials");
 
     private final HttpStatus status;

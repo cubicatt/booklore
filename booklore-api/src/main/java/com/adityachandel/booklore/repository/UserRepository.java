@@ -11,5 +11,5 @@ public interface UserRepository extends JpaRepository<BookLoreUserEntity, Long> 
 
     Optional<BookLoreUserEntity> findByUsername(String username);
 
-    Optional<BookLoreUserEntity> findByEmail(String email);
+    Optional<BookLoreUserEntity> findById(Long id);
 }

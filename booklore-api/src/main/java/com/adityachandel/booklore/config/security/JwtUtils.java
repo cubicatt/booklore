@@ -53,6 +53,16 @@ public class JwtUtils {
         return extractClaims(token).getSubject();
     }
 
+    public Long extractUserId(String token) {
+        Object userIdClaim = extractClaims(token).get("userId");
+        if (userIdClaim instanceof Integer) {
+            return ((Integer) userIdClaim).longValue();
+        } else if (userIdClaim instanceof Long) {
+            return (Long) userIdClaim;
+        }
+        throw new IllegalArgumentException("userId claim is not of type Long or Integer");
+    }
+
     private boolean isTokenExpired(String token) {
         return extractClaims(token).getExpiration().before(new Date());
     }

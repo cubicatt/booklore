@@ -1,7 +1,3 @@
-INSERT INTO shelf (name, icon)
-VALUES
-    ('Favorites', 'heart');
-
 INSERT INTO app_settings (category, name, val)
 VALUES
     ('epub', 'theme', 'white'),

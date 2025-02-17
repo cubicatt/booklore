@@ -6,15 +6,9 @@ import com.adityachandel.booklore.mapper.EpubViewerPreferencesMapper;
 import com.adityachandel.booklore.mapper.PdfViewerPreferencesMapper;
 import com.adityachandel.booklore.model.dto.*;
 import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
-import com.adityachandel.booklore.model.entity.BookEntity;
-import com.adityachandel.booklore.model.entity.EpubViewerPreferencesEntity;
-import com.adityachandel.booklore.model.entity.PdfViewerPreferencesEntity;
-import com.adityachandel.booklore.model.entity.ShelfEntity;
+import com.adityachandel.booklore.model.entity.*;
 import com.adityachandel.booklore.model.enums.BookFileType;
-import com.adityachandel.booklore.repository.BookRepository;
-import com.adityachandel.booklore.repository.EpubViewerPreferencesRepository;
-import com.adityachandel.booklore.repository.PdfViewerPreferencesRepository;
-import com.adityachandel.booklore.repository.ShelfRepository;
+import com.adityachandel.booklore.repository.*;
 import com.adityachandel.booklore.util.FileService;
 import com.adityachandel.booklore.util.FileUtils;
 import lombok.AllArgsConstructor;
@@ -34,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,6 +43,8 @@ public class BooksService {
     private final ShelfRepository shelfRepository;
     private final FileService fileService;
     private final BookMapper bookMapper;
+    private final UserRepository userRepository;
+    private final AuthenticationService authenticationService;
     private final PdfViewerPreferencesMapper pdfViewerPreferencesMapper;
     private final EpubViewerPreferencesMapper epubViewerPreferencesMapper;
 
@@ -100,25 +97,68 @@ public class BooksService {
 
     @Transactional
     public List<Book> assignShelvesToBooks(Set<Long> bookIds, Set<Long> shelfIdsToAssign, Set<Long> shelfIdsToUnassign) {
+        BookLoreUser user = authenticationService.getAuthenticatedUser();
+        Optional<BookLoreUserEntity> bookLoreUserEntity = userRepository.findById(user.getId());
+
+        if (bookLoreUserEntity.isEmpty()) {
+            throw ApiError.USER_NOT_FOUND.createException(user.getId());
+        }
+
+        // Fetch books by their IDs
         List<BookEntity> bookEntities = bookRepository.findAllById(bookIds);
+
+        // Fetch shelves to assign and unassign
         List<ShelfEntity> shelvesToAssign = shelfRepository.findAllById(shelfIdsToAssign);
         List<ShelfEntity> shelvesToUnassign = shelfRepository.findAllById(shelfIdsToUnassign);
+
+        // Validate that the shelves belong to the authenticated user
+        validateShelfOwnership(shelvesToAssign, user);
+        validateShelfOwnership(shelvesToUnassign, user);
+
+        // Explicitly set user on the shelves
+        shelvesToAssign.forEach(shelf -> {
+            if (shelf.getUser() == null) {
+                shelf.setUser(bookLoreUserEntity.get());
+            }
+        });
+        shelvesToUnassign.forEach(shelf -> {
+            if (shelf.getUser() == null) {
+                shelf.setUser(bookLoreUserEntity.get());
+            }
+        });
+
+        // Ensure user_id is correctly set on book_shelf_mapping table by setting user_id explicitly when managing many-to-many relationships
         for (BookEntity bookEntity : bookEntities) {
+            // Unassign shelves
             bookEntity.getShelves().removeIf(shelf -> shelfIdsToUnassign.contains(shelf.getId()));
             shelvesToUnassign.forEach(shelf -> shelf.getBookEntities().remove(bookEntity));
+
+            // Assign new shelves and add user_id
             shelvesToAssign.forEach(shelf -> {
                 if (!bookEntity.getShelves().contains(shelf)) {
                     bookEntity.getShelves().add(shelf);
                 }
-                // Do remove contains, it's necessary
                 if (!shelf.getBookEntities().contains(bookEntity)) {
                     shelf.getBookEntities().add(bookEntity);
                 }
+
+                // Ensure the user_id is set correctly in the relationship table
+                bookRepository.save(bookEntity);
+                shelfRepository.save(shelf); // Explicit save after associating user
             });
-            bookRepository.save(bookEntity);
-            shelfRepository.saveAll(shelvesToAssign);
         }
+
+        // Return the updated books
         return bookEntities.stream().map(bookMapper::toBook).collect(Collectors.toList());
+    }
+
+    @Transactional
+    protected void validateShelfOwnership(List<ShelfEntity> shelves, BookLoreUser user) {
+        for (ShelfEntity shelf : shelves) {
+            if (!shelf.getUser().getId().equals(user.getId())) {
+                throw ApiError.UNAUTHORIZED.createException("You are not authorized to modify the shelf: " + shelf.getName());
+            }
+        }
     }
 
     public Resource getBookCover(long bookId) {

@@ -142,32 +142,6 @@ CREATE TABLE IF NOT EXISTS book_metadata_author_mapping
 CREATE INDEX IF NOT EXISTS idx_book_metadata_id ON book_metadata_author_mapping (book_id);
 CREATE INDEX IF NOT EXISTS idx_author_id ON book_metadata_author_mapping (author_id);
 
-CREATE TABLE IF NOT EXISTS shelf
-(
-    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE,
-    sort VARCHAR(255) NULL,
-    icon VARCHAR(64)  NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS book_shelf_mapping
-(
-    book_id  BIGINT NOT NULL,
-    shelf_id BIGINT NOT NULL,
-    PRIMARY KEY (book_id, shelf_id),
-    CONSTRAINT fk_book_shelf_mapping_book FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE,
-    CONSTRAINT fk_book_shelf_mapping_shelf FOREIGN KEY (shelf_id) REFERENCES shelf (id) ON DELETE CASCADE
-);
-
-CREATE TABLE app_settings
-(
-    id       BIGINT AUTO_INCREMENT PRIMARY KEY,
-    category VARCHAR(255) NOT NULL,
-    name     VARCHAR(255) NOT NULL,
-    val      TEXT         NOT NULL,
-    UNIQUE (category, name)
-);
-
 CREATE TABLE IF NOT EXISTS users
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -192,3 +166,34 @@ CREATE TABLE IF NOT EXISTS user_permissions
 );
 
 CREATE INDEX idx_user_permissions_user ON user_permissions (user_id);
+
+CREATE TABLE IF NOT EXISTS shelf
+(
+    id      BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    name    VARCHAR(255) NOT NULL,
+    sort    VARCHAR(255) NULL,
+    icon    VARCHAR(64)  NOT NULL,
+    UNIQUE (user_id, name),
+    CONSTRAINT fk_shelf_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS book_shelf_mapping
+(
+    book_id  BIGINT NOT NULL,
+    shelf_id BIGINT NOT NULL,
+    user_id  BIGINT NOT NULL,
+    PRIMARY KEY (book_id, shelf_id, user_id),
+    CONSTRAINT fk_book_shelf_mapping_book FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE,
+    CONSTRAINT fk_book_shelf_mapping_shelf FOREIGN KEY (shelf_id) REFERENCES shelf (id) ON DELETE CASCADE,
+    CONSTRAINT fk_book_shelf_mapping_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE app_settings
+(
+    id       BIGINT AUTO_INCREMENT PRIMARY KEY,
+    category VARCHAR(255) NOT NULL,
+    name     VARCHAR(255) NOT NULL,
+    val      TEXT         NOT NULL,
+    UNIQUE (category, name)
+);

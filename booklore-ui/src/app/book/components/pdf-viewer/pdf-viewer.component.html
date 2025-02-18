@@ -5,12 +5,11 @@
   [page]="page"
   [rotation]="rotation"
   [scrollMode]="scrollMode"
-  [sidebarVisible]="sidebarVisible"
   [zoom]="zoom"
   [spread]="spread"
+  [sidebarVisible]="false"
   (pageChange)="onPageChange($event)"
   (zoomChange)="onZoomChange($event)"
-  (sidebarVisibleChange)="onSidebarVisibleChange($event)"
   (pdfLoaded)="onPdfLoaded($event)"
   (spreadChange)="onSpreadChange($event)">
 </ngx-extended-pdf-viewer>

@@ -18,7 +18,6 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   rotation: 0 | 90 | 180 | 270 = 0;
   scrollMode: ScrollModeType = ScrollModeType.page;
 
-  sidebarVisible!: boolean;
   page!: number;
   spread!: 'off' | 'even' | 'odd';
   zoom!: number | string;
@@ -79,14 +78,6 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
     }
   }
 
-  onSidebarVisibleChange(visible: boolean): void {
-    if (!this.pdfLoaded) return;
-    if (visible !== this.sidebarVisible) {
-      this.sidebarVisible = visible;
-      this.updateViewerSetting();
-    }
-  }
-
   onSpreadChange(spread: 'off' | 'even' | 'odd'): void {
     if (!this.pdfLoaded) return;
     if (spread !== this.spread) {
@@ -99,7 +90,6 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
     if (!this.pdfLoaded) return;
     const bookSetting: BookSetting = {
       pdfSettings: {
-        sidebarVisible: this.sidebarVisible,
         spread: this.spread,
         zoom: this.zoom,
       }
@@ -123,11 +113,9 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
     this.updateProgress();
     if (this.pdfScope === 'global') {
       this.zoom = this.globalPdfSettings?.zoom || 'page-fit';
-      this.sidebarVisible = this.globalPdfSettings?.sidebar ?? true;
       this.spread = this.globalPdfSettings?.spread || 'odd';
     } else {
       this.zoom = this.individualPdfSettings?.zoom || this.globalPdfSettings?.zoom || 'page-fit';
-      this.sidebarVisible = this.individualPdfSettings?.sidebarVisible ?? this.globalPdfSettings?.sidebar ?? true;
       this.spread = this.individualPdfSettings?.spread || this.globalPdfSettings?.spread || 'odd';
     }
   }

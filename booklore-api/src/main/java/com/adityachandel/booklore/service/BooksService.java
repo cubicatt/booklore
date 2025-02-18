@@ -68,7 +68,6 @@ public class BooksService {
             PdfViewerPreferencesEntity viewerPrefs = bookEntity.getPdfViewerPrefs();
             viewerPrefs.setZoom(pdfSettings.getZoom());
             viewerPrefs.setSpread(pdfSettings.getSpread());
-            viewerPrefs.setSidebarVisible(pdfSettings.getSidebarVisible());
             pdfViewerPreferencesRepository.save(viewerPrefs);
         } else if (bookEntity.getBookType() == BookFileType.EPUB) {
             EpubViewerPreferences epubSettings = bookViewerSettings.getEpubSettings();

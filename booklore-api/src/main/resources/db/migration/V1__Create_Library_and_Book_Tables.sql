@@ -35,9 +35,9 @@ CREATE INDEX IF NOT EXISTS idx_library_id ON book (library_id);
 CREATE TABLE IF NOT EXISTS book_metadata
 (
     book_id               BIGINT    NOT NULL PRIMARY KEY,
-    title                 VARCHAR(1024),
-    subtitle              VARCHAR(1024),
-    publisher             VARCHAR(1024),
+    title                 VARCHAR(255),
+    subtitle              VARCHAR(255),
+    publisher             VARCHAR(255),
     published_date        DATE,
     description           TEXT,
     isbn_13               VARCHAR(20),
@@ -47,9 +47,9 @@ CREATE TABLE IF NOT EXISTS book_metadata
     language              VARCHAR(10),
     rating                FLOAT,
     review_count          INT,
-    cover                 VARCHAR(1024),
+    cover                 VARCHAR(255),
     cover_updated_on      TIMESTAMP NULL,
-    series_name           VARCHAR(1024),
+    series_name           VARCHAR(255),
     series_number         INT,
     series_total          INT,
     all_fields_locked     BOOLEAN DEFAULT FALSE,
@@ -103,6 +103,7 @@ CREATE TABLE IF NOT EXISTS pdf_viewer_preference
 (
     book_id         BIGINT PRIMARY KEY,
     zoom            VARCHAR(16) NULL,
+    sidebar_visible BOOLEAN     NULL,
     spread          VARCHAR(16) NULL,
     CONSTRAINT fk_pdf_viewer_setting FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE
 );

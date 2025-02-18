@@ -72,6 +72,7 @@ export interface Award {
 
 export interface PdfViewerSetting {
   zoom: string | number;
+  sidebarVisible: boolean;
   spread: 'off' | 'even' | 'odd';
 }
 

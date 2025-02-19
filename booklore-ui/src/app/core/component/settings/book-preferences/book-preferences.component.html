@@ -1,8 +1,6 @@
 <div class="w-full h-[calc(100vh-12.1rem)] overflow-y-auto border rounded-lg p-4 enclosing-container">
-  <p class="text-3xl font-semibold">Preferences</p>
-  <p-divider></p-divider>
 
-  <p class="text-xl pb-4 pt-4">
+  <p class="text-xl pb-4 pt-6">
     Book Reader Settings: Global or Per-Book
     <i class="pi pi-info-circle text-sky-600"
        pTooltip="Choose whether you want to apply the same settings (like font, theme, spread, zoom, etc.) to all your books by default, or have individual setting for each book."
@@ -40,11 +38,11 @@
         <label [for]="item">{{ item }}</label>
       </div>
     </div>
-
   </div>
 
   <p-divider></p-divider>
-  <p class="text-xl pb-4 pt-4">
+
+  <p class="text-xl pb-6 pt-6">
     PDF Reader: Global Preferences
     <i class="pi pi-info-circle text-sky-600"
        pTooltip="These settings apply globally to all PDFs. You can customize how PDFs are displayed, including page spread type, zoom level, and sidebar visibility."
@@ -93,7 +91,7 @@
 
   <p-divider></p-divider>
 
-  <p class="text-xl pb-4 pt-4">
+  <p class="text-xl pb-6 pt-6">
     Epub Reader: Global Preferences
     <i class="pi pi-info-circle text-sky-600"
        pTooltip="These settings apply globally to all EPUBs. Customize how EPUBs are displayed, including themes, font types, and font sizes." tooltipPosition="right"
@@ -135,15 +133,4 @@
       <p-button icon="pi pi-plus" rounded="true" (click)="increaseFontSize()"></p-button>
     </div>
   </div>
-
-  <p-divider></p-divider>
-  <p class="text-xl pb-4 pt-4">
-    Quick Book Match Preferences
-    <i class="pi pi-info-circle text-sky-600"
-       pTooltip="Choose whether you want to apply the same settings (like font, theme, spread, zoom, etc.) to all your books by default, or have individual setting for each book."
-       tooltipPosition="right"
-       style="cursor: pointer;">
-    </i>
-  </p>
-  <app-metadata-advanced-fetch-options (metadataOptionsSubmitted)="onMetadataSubmit($event)" [currentMetadataOptions]="currentMetadataOptions"></app-metadata-advanced-fetch-options>
 </div>

@@ -3,7 +3,10 @@
     <p-tablist>
       <p-tab value="0">Book Preferences</p-tab>
       <ng-container *ngIf="userData.permissions.admin">
-        <p-tab value="1">Admin</p-tab>
+        <p-tab value="1">Quick Metadata</p-tab>
+      </ng-container>
+      <ng-container *ngIf="userData.permissions.admin">
+        <p-tab value="2">Admin Panel</p-tab>
       </ng-container>
     </p-tablist>
 
@@ -13,6 +16,11 @@
       </p-tabpanel>
       <ng-container *ngIf="userData.permissions.admin">
         <p-tabpanel value="1">
+          <app-metadata-settings></app-metadata-settings>
+        </p-tabpanel>
+      </ng-container>
+      <ng-container *ngIf="userData.permissions.admin">
+        <p-tabpanel value="2">
           <app-admin></app-admin>
         </p-tabpanel>
       </ng-container>

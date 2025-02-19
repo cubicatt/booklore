@@ -16,7 +16,7 @@ import {MetadataRefreshOptions} from '../../../../metadata/model/request/metadat
 @Component({
   selector: 'app-book-preferences',
   templateUrl: './book-preferences.component.html',
-  imports: [Select, FormsModule, NgForOf, ToggleSwitch, RadioButton, Divider, Button, Tooltip, MetadataAdvancedFetchOptionsComponent],
+  imports: [Select, FormsModule, NgForOf, ToggleSwitch, RadioButton, Divider, Button, Tooltip],
   standalone: true,
   styleUrls: ['./book-preferences.component.scss']
 })
@@ -58,13 +58,11 @@ export class BookPreferences implements OnInit {
   private appSettingsService = inject(AppSettingsService);
   appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
   individualOrGlobal = ['global', 'individual'];
-  currentMetadataOptions!: MetadataRefreshOptions;
 
   ngOnInit(): void {
     this.appSettings$.subscribe(settings => {
       if (settings) {
         this.populateSettings(settings);
-        this.currentMetadataOptions = settings.metadataRefreshOptions;
       }
     });
   }
@@ -134,9 +132,5 @@ export class BookPreferences implements OnInit {
       this.fontSize -= 10;
       this.onFontSizeChange();
     }
-  }
-
-  onMetadataSubmit(metadataRefreshOptions: MetadataRefreshOptions) {
-    this.appSettingsService.saveAppSetting('quick_book_match', 'all_books', metadataRefreshOptions)
   }
 }

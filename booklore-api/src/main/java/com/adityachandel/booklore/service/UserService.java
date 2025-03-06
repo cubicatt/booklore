@@ -3,6 +3,7 @@ package com.adityachandel.booklore.service;
 import com.adityachandel.booklore.config.security.JwtUtils;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookLoreUserMapper;
+import com.adityachandel.booklore.model.BookPreferences;
 import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.model.dto.UserCreateRequest;
 import com.adityachandel.booklore.model.dto.request.UserLoginRequest;
@@ -35,7 +36,7 @@ public class UserService {
     private final JwtUtils jwtUtils;
 
     @Transactional
-    public ResponseEntity<Map<String, String>> registerUser(UserCreateRequest request) {
+    public void registerUser(UserCreateRequest request) {
         Optional<BookLoreUserEntity> existingUser = userRepository.findByUsername(request.getUsername());
         if (existingUser.isPresent()) {
             throw ApiError.USERNAME_ALREADY_TAKEN.createException(request.getUsername());
@@ -55,19 +56,14 @@ public class UserService {
         permissions.setPermissionManipulateLibrary(request.isPermissionManipulateLibrary());
         bookLoreUserEntity.setPermissions(permissions);
 
+        bookLoreUserEntity.setBookPreferences(buildDefaultBookPreferences());
+
         if (request.getSelectedLibraries() != null && !request.getSelectedLibraries().isEmpty()) {
             List<LibraryEntity> libraries = libraryRepository.findAllById(request.getSelectedLibraries());
             bookLoreUserEntity.setLibraries(new ArrayList<>(libraries));
         }
 
         userRepository.save(bookLoreUserEntity);
-
-        String token = jwtUtils.generateToken(bookLoreUserEntity);
-
-        Map<String, String> response = new HashMap<>();
-        response.put("token", token);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     public ResponseEntity<Map<String, String>> loginUser(UserLoginRequest loginRequest) {
@@ -124,9 +120,36 @@ public class UserService {
         userRepository.delete(user);
     }
 
-
     public BookLoreUser getBookLoreUser(Long id) {
         BookLoreUserEntity user = userRepository.findById(id).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(id));
         return bookLoreUserMapper.toDto(user);
     }
+
+
+    public BookPreferences buildDefaultBookPreferences() {
+        return BookPreferences.builder()
+                .perBookSetting(BookPreferences.PerBookSetting.builder()
+                        .epub(BookPreferences.GlobalOrIndividual.Individual)
+                        .pdf(BookPreferences.GlobalOrIndividual.Individual)
+                        .build())
+                .pdfReaderSetting(BookPreferences.PdfReaderSetting.builder()
+                        .showSidebar(false)
+                        .pageSpread("odd")
+                        .pageZoom("page-fit")
+                        .build())
+                .epubReaderSetting(BookPreferences.EpubReaderSetting.builder()
+                        .theme("white")
+                        .font("serif")
+                        .fontSize(150)
+                        .build())
+                .build();
+    }
+
+
+    public void updateBookPreferences(long userId, BookPreferences bookPreferences) {
+        BookLoreUserEntity user = userRepository.findById(userId).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(userId));
+        user.setBookPreferences(bookPreferences);
+        userRepository.save(user);
+    }
+
 }

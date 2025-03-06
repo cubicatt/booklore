@@ -140,13 +140,14 @@ CREATE INDEX IF NOT EXISTS idx_author_id ON book_metadata_author_mapping (author
 
 CREATE TABLE IF NOT EXISTS users
 (
-    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-    username      VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    name          VARCHAR(255) NOT NULL,
-    email         VARCHAR(255) UNIQUE,
-    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username         VARCHAR(255) NOT NULL UNIQUE,
+    password_hash    VARCHAR(255) NOT NULL,
+    name             VARCHAR(255) NOT NULL,
+    email            VARCHAR(255) UNIQUE,
+    book_preferences TEXT         NOT NULL,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS user_permissions
@@ -204,10 +205,8 @@ CREATE TABLE IF NOT EXISTS user_book_progress
     CONSTRAINT fk_user_book_progress_book FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE,
     CONSTRAINT unique_user_book_progress UNIQUE (user_id, book_id)
 );
-
 CREATE INDEX IF NOT EXISTS idx_user_book_progress_user ON user_book_progress (user_id);
 CREATE INDEX IF NOT EXISTS idx_user_book_progress_book ON user_book_progress (book_id);
-
 
 CREATE TABLE IF NOT EXISTS user_library_mapping
 (

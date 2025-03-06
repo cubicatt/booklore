@@ -1,8 +1,10 @@
 package com.adityachandel.booklore.config.security;
 
+import com.adityachandel.booklore.model.BookPreferences;
 import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
 import com.adityachandel.booklore.model.entity.UserPermissionsEntity;
 import com.adityachandel.booklore.repository.UserRepository;
+import com.adityachandel.booklore.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -13,9 +15,10 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Component
 public class ApplicationStartupRunner implements CommandLineRunner {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final UserService userService;
 
     @Override
     public void run(String... args) {
@@ -33,6 +36,9 @@ public class ApplicationStartupRunner implements CommandLineRunner {
             permissions.setPermissionManipulateLibrary(true);
             permissions.setPermissionEditMetadata(true);
             permissions.setPermissionAdmin(true);
+
+            BookPreferences bookPreferences = userService.buildDefaultBookPreferences();
+            admin.setBookPreferences(bookPreferences);
 
             admin.setPermissions(permissions);
             userRepository.save(admin);

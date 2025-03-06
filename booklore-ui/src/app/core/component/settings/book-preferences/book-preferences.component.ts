@@ -1,123 +1,120 @@
-import {Component, inject, OnInit} from '@angular/core';
-import {AppSettingsService} from '../../../service/app-settings.service';
-import {Observable} from 'rxjs';
-import {AppSettings} from '../../../model/app-settings.model';
-import {Select} from 'primeng/select';
-import {FormsModule} from '@angular/forms';
-import {NgForOf} from '@angular/common';
-import {ToggleSwitch} from 'primeng/toggleswitch';
-import {RadioButton} from 'primeng/radiobutton';
-import {Divider} from 'primeng/divider';
-import {Button} from 'primeng/button';
-import {Tooltip} from 'primeng/tooltip';
-import {MetadataAdvancedFetchOptionsComponent} from '../../../../metadata/metadata-options-dialog/metadata-advanced-fetch-options/metadata-advanced-fetch-options.component';
-import {MetadataRefreshOptions} from '../../../../metadata/model/request/metadata-refresh-options.model';
+import { Component, inject, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { FormsModule } from '@angular/forms';
+import { NgForOf } from '@angular/common';
+import { Select } from 'primeng/select';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+import { RadioButton } from 'primeng/radiobutton';
+import { Divider } from 'primeng/divider';
+import { Button } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
+import { User, UserBookPreferences, UserService } from '../../../../user.service';
 
 @Component({
   selector: 'app-book-preferences',
   templateUrl: './book-preferences.component.html',
-  imports: [Select, FormsModule, NgForOf, ToggleSwitch, RadioButton, Divider, Button, Tooltip],
   standalone: true,
-  styleUrls: ['./book-preferences.component.scss']
+  styleUrls: ['./book-preferences.component.scss'],
+  imports: [Select, FormsModule, NgForOf, ToggleSwitch, RadioButton, Divider, Button, Tooltip]
 })
 export class BookPreferences implements OnInit {
-  spreads = [
-    {name: 'Even Spread', key: 'even'},
-    {name: 'Odd Spread', key: 'odd'},
-    {name: 'No Spread', key: 'off'}
-  ];
-  zooms = [
-    {name: 'Auto Zoom', key: 'auto'},
-    {name: 'Page Fit', key: 'page-fit'},
-    {name: 'Page Width', key: 'page-width'},
-    {name: 'Actual Size', key: 'page-actual'}
-  ];
-  themes = [
-    {name: 'White', key: 'white'},
-    {name: 'Black', key: 'black'},
-    {name: 'Grey', key: 'grey'},
-    {name: 'Sepia', key: 'sepia'}
-  ];
-  fonts = [
-    {name: 'Serif', key: 'serif'},
-    {name: 'Sans Serif', key: 'sans-serif'},
-    {name: 'Roboto', key: 'roboto'},
-    {name: 'Cursive', key: 'cursive'},
-    {name: 'Monospace', key: 'monospace'}
+  readonly spreads = [
+    { name: 'Even Spread', key: 'even' },
+    { name: 'Odd Spread', key: 'odd' },
+    { name: 'No Spread', key: 'off' }
   ];
 
-  selectedSpread: any;
-  selectedZoom: any;
+  readonly zooms = [
+    { name: 'Auto Zoom', key: 'auto' },
+    { name: 'Page Fit', key: 'page-fit' },
+    { name: 'Page Width', key: 'page-width' },
+    { name: 'Actual Size', key: 'page-actual' }
+  ];
+
+  readonly themes = [
+    { name: 'White', key: 'white' },
+    { name: 'Black', key: 'black' },
+    { name: 'Grey', key: 'grey' },
+    { name: 'Sepia', key: 'sepia' }
+  ];
+
+  readonly fonts = [
+    { name: 'Serif', key: 'serif' },
+    { name: 'Sans Serif', key: 'sans-serif' },
+    { name: 'Roboto', key: 'roboto' },
+    { name: 'Cursive', key: 'cursive' },
+    { name: 'Monospace', key: 'monospace' }
+  ];
+
+  readonly individualOrGlobal = ['Global', 'Individual'];
+
+  selectedSpread!: string;
+  selectedZoom!: string;
   showSidebar = false;
-  selectedTheme!: any;
-  fontSize: number = 100;
-  selectedFont: any;
+  selectedTheme!: string;
+  fontSize = 100;
+  selectedFont!: string;
   selectedPdfScope!: string;
   selectedEpubScope!: string;
 
-  private appSettingsService = inject(AppSettingsService);
-  appSettings$: Observable<AppSettings | null> = this.appSettingsService.appSettings$;
-  individualOrGlobal = ['global', 'individual'];
+  private readonly userService = inject(UserService);
+  userData$: Observable<User | null> = this.userService.userData$;
 
   ngOnInit(): void {
-    this.appSettings$.subscribe(settings => {
-      if (settings) {
-        this.populateSettings(settings);
-      }
+    this.userData$.subscribe(userData => {
+      if (userData) this.populateSettings(userData.bookPreferences);
     });
   }
 
-  populateSettings(settings: AppSettings): void {
-    if (settings.pdf) {
-      const pdfSettings = settings.pdf;
-      this.selectedSpread = this.spreads.find(s => s.key === pdfSettings.spread)?.key;
-      this.selectedZoom = this.zooms.find(z => z.key === pdfSettings.zoom)?.key;
-      this.showSidebar = pdfSettings.sidebar;
-    }
+  private populateSettings(prefs: UserBookPreferences): void {
+    this.selectedPdfScope = prefs.perBookSetting.pdf;
+    this.selectedEpubScope = prefs.perBookSetting.epub;
+    this.selectedSpread = prefs.pdfReaderSetting.pageSpread;
+    this.selectedZoom = prefs.pdfReaderSetting.pageZoom;
+    this.showSidebar = prefs.pdfReaderSetting.showSidebar;
+    this.selectedTheme = prefs.epubReaderSetting.theme;
+    this.fontSize = prefs.epubReaderSetting.fontSize;
+    this.selectedFont = prefs.epubReaderSetting.font;
+  }
 
-    if (settings.epub) {
-      const epubSettings = settings.epub;
-      this.selectedTheme = this.themes.find(t => t.key === epubSettings.theme)?.key;
-      this.fontSize = Number(epubSettings.fontSize);
-      this.selectedFont = this.fonts.find(f => f.key === epubSettings.font)?.key;
-    }
-
-    if (settings.readerSettings) {
-      this.selectedPdfScope = settings.readerSettings.pdfScope;
-      this.selectedEpubScope = settings.readerSettings.epubScope;
+  private updatePreference<T>(updateFn: (prefs: UserBookPreferences) => void): void {
+    const user = this.userService.getLocalUser();
+    if (user) {
+      updateFn(user.bookPreferences);
+      this.userService.updateBookPreferences(user.id, user.bookPreferences);
     }
   }
 
   onThemeChange(): void {
-    this.appSettingsService.saveAppSetting('epub', 'theme', this.selectedTheme);
+    this.updatePreference(prefs => prefs.epubReaderSetting.theme = this.selectedTheme);
   }
 
   onFontChange(): void {
-    this.appSettingsService.saveAppSetting('epub', 'font', this.selectedFont);
+    this.updatePreference(prefs => prefs.epubReaderSetting.font = this.selectedFont);
   }
 
   onSpreadChange(): void {
-    this.appSettingsService.saveAppSetting('pdf', 'spread', this.selectedSpread);
+    this.updatePreference(prefs => prefs.pdfReaderSetting.pageSpread = this.selectedSpread);
   }
 
   onZoomChange(): void {
-    this.appSettingsService.saveAppSetting('pdf', 'zoom', this.selectedZoom);
+    this.updatePreference(prefs => prefs.pdfReaderSetting.pageZoom = this.selectedZoom);
   }
 
   onSidebarChange(): void {
-    this.appSettingsService.saveAppSetting('pdf', 'sidebar', this.showSidebar.toString());
+    this.updatePreference(prefs => prefs.pdfReaderSetting.showSidebar = this.showSidebar);
   }
 
   onFontSizeChange(): void {
-    this.appSettingsService.saveAppSetting('epub', 'fontSize', this.fontSize);
+    this.updatePreference(prefs => prefs.epubReaderSetting.fontSize = this.fontSize);
   }
 
   onPdfScopeChange(): void {
-    this.appSettingsService.saveAppSetting('reader_setting', 'pdf', this.selectedPdfScope);
+    this.updatePreference(prefs => prefs.perBookSetting.pdf = this.selectedPdfScope);
   }
 
   onEpubScopeChange(): void {
-    this.appSettingsService.saveAppSetting('reader_setting', 'epub', this.selectedEpubScope);
+    this.updatePreference(prefs => prefs.perBookSetting.epub = this.selectedEpubScope);
   }
 
   increaseFontSize(): void {

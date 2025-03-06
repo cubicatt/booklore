@@ -19,6 +19,24 @@ export interface User {
     canEditMetadata: boolean;
     canManipulateLibrary: boolean;
   };
+  bookPreferences: UserBookPreferences;
+}
+
+export interface UserBookPreferences {
+  perBookSetting: {
+    pdf: string;
+    epub: string;
+  };
+  pdfReaderSetting: {
+    pageSpread: string;
+    pageZoom: string;
+    showSidebar: boolean;
+  };
+  epubReaderSetting: {
+    theme: string;
+    font: string;
+    fontSize: number;
+  };
 }
 
 interface JwtPayload {
@@ -60,6 +78,10 @@ export class UserService {
     });
   }
 
+  getLocalUser(): User | null {
+    return this.userDataSubject.getValue();
+  }
+
   createUser(userData: Omit<User, 'id'>): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(this.apiUrl, userData);
   }
@@ -74,6 +96,17 @@ export class UserService {
 
   deleteUser(userId: number): Observable<void> {
     return this.http.delete<void>(`${this.userUrl}/${userId}`);
+  }
+
+  updateBookPreferences(userId: number, prefs: UserBookPreferences): void {
+    this.http.put<void>(`${this.userUrl}/${userId}/book-preferences`, prefs)
+      .subscribe(() => {
+        const currentUser = this.userDataSubject.getValue();
+        if (currentUser) {
+          const updatedUser = {...currentUser, bookPreferences: {...prefs}};
+          this.userDataSubject.next(updatedUser);
+        }
+      });
   }
 
   private startWebSocket(): void {

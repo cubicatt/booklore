@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.model.dto;
 
+import com.adityachandel.booklore.model.BookPreferences;
 import lombok.Data;
 
 import java.util.List;
@@ -12,6 +13,7 @@ public class BookLoreUser {
     private String email;
     private List<Library> assignedLibraries;
     private UserPermissions permissions;
+    private BookPreferences bookPreferences;
 
     @Data
     public static class UserPermissions {

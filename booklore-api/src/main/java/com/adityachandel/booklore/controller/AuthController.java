@@ -23,8 +23,9 @@ public class AuthController {
 
     @PostMapping("/register")
     @PreAuthorize("@securityUtil.isAdmin()")
-    public ResponseEntity<Map<String, String>> registerUser(@RequestBody @Valid UserCreateRequest userCreateRequest) {
-        return userService.registerUser(userCreateRequest);
+    public ResponseEntity<?> registerUser(@RequestBody @Valid UserCreateRequest userCreateRequest) {
+        userService.registerUser(userCreateRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/login")

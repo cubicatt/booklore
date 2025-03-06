@@ -1,5 +1,8 @@
 package com.adityachandel.booklore.model.entity;
 
+import com.adityachandel.booklore.convertor.BookPreferencesConverter;
+import com.adityachandel.booklore.convertor.SortConverter;
+import com.adityachandel.booklore.model.BookPreferences;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,6 +41,10 @@ public class BookLoreUserEntity {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "book_preferences")
+    @Convert(converter = BookPreferencesConverter.class)
+    private BookPreferences bookPreferences;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserPermissionsEntity permissions;

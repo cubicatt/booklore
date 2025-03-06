@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.controller;
 
+import com.adityachandel.booklore.model.BookPreferences;
 import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.model.dto.UserCreateRequest;
 import com.adityachandel.booklore.model.dto.request.UserLoginRequest;
@@ -46,4 +47,11 @@ public class UserController {
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
     }
+
+    @PutMapping("/{id}/book-preferences")
+    @PreAuthorize("@securityUtil.isSelf(#id)")
+    public void updateUserBookPreferences(@PathVariable Long id, @RequestBody BookPreferences bookPreferences) {
+        userService.updateBookPreferences(id, bookPreferences);
+    }
+
 }

@@ -20,6 +20,14 @@ public class SecurityUtil {
         return false;
     }
 
+    public boolean isSelf(Long userId) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof BookLoreUser user) {
+            return user.getId().equals(userId);
+        }
+        return false;
+    }
+
     public boolean canUpload() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof BookLoreUser user) {

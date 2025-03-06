@@ -2,6 +2,7 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.service.PathService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +18,7 @@ public class PathController {
     private PathService pathService;
 
     @GetMapping
+    @PreAuthorize("@securityUtil.canManipulateLibrary() or @securityUtil.isAdmin()")
     public List<String> getFolders(@RequestParam String path) {
         return pathService.getFoldersAtPath(path);
     }

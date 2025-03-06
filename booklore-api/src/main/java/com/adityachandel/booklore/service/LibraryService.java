@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.service;
 
+import com.adityachandel.booklore.config.security.AuthenticationService;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.mapper.LibraryMapper;
@@ -174,11 +175,11 @@ public class LibraryService {
         return libraryMapper.toLibrary(libraryEntity);
     }
 
-    public void refreshLibrary(long libraryId) {
+    public void rescanLibrary(long libraryId) {
         libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         Thread.startVirtualThread(() -> {
             try {
-                libraryProcessingService.refreshLibrary(libraryId);
+                libraryProcessingService.rescanLibrary(libraryId);
             } catch (InvalidDataAccessApiUsageException e) {
                 log.warn("InvalidDataAccessApiUsageException - Library id: {}", libraryId);
             } catch (IOException e) {

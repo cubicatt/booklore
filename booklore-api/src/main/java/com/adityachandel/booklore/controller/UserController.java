@@ -23,25 +23,26 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{id}")
+    @PreAuthorize("@securityUtil.canViewUserProfile(#id)")
     public ResponseEntity<BookLoreUser> getUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getBookLoreUser(id));
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityUtil.isAdmin()")
     public ResponseEntity<List<BookLoreUser>> getAllUsers() {
         return ResponseEntity.ok(userService.getBookLoreUsers());
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityUtil.isAdmin()")
     public ResponseEntity<BookLoreUser> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateRequest updateRequest) {
         BookLoreUser updatedUser = userService.updateUser(id, updateRequest);
         return ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("@securityUtil.isAdmin()")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
     }

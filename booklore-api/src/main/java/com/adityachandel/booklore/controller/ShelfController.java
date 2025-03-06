@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class ShelfController {
     }
 
     @GetMapping("/{shelfId}")
+    @PreAuthorize("@securityUtil.isShelfOwner(#shelfId)")
     public ResponseEntity<Shelf> getShelf(@PathVariable Long shelfId) {
         return ResponseEntity.ok(shelfService.getShelf(shelfId));
     }
@@ -36,17 +38,20 @@ public class ShelfController {
     }
 
     @PutMapping("/{shelfId}")
+    @PreAuthorize("@securityUtil.isShelfOwner(#shelfId)")
     public ResponseEntity<Shelf> updateShelf(@Valid @RequestBody ShelfCreateRequest request, @PathVariable Long shelfId) {
         return ResponseEntity.ok(shelfService.updateShelf(shelfId, request));
     }
 
     @DeleteMapping("/{shelfId}")
+    @PreAuthorize("@securityUtil.isShelfOwner(#shelfId)")
     public ResponseEntity<Void> deleteShelf(@PathVariable Long shelfId) {
         shelfService.deleteShelf(shelfId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/{shelfId}/books")
+    @PreAuthorize("@securityUtil.isShelfOwner(#shelfId)")
     public ResponseEntity<List<Book>> getShelfBooks(@PathVariable Long shelfId) {
         return ResponseEntity.ok(shelfService.getShelfBooks(shelfId));
     }

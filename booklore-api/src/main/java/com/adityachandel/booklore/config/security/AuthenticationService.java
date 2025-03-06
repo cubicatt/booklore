@@ -1,7 +1,6 @@
-package com.adityachandel.booklore.service;
+package com.adityachandel.booklore.config.security;
 
 import com.adityachandel.booklore.model.dto.BookLoreUser;
-import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

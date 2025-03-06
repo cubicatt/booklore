@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -102,7 +101,7 @@ public class LibraryProcessingService {
     }
 
     @Transactional
-    public void refreshLibrary(long libraryId) throws IOException {
+    public void rescanLibrary(long libraryId) throws IOException {
         LibraryEntity libraryEntity = libraryRepository.findById(libraryId).orElseThrow(() -> ApiError.LIBRARY_NOT_FOUND.createException(libraryId));
         notificationService.sendMessage(Topic.LOG, createLogNotification("Started refreshing library: " + libraryEntity.getName()));
         processLibraryFiles(getUnProcessedFiles(libraryEntity));

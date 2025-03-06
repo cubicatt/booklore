@@ -4,6 +4,7 @@ import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.service.FileUploadService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +18,7 @@ public class FileUploadController {
 
     private final FileUploadService fileUploadService;
 
+    @PreAuthorize("@securityUtil.canUpload()")
     @PostMapping(value = "/upload", consumes = "multipart/form-data")
     public ResponseEntity<Book> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("libraryId") long libraryId, @RequestParam("pathId") long pathId) {
         if (file.isEmpty()) {

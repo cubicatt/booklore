@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.service;
 
+import com.adityachandel.booklore.config.security.AuthenticationService;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.mapper.EpubViewerPreferencesMapper;
@@ -29,7 +30,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 

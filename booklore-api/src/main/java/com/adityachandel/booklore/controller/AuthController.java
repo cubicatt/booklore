@@ -6,6 +6,7 @@ import com.adityachandel.booklore.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
+    @PreAuthorize("@securityUtil.isAdmin()")
     public ResponseEntity<Map<String, String>> registerUser(@RequestBody @Valid UserCreateRequest userCreateRequest) {
         return userService.registerUser(userCreateRequest);
     }

@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.service;
 
+import com.adityachandel.booklore.config.security.AuthenticationService;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.mapper.ShelfMapper;
@@ -10,7 +11,6 @@ import com.adityachandel.booklore.model.dto.request.ShelfCreateRequest;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
 import com.adityachandel.booklore.model.entity.ShelfEntity;
-import com.adityachandel.booklore.model.dto.Sort;
 import com.adityachandel.booklore.repository.BookRepository;
 import com.adityachandel.booklore.repository.ShelfRepository;
 import com.adityachandel.booklore.repository.UserRepository;
@@ -47,11 +47,7 @@ public class ShelfService {
     }
 
     public Shelf updateShelf(Long id, ShelfCreateRequest request) {
-        BookLoreUser user = authenticationService.getAuthenticatedUser();
         ShelfEntity shelfEntity = shelfRepository.findById(id).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(id));
-        if (!shelfEntity.getUser().getId().equals(user.getId())) {
-            throw ApiError.UNAUTHORIZED.createException("You are not authorized to access this shelf.");
-        }
         shelfEntity.setName(request.getName());
         shelfEntity.setIcon(request.getIcon());
         return shelfMapper.toShelf(shelfRepository.save(shelfEntity));
@@ -65,29 +61,17 @@ public class ShelfService {
     }
 
     public Shelf getShelf(Long shelfId) {
-        BookLoreUser user = authenticationService.getAuthenticatedUser();
         ShelfEntity shelfEntity = shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
-        if (!shelfEntity.getUser().getId().equals(user.getId())) {
-            throw ApiError.UNAUTHORIZED.createException("You are not authorized to access this shelf.");
-        }
         return shelfMapper.toShelf(shelfEntity);
     }
 
     public void deleteShelf(Long shelfId) {
-        BookLoreUser user = authenticationService.getAuthenticatedUser();
-        ShelfEntity shelfEntity = shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
-        if (!shelfEntity.getUser().getId().equals(user.getId())) {
-            throw ApiError.UNAUTHORIZED.createException("You are not authorized to delete this shelf.");
-        }
+        shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
         shelfRepository.deleteById(shelfId);
     }
 
     public List<Book> getShelfBooks(Long shelfId) {
-        BookLoreUser user = authenticationService.getAuthenticatedUser();
-        ShelfEntity shelfEntity = shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
-        if (!shelfEntity.getUser().getId().equals(user.getId())) {
-            throw ApiError.UNAUTHORIZED.createException("You are not authorized to view the books in this shelf.");
-        }
+        shelfRepository.findById(shelfId).orElseThrow(() -> ApiError.SHELF_NOT_FOUND.createException(shelfId));
         List<BookEntity> bookEntities = bookRepository.findByShelfId(shelfId);
         return bookEntities.stream()
                 .map(bookMapper::toBook)

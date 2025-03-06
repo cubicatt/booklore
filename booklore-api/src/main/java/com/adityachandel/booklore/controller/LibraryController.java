@@ -6,6 +6,7 @@ import com.adityachandel.booklore.model.dto.request.CreateLibraryRequest;
 import com.adityachandel.booklore.service.LibraryService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,16 +29,19 @@ public class LibraryController {
     }
 
     @PostMapping
+    @PreAuthorize("@securityUtil.canManipulateLibrary() or @securityUtil.isAdmin()")
     public ResponseEntity<Library> createLibrary(@RequestBody CreateLibraryRequest request) {
         return ResponseEntity.ok(libraryService.createLibrary(request));
     }
 
     @PutMapping("/{libraryId}")
+    @PreAuthorize("@securityUtil.canManipulateLibrary() or @securityUtil.isAdmin()")
     public ResponseEntity<Library> updateLibrary(@RequestBody CreateLibraryRequest request, @PathVariable Long libraryId) {
         return ResponseEntity.ok(libraryService.updateLibrary(request, libraryId));
     }
 
     @DeleteMapping("/{libraryId}")
+    @PreAuthorize("@securityUtil.canManipulateLibrary() or @securityUtil.isAdmin()")
     public ResponseEntity<?> deleteLibrary(@PathVariable long libraryId) {
         libraryService.deleteLibrary(libraryId);
         return ResponseEntity.noContent().build();
@@ -55,8 +59,9 @@ public class LibraryController {
     }
 
     @PutMapping("/{libraryId}/refresh")
-    public ResponseEntity<?> refreshLibrary(@PathVariable long libraryId) {
-        libraryService.refreshLibrary(libraryId);
+    @PreAuthorize("@securityUtil.canManipulateLibrary() or @securityUtil.isAdmin()")
+    public ResponseEntity<?> rescanLibrary(@PathVariable long libraryId) {
+        libraryService.rescanLibrary(libraryId);
         return ResponseEntity.noContent().build();
     }
 }

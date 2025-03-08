@@ -67,19 +67,21 @@ export class CreateUserDialogComponent implements OnInit {
     };
 
     this.userService.createUser(userData).subscribe({
-      next: response => {
+      next: () => {
         this.messageService.add({
           severity: 'success',
           summary: 'User Created',
-          detail: response.message
+          detail: 'The user has been successfully created.'
         });
         this.ref.close(true);
       },
-      error: err => {
+      error: (err) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to create user: ' + err.error.message
+          summary: 'User Creation Failed',
+          detail: err?.error?.message
+            ? `Unable to create user: ${err.error.message}`
+            : 'An unexpected error occurred while creating the user. Please try again later.'
         });
       }
     });

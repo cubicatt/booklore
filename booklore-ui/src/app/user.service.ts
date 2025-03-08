@@ -82,23 +82,12 @@ export class UserService {
     return this.http.get<User>(`${this.userUrl}/me`);
   }
 
-  getUserFromAPI(): Observable<User> {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decoded: JwtPayload & { userId?: string } = jwtDecode(token);
-      if (decoded.userId) {
-        return this.http.get<User>(`${this.userUrl}/${decoded.userId}`);
-      }
-    }
-    return of(null as unknown as User);
-  }
-
   getLocalUser(): User | null {
     return this.userDataSubject.getValue();
   }
 
-  createUser(userData: Omit<User, 'id'>): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(this.apiUrl, userData);
+  createUser(userData: Omit<User, 'id'>): Observable<void> {
+    return this.http.post<void>(this.apiUrl, userData);
   }
 
   getUsers(): Observable<User[]> {

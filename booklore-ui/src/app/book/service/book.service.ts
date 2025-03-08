@@ -29,7 +29,7 @@ export class BookService {
 
   loadBooks(): void {
     const currentState = this.bookStateSubject.value;
-    if (currentState.loaded) {
+    if (currentState.loaded && this.bookStateSubject.value.books != null) {
       return;
     }
     this.http.get<Book[]>(this.url).pipe(

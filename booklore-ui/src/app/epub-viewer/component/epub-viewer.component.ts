@@ -109,7 +109,7 @@ export class EpubViewerComponent implements OnInit, OnDestroy {
             this.rendition.themes.register(name, theme);
           });
 
-          let globalOrIndividual = myself.bookPreferences.perBookSetting.pdf;
+          let globalOrIndividual = myself.bookPreferences.perBookSetting.epub;
           if (globalOrIndividual === 'Global') {
             this.selectedTheme = myself.bookPreferences.epubReaderSetting.theme || FALLBACK_EPUB_SETTINGS.theme;
             this.selectedFontType = myself.bookPreferences.epubReaderSetting.font || FALLBACK_EPUB_SETTINGS.fontType;

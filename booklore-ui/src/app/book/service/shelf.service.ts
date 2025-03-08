@@ -83,24 +83,6 @@ export class ShelfService {
     );
   }
 
-  updateSort(shelfId: number, sort: SortOption): Observable<Shelf> {
-    return this.http.put<Shelf>(`${this.url}/${shelfId}/sort`, sort).pipe(
-      map(updatedShelf => {
-        const currentState = this.shelfStateSubject.value;
-        const updatedShelves = currentState.shelves?.map(shelf =>
-          shelf.id === shelfId ? updatedShelf : shelf
-        ) || [];
-        this.shelfStateSubject.next({ ...currentState, shelves: updatedShelves });
-        return updatedShelf;
-      }),
-      catchError(error => {
-        const currentState = this.shelfStateSubject.value;
-        this.shelfStateSubject.next({ ...currentState, error: error.message });
-        throw error;
-      })
-    );
-  }
-
   deleteShelf(shelfId: number): Observable<void> {
     return this.http.delete<void>(`${this.url}/${shelfId}`).pipe(
       tap(() => {

@@ -367,11 +367,6 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
         switchMap(({entityId, entityType}) => this.fetchBooksByEntity(entityId, entityType))
       );
     }
-    if (this.entityType === EntityType.LIBRARY) {
-      this.libraryService.updateSort(this.entity?.id!, sortOption).subscribe();
-    } else if (this.entityType === EntityType.SHELF) {
-      this.shelfService.updateSort(this.entity?.id!, sortOption).subscribe();
-    }
   }
 
   private setSelectedSortFromEntity(entity: Library | Shelf | null): void {

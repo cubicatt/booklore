@@ -113,24 +113,6 @@ export class LibraryService {
     );
   }
 
-  updateSort(libraryId: number, sort: SortOption): Observable<Library> {
-    return this.http.put<Library>(`${this.url}/${libraryId}/sort`, sort).pipe(
-      map(updatedLibrary => {
-        const currentState = this.libraryStateSubject.value;
-        const updatedLibraries = currentState.libraries?.map(library =>
-          library.id === libraryId ? updatedLibrary : library
-        ) || [];
-        this.libraryStateSubject.next({...currentState, libraries: updatedLibraries});
-        return updatedLibrary;
-      }),
-      catchError(error => {
-        const currentState = this.libraryStateSubject.value;
-        this.libraryStateSubject.next({...currentState, error: error.message});
-        throw error;
-      })
-    );
-  }
-
   getBookCount(libraryId: number): Observable<number> {
     return this.bookService.bookState$.pipe(
       map(state => (state.books || []).filter(book => book.libraryId === libraryId).length)

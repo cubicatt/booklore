@@ -2,12 +2,6 @@ app:
   path-book: '/app/books'
   path-config: '/app/config'
 
-security:
-  jwt:
-    secret: G6u4m3g7M/b93k7m9a1h1Kw4l3D+5WqXldpl4nTjl4s=
-    expiration: 36000000  # 10 hours in milliseconds
-    refreshExpiration: 604800000  # 7 days in milliseconds
-
 spring:
   servlet:
     multipart:

@@ -1,3 +1,10 @@
+CREATE TABLE IF NOT EXISTS jwt_secret
+(
+    id         SERIAL PRIMARY KEY,
+    secret     TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS library
 (
     id    BIGINT AUTO_INCREMENT PRIMARY KEY,

@@ -3,26 +3,27 @@ package com.adityachandel.booklore.config.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
-import org.springframework.beans.factory.annotation.Value;
+import com.adityachandel.booklore.service.JwtSecretService;
 import org.springframework.stereotype.Component;
-
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class JwtUtils {
 
-    @Value("${security.jwt.secret}")
-    private String secretKey;
+    private final JwtSecretService jwtSecretService;
+    private final long accessTokenExpirationMs;
+    private final long refreshTokenExpirationMs;
 
-    @Value("${security.jwt.expiration}")
-    private long accessTokenExpirationMs;
-
-    @Value("${security.jwt.refreshExpiration}")
-    private long refreshTokenExpirationMs;
+    public JwtUtils(JwtSecretService jwtSecretService) {
+        this.jwtSecretService = jwtSecretService;
+        this.accessTokenExpirationMs = 36000000;  // 10 hours
+        this.refreshTokenExpirationMs = 604800000; // 7 days
+    }
 
     private SecretKey getSigningKey() {
+        String secretKey = jwtSecretService.getSecret();
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 

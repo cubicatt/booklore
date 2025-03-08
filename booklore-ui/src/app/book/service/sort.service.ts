@@ -9,6 +9,7 @@ export class SortService {
 
   private readonly fieldExtractors: Record<string, (book: Book) => any> = {
     title: (book) => book.metadata?.title?.toLowerCase() || null,
+    author: (book) => book.metadata?.authors?.map(a => a.toLowerCase()).join(", ") || null,
     publishedDate: (book) =>book.metadata?.publishedDate === null ? null : new Date(book.metadata?.publishedDate!).getTime(),
     publisher: (book) => book.metadata?.publisher || null,
     pageCount: (book) => book.metadata?.pageCount || null,

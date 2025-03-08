@@ -95,6 +95,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   sortOptions: any[] = [
     {label: 'Title', icon: '', field: 'title', command: () => this.sortBooks('title')},
+    {label: 'Author', icon: '', field: 'author', command: () => this.sortBooks('author')},
     {label: 'Publisher', icon: '', field: 'publisher', command: () => this.sortBooks('publisher')},
     {label: 'Published', icon: '', field: 'publishedDate', command: () => this.sortBooks('publishedDate')},
     {label: 'Pages', icon: '', field: 'pageCount', command: () => this.sortBooks('pageCount')},

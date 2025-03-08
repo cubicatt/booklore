@@ -29,21 +29,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BookLoreUserMapper bookLoreUserMapper;
-    private final PasswordEncoder passwordEncoder;
     private final LibraryRepository libraryRepository;
-    private final JwtUtils jwtUtils;
     private final AuthenticationService authenticationService;
-
-    public ResponseEntity<Map<String, String>> loginUser(UserLoginRequest loginRequest) {
-        BookLoreUserEntity user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(loginRequest.getUsername()));
-
-        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())) {
-            throw ApiError.INVALID_CREDENTIALS.createException();
-        }
-
-        String token = jwtUtils.generateToken(user);
-        return ResponseEntity.ok(Map.of("token", token));
-    }
 
     public List<BookLoreUser> getBookLoreUsers() {
         return userRepository.findAll()

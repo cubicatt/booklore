@@ -64,7 +64,7 @@ export class UserService {
   }
 
   private loadUserFromToken(): void {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       const decoded: JwtPayload = jwtDecode(token);
       this.fetchUser(decoded.userId);
@@ -129,6 +129,6 @@ export class UserService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return localStorage.getItem('accessToken');
   }
 }

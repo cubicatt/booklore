@@ -34,8 +34,7 @@ export class LoginComponent {
 
   login(): void {
     this.authService.login({ username: this.username, password: this.password }).subscribe({
-      next: (response) => {
-        this.authService.saveToken(response.token);
+      next: () => {
         this.router.navigate(['/dashboard']);
       },
       error: () => {

@@ -3,42 +3,58 @@ package com.adityachandel.booklore.config.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import com.adityachandel.booklore.model.entity.BookLoreUserEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 @Component
 public class JwtUtils {
-    private final String secretKey = "G6u4m3g7M/b93k7m9a1h1Kw4l3D+5WqXldpl4nTjl4s=";
+
+    @Value("${security.jwt.secret}")
+    private String secretKey;
+
+    @Value("${security.jwt.expiration}")
+    private long accessTokenExpirationMs;
+
+    @Value("${security.jwt.refreshExpiration}")
+    private long refreshTokenExpirationMs;
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(BookLoreUserEntity user) {
-        SecretKey key = getSigningKey();
-        Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + 1000 * 60 * 60 * 10);
-
+    public String generateToken(BookLoreUserEntity user, boolean isRefreshToken) {
+        long expirationTime = isRefreshToken ? refreshTokenExpirationMs : accessTokenExpirationMs;
         return Jwts.builder()
                 .subject(user.getUsername())
                 .claim("userId", user.getId())
-                .issuedAt(now)
-                .expiration(expirationDate)
-                .signWith(key, Jwts.SIG.HS256)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();
+    }
+
+    public String generateAccessToken(BookLoreUserEntity user) {
+        return generateToken(user, false);
+    }
+
+    public String generateRefreshToken(BookLoreUserEntity user) {
+        return generateToken(user, true);
     }
 
     public boolean validateToken(String token) {
         try {
-            return !isTokenExpired(token);
+            extractClaims(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            System.out.println("Token expired: " + e.getMessage());
         } catch (JwtException e) {
-            return false;
+            System.out.println("Invalid token: " + e.getMessage());
         }
+        return false;
     }
 
     public Claims extractClaims(String token) {
@@ -55,15 +71,13 @@ public class JwtUtils {
 
     public Long extractUserId(String token) {
         Object userIdClaim = extractClaims(token).get("userId");
-        if (userIdClaim instanceof Integer) {
-            return ((Integer) userIdClaim).longValue();
-        } else if (userIdClaim instanceof Long) {
-            return (Long) userIdClaim;
+        if (userIdClaim instanceof Number) {
+            return ((Number) userIdClaim).longValue();
         }
-        throw new IllegalArgumentException("userId claim is not of type Long or Integer");
+        throw new IllegalArgumentException("Invalid userId claim type");
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractClaims(token).getExpiration().before(new Date());
     }
 }

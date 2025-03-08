@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
 import {BookCardComponent} from '../../../book/components/book-browser/book-card/book-card.component';
 import {InfiniteScrollDirective} from 'ngx-infinite-scroll';
 import {NgForOf, NgIf} from '@angular/common';
@@ -18,7 +18,7 @@ import {Book} from '../../../book/model/book.model';
   ],
   standalone: true
 })
-export class DashboardScrollerComponent implements OnInit {
+export class DashboardScrollerComponent implements OnInit, OnChanges {
 
   @Input() bookListType: 'lastRead' | null = null;
   @Input() title: string = 'Last Read Books';
@@ -27,6 +27,17 @@ export class DashboardScrollerComponent implements OnInit {
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
 
+  isLoading = true;
+
   ngOnInit(): void {
+    if (this.books !== undefined) {
+      this.isLoading = false;
+    }
+  }
+
+  ngOnChanges(): void {
+    if (this.books !== undefined) {
+      this.isLoading = false;
+    }
   }
 }

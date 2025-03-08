@@ -34,7 +34,7 @@
     </div>
 
     <app-dashboard-scroller
-      [books]="randomBooks"
+      [books]="randomBooks$ | async"
       [title]="'Discover Random Reads'">
     </app-dashboard-scroller>
 

@@ -34,7 +34,7 @@ export class MainDashboardComponent implements OnInit {
 
   lastReadBooks$: Observable<Book[]> | undefined;
   latestAddedBooks$: Observable<Book[]> | undefined;
-  randomBooks!: Book[];
+  randomBooks$: Observable<Book[]> | undefined;
 
   isLibrariesEmpty$: Observable<boolean> = inject(LibraryService).libraryState$.pipe(
     map(state => !state.libraries || state.libraries.length === 0)
@@ -68,16 +68,9 @@ export class MainDashboardComponent implements OnInit {
       ))
     );
 
-    this.bookService.bookState$.pipe(
-      filter((state): state is BookState => !!state && !!state.books && state.books.length > 0),
-      take(1),
-      map((state) => {
-        const books = state.books || [];
-        return this.getRandomBooks(books, 15);
-      })
-    ).subscribe((randomBooks) => {
-      this.randomBooks = randomBooks;
-    });
+    this.randomBooks$ = this.bookService.bookState$.pipe(
+      map((state: BookState) => this.getRandomBooks(state.books || [], 15))
+    );
   }
 
   private getRandomBooks(books: Book[], count: number): Book[] {

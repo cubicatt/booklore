@@ -1,7 +1,7 @@
-import { inject, Injectable, Injector } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-import { RxStompService } from '../../shared/websocket/rx-stomp.service';
+import {inject, Injectable, Injector} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable, tap} from 'rxjs';
+import {RxStompService} from '../../shared/websocket/rx-stomp.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,11 +17,27 @@ export class AuthService {
     return this.http.post<{ accessToken: string; refreshToken: string }>(`${this.apiUrl}/login`, credentials).pipe(
       tap((response) => {
         if (response.accessToken && response.refreshToken) {
-          this.saveToken(response.accessToken);
+          this.saveTokens(response.accessToken, response.refreshToken);
           this.getRxStompService().activate();
         }
       })
     );
+  }
+
+  refreshToken(): Observable<{ accessToken: string; refreshToken: string }> {
+    const refreshToken = this.getRefreshToken();
+    return this.http.post<{ accessToken: string; refreshToken: string }>(`${this.apiUrl}/refresh`, {refreshToken}).pipe(
+      tap((response) => {
+        if (response.accessToken && response.refreshToken) {
+          this.saveTokens(response.accessToken, response.refreshToken);
+        }
+      })
+    );
+  }
+
+  saveTokens(accessToken: string, refreshToken: string): void {
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
   }
 
   saveToken(token: string): void {
@@ -32,8 +48,13 @@ export class AuthService {
     return localStorage.getItem('accessToken');
   }
 
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken');
+  }
+
   logout(): void {
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     this.getRxStompService().deactivate();
   }
 

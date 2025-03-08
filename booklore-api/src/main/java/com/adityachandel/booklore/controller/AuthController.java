@@ -2,7 +2,8 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.dto.UserCreateRequest;
 import com.adityachandel.booklore.model.dto.request.UserLoginRequest;
-import com.adityachandel.booklore.service.UserService;
+import com.adityachandel.booklore.service.user.UserCreatorService;
+import com.adityachandel.booklore.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +20,13 @@ import java.util.Map;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
+    private final UserCreatorService userCreatorService;
     private final UserService userService;
 
     @PostMapping("/register")
     @PreAuthorize("@securityUtil.isAdmin()")
     public ResponseEntity<?> registerUser(@RequestBody @Valid UserCreateRequest userCreateRequest) {
-        userService.registerUser(userCreateRequest);
+        userCreatorService.registerUser(userCreateRequest);
         return ResponseEntity.noContent().build();
     }
 

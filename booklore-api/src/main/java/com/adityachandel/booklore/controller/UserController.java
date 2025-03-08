@@ -2,19 +2,15 @@ package com.adityachandel.booklore.controller;
 
 import com.adityachandel.booklore.model.BookPreferences;
 import com.adityachandel.booklore.model.dto.BookLoreUser;
-import com.adityachandel.booklore.model.dto.UserCreateRequest;
-import com.adityachandel.booklore.model.dto.request.UserLoginRequest;
 import com.adityachandel.booklore.model.dto.request.UserUpdateRequest;
-import com.adityachandel.booklore.service.UserService;
+import com.adityachandel.booklore.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @AllArgsConstructor
 @RestController

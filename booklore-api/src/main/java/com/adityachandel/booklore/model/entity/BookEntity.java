@@ -40,12 +40,6 @@ public class BookEntity {
     @JoinColumn(name = "library_path_id", nullable = false)
     private LibraryPathEntity libraryPath;
 
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private PdfViewerPreferencesEntity pdfViewerPrefs;
-
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private EpubViewerPreferencesEntity epubViewerPrefs;
-
     @Column(name = "added_on")
     private Instant addedOn;
 

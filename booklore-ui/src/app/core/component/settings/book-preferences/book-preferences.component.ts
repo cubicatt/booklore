@@ -48,7 +48,7 @@ export class BookPreferences implements OnInit {
 
   readonly individualOrGlobal = ['Global', 'Individual'];
 
-  selectedSpread!: string;
+  selectedSpread!: 'off' | 'even' | 'odd';
   selectedZoom!: string;
   showSidebar = false;
   selectedTheme!: string;

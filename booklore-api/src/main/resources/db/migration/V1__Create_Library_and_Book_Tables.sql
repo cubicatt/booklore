@@ -101,20 +101,24 @@ CREATE TABLE IF NOT EXISTS category
 
 CREATE TABLE IF NOT EXISTS pdf_viewer_preference
 (
-    book_id         BIGINT PRIMARY KEY,
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id         BIGINT      NOT NULL,
+    book_id         BIGINT      NOT NULL,
     zoom            VARCHAR(16) NULL,
     sidebar_visible BOOLEAN     NULL,
     spread          VARCHAR(16) NULL,
-    CONSTRAINT fk_pdf_viewer_setting FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE
+    UNIQUE (user_id, book_id)
 );
 
 CREATE TABLE IF NOT EXISTS epub_viewer_preference
 (
-    book_id   BIGINT PRIMARY KEY,
+    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id   BIGINT       NOT NULL,
+    book_id   BIGINT       NOT NULL,
     theme     VARCHAR(128) NULL,
     font      VARCHAR(128) NULL,
     font_size INT          NULL,
-    CONSTRAINT fk_epub_viewer_setting FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE
+    UNIQUE (user_id, book_id)
 );
 
 CREATE TABLE IF NOT EXISTS book_metadata_category_mapping

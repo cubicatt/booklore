@@ -15,8 +15,8 @@ export interface PdfSettings {
 }
 
 export interface ReaderSettings {
-  pdfScope: 'global' | 'individual';
-  epubScope: 'global' | 'individual';
+  pdfScope: 'Global' | 'Individual';
+  epubScope: 'Global' | 'Individual';
 }
 
 export interface AppSettings {

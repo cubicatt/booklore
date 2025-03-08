@@ -92,6 +92,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         bookLoreUser.setEmail(userEntity.getEmail());
         bookLoreUser.setPermissions(permissions);
 
+        bookLoreUser.setBookPreferences(userEntity.getBookPreferences());
+
         return bookLoreUser;
     }
 }

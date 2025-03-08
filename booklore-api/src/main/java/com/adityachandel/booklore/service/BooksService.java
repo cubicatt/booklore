@@ -1,10 +1,12 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.config.security.AuthenticationService;
+import com.adityachandel.booklore.config.security.SecurityUtil;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
 import com.adityachandel.booklore.mapper.EpubViewerPreferencesMapper;
 import com.adityachandel.booklore.mapper.PdfViewerPreferencesMapper;
+import com.adityachandel.booklore.model.BookPreferences;
 import com.adityachandel.booklore.model.dto.*;
 import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.entity.*;
@@ -30,6 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,36 +50,71 @@ public class BooksService {
     private final UserRepository userRepository;
     private final UserBookProgressRepository userBookProgressRepository;
     private final AuthenticationService authenticationService;
-    private final PdfViewerPreferencesMapper pdfViewerPreferencesMapper;
-    private final EpubViewerPreferencesMapper epubViewerPreferencesMapper;
 
     public BookViewerSettings getBookViewerSetting(long bookId) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
-        if (bookEntity.getBookType() == BookFileType.PDF) {
-            return BookViewerSettings.builder().pdfSettings(pdfViewerPreferencesMapper.toModel(bookEntity.getPdfViewerPrefs())).build();
-        } else if (bookEntity.getBookType() == BookFileType.EPUB) {
-            return BookViewerSettings.builder().epubSettings(epubViewerPreferencesMapper.toModel(bookEntity.getEpubViewerPrefs())).build();
+        BookLoreUser user = authenticationService.getAuthenticatedUser();
+        BookViewerSettings.BookViewerSettingsBuilder settingsBuilder = BookViewerSettings.builder();
+        if (bookEntity.getBookType() == BookFileType.EPUB) {
+            epubViewerPreferencesRepository.findByBookIdAndUserId(bookId, user.getId())
+                    .ifPresent(epubPref -> settingsBuilder.epubSettings(EpubViewerPreferences.builder()
+                            .bookId(bookId)
+                            .font(epubPref.getFont())
+                            .fontSize(epubPref.getFontSize())
+                            .theme(epubPref.getTheme())
+                            .build()));
+        } else if (bookEntity.getBookType() == BookFileType.PDF) {
+            pdfViewerPreferencesRepository.findByBookIdAndUserId(bookId, user.getId())
+                    .ifPresent(pdfPref -> settingsBuilder.pdfSettings(PdfViewerPreferences.builder()
+                            .bookId(bookId)
+                            .zoom(pdfPref.getZoom())
+                            .sidebarVisible(pdfPref.getSidebarVisible())
+                            .spread(pdfPref.getSpread())
+                            .build()));
         } else {
             throw ApiError.UNSUPPORTED_BOOK_TYPE.createException();
         }
+        return settingsBuilder.build();
     }
 
     public void updateBookViewerSetting(long bookId, BookViewerSettings bookViewerSettings) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
+        BookLoreUser user = authenticationService.getAuthenticatedUser();
+
         if (bookEntity.getBookType() == BookFileType.PDF) {
+            PdfViewerPreferencesEntity pdfPrefs = pdfViewerPreferencesRepository
+                    .findByBookIdAndUserId(bookId, user.getId())
+                    .orElseGet(() -> {
+                        PdfViewerPreferencesEntity newPrefs = PdfViewerPreferencesEntity.builder()
+                                .bookId(bookId)
+                                .userId(user.getId())
+                                .build();
+                        return pdfViewerPreferencesRepository.save(newPrefs);
+                    });
+
             PdfViewerPreferences pdfSettings = bookViewerSettings.getPdfSettings();
-            PdfViewerPreferencesEntity viewerPrefs = bookEntity.getPdfViewerPrefs();
-            viewerPrefs.setZoom(pdfSettings.getZoom());
-            viewerPrefs.setSpread(pdfSettings.getSpread());
-            viewerPrefs.setSidebarVisible(pdfSettings.getSidebarVisible());
-            pdfViewerPreferencesRepository.save(viewerPrefs);
+            pdfPrefs.setZoom(pdfSettings.getZoom());
+            pdfPrefs.setSpread(pdfSettings.getSpread());
+            pdfPrefs.setSidebarVisible(pdfSettings.getSidebarVisible());
+            pdfViewerPreferencesRepository.save(pdfPrefs);
+
         } else if (bookEntity.getBookType() == BookFileType.EPUB) {
+            EpubViewerPreferencesEntity epubPrefs = epubViewerPreferencesRepository
+                    .findByBookIdAndUserId(bookId, user.getId())
+                    .orElseGet(() -> {
+                        EpubViewerPreferencesEntity newPrefs = EpubViewerPreferencesEntity.builder()
+                                .bookId(bookId)
+                                .userId(user.getId())
+                                .build();
+                        return epubViewerPreferencesRepository.save(newPrefs);
+                    });
+
             EpubViewerPreferences epubSettings = bookViewerSettings.getEpubSettings();
-            EpubViewerPreferencesEntity viewerPrefs = bookEntity.getEpubViewerPrefs();
-            viewerPrefs.setFont(epubSettings.getFont());
-            viewerPrefs.setFontSize(epubSettings.getFontSize());
-            viewerPrefs.setTheme(epubSettings.getTheme());
-            epubViewerPreferencesRepository.save(viewerPrefs);
+            epubPrefs.setFont(epubSettings.getFont());
+            epubPrefs.setFontSize(epubSettings.getFontSize());
+            epubPrefs.setTheme(epubSettings.getTheme());
+            epubViewerPreferencesRepository.save(epubPrefs);
+
         } else {
             throw ApiError.UNSUPPORTED_BOOK_TYPE.createException();
         }

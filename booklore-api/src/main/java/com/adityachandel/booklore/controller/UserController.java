@@ -19,6 +19,12 @@ public class UserController {
 
     private final UserService userService;
 
+
+    @GetMapping("/me")
+    public ResponseEntity<BookLoreUser> getMyself() {
+        return ResponseEntity.ok(userService.getMyself());
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("@securityUtil.canViewUserProfile(#id)")
     public ResponseEntity<BookLoreUser> getUser(@PathVariable Long id) {

@@ -1,5 +1,6 @@
 package com.adityachandel.booklore.service.user;
 
+import com.adityachandel.booklore.config.security.AuthenticationService;
 import com.adityachandel.booklore.config.security.JwtUtils;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookLoreUserMapper;
@@ -31,6 +32,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final LibraryRepository libraryRepository;
     private final JwtUtils jwtUtils;
+    private final AuthenticationService authenticationService;
 
     public ResponseEntity<Map<String, String>> loginUser(UserLoginRequest loginRequest) {
         BookLoreUserEntity user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() -> ApiError.USER_NOT_FOUND.createException(loginRequest.getUsername()));
@@ -98,4 +100,8 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public BookLoreUser getMyself() {
+        BookLoreUser user = authenticationService.getAuthenticatedUser();
+        return user;
+    }
 }

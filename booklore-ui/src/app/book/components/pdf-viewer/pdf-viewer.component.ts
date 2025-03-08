@@ -6,6 +6,7 @@ import {AppSettingsService} from '../../../core/service/app-settings.service';
 import {filter, forkJoin, Subscription, take} from 'rxjs';
 import {BookSetting, PdfViewerSetting} from '../../model/book.model';
 import {PdfSettings} from '../../../core/model/app-settings.model';
+import {UserService} from '../../../user.service';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -23,48 +24,46 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   spread!: 'off' | 'even' | 'odd';
   zoom!: number | string;
 
-  private pdfLoaded = false;
   bookData!: string | Blob;
   bookId!: number;
   private appSettingsSubscription!: Subscription;
 
   private bookService = inject(BookService);
-  private appSettingsService = inject(AppSettingsService);
+  private userService = inject(UserService);
   private route = inject(ActivatedRoute);
-
-  private individualPdfSettings: PdfViewerSetting | undefined;
-  private globalPdfSettings: PdfSettings | undefined;
-  private pdfScope: 'global' | 'individual' | undefined;
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
       this.bookId = +params.get('bookId')!;
 
-      this.appSettingsService.appSettings$
-        .pipe(
-          filter((appSettings) => appSettings !== null),
-          take(1)
-        )
-        .subscribe((appSettings) => {
-          const book$ = this.bookService.getBookByIdFromAPI(this.bookId, false);
-          const pdf$ = this.bookService.getFileContent(this.bookId);
-          const bookSetting$ = this.bookService.getBookSetting(this.bookId);
+      const myself$ = this.userService.getMyself();
+      const book$ = this.bookService.getBookByIdFromAPI(this.bookId, false);
+      const bookSetting$ = this.bookService.getBookSetting(this.bookId);
+      const pdfData$ = this.bookService.getFileContent(this.bookId);
 
-          forkJoin([book$, pdf$, bookSetting$]).subscribe((results) => {
-            const pdf = results[0];
-            const pdfData = results[1];
-            this.individualPdfSettings = results[2]?.pdfSettings;
-            this.globalPdfSettings = appSettings.pdf;
-            this.pdfScope = appSettings?.readerSettings?.pdfScope;
-            this.page = pdf.pdfProgress || 1;
-            this.bookData = pdfData;
-          });
-        });
+      forkJoin([book$, bookSetting$, pdfData$, myself$]).subscribe((results) => {
+        const pdfMeta = results[0];
+        const pdfPrefs = results[1];
+        const pdfData = results[2];
+        const myself = results[3];
+
+        let globalOrIndividual = myself.bookPreferences.perBookSetting.pdf;
+        if (globalOrIndividual === 'Global') {
+          this.zoom = myself.bookPreferences.pdfReaderSetting.pageZoom || 'page-fit';
+          this.sidebarVisible = myself.bookPreferences.pdfReaderSetting.showSidebar ?? true;
+          this.spread = myself.bookPreferences.pdfReaderSetting.pageSpread || 'odd';
+        } else {
+          this.zoom = pdfPrefs.pdfSettings?.zoom || myself.bookPreferences.pdfReaderSetting.pageZoom || 'page-fit';
+          this.sidebarVisible = pdfPrefs.pdfSettings?.sidebarVisible ?? myself.bookPreferences.pdfReaderSetting.showSidebar ?? true;
+          this.spread = pdfPrefs.pdfSettings?.spread || myself.bookPreferences.pdfReaderSetting.pageSpread || 'odd';
+        }
+        this.page = pdfMeta.pdfProgress || 1;
+        this.bookData = pdfData;
+      });
     });
   }
 
   onPageChange(page: number): void {
-    if (!this.pdfLoaded) return;
     if (page !== this.page) {
       this.page = page;
     }
@@ -72,7 +71,6 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   }
 
   onZoomChange(zoom: string | number): void {
-    if (!this.pdfLoaded) return;
     if (zoom !== this.zoom) {
       this.zoom = zoom;
       this.updateViewerSetting();
@@ -80,7 +78,6 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   }
 
   onSidebarVisibleChange(visible: boolean): void {
-    if (!this.pdfLoaded) return;
     if (visible !== this.sidebarVisible) {
       this.sidebarVisible = visible;
       this.updateViewerSetting();
@@ -88,7 +85,6 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   }
 
   onSpreadChange(spread: 'off' | 'even' | 'odd'): void {
-    if (!this.pdfLoaded) return;
     if (spread !== this.spread) {
       this.spread = spread;
       this.updateViewerSetting();
@@ -96,7 +92,6 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   }
 
   private updateViewerSetting(): void {
-    if (!this.pdfLoaded) return;
     const bookSetting: BookSetting = {
       pdfSettings: {
         sidebarVisible: this.sidebarVisible,
@@ -116,19 +111,5 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
       this.appSettingsSubscription.unsubscribe();
     }
     this.updateProgress();
-  }
-
-  onPdfLoaded($event: PdfLoadedEvent) {
-    this.pdfLoaded = true;
-    this.updateProgress();
-    if (this.pdfScope === 'global') {
-      this.zoom = this.globalPdfSettings?.zoom || 'page-fit';
-      this.sidebarVisible = this.globalPdfSettings?.sidebar ?? true;
-      this.spread = this.globalPdfSettings?.spread || 'odd';
-    } else {
-      this.zoom = this.individualPdfSettings?.zoom || this.globalPdfSettings?.zoom || 'page-fit';
-      this.sidebarVisible = this.individualPdfSettings?.sidebarVisible ?? this.globalPdfSettings?.sidebar ?? true;
-      this.spread = this.individualPdfSettings?.spread || this.globalPdfSettings?.spread || 'odd';
-    }
   }
 }

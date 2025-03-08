@@ -1,6 +1,6 @@
 import {inject, Injectable, Injector} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import {API_CONFIG} from './config/api-config';
 import {jwtDecode} from 'jwt-decode';
 import {RxStompService} from './shared/websocket/rx-stomp.service';
@@ -28,7 +28,7 @@ export interface UserBookPreferences {
     epub: string;
   };
   pdfReaderSetting: {
-    pageSpread: string;
+    pageSpread: 'off' | 'even' | 'odd';
     pageZoom: string;
     showSidebar: boolean;
   };
@@ -76,6 +76,21 @@ export class UserService {
       this.userDataSubject.next(user);
       this.startWebSocket();
     });
+  }
+
+  getMyself(): Observable<User> {
+    return this.http.get<User>(`${this.userUrl}/me`);
+  }
+
+  getUserFromAPI(): Observable<User> {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded: JwtPayload & { userId?: string } = jwtDecode(token);
+      if (decoded.userId) {
+        return this.http.get<User>(`${this.userUrl}/${decoded.userId}`);
+      }
+    }
+    return of(null as unknown as User);
   }
 
   getLocalUser(): User | null {

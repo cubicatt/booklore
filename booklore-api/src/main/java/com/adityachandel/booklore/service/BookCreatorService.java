@@ -34,19 +34,6 @@ public class BookCreatorService {
                 .addedOn(Instant.now())
                 .build();
         BookMetadataEntity bookMetadataEntity = BookMetadataEntity.builder().build();
-        if (bookFileType == BookFileType.PDF) {
-            PdfViewerPreferencesEntity pdfViewerPreferencesEntity = PdfViewerPreferencesEntity.builder()
-                    .book(bookEntity)
-                    .bookId(bookEntity.getId())
-                    .build();
-            bookEntity.setPdfViewerPrefs(pdfViewerPreferencesEntity);
-        } else if (bookFileType == BookFileType.EPUB) {
-            EpubViewerPreferencesEntity epubViewerPreferencesEntity = EpubViewerPreferencesEntity.builder()
-                    .book(bookEntity)
-                    .bookId(bookEntity.getId())
-                    .build();
-            bookEntity.setEpubViewerPrefs(epubViewerPreferencesEntity);
-        }
         bookEntity.setMetadata(bookMetadataEntity);
         bookEntity = bookRepository.saveAndFlush(bookEntity);
 
@@ -97,10 +84,5 @@ public class BookCreatorService {
         }
         bookRepository.save(bookEntity);
         bookMetadataRepository.save(bookEntity.getMetadata());
-        if (bookEntity.getBookType() == BookFileType.EPUB) {
-            epubViewerPreferencesRepository.save(bookEntity.getEpubViewerPrefs());
-        } else if (bookEntity.getBookType() == BookFileType.PDF) {
-            pdfViewerPreferencesRepository.save(bookEntity.getPdfViewerPrefs());
-        }
     }
 }

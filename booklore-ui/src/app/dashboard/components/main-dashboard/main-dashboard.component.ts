@@ -11,6 +11,7 @@ import {BookService} from '../../../book/service/book.service';
 import {BookState} from '../../../book/model/state/book-state.model';
 import {Book} from '../../../book/model/book.model';
 import {Divider} from 'primeng/divider';
+import {UserService} from '../../../user.service';
 
 @Component({
   selector: 'app-main-dashboard',
@@ -31,6 +32,7 @@ export class MainDashboardComponent implements OnInit {
 
   private bookService = inject(BookService);
   private dialogService = inject(DialogService);
+  protected userService = inject(UserService);
 
   lastReadBooks$: Observable<Book[]> | undefined;
   latestAddedBooks$: Observable<Book[]> | undefined;

@@ -1,15 +1,17 @@
 <div class="dashboard">
 
   <div class="dashboard-no-library" *ngIf="isLibrariesEmpty$ | async; else dashboardScroller">
-    <h1 class="no-library-header">
-      Looks like you haven't added a library yet. Let's add one!
-    </h1>
-    <p-button
-      label="Add a Library"
-      icon="pi pi-plus"
-      styleClass="p-button-rounded p-button-outlined"
-      (click)="createNewLibrary()">
-    </p-button>
+    <div *ngIf="(userService.userData$ | async)?.permissions as permissions">
+      <div *ngIf="permissions.admin || permissions.canManipulateLibrary">
+        <h1 class="no-library-header">Looks like you haven't added a library yet. Let's add one!</h1>
+        <p-button
+          label="Add a Library"
+          icon="pi pi-plus"
+          styleClass="p-button-rounded p-button-outlined"
+          (click)="createNewLibrary()">
+        </p-button>
+      </div>
+    </div>
   </div>
 
   <ng-template #dashboardScroller>

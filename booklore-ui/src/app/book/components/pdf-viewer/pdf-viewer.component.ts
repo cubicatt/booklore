@@ -18,7 +18,6 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   handTool = true;
   rotation: 0 | 90 | 180 | 270 = 0;
 
-  sidebarVisible!: boolean;
   page!: number;
   spread!: 'off' | 'even' | 'odd';
   zoom!: number | string;
@@ -49,11 +48,9 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
         let globalOrIndividual = myself.bookPreferences.perBookSetting.pdf;
         if (globalOrIndividual === 'Global') {
           this.zoom = myself.bookPreferences.pdfReaderSetting.pageZoom || 'page-fit';
-          this.sidebarVisible = myself.bookPreferences.pdfReaderSetting.showSidebar ?? true;
           this.spread = myself.bookPreferences.pdfReaderSetting.pageSpread || 'odd';
         } else {
           this.zoom = pdfPrefs.pdfSettings?.zoom || myself.bookPreferences.pdfReaderSetting.pageZoom || 'page-fit';
-          this.sidebarVisible = pdfPrefs.pdfSettings?.sidebarVisible ?? myself.bookPreferences.pdfReaderSetting.showSidebar ?? true;
           this.spread = pdfPrefs.pdfSettings?.spread || myself.bookPreferences.pdfReaderSetting.pageSpread || 'odd';
         }
         this.page = pdfMeta.pdfProgress || 1;
@@ -76,14 +73,6 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
     }
   }
 
-  onSidebarVisibleChange(visible: boolean): void {
-    if (visible !== this.sidebarVisible) {
-      this.sidebarVisible = visible;
-      this.updateViewerSetting();
-    }
-  }
-
-
   onSpreadChange(spread: 'off' | 'even' | 'odd'): void {
     if (spread !== this.spread) {
       this.spread = spread;
@@ -94,7 +83,6 @@ export class PdfViewerComponent implements OnInit, OnDestroy {
   private updateViewerSetting(): void {
     const bookSetting: BookSetting = {
       pdfSettings: {
-        sidebarVisible: this.sidebarVisible,
         spread: this.spread,
         zoom: this.zoom,
       }

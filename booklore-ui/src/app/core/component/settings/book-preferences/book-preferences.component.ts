@@ -1,21 +1,20 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { FormsModule } from '@angular/forms';
-import { NgForOf } from '@angular/common';
-import { Select } from 'primeng/select';
-import { ToggleSwitch } from 'primeng/toggleswitch';
-import { RadioButton } from 'primeng/radiobutton';
-import { Divider } from 'primeng/divider';
-import { Button } from 'primeng/button';
-import { Tooltip } from 'primeng/tooltip';
-import { User, UserBookPreferences, UserService } from '../../../../user.service';
+import {Component, inject, OnInit} from '@angular/core';
+import {Observable} from 'rxjs';
+import {FormsModule} from '@angular/forms';
+import {NgForOf} from '@angular/common';
+import {Select} from 'primeng/select';
+import {RadioButton} from 'primeng/radiobutton';
+import {Divider} from 'primeng/divider';
+import {Button} from 'primeng/button';
+import {Tooltip} from 'primeng/tooltip';
+import {User, UserBookPreferences, UserService} from '../../../../user.service';
 
 @Component({
   selector: 'app-book-preferences',
   templateUrl: './book-preferences.component.html',
   standalone: true,
   styleUrls: ['./book-preferences.component.scss'],
-  imports: [Select, FormsModule, NgForOf, ToggleSwitch, RadioButton, Divider, Button, Tooltip]
+  imports: [Select, FormsModule, NgForOf, RadioButton, Divider, Button, Tooltip]
 })
 export class BookPreferences implements OnInit {
   readonly spreads = [
@@ -99,10 +98,6 @@ export class BookPreferences implements OnInit {
 
   onZoomChange(): void {
     this.updatePreference(prefs => prefs.pdfReaderSetting.pageZoom = this.selectedZoom);
-  }
-
-  onSidebarChange(): void {
-    this.updatePreference(prefs => prefs.pdfReaderSetting.showSidebar = this.showSidebar);
   }
 
   onFontSizeChange(): void {

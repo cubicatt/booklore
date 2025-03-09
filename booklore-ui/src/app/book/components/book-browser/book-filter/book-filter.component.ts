@@ -1,5 +1,5 @@
 import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
-import {combineLatest, Observable, of} from 'rxjs';
+import {combineLatest, Observable, of, Subject} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {BookService} from '../../../service/book.service';
 import {Library} from '../../../model/library.model';
@@ -37,13 +37,13 @@ export class BookFilterComponent implements OnInit {
   @Input() showFilters: boolean = true;
   @Input() entity$!: Observable<Library | Shelf | null> | undefined;
   @Input() entityType$!: Observable<EntityType> | undefined;
+  @Input() resetFilter$!: Subject<void>;
 
   activeFilter: { type: string; value: any | null } = {type: '', value: null};
   filterStreams: Record<string, Observable<Filter<any>[]>> = {};
   filterTypes: string[] = [];
 
   bookService = inject(BookService);
-
 
   ngOnInit(): void {
     if (this.entity$ && this.entityType$) {
@@ -55,6 +55,9 @@ export class BookFilterComponent implements OnInit {
         publisher: this.getFilterStream((book) => (book.metadata?.publisher ? [{id: book.metadata.publisher, name: book.metadata.publisher}] : []), 'id', 'name'),
       };
       this.filterTypes = Object.keys(this.filterStreams);
+    }
+    if (this.resetFilter$) {
+      this.resetFilter$.subscribe(() => this.clearActiveFilter());
     }
   }
 
@@ -96,5 +99,10 @@ export class BookFilterComponent implements OnInit {
       this.activeFilter = {type: filterType, value};
       this.filterSelected.emit({type: filterType, value});
     }
+  }
+
+  clearActiveFilter() {
+    this.activeFilter = { type: '', value: null };
+    this.filterSelected.emit(null);
   }
 }

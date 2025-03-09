@@ -4,7 +4,7 @@ import {MenuItem, MessageService, PrimeTemplate} from 'primeng/api';
 import {LibraryService} from '../../service/library.service';
 import {BookService} from '../../service/book.service';
 import {map, switchMap} from 'rxjs/operators';
-import {BehaviorSubject, combineLatest, Observable, of} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {ShelfService} from '../../service/shelf.service';
 import {ShelfAssignerComponent} from '../shelf-assigner/shelf-assigner.component';
 import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
@@ -83,6 +83,7 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
 
   selectedFilter = new BehaviorSubject<{ type: string; value: any } | null>(null);
 
+  protected userService = inject(UserService);
   private activatedRoute = inject(ActivatedRoute);
   private messageService = inject(MessageService);
   private libraryService = inject(LibraryService);
@@ -90,8 +91,10 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   private shelfService = inject(ShelfService);
   private dialogService = inject(DialogService);
   private sortService = inject(SortService);
-  protected userService = inject(UserService);
   private libraryShelfMenuService = inject(LibraryShelfMenuService);
+
+  protected resetFilterSubject = new Subject<void>();
+
 
   sortOptions: any[] = [
     {label: 'Title', icon: '', field: 'title', command: () => this.sortBooks('title')},
@@ -390,6 +393,11 @@ export class BookBrowserComponent implements OnInit, AfterViewInit {
   clearSearch(): void {
     this.bookTitle = '';
     this.onBookTitleChange('');
+    this.resetFilters();
+  }
+
+  resetFilters() {
+    this.resetFilterSubject.next();
   }
 
   openShelfAssigner() {

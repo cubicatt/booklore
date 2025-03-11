@@ -36,7 +36,6 @@ export class MetadataSearcherComponent implements OnInit {
   constructor() {
     this.form = this.formBuilder.group({
       provider: null,
-      isbn: [''],
       title: [''],
       author: [''],
     });
@@ -48,19 +47,18 @@ export class MetadataSearcherComponent implements OnInit {
         this.bookId = metadata.bookId;
         this.form.patchValue(({
           provider: Object.values(MetadataProvider),
-          isbn: metadata.isbn10 || null,
           title: metadata.title || null,
           author: metadata.authors?.length! > 0 ? metadata.authors[0] : ''
         }));
       }
     }));
-    //this.onSubmit();
+    this.onSubmit();
   }
 
   get isSearchEnabled(): boolean {
     const providerSelected = !!this.form.get('provider')?.value;
-    const isbnOrTitle = this.form.get('isbn')?.value || this.form.get('title')?.value;
-    return providerSelected && isbnOrTitle;
+    const title = this.form.get('title')?.value;
+    return providerSelected && title;
   }
 
   onSubmit(): void {
@@ -69,14 +67,12 @@ export class MetadataSearcherComponent implements OnInit {
         (this.form.get('provider')?.value as string[]).includes(MetadataProvider[key as keyof typeof MetadataProvider])
       );
       if (!providerKeys) {
-        console.error('Invalid provider selected.');
         return;
       }
       const fetchRequest: FetchMetadataRequest = {
         bookId: this.bookId,
         providers: providerKeys,
         title: this.form.get('title')?.value,
-        isbn: this.form.get('isbn')?.value,
         author: this.form.get('author')?.value
       };
       this.loading = true;

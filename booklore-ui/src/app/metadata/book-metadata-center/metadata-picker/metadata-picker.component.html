@@ -30,7 +30,39 @@
       </div>
     </div>
 
-    <div *ngFor="let field of metadataFields" class="form-row">
+    <div *ngFor="let field of metadataFieldsTop" class="form-row">
+      <label for="{{field.controlName}}" class="label">{{ field.label }}</label>
+      <div class="input-container">
+        <p-button *ngIf="!metadata[field.lockedKey]" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock(field.controlName)" severity="success"></p-button>
+        <p-button *ngIf="metadata[field.lockedKey]" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock(field.controlName)" severity="warn"></p-button>
+        <input pInputText id="{{field.controlName}}" formControlName="{{field.controlName}}" class="input"/>
+        <p-button
+          [icon]="isValueSaved(field.controlName) ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueSaved(field.controlName), 'yellow-outlined-button': isValueCopied(field.controlName)}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent(field.controlName)"/>
+        <input pInputText [value]="fetchedMetadata[field.fetchedKey] ?? null" class="input" readonly/>
+      </div>
+    </div>
+
+    <div *ngFor="let field of metadataDescription" class="form-row">
+      <label for="{{field.controlName}}" class="label">{{ field.label }}</label>
+      <div class="input-container">
+        <p-button *ngIf="!metadata[field.lockedKey]" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock(field.controlName)" severity="success"></p-button>
+        <p-button *ngIf="metadata[field.lockedKey]" icon="pi pi-lock" [outlined]="true" (onClick)="toggleLock(field.controlName)" severity="warn"></p-button>
+        <textarea rows="6" pTextarea id="{{field.controlName}}" formControlName="{{field.controlName}}" class="input"></textarea>
+        <p-button
+          [icon]="isValueSaved(field.controlName) ? 'pi pi-check' : 'pi pi-arrow-left'"
+          [outlined]="true"
+          [ngClass]="{'green-outlined-button': isValueSaved(field.controlName), 'yellow-outlined-button': isValueCopied(field.controlName)}"
+          class="arrow-button"
+          (click)="copyFetchedToCurrent(field.controlName)"/>
+        <textarea rows="6" pInputText [value]="fetchedMetadata[field.fetchedKey] ?? null" class="input" readonly></textarea>
+      </div>
+    </div>
+
+    <div *ngFor="let field of metadataFieldsBottom" class="form-row">
       <label for="{{field.controlName}}" class="label">{{ field.label }}</label>
       <div class="input-container">
         <p-button *ngIf="!metadata[field.lockedKey]" icon="pi pi-lock-open" [outlined]="true" (onClick)="toggleLock(field.controlName)" severity="success"></p-button>

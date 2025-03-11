@@ -11,6 +11,7 @@ import {Observable} from 'rxjs';
 import {Tooltip} from 'primeng/tooltip';
 import {UrlHelperService} from '../../../utilities/service/url-helper.service';
 import {BookService} from '../../../book/service/book.service';
+import {Textarea} from 'primeng/textarea';
 
 @Component({
   selector: 'app-metadata-picker',
@@ -28,20 +29,28 @@ import {BookService} from '../../../book/service/book.service';
     NgStyle,
     Tooltip,
     AsyncPipe,
-    NgForOf
+    NgForOf,
+    Textarea
   ]
 })
 export class MetadataPickerComponent implements OnInit {
 
-  metadataFields = [
+
+  metadataFieldsTop = [
     {label: 'Title', controlName: 'title', lockedKey: 'titleLocked', fetchedKey: 'title'},
     {label: 'Authors', controlName: 'authors', lockedKey: 'authorsLocked', fetchedKey: 'authors'},
     {label: 'Categories', controlName: 'categories', lockedKey: 'categoriesLocked', fetchedKey: 'categories'},
     {label: 'Publisher', controlName: 'publisher', lockedKey: 'publisherLocked', fetchedKey: 'publisher'},
     {label: 'Published', controlName: 'publishedDate', lockedKey: 'publishedDateLocked', fetchedKey: 'publishedDate'},
     {label: 'ISBN-10', controlName: 'isbn10', lockedKey: 'isbn10Locked', fetchedKey: 'isbn10'},
-    {label: 'Language', controlName: 'language', lockedKey: 'languageLocked', fetchedKey: 'language'},
+    {label: 'Language', controlName: 'language', lockedKey: 'languageLocked', fetchedKey: 'language'}
+  ];
+
+  metadataDescription = [
     {label: 'Description', controlName: 'description', lockedKey: 'descriptionLocked', fetchedKey: 'description'},
+  ];
+
+  metadataFieldsBottom = [
     {label: 'Series', controlName: 'seriesName', lockedKey: 'seriesNameLocked', fetchedKey: 'seriesName'},
     {label: 'Book #', controlName: 'seriesNumber', lockedKey: 'seriesNumberLocked', fetchedKey: 'seriesNumber'},
     {label: 'Total Books', controlName: 'seriesTotal', lockedKey: 'seriesTotalLocked', fetchedKey: 'seriesTotal'},

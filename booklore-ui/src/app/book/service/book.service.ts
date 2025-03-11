@@ -23,7 +23,6 @@ export class BookService {
   });
   bookState$ = this.bookStateSubject.asObservable();
 
-
   private http = inject(HttpClient);
   private messageService = inject(MessageService);
 

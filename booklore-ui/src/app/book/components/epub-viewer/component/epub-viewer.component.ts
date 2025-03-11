@@ -6,12 +6,12 @@ import {NgForOf} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Divider} from 'primeng/divider';
 import {ActivatedRoute} from '@angular/router';
-import {Book, BookSetting} from '../../book/model/book.model';
-import {BookService} from '../../book/service/book.service';
+import {Book, BookSetting} from '../../../model/book.model';
+import {BookService} from '../../../service/book.service';
 import {filter, forkJoin, take} from 'rxjs';
-import {AppSettingsService} from '../../core/service/app-settings.service';
+import {AppSettingsService} from '../../../../core/service/app-settings.service';
 import {Select} from 'primeng/select';
-import {UserService} from '../../user.service';
+import {UserService} from '../../../../user.service';
 
 const FALLBACK_EPUB_SETTINGS = {
   fontSize: 150,

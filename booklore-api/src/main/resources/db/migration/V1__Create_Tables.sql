@@ -1,10 +1,3 @@
-CREATE TABLE IF NOT EXISTS jwt_secret
-(
-    id         SERIAL PRIMARY KEY,
-    secret     TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW()
-);
-
 CREATE TABLE IF NOT EXISTS library
 (
     id    BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -14,6 +7,7 @@ CREATE TABLE IF NOT EXISTS library
     watch BOOLEAN             NOT NULL DEFAULT FALSE
 );
 
+
 CREATE TABLE IF NOT EXISTS library_path
 (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -21,6 +15,7 @@ CREATE TABLE IF NOT EXISTS library_path
     library_id BIGINT,
     CONSTRAINT fk_library_path FOREIGN KEY (library_id) REFERENCES library (id)
 );
+
 
 CREATE TABLE IF NOT EXISTS book
 (
@@ -36,8 +31,8 @@ CREATE TABLE IF NOT EXISTS book
     CONSTRAINT fk_library_path_id FOREIGN KEY (library_path_id) REFERENCES library_path (id) ON DELETE CASCADE,
     CONSTRAINT unique_file_library UNIQUE (file_name, library_id)
 );
-
 CREATE INDEX IF NOT EXISTS idx_library_id ON book (library_id);
+
 
 CREATE TABLE IF NOT EXISTS book_metadata
 (
@@ -81,6 +76,15 @@ CREATE TABLE IF NOT EXISTS book_metadata
     CONSTRAINT fk_book_metadata FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE
 );
 
+
+CREATE TABLE IF NOT EXISTS jwt_secret
+(
+    id         SERIAL PRIMARY KEY,
+    secret     TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+
 CREATE TABLE book_award
 (
     id          BIGINT       NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -93,6 +97,7 @@ CREATE TABLE book_award
     CONSTRAINT unique_book_award UNIQUE (book_id, name, category, awarded_at)
 );
 
+
 CREATE TABLE IF NOT EXISTS author
 (
     id   BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -100,11 +105,13 @@ CREATE TABLE IF NOT EXISTS author
     CONSTRAINT unique_name UNIQUE (name)
 );
 
+
 CREATE TABLE IF NOT EXISTS category
 (
     id   BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE
 );
+
 
 CREATE TABLE IF NOT EXISTS pdf_viewer_preference
 (
@@ -117,6 +124,7 @@ CREATE TABLE IF NOT EXISTS pdf_viewer_preference
     UNIQUE (user_id, book_id)
 );
 
+
 CREATE TABLE IF NOT EXISTS epub_viewer_preference
 (
     id        BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -128,6 +136,7 @@ CREATE TABLE IF NOT EXISTS epub_viewer_preference
     UNIQUE (user_id, book_id)
 );
 
+
 CREATE TABLE IF NOT EXISTS book_metadata_category_mapping
 (
     book_id     BIGINT NOT NULL,
@@ -137,6 +146,7 @@ CREATE TABLE IF NOT EXISTS book_metadata_category_mapping
     CONSTRAINT fk_book_metadata_category_mapping_category FOREIGN KEY (category_id) REFERENCES category (id) ON DELETE CASCADE
 );
 
+
 CREATE TABLE IF NOT EXISTS book_metadata_author_mapping
 (
     book_id   BIGINT NOT NULL,
@@ -145,9 +155,9 @@ CREATE TABLE IF NOT EXISTS book_metadata_author_mapping
     CONSTRAINT fk_book_metadata_author_mapping_book FOREIGN KEY (book_id) REFERENCES book_metadata (book_id) ON DELETE CASCADE,
     CONSTRAINT fk_book_metadata_author_mapping_author FOREIGN KEY (author_id) REFERENCES author (id) ON DELETE CASCADE
 );
-
 CREATE INDEX IF NOT EXISTS idx_book_metadata_id ON book_metadata_author_mapping (book_id);
 CREATE INDEX IF NOT EXISTS idx_author_id ON book_metadata_author_mapping (author_id);
+
 
 CREATE TABLE IF NOT EXISTS users
 (
@@ -161,6 +171,7 @@ CREATE TABLE IF NOT EXISTS users
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+
 CREATE TABLE IF NOT EXISTS user_permissions
 (
     id                            BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -172,8 +183,8 @@ CREATE TABLE IF NOT EXISTS user_permissions
     permission_admin              BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT fk_user_permissions_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
-
 CREATE INDEX idx_user_permissions_user ON user_permissions (user_id);
+
 
 CREATE TABLE IF NOT EXISTS shelf
 (
@@ -186,6 +197,7 @@ CREATE TABLE IF NOT EXISTS shelf
     CONSTRAINT fk_shelf_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
+
 CREATE TABLE IF NOT EXISTS book_shelf_mapping
 (
     book_id  BIGINT NOT NULL,
@@ -195,6 +207,7 @@ CREATE TABLE IF NOT EXISTS book_shelf_mapping
     CONSTRAINT fk_book_shelf_mapping_shelf FOREIGN KEY (shelf_id) REFERENCES shelf (id) ON DELETE CASCADE
 );
 
+
 CREATE TABLE app_settings
 (
     id       BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -203,6 +216,7 @@ CREATE TABLE app_settings
     val      TEXT         NOT NULL,
     UNIQUE (category, name)
 );
+
 
 CREATE TABLE IF NOT EXISTS user_book_progress
 (
@@ -218,6 +232,7 @@ CREATE TABLE IF NOT EXISTS user_book_progress
 );
 CREATE INDEX IF NOT EXISTS idx_user_book_progress_user ON user_book_progress (user_id);
 CREATE INDEX IF NOT EXISTS idx_user_book_progress_book ON user_book_progress (book_id);
+
 
 CREATE TABLE IF NOT EXISTS user_library_mapping
 (

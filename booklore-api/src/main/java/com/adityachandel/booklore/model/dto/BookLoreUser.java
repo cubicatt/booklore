@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.model.dto;
 
-import com.adityachandel.booklore.model.BookPreferences;
+import com.adityachandel.booklore.model.dto.settings.BookPreferences;
 import lombok.Data;
 
 import java.util.List;

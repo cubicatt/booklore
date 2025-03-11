@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class LibraryController {
 
-    private LibraryService libraryService;
+    private final LibraryService libraryService;
 
     @GetMapping
     public ResponseEntity<List<Library>> getLibraries() {

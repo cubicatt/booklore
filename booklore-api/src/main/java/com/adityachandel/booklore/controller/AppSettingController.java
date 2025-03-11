@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/settings")
 public class AppSettingController {
 
-    private AppSettingService appSettingService;
+    private final AppSettingService appSettingService;
 
     @GetMapping
     public AppSettings getAppSettings() {

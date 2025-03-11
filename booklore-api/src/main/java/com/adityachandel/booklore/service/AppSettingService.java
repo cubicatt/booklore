@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class AppSettingService {
 
-    private AppSettingsRepository appSettingsRepository;
-    private ObjectMapper objectMapper;
+    private final AppSettingsRepository appSettingsRepository;
+    private final ObjectMapper objectMapper;
 
     public AppSettings getAppSettings() {
         List<AppSettingEntity> settings = appSettingsRepository.findAll();

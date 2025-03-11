@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class AuthorController {
 
-    private AuthorService authorService;
+    private final AuthorService authorService;
 
     @GetMapping("/book/{bookId}")
     public ResponseEntity<List<String>> getAuthorsByBookId(@PathVariable long bookId) {

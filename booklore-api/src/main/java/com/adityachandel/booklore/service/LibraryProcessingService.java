@@ -1,7 +1,7 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.exception.ApiError;
-import com.adityachandel.booklore.model.LibraryFile;
+import com.adityachandel.booklore.model.dto.settings.LibraryFile;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.entity.BookEntity;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
@@ -39,7 +39,6 @@ public class LibraryProcessingService {
     private final EpubProcessor epubProcessor;
     private final BookRepository bookRepository;
     private final EntityManager entityManager;
-
 
     @Transactional
     public void processLibrary(long libraryId) throws IOException {

@@ -50,7 +50,6 @@ public class BookMetadataService {
     private final FileService fileService;
     private final Map<MetadataProvider, BookParser> parserMap;
 
-
     public List<BookMetadata> getProspectiveMetadataListForBookId(long bookId, FetchMetadataRequest request) {
         BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(() -> ApiError.BOOK_NOT_FOUND.createException(bookId));
         Book book = bookMapper.toBook(bookEntity);

@@ -1,8 +1,7 @@
 package com.adityachandel.booklore.model.entity;
 
 import com.adityachandel.booklore.convertor.BookPreferencesConverter;
-import com.adityachandel.booklore.convertor.SortConverter;
-import com.adityachandel.booklore.model.BookPreferences;
+import com.adityachandel.booklore.model.dto.settings.BookPreferences;
 import jakarta.persistence.*;
 import lombok.*;
 

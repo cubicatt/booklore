@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.controller;
 
-import com.adityachandel.booklore.model.BookPreferences;
+import com.adityachandel.booklore.model.dto.settings.BookPreferences;
 import com.adityachandel.booklore.model.dto.BookLoreUser;
 import com.adityachandel.booklore.model.dto.request.UserUpdateRequest;
 import com.adityachandel.booklore.service.user.UserService;
@@ -18,7 +18,6 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-
 
     @GetMapping("/me")
     public ResponseEntity<BookLoreUser> getMyself() {

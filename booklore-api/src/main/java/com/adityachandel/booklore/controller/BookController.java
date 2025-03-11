@@ -21,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 public class BookController {
 
-    private BooksService booksService;
+    private final BooksService booksService;
 
     @GetMapping
     public ResponseEntity<List<Book>> getBooks(@RequestParam(required = false, defaultValue = "false") boolean withDescription) {

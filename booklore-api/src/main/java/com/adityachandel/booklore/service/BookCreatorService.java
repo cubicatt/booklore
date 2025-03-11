@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.service;
 
-import com.adityachandel.booklore.model.LibraryFile;
+import com.adityachandel.booklore.model.dto.settings.LibraryFile;
 import com.adityachandel.booklore.model.entity.*;
 import com.adityachandel.booklore.model.enums.BookFileType;
 import com.adityachandel.booklore.repository.*;
@@ -17,12 +17,10 @@ import java.util.Set;
 @AllArgsConstructor
 public class BookCreatorService {
 
-    private AuthorRepository authorRepository;
-    private CategoryRepository categoryRepository;
-    private BookRepository bookRepository;
-    private BookMetadataRepository bookMetadataRepository;
-    private PdfViewerPreferencesRepository pdfViewerPreferencesRepository;
-    private EpubViewerPreferencesRepository epubViewerPreferencesRepository;
+    private final AuthorRepository authorRepository;
+    private final CategoryRepository categoryRepository;
+    private final BookRepository bookRepository;
+    private final BookMetadataRepository bookMetadataRepository;
 
     public BookEntity createShellBook(LibraryFile libraryFile, BookFileType bookFileType) {
         BookEntity bookEntity = BookEntity.builder()

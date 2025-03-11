@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PathController {
 
-    private PathService pathService;
+    private final PathService pathService;
 
     @GetMapping
     @PreAuthorize("@securityUtil.canManipulateLibrary() or @securityUtil.isAdmin()")

@@ -1,7 +1,7 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.exception.ApiError;
-import com.adityachandel.booklore.model.LibraryFile;
+import com.adityachandel.booklore.model.dto.settings.LibraryFile;
 import com.adityachandel.booklore.model.dto.Book;
 import com.adityachandel.booklore.model.entity.LibraryEntity;
 import com.adityachandel.booklore.model.entity.LibraryPathEntity;
@@ -14,7 +14,6 @@ import com.adityachandel.booklore.util.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -22,13 +21,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class FileUploadService {
-
 
     private static final long MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
     private static final String PDF_MIME_TYPE = "application/pdf";
@@ -38,7 +35,6 @@ public class FileUploadService {
     private final PdfProcessor pdfProcessor;
     private final EpubProcessor epubProcessor;
     private final NotificationService notificationService;
-
 
     public Book uploadFile(MultipartFile file, long libraryId, long pathId) {
         validateFile(file);

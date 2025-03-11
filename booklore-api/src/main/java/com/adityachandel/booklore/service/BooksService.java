@@ -1,12 +1,8 @@
 package com.adityachandel.booklore.service;
 
 import com.adityachandel.booklore.config.security.AuthenticationService;
-import com.adityachandel.booklore.config.security.SecurityUtil;
 import com.adityachandel.booklore.exception.ApiError;
 import com.adityachandel.booklore.mapper.BookMapper;
-import com.adityachandel.booklore.mapper.EpubViewerPreferencesMapper;
-import com.adityachandel.booklore.mapper.PdfViewerPreferencesMapper;
-import com.adityachandel.booklore.model.BookPreferences;
 import com.adityachandel.booklore.model.dto.*;
 import com.adityachandel.booklore.model.dto.request.ReadProgressRequest;
 import com.adityachandel.booklore.model.entity.*;
@@ -32,7 +28,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 

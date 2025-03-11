@@ -1,4 +1,4 @@
-package com.adityachandel.booklore.model;
+package com.adityachandel.booklore.model.dto.settings;
 
 import lombok.*;
 

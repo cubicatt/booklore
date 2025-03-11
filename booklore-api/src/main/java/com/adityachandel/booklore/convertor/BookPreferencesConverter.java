@@ -1,6 +1,6 @@
 package com.adityachandel.booklore.convertor;
 
-import com.adityachandel.booklore.model.BookPreferences;
+import com.adityachandel.booklore.model.dto.settings.BookPreferences;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;

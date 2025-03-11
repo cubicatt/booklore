@@ -11,5 +11,4 @@ public class BookloreApplication {
     public static void main(String[] args) {
         SpringApplication.run(BookloreApplication.class, args);
     }
-
 }

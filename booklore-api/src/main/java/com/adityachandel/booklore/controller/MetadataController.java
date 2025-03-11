@@ -22,10 +22,10 @@ import java.util.List;
 @AllArgsConstructor
 public class MetadataController {
 
-    private BookMetadataService bookMetadataService;
-    private BookMetadataUpdater bookMetadataUpdater;
-    private JobSchedulerService jobSchedulerService;
-    private BookMetadataMapper bookMetadataMapper;
+    private final BookMetadataService bookMetadataService;
+    private final BookMetadataUpdater bookMetadataUpdater;
+    private final JobSchedulerService jobSchedulerService;
+    private final BookMetadataMapper bookMetadataMapper;
 
     @PostMapping("/{bookId}/metadata/prospective")
     @PreAuthorize("@securityUtil.canEditMetadata() or @securityUtil.isAdmin()")

@@ -24,14 +24,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class BookMetadataUpdater {
 
-    private BookRepository bookRepository;
-    private AuthorRepository authorRepository;
-    private BookMetadataRepository bookMetadataRepository;
-    private CategoryRepository categoryRepository;
-    private BookAwardRepository awardRepository;
-    private FileService fileService;
-    private BookAwardRepository bookAwardRepository;
-
+    private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
+    private final BookMetadataRepository bookMetadataRepository;
+    private final CategoryRepository categoryRepository;
+    private final BookAwardRepository awardRepository;
+    private final FileService fileService;
+    private final BookAwardRepository bookAwardRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public BookMetadataEntity setBookMetadata(long bookId, BookMetadata newMetadata, boolean setThumbnail, boolean mergeCategories) {

@@ -167,8 +167,7 @@ jobs:
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             --build-arg APP_VERSION=${{ env.image_tag }} \
-            --tag booklore/booklore:${{ env.image_tag }} \
-            --tag ghcr.io/booklore-app/booklore:${{ env.image_tag }} \
+            --tag cubicatt/booklore:${{ env.image_tag }} \
             --push .
 
       - name: Push Latest Tag (Only for Master)
@@ -177,12 +176,11 @@ jobs:
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             --build-arg APP_VERSION=${{ env.new_tag }} \
-            --tag booklore/booklore:latest \
-            --tag ghcr.io/booklore-app/booklore:latest \
+            --tag cubicatt/booklore:latest \
             --push .
 
       - name: Update Release Draft (Only for Master)
-        if: github.ref == 'refs/heads/master'
+        if: false
         uses: release-drafter/release-drafter@v6
         with:
           tag: ${{ env.new_tag }}
@@ -191,7 +189,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Publish Draft Release (Only for Master)
-        if: github.ref == 'refs/heads/master'
+        if: false
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
